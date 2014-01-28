@@ -323,10 +323,7 @@ def getSegmentName(blast_hit,fastaListOfDescs):
 		index=int(digits)
 		return fastaListOfDescs[index].strip()
 	else:
-		raise Exception("Error, unhandled blast segment rearrangment descriptor '"+blast_hit+"' !")
-		
-	
-
+		raise Exception("Error, unhandled blast segment rearrangment descriptor '"+blast_hit+"' !") 
 
 def getFastaListOfDescs(fasta_file):
 	fr=open(fasta_file,'r')
