@@ -376,60 +376,97 @@ def getWholeChainAlignment(qvseq,vseq,qdseq,dseq,qjseq,jseq,btop_map):
 	print "J aln :\n",getNiceAlignment(jaln),"\n\n"
 	
 
-def buildAlignmentWholeSeqs(btop,q,s):
-	#print "At begging of call, btop=",btop,"q=",q,"s=",s
+
+def buildAlignmentWholeSeqsDirect(q,s):
+	aln=["","",""]
+	aln[0]=q
+	aln[2]=s
+	for b in range(len(aln[0])):
+		qbase=aln[0][b]
+		sbase=aln[0][b]
+		if(qbase=="-" or sbase=="-"):
+			aln[1]+=" "
+		elif(not(qbase==sbase)):
+			aln[1]+="X"
+		else:
+			aln[1]+="|"
+	return aln		
+
+
+
+
+
+def buildAlignmentWholeSeqs(btop,q,s,debug=False,level=0):
+	if(debug):	
+		print repeatString("\t",level)+"At begging of call, btop=",btop,"q=",q,"s=",s
 	aln=["","",""]
 	aln[0]=str("")
 	aln[1]=str("")
 	aln[2]=str("")
-	#print "now performing digital tests..."
+	if(debug):
+		print "now performing digital tests..."
 	dm=re.search('^(\d+)[^0-9]',btop)
 	adm=re.search('^(\d+)$',btop)
 	if adm:
-		#print "matched all digital..."
+		if(debug):		
+			print repeatString("\t",level)+"matched all digital..."
 		btopv=int(adm.group(1))
 		aln[0]=q
 		aln[1]=repeatString("|",btopv)
 		aln[2]=s
+		if(debug):
+			print repeatString("\t",level)+"from all digital btop=",btop," returning : "
+			for x in range(len(aln)):
+				print repeatString("\t",level)+aln[x]
 		return aln
 	elif dm:
-		#print "matched start digital..."
+		if(debug):
+			print repeatString("\t",level)+"matched start digital..."
 		digitString=dm.group(1)
 		size=int(digitString)
 		aln[0]=q[:size]
 		aln[2]=s[:size]
 		aln[1]=repeatString("|",size)
-		rec=buildAlignmentWholeSeqs(btop[len(digitString):],q[(size-0):],s[(size-0):])
+		if(debug):
+			print repeatString("\t",level)+"From little btop :",digitString," got "
+			for x in range(len(aln)):
+				print repeatString("\t",level)+aln[x]
+		rec=buildAlignmentWholeSeqs(btop[len(digitString):],q[(size-0):],s[(size-0):],debug,level+1)
 		aln[0]+=rec[0]
 		aln[1]+=rec[1]
 		aln[2]+=rec[2]
 		return aln
-	#print "no digital tests passed...doing letter tests...."
+	if(debug):
+		print "no digital tests passed...doing letter tests...."
 	firstTwoLetters=re.search('^([a-z\\-])([a-z\\-])',btop,re.IGNORECASE)
 	if firstTwoLetters:
-		#print "aligns first two letters..."
+		if(debug):
+			print "aligns first two letters..."
 		firstLetter=firstTwoLetters.group(1)
 		secondLetter=firstTwoLetters.group(2)
 		aln[0]=firstLetter
 		aln[1]=str("X")
 		aln[2]=secondLetter
-		#print "First-two letters alignment = \n"+getNiceAlignment(aln)
+		if(debug):		
+			print "First-two letters alignment = \n"+getNiceAlignment(aln)
 		if(len(btop)>2):
 			rec=["","",""]
 			if(firstLetter=="-" or secondLetter=="-"):
 				if(firstLetter=="-"):
-					rec=buildAlignmentWholeSeqs(btop[2:],q,s[1:])
+					rec=buildAlignmentWholeSeqs(btop[2:],q,s[1:],debug,level+1)
 				elif(secondLetter=="-"):
-					rec=buildAlignmentWholeSeqs(btop[2:],q[1:],s)
+					rec=buildAlignmentWholeSeqs(btop[2:],q[1:],s,debug,level+1)
 			else:
-				 rec=buildAlignmentWholeSeqs(btop[2:],q[1:],s[1:])
+				 rec=buildAlignmentWholeSeqs(btop[2:],q[1:],s[1:],debug,level+1)
 			aln[0]+=rec[0]
 			aln[1]+=rec[1]
 			aln[2]+=rec[2]
 		else:
-			#print "returning next-to-last aln"
+			if(debug):
+				print "returning next-to-last aln"
 			return aln
-	#print "returning last aln"
+	if(debug):
+		print "returning last aln"
 	return aln
 
 
