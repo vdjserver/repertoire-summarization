@@ -19,6 +19,13 @@ import time
 
 
 
+
+
+
+
+
+
+
 def makeRegionLookupTableFile(infile,outfile):
 	INPUT=open(infile,'r')
 	OUTPUT=open(outfile,'w')
@@ -357,7 +364,17 @@ def repeatString(s,n):
 		
 
 
-
+def getWholeChainAlignment(qvseq,vseq,qdseq,dseq,qjseq,jseq,btop_map):
+	valn=buildAlignmentWholeSeqs(btop_map['V'],qvseq,vseq)
+	daln=None
+	if(dseq is not None):
+		daln=buildAlignmentWholeSeqs(btop_map['D'],qdseq,dseq)
+	jaln=buildAlignmentWholeSeqs(btop_map['J'],qjseq,jseq)
+	print "V aln :\n",getNiceAlignment(valn),"\n\n"
+	if(daln is not None):
+		print "D aln :\n",getNiceAlignment(daln),"\n\n"
+	print "J aln :\n",getNiceAlignment(jaln),"\n\n"
+	
 
 def buildAlignmentWholeSeqs(btop,q,s):
 	#print "At begging of call, btop=",btop,"q=",q,"s=",s
@@ -387,7 +404,7 @@ def buildAlignmentWholeSeqs(btop,q,s):
 		aln[1]+=rec[1]
 		aln[2]+=rec[2]
 		return aln
-	print "no digital tests passed...doing letter tests...."
+	#print "no digital tests passed...doing letter tests...."
 	firstTwoLetters=re.search('^([a-z\\-])([a-z\\-])',btop,re.IGNORECASE)
 	if firstTwoLetters:
 		#print "aligns first two letters..."
