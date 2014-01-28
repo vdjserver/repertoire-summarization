@@ -4,7 +4,7 @@ import vdjml
 import re
 from utils import trimList
 from segment_utils import getFastaListOfDescs,getSegmentName
-
+from igblast_utils import *
 
 
 
@@ -50,6 +50,57 @@ def makeMap(col_list,val_tab_str):
 	return kvmap
 
 
+
+def makeRegionAlnMetricsFromValn(valn,qstart,regionmap):
+	score=1
+	identity=0
+	insertions=0
+	deletions=0
+	substitutions=0
+	aln_start_index=(int(regionmap['from']))-int(qstart)
+	region_len=(int(regionmap['to']))-(int(regionmap['from']))
+	counted=0
+	temp_i=aln_start_index
+	while(counted<region_len):
+		if(not(valn[0][temp_i]=="-")):
+			counted+=1
+		temp_i+=1
+	aln_end_index=temp_i+1
+	#print "qstart is ",qstart
+	#print "The whole aln : \n"
+	#print getNiceAlignment(valn)
+	#print "\n"
+	#print "aln_start_index=",aln_start_index
+	#print "aln_end_index=",aln_end_index
+	aln_region=list()
+	for l in range(len(valn)):
+		aln_region_temp=valn[l][aln_start_index:aln_end_index]
+		aln_region.append(aln_region_temp)
+	#print "From a region "+regionmap['region']+" we have :\n"
+	#print getNiceAlignment(aln_region)
+	#print "\n\n"
+	for i in range(len(aln_region[0])):
+		qbase=aln_region[0][i]
+		sbase=aln_region[2][i]
+		#print "qbase=",qbase,"sbase=",sbase
+		if(qbase==sbase):
+			identity+=1
+		elif(qbase=="-"):
+			deletions+=1
+		elif(sbase=="-"):
+			insertions+=1
+		else:
+			substitutions+=1
+	aln_metric=vdjml.Match_metrics(score,100.0*float(identity)/float(region_len+1),insertions,deletions,substitutions)
+	#print "id=",identity,", del=",deletions," ins=",insertions,"sub=",substitutions
+	#sys.exit(0)
+	return aln_metric
+
+
+
+
+
+
 def scanOutputToVDJML(input_file,output_file,fasta_paths,db_fasta_list,debug=False):
 	if(debug):
 		print "debug is true"
@@ -74,7 +125,16 @@ def scanOutputToVDJML(input_file,output_file,fasta_paths,db_fasta_list,debug=Fal
 	fact=None
 	rb1=None
 	meta = vdjml.Results_meta()
-	rrw1 = vdjml.Result_writer('/tmp/py_out_2.vdjml', meta)
+	fact=vdjml.Result_factory(meta)
+	fact.set_default_aligner('IGBLAST', '123', '45', 67)
+	fact.set_default_gl_database(
+				     'human_gl_S', 
+				     '123-5', 
+				     'blah', 
+				     'http://www.blah.org'
+				     )
+	fact.set_default_num_system(vdjml.Num_system.imgt)
+	rrw1 = vdjml.Result_writer('py_out_2.vdjml', meta)
 	for igblast_line in INPUT:
 		line_num+=1
 		igblast_line=igblast_line.strip()
@@ -86,21 +146,85 @@ def scanOutputToVDJML(input_file,output_file,fasta_paths,db_fasta_list,debug=Fal
 				mode="IGB_VERSION"
 			rem=re.search('^#\s+Query:\s(.*)',igblast_line)
 			if rem:
-				if(not(current_query==None)):
+				if(not(current_query==None) and current_query=="HP17JAM02JQNTL"   ):
 					print "NEED TO SERIALIZE FOR QUERY=",current_query
-					if current_query_id==(0):
-						#make new factories						
-						fact = vdjml.Result_factory(meta)
-						fact.set_default_aligner('IGBLAST', '123', '45', 67)
-						fact.set_default_gl_database(
-									     'human_gl_S', 
-									     '123-5', 
-									     'blah', 
-									     'http://www.blah.org'
-									     )
-						fact.set_default_num_system(vdjml.Num_system.imgt)
-						pass
 					rb1 = fact.new_result(current_query)
+					firstV=None
+					firstD=None
+					firstJ=None
+					vaseq=None
+					qvaseq=None
+					daseq=None
+					qdaseq=None
+					jaseq=None
+					qjaseq=None
+					top_btop=dict()
+					valn=None
+					for h in range(len(hit_vals_list)):
+						kvmap=makeMap(hit_fields,hit_vals_list[h])
+						print "\n\n\nSHOWING A ",kvmap['segment']," segment! (hit #"+str(h+1)+" of "+str(len(hit_vals_list))+")"
+						printMap(kvmap)
+						if(kvmap['segment']=="D"):
+							lookup=dlist
+						elif(kvmap['segment']=="V"):
+							lookup=vlist
+						else:
+							lookup=jlist
+						print "The nice name is ",getSegmentName(kvmap['subject acc.ver'],lookup)
+						btop_to_add=kvmap['BTOP']
+						#print "making interval with values : ",kvmap['q. start']," AND ",kvmap['q. end']
+						query_interval_to_add=vdjml.Interval.first_last_1(int(kvmap['q. start']),int(kvmap['q. end']))
+						segment_type_to_add=kvmap['segment']
+						hit_name_to_add=kvmap['subject ids']
+						hit_interval_to_add=vdjml.Interval.first_last_1(int(kvmap['s. start']),int(kvmap['s. end']))
+						metrics_to_add=vdjml.Match_metrics(int(kvmap['score']),float(kvmap['% identity']),int(9999),int(9999),int(kvmap['mismatches']))
+						smb1 = rb1.add_segment_match(
+							btop_to_add,
+							query_interval_to_add,
+							segment_type_to_add,
+							hit_name_to_add,
+							hit_interval_to_add,
+							metrics_to_add)
+						if(firstV==None and segment_type_to_add=='V'):
+							firstV=smb1
+							vaseq=kvmap['subject seq']
+							qvaseq=kvmap['query seq']
+							top_btop['V']=kvmap['BTOP']
+							valn=buildAlignmentWholeSeqs(top_btop['V'],qvaseq,vaseq)
+							valn_qstart=kvmap['q. start']
+						if(firstD==None and segment_type_to_add=='D'):
+							firstD=smb1
+							daseq=kvmap['subject seq']
+							qdaseq=kvmap['query seq']
+							top_btop['D']=kvmap['BTOP']
+						if(firstJ==None and segment_type_to_add=='J'):
+							firstJ=smb1
+							jaseq=kvmap['subject seq']
+							qjaseq=kvmap['query seq']
+							top_btop['J']=kvmap['BTOP']
+					#getWholeChainAlignment(qvaseq,vaseq,qdaseq,daseq,qjaseq,jaseq,top_btop)
+					scb=None
+					if(firstD==None):
+						scb=rb1.add_segment_combination(firstV.get().id(),firstJ.get().id())
+					else:
+						scb=rb1.add_segment_combination(firstV.get().id(),firstD.get().id(),firstJ.get().id())						
+					print "\n\n\tAlignment summary Info : "
+					print "Alignment summary fields : ",summary_fields
+					print "Alignment summary vals : "
+					for a in range(len(summary_vals_list)):
+						print "\tSummary item "+str(a)+" : "
+						print "\t",summary_vals_list[a]
+						asMap=makeMap(summary_fields,summary_vals_list[a])
+						print "\tThis is a particular alignment summary map : "
+						printMap(asMap)					
+						if(not(asMap['region'].startswith("Total") or asMap['region'].startswith("CDR3"))):
+							region_to_add=asMap['region']
+							interval_to_add=vdjml.Interval.first_last_1(int(asMap['from']),int(asMap['to']))
+							metrics_to_add=makeRegionAlnMetricsFromValn(valn,valn_qstart,asMap)
+							scb.add_region(
+								region_to_add,
+								interval_to_add,
+								metrics_to_add)
 					rrw1(rb1.get())
 					#rrw1.close()
 					print "\n\n\n"
@@ -122,29 +246,7 @@ def scanOutputToVDJML(input_file,output_file,fasta_paths,db_fasta_list,debug=Fal
 					jmap=makeMap(junction_fields,junction_vals_list[0])
 					print "\tJunction map : "
 					printMap(jmap)
-					print "\n\n\tAlignment summary Info : "
-					print "Alignment summary fields : ",summary_fields
-					print "Alignment summary vals : "
-					for a in range(len(summary_vals_list)):
-						print "\tSummary item "+str(a)+" : "
-						print "\t",summary_vals_list[a]
-						asMap=makeMap(summary_fields,summary_vals_list[a])
-						print "\tThis is a particular alignment summary map : "
-						printMap(asMap)
-						print "\n"
-					for h in range(len(hit_vals_list)):
-						kvmap=makeMap(hit_fields,hit_vals_list[h])
-						print "\n\n\nSHOWING A ",kvmap['segment']," segment! (hit #"+str(h+1)+" of "+str(len(hit_vals_list))+")"
-						printMap(kvmap)
-						if(kvmap['segment']=="D"):
-							lookup=dlist
-						elif(kvmap['segment']=="V"):
-							lookup=vlist
-						else:
-							lookup=jlist
-						print "The nice name is ",getSegmentName(kvmap['subject acc.ver'],lookup)
-					print "\n\n\n"
-					break;
+					#break;
 				current_query=rem.group(1)
 				mode="query_retrieve"
 				current_query_id+=1
@@ -241,6 +343,6 @@ def scanOutputToVDJML(input_file,output_file,fasta_paths,db_fasta_list,debug=Fal
 
     
 
-scanOutputToVDJML("/home/esalina2/round1_imgt/all_data.processed.Q35.L200.R1.fna.igblastn.imgt.out","/dev/null","/home/esalina2/round1_imgt/all_data.processed.Q35.L200.R1.fna",
+scanOutputToVDJML("/home/esalina2/round1/all_data.processed.r0.small.fna.imgt.blast.out.singleton.blast.out","/dev/null","/home/esalina2/round1_imgt/all_data.processed.Q35.L200.R1.fna",
 	["/home/esalina2/round1_imgt/human_IG_V.fna","/home/esalina2/round1_imgt/human_IG_D.fna","/home/esalina2/round1_imgt/human_IG_J.fna"])
 
