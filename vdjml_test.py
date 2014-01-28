@@ -33,7 +33,6 @@ def makeMap(col_list,val_tab_str):
 		#	if(x<len(col_list)):
 		#		print col_list[x]+"\t->\t",
 		#	else:
-		#		print "EMPTY\t->\t"
 		#	if(x<len(val_list)):
 		#		print val_list[x]
 		#	else:
@@ -60,25 +59,33 @@ def makeRegionAlnMetricsFromValn(valn,qstart,regionmap):
 	aln_start_index=(int(regionmap['from']))-int(qstart)
 	region_len=(int(regionmap['to']))-(int(regionmap['from']))
 	counted=0
-	temp_i=aln_start_index
+	temp_i=0
+	print "Trying to get aln_start_index...."
+	while(counted<int(regionmap['from'])-int(qstart)):
+		if(not(valn[0][temp_i]=="-")):
+			counted+=1
+		temp_i+=1
+	aln_start_index=temp_i
+	print "qstart is ",qstart
+	print "The whole aln : \n"
+	print getNiceAlignment(valn)
+	counted=0
 	while(counted<region_len):
 		if(not(valn[0][temp_i]=="-")):
 			counted+=1
 		temp_i+=1
 	aln_end_index=temp_i+1
-	#print "qstart is ",qstart
-	#print "The whole aln : \n"
-	#print getNiceAlignment(valn)
-	#print "\n"
-	#print "aln_start_index=",aln_start_index
-	#print "aln_end_index=",aln_end_index
+	counted=0
+	print "The valn len =",len(valn[0])
+	print "aln_start_index=",aln_start_index
+	print "aln_end_index=",aln_end_index
 	aln_region=list()
 	for l in range(len(valn)):
 		aln_region_temp=valn[l][aln_start_index:aln_end_index]
 		aln_region.append(aln_region_temp)
-	#print "From a region "+regionmap['region']+" we have :\n"
-	#print getNiceAlignment(aln_region)
-	#print "\n\n"
+	print "From a region "+regionmap['region']+" we have :\n"
+	print getNiceAlignment(aln_region)
+	print "\n\n"
 	for i in range(len(aln_region[0])):
 		qbase=aln_region[0][i]
 		sbase=aln_region[2][i]
@@ -92,8 +99,6 @@ def makeRegionAlnMetricsFromValn(valn,qstart,regionmap):
 		else:
 			substitutions+=1
 	aln_metric=vdjml.Match_metrics(score,100.0*float(identity)/float(region_len+1),insertions,deletions,substitutions)
-	#print "id=",identity,", del=",deletions," ins=",insertions,"sub=",substitutions
-	#sys.exit(0)
 	return aln_metric
 
 
@@ -145,8 +150,10 @@ def scanOutputToVDJML(input_file,output_file,fasta_paths,db_fasta_list,debug=Fal
 				igblast_version=rem.group(1)
 				mode="IGB_VERSION"
 			rem=re.search('^#\s+Query:\s(.*)',igblast_line)
-			if rem:
-				if(not(current_query==None) and current_query=="HP17JAM02JQNTL"   ):
+			ref=re.search('^#\s+BLAST\s+processed\s+\d+\s+queries',igblast_line)
+			if(rem or ref):
+				if(not(current_query==None)):
+					print "*******************************************\n"
 					print "NEED TO SERIALIZE FOR QUERY=",current_query
 					rb1 = fact.new_result(current_query)
 					firstV=None
@@ -176,7 +183,12 @@ def scanOutputToVDJML(input_file,output_file,fasta_paths,db_fasta_list,debug=Fal
 						query_interval_to_add=vdjml.Interval.first_last_1(int(kvmap['q. start']),int(kvmap['q. end']))
 						segment_type_to_add=kvmap['segment']
 						hit_name_to_add=kvmap['subject ids']
-						hit_interval_to_add=vdjml.Interval.first_last_1(int(kvmap['s. start']),int(kvmap['s. end']))
+						#hit_interval_to_add=vdjml.Interval.first_last_1(int(kvmap['s. start']),int(kvmap['s. end']))
+						if(int(kvmap['s. start'])<int(kvmap['s. end'])):
+							hit_interval_to_add=vdjml.Interval.first_last_1(int(kvmap['s. start']),int(kvmap['s. end']))
+						else:
+							#strand!
+							hit_interval_to_add=vdjml.Interval.first_last_1(int(kvmap['s. end']),int(kvmap['s. start']))							
 						metrics_to_add=vdjml.Match_metrics(int(kvmap['score']),float(kvmap['% identity']),int(9999),int(9999),int(kvmap['mismatches']))
 						smb1 = rb1.add_segment_match(
 							btop_to_add,
@@ -190,7 +202,15 @@ def scanOutputToVDJML(input_file,output_file,fasta_paths,db_fasta_list,debug=Fal
 							vaseq=kvmap['subject seq']
 							qvaseq=kvmap['query seq']
 							top_btop['V']=kvmap['BTOP']
-							valn=buildAlignmentWholeSeqs(top_btop['V'],qvaseq,vaseq)
+							alnDebugFlag=False
+							if(current_query=="HZ8R54Q01C3N51"):
+								alnDebugFlag=True
+							#valn=buildAlignmentWholeSeqs(top_btop['V'],qvaseq,vaseq,alnDebugFlag)
+							valn=buildAlignmentWholeSeqsDirect(qvaseq,vaseq)
+							if(alnDebugFlag):
+								print "The debug is :",
+								print getNiceAlignment(valn)
+								#sys.exit(0)
 							valn_qstart=kvmap['q. start']
 						if(firstD==None and segment_type_to_add=='D'):
 							firstD=smb1
@@ -204,20 +224,32 @@ def scanOutputToVDJML(input_file,output_file,fasta_paths,db_fasta_list,debug=Fal
 							top_btop['J']=kvmap['BTOP']
 					#getWholeChainAlignment(qvaseq,vaseq,qdaseq,daseq,qjaseq,jaseq,top_btop)
 					scb=None
-					if(firstD==None):
-						scb=rb1.add_segment_combination(firstV.get().id(),firstJ.get().id())
+					#note, because igBLAST "anchors" on the V alignment, if V aligns, then D and J are both optional, but if V doesn't align, then no D alignment exists and no J alignment exists!
+					if(not(firstV==None)):
+						if(firstD==None):
+							if(not(firstJ==None)):
+								scb=rb1.add_segment_combination(firstV.get().id(),firstJ.get().id())
+							else:
+								#firstJ is none
+								scb=rb1.add_segment_combination(firstV.get().id())
+						else:
+							#firstD not none
+							if(not(firstJ==None)):
+								scb=rb1.add_segment_combination(firstV.get().id(),firstD.get().id(),firstJ.get().id())						
+							else:
+								scb=rb1.add_segment_combination(firstV.get().id(),firstD.get().id())
 					else:
-						scb=rb1.add_segment_combination(firstV.get().id(),firstD.get().id(),firstJ.get().id())						
+						pass
 					print "\n\n\tAlignment summary Info : "
 					print "Alignment summary fields : ",summary_fields
 					print "Alignment summary vals : "
 					for a in range(len(summary_vals_list)):
-						print "\tSummary item "+str(a)+" : "
-						print "\t",summary_vals_list[a]
 						asMap=makeMap(summary_fields,summary_vals_list[a])
-						print "\tThis is a particular alignment summary map : "
-						printMap(asMap)					
 						if(not(asMap['region'].startswith("Total") or asMap['region'].startswith("CDR3"))):
+							print "\tSummary item "+str(a)+" : "
+							print "\t",summary_vals_list[a]
+							print "\tThis is a particular alignment summary map : "
+							printMap(asMap)	
 							region_to_add=asMap['region']
 							interval_to_add=vdjml.Interval.first_last_1(int(asMap['from']),int(asMap['to']))
 							metrics_to_add=makeRegionAlnMetricsFromValn(valn,valn_qstart,asMap)
@@ -228,26 +260,34 @@ def scanOutputToVDJML(input_file,output_file,fasta_paths,db_fasta_list,debug=Fal
 					rrw1(rb1.get())
 					#rrw1.close()
 					print "\n\n\n"
-					print "rearrangment summary "
-					print "\tFields : "
-					print rearrangement_summary_fields
-					for f in range(len(rearrangement_summary_fields)):
-						print "\t\tfield "+str(f)+" : "+rearrangement_summary_fields[f]
-					print "\tValues:"
-					print vdjr_vals_list
-					for v in range(len(vdjr_vals_list)):
-						print "\t\tval : "+str(v)+" : "+vdjr_vals_list[v]
-					kvmap=makeMap(rearrangement_summary_fields,vdjr_vals_list[0])
-					for k in kvmap:
-						print "\t"+k+"\t->\t"+kvmap[k]
-					print "\n\nJUNCTION summary:"
-					print "\tJunction Fields list : ",junction_fields
-					print "\tJunction vals list",junction_vals_list
-					jmap=makeMap(junction_fields,junction_vals_list[0])
-					print "\tJunction map : "
-					printMap(jmap)
-					#break;
-				current_query=rem.group(1)
+					if(len(vdjr_vals_list)>0):
+						print "rearrangment summary "
+						print "\tFields : "
+						print rearrangement_summary_fields
+						for f in range(len(rearrangement_summary_fields)):
+							print "\t\tfield "+str(f)+" : "+rearrangement_summary_fields[f]
+						print "\tValues:"
+						print vdjr_vals_list
+						for v in range(len(vdjr_vals_list)):
+							print "\t\tval : "+str(v)+" : "+vdjr_vals_list[v]
+						kvmap=makeMap(rearrangement_summary_fields,vdjr_vals_list[0])
+						for k in kvmap:
+							print "\t"+k+"\t->\t"+kvmap[k]
+					if(len(junction_vals_list)>0):
+						print "\n\nJUNCTION summary:"
+						print "\tJunction Fields list : ",junction_fields
+						print "\tJunction vals list",junction_vals_list
+						jmap=makeMap(junction_fields,junction_vals_list[0])
+						print "\tJunction map : "
+						printMap(jmap)
+				if(rem):
+					current_query=rem.group(1)
+				else:
+					current_query=None
+				vdjr_vals_list=list()
+				junction_vals_list=list()
+				summary_vals_list=list()
+				hit_vals_list=list()
 				mode="query_retrieve"
 				current_query_id+=1
 			rem=re.search('^#\s+Database:\s(.*)$',igblast_line)
@@ -343,6 +383,6 @@ def scanOutputToVDJML(input_file,output_file,fasta_paths,db_fasta_list,debug=Fal
 
     
 
-scanOutputToVDJML("/home/esalina2/round1/all_data.processed.r0.small.fna.imgt.blast.out.singleton.blast.out","/dev/null","/home/esalina2/round1_imgt/all_data.processed.Q35.L200.R1.fna",
+scanOutputToVDJML("/home/esalina2/round1_imgt/all_data.processed.Q35.L200.R1.fna.igblastn.imgt.out","/dev/null","/home/esalina2/round1_imgt/all_data.processed.Q35.L200.R1.fna",
 	["/home/esalina2/round1_imgt/human_IG_V.fna","/home/esalina2/round1_imgt/human_IG_D.fna","/home/esalina2/round1_imgt/human_IG_J.fna"])
 
