@@ -1312,6 +1312,47 @@ def testIdx(dat,idx):
 		print "For accession='"+str(acc)+"', got data='"+str(data)+"' ! :)\n\n"
 
 
+class imgt_db:
+	org_allele_name_desc_map=None
+	def extractDescriptorLine(self,db_base,org,allele_name):
+		if(not(org_allele_name_desc_map==None)):
+			if(org in org_allele_name_desc_map):
+				if(allele_name in org_allele_name_desc_map[org]):
+					return org_allele_name_desc_map[org][allele_name]
+		else:
+			org_allele_name_desc_map=dict()
+		org_dir=db_base+"/"+org
+		to_be_returned=None
+		if(os.path.isdir(org_dir)):
+			fna_glob_str=org_dir+"/ReferenceDirectorySet/*.html.fna"
+			fna_files=glob.glob(fna_glob_str)
+			for fna_file in fna_files:
+				fna_reader=open(fna_file,'r')
+				for fna_line in fna_reader:
+					if(fna_line.startswith(">")):
+						descriptor=fna_line[1:]
+						if(not(org in org_allele_name_desc_map)):
+							org_allele_name_desc_map[org]=dict()
+						pieces=descriptor.split("|")
+						descriptor_allele=pieces[1]
+						if(descriptor_allele.strip()==allele_name.strip()):
+							to_be_returned=descriptor
+						org_allele_name_desc_map[org][descriptor_allele.strip()]=descriptor
+		if(not(to_be_returned==None)):
+			return to_be_returned
+		else:
+			raise Exception("Error, descriptor with allele name = '"+str(allele_name)+"' not found under "+db_base+" for organism = "+org)		
+		else:
+			raise Exception("Error, invalid organism="+str(org)+", its directory doesn't exist under"+str(db_base)+"!")
+
+
+
+
+	
+
+
+
+
 
 def test():
 	datPath="/home/data/DATABASE/01_22_2014/www.imgt.org/download/LIGM-DB/imgt.dat"
