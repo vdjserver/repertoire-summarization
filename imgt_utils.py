@@ -1259,41 +1259,7 @@ def loadPickleDataAndMakeIfNotAvailable(base_dir):
 
 
 
-def fetchRecFromDat(idxpath,start,stop):
-	if(not(stop>start)):
-		return ""
-	reader=open(idxpath,'r')
-	reader.seek(start)
-	data=reader.read(stop-start)
-	reader.close()
-	return data
-
-
-
-
-def indexIMGTDatFile(filepath,indexfile):
-	reader=open(filepath,'r')
-	acc_re=re.compile(r'^ID\s+([A-Z0-9]+)\s')
-	current_accession=None
-	rec_start=None
-	rec_end=None
-	index_file=open(indexfile,'w')
-	rec_num=0
-	flag=True
-	while(flag):
-		#line=line.strip()
-		line=reader.readline()
-		if(line):
-			rs=re.search(acc_re,line)
-			if(rs):
-				current_accession=rs.group(1)
-				rec_start=reader.tell()-len(line)
-			elif(line.startswith("//")):
-				rec_end=reader.tell()-1
-				index_file.write(current_accession+"\t"+str(rec_start)+"\t"+str(rec_end)+"\n")
-		else:
-			flag=False
-	index_file.close()		
+	
 		
 
 
@@ -1313,8 +1279,24 @@ def testIdx(dat,idx):
 
 
 class imgt_db:
+
+	####################
+	#data
 	org_allele_name_desc_map=None
-	def extractDescriptorLine(self,db_base,org,allele_name):
+	db_base=None
+	db_idx_extension=".acc_idx"
+
+	####################
+	#constructor(s)
+	def __init__(self,init_db_base):
+		self.db_base=init_db_base
+
+	####################
+	#functions
+
+	#given an allele name and an organism string, extract the fasta descriptor with the specified allele name
+	#use hashing for cache purposes
+	def extractDescriptorLine(self,db_base=self.db_base,org,allele_name):
 		if(not(org_allele_name_desc_map==None)):
 			if(org in org_allele_name_desc_map):
 				if(allele_name in org_allele_name_desc_map[org]):
@@ -1336,7 +1318,7 @@ class imgt_db:
 						pieces=descriptor.split("|")
 						descriptor_allele=pieces[1]
 						if(descriptor_allele.strip()==allele_name.strip()):
-							to_be_returned=descriptor
+							to_be_returned=descriptor.strip()
 						org_allele_name_desc_map[org][descriptor_allele.strip()]=descriptor
 		if(not(to_be_returned==None)):
 			return to_be_returned
@@ -1345,9 +1327,40 @@ class imgt_db:
 		else:
 			raise Exception("Error, invalid organism="+str(org)+", its directory doesn't exist under"+str(db_base)+"!")
 
+	#fetch a record given position interval from the imgt.dat file
+	def fetchRecFromDat(self,self.idxpath=self.db_base+"www.imgt.org/download/LIGM-DB/imgt.dat",start,stop):
+		if(not(stop>start)):
+			return ""
+		reader=open(idxpath,'r')
+		reader.seek(start)
+		data=reader.read(stop-start)
+		reader.close()
+		return data
 
-
-
+	#index the imgt.dat file
+	def indexIMGTDatFile(self,filepath=self.db_base+"www.imgt.org/download/LIGM-DB/imgt.dat",indexfile=filepath+db_idx_extension):
+		reader=open(filepath,'r')
+		acc_re=re.compile(r'^ID\s+([A-Z0-9]+)\s')
+		current_accession=None
+		rec_start=None
+		rec_end=None
+		index_file=open(indexfile,'w')
+		rec_num=0
+		flag=True
+		while(flag):
+			#line=line.strip()
+			line=reader.readline()
+			if(line):
+				rs=re.search(acc_re,line)
+				if(rs):
+					current_accession=rs.group(1)
+					rec_start=reader.tell()-len(line)
+				elif(line.startswith("//")):
+					rec_end=reader.tell()-1
+					index_file.write(current_accession+"\t"+str(rec_start)+"\t"+str(rec_end)+"\n")
+			else:
+				flag=False
+		index_file.close()	
 	
 
 
@@ -1355,7 +1368,7 @@ class imgt_db:
 
 
 def test():
-	datPath="/home/data/DATABASE/01_22_2014/www.imgt.org/download/LIGM-DB/imgt.dat"
+	#datPath="/home/data/DATABASE/01_22_2014/www.imgt.org/download/LIGM-DB/imgt.dat"
 	#datIndexPath=datPath+".acc_idx"
 	#print "Reading file",datPath
 	#indexIMGTDatFile(datPath,datIndexPath)
