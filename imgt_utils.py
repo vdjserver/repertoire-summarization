@@ -1279,7 +1279,6 @@ def testIdx(dat,idx):
 
 
 class imgt_db:
-
 	####################
 	#data
 	org_allele_name_desc_map=None
@@ -1336,6 +1335,19 @@ class imgt_db:
 		data=reader.read(stop-start)
 		reader.close()
 		return data
+
+	#given a record from imgt.dat, find the first region interval
+	def getRefVRegionInterval(self,data,region_name):
+		lines=data.split("\t")
+		for line in lines:
+			#FT   CDR3-IMGT           371..412
+			reg_regex="^FT\s+"+region_name+"\-IMGT\s+<?(\d+)\.+(\d+)>?\s*$"
+			search_res=re.search(reg_regex,line)
+			if(search_res):
+				start=search_res.group(1)
+				end=search_res.group(2)
+				return [start,end]
+		return None
 
 	#index the imgt.dat file
 	def indexIMGTDatFile(self,filepath=self.db_base+"www.imgt.org/download/LIGM-DB/imgt.dat",indexfile=filepath+db_idx_extension):
