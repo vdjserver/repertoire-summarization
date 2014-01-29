@@ -1204,17 +1204,6 @@ def makeIGBLASTVRegionDatabase(outputdir,listOfVDatabases,auxBase):
 
 
 
-
-#def indexIMGTDatFile(filepath,indexfile):
-#	reader=open(filepath,'r')
-#	index_file=open(indexfile,'w')
-#	for line in reader:
-		
-		
-		
-
-
-
 def batchMultistepSegmentsAndOrganisms(base_dir):
 	allPPath="/tmp/imgt_down/www.imgt.org/download/GENE-DB/IMGTGENEDB-ReferenceSequences.fasta-nt-WithoutGaps-F+ORF+allP"
 	hier_data=loadPickleDataAndMakeIfNotAvailable(base_dir)
@@ -1268,8 +1257,75 @@ def loadPickleDataAndMakeIfNotAvailable(base_dir):
 
 
 
+
+
+def fetchRecFromDat(idxpath,start,stop):
+	if(not(stop>start)):
+		return ""
+	reader=open(idxpath,'r')
+	reader.seek(start)
+	data=reader.read(stop-start)
+	reader.close()
+	return data
+
+
+
+
+def indexIMGTDatFile(filepath,indexfile):
+	reader=open(filepath,'r')
+	acc_re=re.compile(r'^ID\s+([A-Z0-9]+)\s')
+	current_accession=None
+	rec_start=None
+	rec_end=None
+	index_file=open(indexfile,'w')
+	rec_num=0
+	flag=True
+	while(flag):
+		#line=line.strip()
+		line=reader.readline()
+		if(line):
+			rs=re.search(acc_re,line)
+			if(rs):
+				current_accession=rs.group(1)
+				rec_start=reader.tell()-len(line)
+			elif(line.startswith("//")):
+				rec_end=reader.tell()-1
+				index_file.write(current_accession+"\t"+str(rec_start)+"\t"+str(rec_end)+"\n")
+		else:
+			flag=False
+	index_file.close()		
+		
+
+
+def testIdx(dat,idx):
+	idx_read=open(idx,'r')
+	m=5
+	for line_num in range(m):
+		print "\n\n\n"
+		line=idx_read.readline()
+		print "read line :"+str(line)
+		pieces=line.split('\t')
+		acc=pieces[0]
+		start=int(pieces[1])
+		end=int(pieces[2])
+		data=fetchRecFromDat(dat,start,end)
+		print "For accession='"+str(acc)+"', got data='"+str(data)+"' ! :)\n\n"
+
+
+
 def test():
-	#download_imgt_RefDirSeqs_AndGeneTables_HumanAndMouse("/tmp/imgt_down","/tmp/del_me")
+	datPath="/home/data/DATABASE/01_22_2014/www.imgt.org/download/LIGM-DB/imgt.dat"
+	#datIndexPath=datPath+".acc_idx"
+	#print "Reading file",datPath
+	#indexIMGTDatFile(datPath,datIndexPath)
+	#print "Wrote index file",datIndexPath
+	#testIdx(datPath,datIndexPath)
+	#vtd=fetchRecFromDat(datPath,761609274,761613382)
+	#print "''''''"+vtd+"''''''''"
+	jtd=fetchRecFromDat(datPath,741876366,741888356)
+	print "''''''"+jtd+"''''''''"
+	
+	##download_imgt_RefDirSeqs_AndGeneTables_HumanAndMouse("/tmp/imgt_down","/tmp/del_me")
 	#analyze_download_dir_forVDJserver("/tmp/imgt_down",None,None,None)
 	#hier_data=loadPickleDataAndMakeIfNotAvailable("/tmp/imgt_down")
 	#organism_hierarchy=hier_data[0]
@@ -1277,7 +1333,7 @@ def test():
 	#alleleNames=get_list_of_alleles_appearing_in_tree(organism_hierarchy['human'])
 	#print "THESE ARE CLONE NAMES : "
 	#print yaml.dump(clone_names_by_org, default_flow_style=False)
-	batchMultistepSegmentsAndOrganisms("/tmp/imgt_down")
+	#batchMultistepSegmentsAndOrganisms("/tmp/imgt_down")
 	#igblast_blast_map_multistep(nonExistentMapDir,query,refDirSetFNAList,allPPath,workDir,clone_map,alleleList):
 	#blast_dir="/tmp/imgt_down/human/BLAST_MAP_V"
 	#query="/usr/local/igblast_from_lonestar/database/human_gl_V.fna"
