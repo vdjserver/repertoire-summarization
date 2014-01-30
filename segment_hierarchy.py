@@ -9,7 +9,7 @@ vfasta="/home/esalina2/round1_imgt/human_IG_V.fna"
 dfasta="/home/esalina2/round1_imgt/human_IG_D.fna"
 jfasta="/home/esalina2/round1_imgt/human_IG_J.fna"
 fasta_list=[vfasta,dfasta,jfasta]
-blast_out="/home/esalina2/round1_imgt/all_data.processed.Q35.L200.R1.fna.blast.out"
+blast_out="/home/esalina2/round1_imgt/all_data.processed.Q35.L200.R1.fna.igblastn.imgt.out"
 
 #define inputs for database
 base_dir="/home/data/DATABASE/01_22_2014/"
@@ -30,6 +30,7 @@ else:
 	#setup for gene tables parsing
 	geneTables_dir=base_dir+"/"+organism+"/GeneTables"
 	loci=['IGHD','IGHJ','IGHV','IGKJ','IGKV','IGLJ','IGLV','TRAJ','TRAV','TRBD','TRBJ','TRBV','TRDD','TRDJ','TRDV','TRGJ','TRGV']
+	#loci=list()
 	hierarchy=tree()
 	for l in range(len(loci)):
 		locus=loci[l]
@@ -59,6 +60,6 @@ for item in counts_map:
 
 
 
-JSON=jsonify_hierarchy(hierarchy['human'],"human",counts_map,"count")
+JSON=jsonify_hierarchy(hierarchy['human'],"human",counts_map,"value")
 print "\n\nTHIS IS THE JSON:\n\n\n"
 print JSON
