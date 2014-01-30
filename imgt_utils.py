@@ -720,33 +720,6 @@ def basic_tree_test():
 	get_total_tree(mytree['TCRA'],'TCRA',counts_map)
 	
 
-def jsonify_hierarchy(hier_map,name,counts_map):
-	JSON=""
-	JSON+="{\n"
-	JSON+="\"name\":\""+name+"\",\n"
-	actual_value=0
-	actual_value=get_total_tree(hier_map,name,counts_map)
-	#JSON+="\"value\":"+str(actual_value)+",\n"
-	#JSON+="\"size\":"+str(actual_value)+"\n"
-	JSON+="\"count\":"+str(actual_value)+"\n"
-	num_kids=len(hier_map)
-	if(num_kids>=1):
-		JSON+=",\n"
-		JSON+="\"children\": [\n"
-		kid_num=0
-		for child in hier_map:
-			JSON+=jsonify_hierarchy(hier_map[child],child,counts_map)
-			if(kid_num<(num_kids-1)):
-				JSON+=" , \n"
-			kid_num+=1
-		JSON+=" ] \n"
-	else:
-		JSON+=""
-		#num_kids<1
-	JSON+=" }\n"
-	return JSON
-
-
 
 #from http://stackoverflow.com/questions/8384737/python-extract-file-name-from-path-no-matter-what-the-os-path-format
 def path_leaf(path):
@@ -1388,8 +1361,8 @@ def test():
 	#testIdx(datPath,datIndexPath)
 	#vtd=fetchRecFromDat(datPath,761609274,761613382)
 	#print "''''''"+vtd+"''''''''"
-	jtd=fetchRecFromDat(datPath,741876366,741888356)
-	print "''''''"+jtd+"''''''''"
+	#jtd=fetchRecFromDat(datPath,741876366,741888356)
+	#print "''''''"+jtd+"''''''''"
 	
 	##download_imgt_RefDirSeqs_AndGeneTables_HumanAndMouse("/tmp/imgt_down","/tmp/del_me")
 	#analyze_download_dir_forVDJserver("/tmp/imgt_down",None,None,None)
