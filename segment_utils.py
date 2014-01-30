@@ -284,12 +284,62 @@ def get_total_tree(tree,this_name,counts_map):
 	return subtree_sum
 
 
+def zeropad(e,tot):
+	str_e=str(e)
+	if(len(str_e)>=tot):
+		return str_e
+	else:
+		numZ=tot-len(str_e)
+		zeroes=""
+		for n in range(numZ):
+			zeroes+="0"
+		return zeroes+str_e
+
+
+
+def zeroPadDigitsTo(s,num=8):
+	if(re.search(r'\d',s)):
+		#proceed here
+		reg=re.compile(r'\d+')
+		digits_list=reg.findall(s)
+		nondigits_list=reg.split(s)
+		#print "got digits list : ",digits_list
+		#print "got nondigits list : ",nondigits_list
+		ret=""
+		for i in range(len(nondigits_list)-1):
+			ret+=nondigits_list[i]
+			ret+=zeropad(digits_list[i],num)
+		#uniq_map=dict()
+		#for digits in digits_list:
+		#	uniq_map[digits]=digits
+		#digits_list=uniq_map.keys()
+		#for digits in digits_list:
+		#	existing=str(digits)
+		#	padded=zeropad(existing,num)
+		#	s=re.sub(digits,padded,s)
+		return ret
+	else:	
+		return s
+
+
 
 
 
 def jsonify_hierarchy(hier_map,name,counts_map,count_string):
+	#print "\n\n\n\n\n"
 	hier_map_keys=hier_map.keys()
-	hier_map_keys.sort()
+	original_to_padded=dict()
+	padded_to_original=dict()
+	padded_key_list=list()
+	for hier_map_key in hier_map_keys:
+		padded_key=zeroPadDigitsTo(hier_map_key)
+		original_to_padded[hier_map_key]=padded_key
+		padded_to_original[padded_key]=hier_map_key
+		padded_key_list.append(padded_key)
+	#print "A key list is :",hier_map_keys
+	#print "A padded list is :",padded_key_list
+	padded_key_list.sort()
+	#print "A sorted padded list is :",padded_key_list
 	JSON=""
 	JSON+="{\n"
 	JSON+="\"label\":\""+name+"\",\n"
@@ -305,8 +355,10 @@ def jsonify_hierarchy(hier_map,name,counts_map,count_string):
 		kid_num=0
 		#for child in hier_map:
 		for c in range(len(hier_map_keys)):
-			child=hier_map_keys[c]
-			JSON+=jsonify_hierarchy(hier_map[child],child,counts_map,count_string)
+			#child=hier_map_keys[c]
+			child=padded_key_list[c]
+			original_child=padded_to_original[child]
+			JSON+=jsonify_hierarchy(hier_map[original_child],original_child,counts_map,count_string)
 			if(kid_num<(num_kids-1)):
 				JSON+=" , \n"
 			kid_num+=1
