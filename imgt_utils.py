@@ -769,7 +769,7 @@ def getHierarchyTreeFromFile(hier_file):
 		lineage=hier_look(mapping,child,20)
 		#print "i have a child=",child,"with lineage="+lineage
 		lineage_array=lineage.split('->')
-		#print "\tAs an array : ",lineage_array
+		#print "\tAs an array : ",lineage_arrayIndentationError: expected an indented block
 		lineage_array.reverse()
 		#print "\tAs a reversed array : ",lineage_array
 		str_to_eval=array_eval_join_str.join(lineage_array)
@@ -1064,7 +1064,7 @@ def igblast_imgt_mapping(base_dir,org_to_glob_db_map,imgtfastaPath,hierachyByOrg
 			#if(organism=="Mus_musculus"):
 			#	#ig_glob="/usr/local/igblast_from_lonestar/database/mouse_gl_"+segment+".fna"
 			#	ig_glob=org_to_glob_db_map[org
-			#else:
+			#else:IndentationError: expected an indented block
 			#	#continue
 			#	ig_glob="/usr/local/igblast_from_lonestar/database/"+organism+"_gl_"+segment+".fna"
 			#ref_glob="/tmp/imgt_down/"+organism+"/ReferenceDirectorySet/IG*"+segment+".html.fna"
@@ -1268,7 +1268,9 @@ class imgt_db:
 
 	#given an allele name and an organism string, extract the fasta descriptor with the specified allele name
 	#use hashing for cache purposes
-	def extractDescriptorLine(self,db_base=self.db_base,org,allele_name):
+	def extractDescriptorLine(self,allele_name,db_base=None,org="human"):
+		if(db_base==None):
+			db_base=self.db_base
 		if(not(org_allele_name_desc_map==None)):
 			if(org in org_allele_name_desc_map):
 				if(allele_name in org_allele_name_desc_map[org]):
@@ -1292,15 +1294,17 @@ class imgt_db:
 						if(descriptor_allele.strip()==allele_name.strip()):
 							to_be_returned=descriptor.strip()
 						org_allele_name_desc_map[org][descriptor_allele.strip()]=descriptor
-		if(not(to_be_returned==None)):
-			return to_be_returned
-		else:
-			raise Exception("Error, descriptor with allele name = '"+str(allele_name)+"' not found under "+db_base+" for organism = "+org)		
+			if(not(to_be_returned==None)):
+				return to_be_returned
+			else:
+				raise Exception("Error, descriptor with allele name = '"+str(allele_name)+"' not found under "+str(db_base)+" for organism = "+str(org))
 		else:
 			raise Exception("Error, invalid organism="+str(org)+", its directory doesn't exist under"+str(db_base)+"!")
 
 	#fetch a record given position interval from the imgt.dat file
-	def fetchRecFromDat(self,self.idxpath=self.db_base+"www.imgt.org/download/LIGM-DB/imgt.dat",start,stop):
+	def fetchRecFromDat(self,start,stop,idxpath=None):
+		if(idxpath==None):
+			idxpath=self.db_base+"www.imgt.org/download/LIGM-DB/imgt.dat"
 		if(not(stop>start)):
 			return ""
 		reader=open(idxpath,'r')
@@ -1323,7 +1327,11 @@ class imgt_db:
 		return None
 
 	#index the imgt.dat file
-	def indexIMGTDatFile(self,filepath=self.db_base+"www.imgt.org/download/LIGM-DB/imgt.dat",indexfile=filepath+db_idx_extension):
+	def indexIMGTDatFile(self,filepath=None,indexfile=None):
+		if(filepath==None):
+			filepath=self.db_base+"www.imgt.org/download/LIGM-DB/imgt.dat"
+		if(indexfile==None):
+			indexfile=filepath+db_idx_extension
 		reader=open(filepath,'r')
 		acc_re=re.compile(r'^ID\s+([A-Z0-9]+)\s')
 		current_accession=None
@@ -1353,6 +1361,7 @@ class imgt_db:
 
 
 def test():
+	pass
 	#datPath="/home/data/DATABASE/01_22_2014/www.imgt.org/download/LIGM-DB/imgt.dat"
 	#datIndexPath=datPath+".acc_idx"
 	#print "Reading file",datPath
