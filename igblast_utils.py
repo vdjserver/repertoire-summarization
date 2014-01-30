@@ -503,20 +503,23 @@ def getDomainClasses():
 
 
 def test():
-	print "Running test...."
-	in_hier_dir="/home/data/vdj_server/pipeline/vdj_ann/17_way/"
-	out_hier_dir="/tmp/tmp_json"
-	count_map=dict()
-	count_map['TRBD2*01']=10
-	count_map['TRBD2*02']=30	
-	count_map['TRBD1*01']=25
-	count_map['TRBD']=1
+	#print "Running test...."
+	#counts_map=
+
+
+	#in_hier_dir="/home/data/vdj_server/pipeline/vdj_ann/17_way/"
+	#out_hier_dir="/tmp/tmp_json"
+	#count_map=dict()
+	#count_map['TRBD2*01']=10
+	#count_map['TRBD2*02']=30	
+	#count_map['TRBD1*01']=25
+	#count_map['TRBD']=1
 	#name="TRBD"
 	#tree_dat_file="/home/data/vdj_server/pipeline/vdj_ann/17_way/TRBD.dat"
 	#tree=getHierarchyTreeFromFile(tree_dat_file)
 	#print "The total is ",get_total_tree(tree,name,count_map)
 	
-	hierarchy_jsonify_batch(in_hier_dir,out_hier_dir,count_map)
+	#hierarchy_jsonify_batch(in_hier_dir,out_hier_dir,count_map)
 	#basic_tree_test()
 	#root=getRootFromFile("/home/data/vdj_server/pipeline/vdj_ann/17_way/IGHM.dat")
 	#print "the root is ",root
