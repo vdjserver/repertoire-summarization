@@ -98,7 +98,8 @@ def makeRegionAlnMetricsFromValn(valn,qstart,regionmap):
 			insertions+=1
 		else:
 			substitutions+=1
-	aln_metric=vdjml.Match_metrics(score,100.0*float(identity)/float(region_len+1),insertions,deletions,substitutions)
+	#aln_metric=vdjml.Match_metrics(score,100.0*float(identity)/float(region_len+1),insertions,deletions,substitutions)
+	aln_metric =vdjml.Match_metrics(100.0*float(identity)/float(region_len+1),substitutions=substitutions,insertions=insertions,deletions=deletions)
 	return aln_metric
 
 
@@ -189,7 +190,8 @@ def scanOutputToVDJML(input_file,output_file,fasta_paths,db_fasta_list,debug=Fal
 						else:
 							#strand!
 							hit_interval_to_add=vdjml.Interval.first_last_1(int(kvmap['s. end']),int(kvmap['s. start']))							
-						metrics_to_add=vdjml.Match_metrics(int(kvmap['score']),float(kvmap['% identity']),int(9999),int(9999),int(kvmap['mismatches']))
+						#metrics_to_add=vdjml.Match_metrics(int(kvmap['score']),float(kvmap['% identity']),int(9999),int(9999),int(kvmap['mismatches']))
+						metrics_to_add=vdjml.Match_metrics(float(kvmap['% identity']),int(kvmap['score']),int(kvmap['mismatches']))
 						smb1 = rb1.add_segment_match(
 							btop_to_add,
 							query_interval_to_add,
@@ -383,6 +385,6 @@ def scanOutputToVDJML(input_file,output_file,fasta_paths,db_fasta_list,debug=Fal
 
     
 
-scanOutputToVDJML("/home/esalina2/round1_imgt/all_data.processed.Q35.L200.R1.fna.igblastn.imgt.out","/dev/null","/home/esalina2/round1_imgt/all_data.processed.Q35.L200.R1.fna",
+scanOutputToVDJML("/home/esalina2/round1_imgt/all_data.processed.Q35.L200.R1.fna.igblastn.imgt.out.first5.out","/dev/null","/home/esalina2/round1_imgt/all_data.processed.Q35.L200.R1.fna",
 	["/home/esalina2/round1_imgt/human_IG_V.fna","/home/esalina2/round1_imgt/human_IG_D.fna","/home/esalina2/round1_imgt/human_IG_J.fna"])
 
