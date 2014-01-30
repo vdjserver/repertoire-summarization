@@ -503,10 +503,9 @@ def getDomainClasses():
 
 
 def test():
+	pass
 	#print "Running test...."
 	#counts_map=
-
-
 	#in_hier_dir="/home/data/vdj_server/pipeline/vdj_ann/17_way/"
 	#out_hier_dir="/tmp/tmp_json"
 	#count_map=dict()
@@ -518,7 +517,6 @@ def test():
 	#tree_dat_file="/home/data/vdj_server/pipeline/vdj_ann/17_way/TRBD.dat"
 	#tree=getHierarchyTreeFromFile(tree_dat_file)
 	#print "The total is ",get_total_tree(tree,name,count_map)
-	
 	#hierarchy_jsonify_batch(in_hier_dir,out_hier_dir,count_map)
 	#basic_tree_test()
 	#root=getRootFromFile("/home/data/vdj_server/pipeline/vdj_ann/17_way/IGHM.dat")
@@ -526,8 +524,6 @@ def test():
 	#dbfile="/home/esalina2/round1/all_data.processed.r0.small.fna.imbg.igblastn.7.out.db"	
 	#counts_map=get_rearrangement_segment_counts_from_db(dbfile)
 	#print counts_map
-	
-
 	#test_tree()
 	#igblast_file="/home/esalina2/round1/all_data.processed.r0.small.fna.imbg.igblastn.7.out"
 	#output_db_file="/home/esalina2/round1/all_data.processed.r0.small.fna.imbg.igblastn.7.out.db"
@@ -588,10 +584,6 @@ def test():
 	#print "\n"+getNiceAlignment(q_j_aln)
 	#v_d_junc=q_seq[(q_v_end):(q_d_start-1)]
 	#print "The extracted VD junction is ",v_d_junc
-
-
-	
-		
 
 if (__name__=="__main__"):
 	import sys
