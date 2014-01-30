@@ -286,7 +286,10 @@ def get_total_tree(tree,this_name,counts_map):
 
 
 
-def jsonify_hierarchy(hier_map,name,counts_map,count_name):
+
+def jsonify_hierarchy(hier_map,name,counts_map):
+	hier_map_keys=hier_map.keys()
+	hier_map_keys.sort()
 	JSON=""
 	JSON+="{\n"
 	JSON+="\"name\":\""+name+"\",\n"
@@ -294,14 +297,16 @@ def jsonify_hierarchy(hier_map,name,counts_map,count_name):
 	actual_value=get_total_tree(hier_map,name,counts_map)
 	#JSON+="\"value\":"+str(actual_value)+",\n"
 	#JSON+="\"size\":"+str(actual_value)+"\n"
-	JSON+="\""+count_name+"\":"+str(actual_value)+"\n"
+	JSON+="\"count\":"+str(actual_value)+"\n"
 	num_kids=len(hier_map)
 	if(num_kids>=1):
 		JSON+=",\n"
 		JSON+="\"children\": [\n"
 		kid_num=0
-		for child in hier_map:
-			JSON+=jsonify_hierarchy(hier_map[child],child,counts_map,count_name)
+		//for child in hier_map:
+		for c in range(len(hier_map_keys)):
+			child=hier_map_keys[c]
+			JSON+=jsonify_hierarchy(hier_map[child],child,counts_map)
 			if(kid_num<(num_kids-1)):
 				JSON+=" , \n"
 			kid_num+=1
@@ -311,6 +316,7 @@ def jsonify_hierarchy(hier_map,name,counts_map,count_name):
 		#num_kids<1
 	JSON+=" }\n"
 	return JSON
+
 
 
 def getSegmentName(blast_hit,fastaListOfDescs):
