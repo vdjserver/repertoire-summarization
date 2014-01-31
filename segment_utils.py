@@ -168,7 +168,8 @@ def getQueryIndexGivenSubjectIndexAndAlignment(query_aln,subject_aln,q_start,q_s
 
 
 def analyze_download_dir_forVDJserver(base_dir,countsMap=None,specifiedOrganism=None,specifiedLocus=None):
-	organisms=getOrganismList()
+	myDB=imgt_db(base_dir)
+	organisms=myDB.getOrganismList()
 	org_hierarchy=tree()
 	clone_names_by_org=dict()
 	if(not(os.path.exists(base_dir) or not(os.path.isdir(base_dir)))):
@@ -559,9 +560,9 @@ if (__name__=="__main__"):
 	#res=getQueryIndexGivenSubjectIndexAndAlignment(q_aln,s_aln,q_f,q_t,s_f,s_t,d_sub)
 	#print "first res is ",res
 	#allele="IGHV4-4*01"
-	allele="IGHJ5*02"
-	imgtdb_obj=imgt_db("/home/data/DATABASE/01_22_2014/")
-	data_rec=imgtdb_obj.getIMGTDatGivenAllele(allele)
+	#allele="IGHJ5*02"
+	#imgtdb_obj=imgt_db("/home/data/DATABASE/01_22_2014/")
+	#data_rec=imgtdb_obj.getIMGTDatGivenAllele(allele)
 	#print "the rec is ",data_rec
 	#s_start=getCDR3StartFromVDataa(data_rec)
 	#print "the s_start is ",s_start
@@ -577,8 +578,10 @@ if (__name__=="__main__"):
 	#		print "got a feature : ",feature
 	#		ftype=feature.type
 	#		print "the type is ",ftype
-	dce=getCDR3EndFromJData(data_rec,allele,1,2)
-	print "desired c_end=",dce
+	#dce=getCDR3EndFromJData(data_rec,allele,1,2)
+	#print "desired c_end=",dce
+	#print "ANALYSIS RESULTS : \n\n\n"
+	analyze_download_dir_forVDJserver("/home/data/DATABASE/01_22_2014/")
 			
 
 
