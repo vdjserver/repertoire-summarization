@@ -1205,15 +1205,9 @@ class imgt_db:
 	####################
 	#functions
 
-
-
-
 	#return the organism list
 	def getOrganismList(self):
 		return self.ol
-
-
-
 
 	#download gene tables and reference directory sets from imgt
 	def download_imgt_RefDirSeqs_AndGeneTables_HumanAndMouse(self,unconditionalForceReplace=False):
