@@ -914,12 +914,6 @@ def allelifyList(l):
 
 
 
-def getOrganismList():
-	ol=["human","Mus_musculus"]
-	return ol
-
-
-
 
 
 def getPMapFromTree(t,emap,currentParent):
@@ -934,56 +928,6 @@ def getPMapFromTree(t,emap,currentParent):
 
 
 
-
-def download_imgt_RefDirSeqs_AndGeneTables_HumanAndMouse(base,unconditionalForceReplace=False):
-	#do mouse and human
-	organisms=getOrganismList()
-	for organism in organisms:
-		#do all organisms
-		loci=get_loci_list()
-		for locus in loci:
-			#do all 17 groups
-			print "Downloading",locus,"for",organism,"at",formatNiceDateTimeStamp(),"..."
-			#first download and save the gene tables
-			geneTableOrgName=organism
-			GeneTablesURLs=formGeneTableURLs(geneTableOrgName,locus)		
-			#download each regular table and orphon table and write to file
-			regularURL=GeneTablesURLs[0]
-			orphonURL=GeneTablesURLs[1]
-			geneTablesBase=base+"/"+organism+"/GeneTables"
-			if(not(os.path.isdir(geneTablesBase))):
-				os.makedirs(geneTablesBase)
-			regularTablePath=geneTablesBase+"/"+locus+".html"
-			if(not(os.path.exists(regularTablePath)) or unconditionalForceReplace==True):
-				print "Gene table",locus,"for organism",organism,"not found or force replace set to true...so downloading it...."
-				print "Downloading gene table",locus,"for organism",organism,"from URL=",regularURL," saving to",regularTablePath
-				downloadURLToLocalFileAssumingDirectoryExists(regularURL,regularTablePath)
-			orphonTablePath=regularTablePath+".orphons.html"
-			if(not(os.path.exists(orphonTablePath)) or unconditionalForceReplace==True):
-				print "Orphon gene table",locus,"for organism",organism,"not found, so downloading it..."
-				print "Downloading orphon gene table",locus,"for organism",organism,"from URL=",orphonURL,"and saving to",orphonTablePath
-				downloadURLToLocalFileAssumingDirectoryExists(orphonURL,orphonTablePath)
-			#download the reference directory
-			refDirBase=geneTablesBase=base+"/"+organism+"/ReferenceDirectorySet"
-			if(not(os.path.isdir(refDirBase))):
-				os.makedirs(refDirBase)
-			refDirFile=refDirBase+"/"+locus+".html"
-			refDirOrgName=organism
-			if(refDirOrgName=="human"):
-				#the ref dir URL won't take 'human', it needs 'Homo+sapiens' instead! :(
-				refDirOrgName="Homo+sapiens"
-			refDirURL=formRefDirURL(refDirOrgName,locus)
-			if(not(os.path.exists(refDirFile)) or unconditionalForceReplace==True):
-				print "Downloading reference directory set ",locus,"for organism",organism,"and saving to",orphonTablePath			
-				downloadURLToLocalFileAssumingDirectoryExists(refDirURL,refDirFile)
-				refDirFastaFile=refDirFile+".fna"
-				localRefURL="file://"+refDirFile
-				fastaString=downloadRefDirFasta(locus,refDirOrgName,localRefURL)
-				writeStringToFilePathAssumingDirectoryExists(fastaString,refDirFastaFile)
-			
-
-			
-	
 
 
 def get_clone_names_by_org_map_from_base_dir(bd):
@@ -1083,16 +1027,6 @@ def igblast_imgt_mapping(base_dir,org_to_glob_db_map,imgtfastaPath,hierachyByOrg
 				print '-'*60	
 
 
-
-def buildAndExecuteWGETDownloadScript(base_dir):
-	refDBURL="http://www.imgt.org/download/"
-	wgetCMD="cd "+base_dir+"\n/usr/bin/wget -r -np "+refDBURL+"GENE-DB/ "+refDBURL+"/LIGM-DB/"
-	wgetScriptPath=base_dir+"/wgetscript.sh"
-	wgetScriptOutLog=wgetScriptPath+".log.out"
-	wgetScriptErrLog=wgetScriptPath+".log.err"
-	write_temp_bash_script(wgetCMD,wgetScriptPath)
-	execute_bash_script(wgetScriptPath,outPath=wgetScriptOutLog,errPath=wgetScriptErrLog)
-	
 
 
 
@@ -1258,16 +1192,87 @@ class imgt_db:
 	db_base=None
 	db_idx_extension=".acc_idx"
 	accession_start_stop_map=None
-	imgt_dat_path="www.imgt.org/download/LIGM-DB/imgt.dat"
+	imgt_dat_rel_path="www.imgt.org/download/LIGM-DB/imgt.dat"
+	imgt_dat_path=None
+	ol=["human","Mus_musculus"]
 
 	####################
 	#constructor(s)
 	def __init__(self,init_db_base):
 		self.db_base=init_db_base
+		self.imgt_dat_path=self.db_base+"/"+imgt_dat_rel_path
 
 	####################
 	#functions
 
+
+
+
+	#return the organism list
+	def getOrganismList(self):
+		return self.ol
+
+
+
+
+	#download gene tables and reference directory sets from imgt
+	def download_imgt_RefDirSeqs_AndGeneTables_HumanAndMouse(self,unconditionalForceReplace=False):
+		base=self.db_base
+		organisms=getOrganismList()
+		for organism in organisms:
+			#do all organisms
+			loci=get_loci_list()
+			for locus in loci:
+				#do all 17 groups
+				print "Downloading",locus,"for",organism,"at",formatNiceDateTimeStamp(),"..."
+				#first download and save the gene tables
+				geneTableOrgName=organism
+				GeneTablesURLs=formGeneTableURLs(geneTableOrgName,locus)		
+				#download each regular table and orphon table and write to file
+				regularURL=GeneTablesURLs[0]
+				orphonURL=GeneTablesURLs[1]
+				geneTablesBase=base+"/"+organism+"/GeneTables"
+				if(not(os.path.isdir(geneTablesBase))):
+					os.makedirs(geneTablesBase)
+				regularTablePath=geneTablesBase+"/"+locus+".html"
+				if(not(os.path.exists(regularTablePath)) or unconditionalForceReplace==True):
+					print "Gene table",locus,"for organism",organism,"not found or force replace set to true...so downloading it...."
+					print "Downloading gene table",locus,"for organism",organism,"from URL=",regularURL," saving to",regularTablePath
+					downloadURLToLocalFileAssumingDirectoryExists(regularURL,regularTablePath)
+				orphonTablePath=regularTablePath+".orphons.html"
+				if(not(os.path.exists(orphonTablePath)) or unconditionalForceReplace==True):
+					print "Orphon gene table",locus,"for organism",organism,"not found, so downloading it..."
+					print "Downloading orphon gene table",locus,"for organism",organism,"from URL=",orphonURL,"and saving to",orphonTablePath
+					downloadURLToLocalFileAssumingDirectoryExists(orphonURL,orphonTablePath)
+				#download the reference directory
+				refDirBase=geneTablesBase=base+"/"+organism+"/ReferenceDirectorySet"
+				if(not(os.path.isdir(refDirBase))):
+					os.makedirs(refDirBase)
+				refDirFile=refDirBase+"/"+locus+".html"
+				refDirOrgName=organism
+				if(refDirOrgName=="human"):
+					#the ref dir URL won't take 'human', it needs 'Homo+sapiens' instead! :(
+					refDirOrgName="Homo+sapiens"
+				refDirURL=formRefDirURL(refDirOrgName,locus)
+				if(not(os.path.exists(refDirFile)) or unconditionalForceReplace==True):
+					print "Downloading reference directory set ",locus,"for organism",organism,"and saving to",orphonTablePath			
+					downloadURLToLocalFileAssumingDirectoryExists(refDirURL,refDirFile)
+					refDirFastaFile=refDirFile+".fna"
+					localRefURL="file://"+refDirFile
+					fastaString=downloadRefDirFasta(locus,refDirOrgName,localRefURL)
+					writeStringToFilePathAssumingDirectoryExists(fastaString,refDirFastaFile)
+			
+
+	#download from IMGT
+	def buildAndExecuteWGETDownloadScript(self):
+		refDBURL="http://www.imgt.org/download/"
+		wgetCMD="cd "+self.db_base+"\n/usr/bin/wget -r -np "+refDBURL+"GENE-DB/ "+refDBURL+"/LIGM-DB/"
+		wgetScriptPath=base_dir+"/wgetscript.sh"
+		wgetScriptOutLog=wgetScriptPath+".log.out"
+		wgetScriptErrLog=wgetScriptPath+".log.err"
+		write_temp_bash_script(wgetCMD,wgetScriptPath)
+		execute_bash_script(wgetScriptPath,outPath=wgetScriptOutLog,errPath=wgetScriptErrLog)
+	
 
 
 	#given a full fasta descriptor, get the record from IMGT.dat
@@ -1291,9 +1296,9 @@ class imgt_db:
 		if(not(accession_start_stop_map==None)):
 			#it's already initialized
 			return
-		indexPath=self.db_base+"/"+imgt_dat_path+db_idx_extension
+		indexPath=self.imgt_dat_path+db_idx_extension
 		if(not(os.path.exists(indexPath))):
-			indexIMGTDatFile(self.db_base+"/"+imgt_dat_path,indexPath)
+			indexIMGTDatFile(self.imgt_dat_path,indexPath)
 		accession_start_stop_map=dict()
 		idxReader=open(indexPath,'r')
 		for line in idxReader:
@@ -1316,7 +1321,7 @@ class imgt_db:
 	#get start/stop from index given accession
 	def getStartStopFromIndexGivenAccession(self,a):
 		if(accession_start_stop_map==None):
-			cacheIndex(db_base+"/"+imgt_dat_path+db_idx_extension)
+			cacheIndex(imgt_dat_path+db_idx_extension)
 		return accession_start_stop_map[a]
 		
 
@@ -1358,7 +1363,7 @@ class imgt_db:
 	#fetch a record given position interval from the imgt.dat file
 	def fetchRecFromDat(self,start,stop,idxpath=None):
 		if(idxpath==None):
-			idxpath=self.db_base+imgt_dat_path
+			idxpath=imgt_dat_path+db_idx_extension
 		if(not(stop>start)):
 			return ""
 		reader=open(idxpath,'r')
@@ -1416,6 +1421,8 @@ class imgt_db:
 
 def test():
 	pass
+	mydb=imgt_db("/home/data/DATABASE/01_22_2014/")
+	print "the db is ",mydb.db_base
 	#datPath="/home/data/DATABASE/01_22_2014/www.imgt.org/download/LIGM-DB/imgt.dat"
 	#datIndexPath=datPath+".acc_idx"
 	#print "Reading file",datPath
