@@ -1200,7 +1200,7 @@ class imgt_db:
 	#constructor(s)
 	def __init__(self,init_db_base):
 		self.db_base=init_db_base
-		self.imgt_dat_path=self.db_base+"/"+imgt_dat_rel_path
+		self.imgt_dat_path=self.db_base+"/"+self.imgt_dat_rel_path
 
 	####################
 	#function members
@@ -1276,10 +1276,12 @@ class imgt_db:
 			raise Exception("Error, db_base is not, must initialize first!")
 		pieces=descriptor.split("|")
 		accession=pieces[0]
-		ss=getStartStopFromIndexGivenAccession(accession)
+		print "accession=",accession
+		ss=self.getStartStopFromIndexGivenAccession(accession)
+		print "ss:",ss
 		start=ss[0]
 		stop=ss[1]
-		return fetchRecFromDat(start,stop)
+		return self.fetchRecFromDat(start,stop)
 		
 
 
@@ -1287,36 +1289,38 @@ class imgt_db:
 
 	#read index into dict/map
 	def cacheIndex(self,indexPath):
-		if(not(accession_start_stop_map==None)):
+		if(not(self.accession_start_stop_map==None)):
 			#it's already initialized
 			return
-		indexPath=self.imgt_dat_path+db_idx_extension
+		indexPath=self.imgt_dat_path+self.db_idx_extension
 		if(not(os.path.exists(indexPath))):
-			indexIMGTDatFile(self.imgt_dat_path,indexPath)
-		accession_start_stop_map=dict()
+			indexIMGTDatFile(self.imgt_dat_path,self.indexPath)
+		self.accession_start_stop_map=dict()
 		idxReader=open(indexPath,'r')
 		for line in idxReader:
 			line=line.strip()
 			pieces=line.split("\t")
 			accession=pieces[0]
 			ss=[pieces[1],pieces[2]]
-			accession_start_stop_map[accession]=ss
+			self.accession_start_stop_map[accession]=ss
 		idxReader.close()
 
 
 	#get the IMGT record given an allele name
 	def getIMGTDatGivenAllele(self,a,org="human"):
-		descriptor=extractDescriptorLine(a,self.db_base,org)
-		imgtDAT=extractIMGTDatRecordUsingRefDirSetDescriptor(descriptor)
+		print "passed : ",a
+		descriptor=self.extractDescriptorLine(a,self.db_base,org)
+		print "descriptor = ",descriptor
+		imgtDAT=self.extractIMGTDatRecordUsingRefDirSetDescriptor(descriptor)
 		return imgtDAT
 	
 
 
 	#get start/stop from index given accession
 	def getStartStopFromIndexGivenAccession(self,a):
-		if(accession_start_stop_map==None):
-			cacheIndex(imgt_dat_path+db_idx_extension)
-		return accession_start_stop_map[a]
+		if(self.accession_start_stop_map==None):
+			self.cacheIndex(self.imgt_dat_path+self.db_idx_extension)
+		return self.accession_start_stop_map[a]
 		
 
 	#given an allele name and an organism string, extract the fasta descriptor with the specified allele name
@@ -1324,7 +1328,7 @@ class imgt_db:
 	def extractDescriptorLine(self,allele_name,db_base=None,org="human"):
 		if(db_base==None):
 			db_base=self.db_base
-		if(not(org_allele_name_desc_map==None)):
+		if(not(self.org_allele_name_desc_map==None)):
 			if(org in org_allele_name_desc_map):
 				if(allele_name in org_allele_name_desc_map[org]):
 					return org_allele_name_desc_map[org][allele_name]
@@ -1357,12 +1361,13 @@ class imgt_db:
 	#fetch a record given position interval from the imgt.dat file
 	def fetchRecFromDat(self,start,stop,idxpath=None):
 		if(idxpath==None):
-			idxpath=imgt_dat_path+db_idx_extension
+			idxpath=self.imgt_dat_path
+		print "i want to open ",idxpath
 		if(not(stop>start)):
 			return ""
 		reader=open(idxpath,'r')
-		reader.seek(start)
-		data=reader.read(stop-start)
+		reader.seek(int(start))
+		data=reader.read(int(stop)-int(start))
 		reader.close()
 		return data
 
