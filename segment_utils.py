@@ -474,9 +474,47 @@ def get_segment_count_map_from_blast_output(blast_out,fasta_file_list):
 
 
 
-def getCDR3StartFromVDataData(vdata):
+def getCDR3EndFromJData(jdata,allele):#,s_start,s_stop):
+	#get line numbers where /IMGT_allel="allele" is found
+	#get line numbers where J-TRP or J-PHEFT   J-PHE 
+	#FT                       J-TRP 
+	lines=jdata.split("\n")
+	allele_subseq="/IMGT_allele=\""+allele+"\""
+	trypRE=re.compile(r'^FT\s+J\-TRP\s+[<>]?(\d+)[^\d]')
+	phenRE=re.compile(r'^FT\s+J\-PHE\s+[<>]?(\d+)[^\d]')
+	allele_lines=list()
+	regEnd_lines=list()
+	for i in range(len(lines)):
+		if(a_subseq_of_b(allele_subseq,lines[i])):
+			allele_lines.append(i)
+		elif(trypRE.match(lines[i])):
+			regEnd_lines.append(i)
+		elif(phenRE.match(lines[i])):
+			regEnd_lines.append(i)
+	#return the lowest JTRP or JPHE line number with line number greater than or equal to the allele_numbers 
+	data=None
+	for j in range(len(regEnd_lines)):
+		geqFlag=False
+		for a in range(len(allele_lines)):
+			if(regEnd_lines[j]>=allele_lines[a]):
+				geqFlag=True
+		if(geqFlag):
+			data=lines[regEnd_lines[j]]
+			print "data is ",data
+			res=trypRE.search(data)
+			if(res):
+				return int(res.group(1))
+			res=phenRE.search(data)
+			if(res):
+				return int(res.group(1))
+	if(data==None):
+		return (-1)
+
+			
+
+def getCDR3StartFromVData(vdata):
 	pieces=vdata.split("\n")
-	cdr3re=re.compile("^FT\s+CDR3\-IMGT\s+<?(\d+)[^0-9]")
+	cdr3re=re.compile("^FT\s+CDR3\-IMGT\s+[<>]?(\d+)[^0-9]")
 	for i in range(len(pieces)):
 		#print "got line #",i," : ",pieces[i]
 		cdr3reMatchRes=cdr3re.match(pieces[i])
@@ -499,16 +537,17 @@ if (__name__=="__main__"):
 	q_t=42
 	d_sub=13
 	res=getQueryIndexGivenSubjectIndexAndAlignment(q_aln,s_aln,q_f,q_t,s_f,s_t,d_sub)
-	#print "first res is ",res
-	allele="IGHV4-4*07"
-	imgtdb_obj=imgt_db("/home/data/DATABASE/01_22_2014/")
-	data_rec=imgtdb_obj.getIMGTDatGivenAllele(allele)
-	print "the rec is ",data_rec
-	s_start=getCDR3StartFromVDataData(data_rec)
-	print "the s_start is ",s_start
-	
-
-
+	print "first res is ",res
+	#allele="IGHV4-4*01"
+	#allele="IGHJ5*02"
+	#imgtdb_obj=imgt_db("/home/data/DATABASE/01_22_2014/")
+	#data_rec=imgtdb_obj.getIMGTDatGivenAllele(allele)
+	#print "the rec is ",data_rec
+	#s_start=getCDR3StartFromVDataa(data_rec)
+	#print "the s_start is ",s_start
+	#jdata=data_rec
+	#cdr3_end=getCDR3EndFromJData(jdata,allele)
+	#print "got end=",cdr3_end
 
 
 
