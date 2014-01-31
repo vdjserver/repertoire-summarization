@@ -1187,7 +1187,7 @@ def testIdx(dat,idx):
 
 class imgt_db:
 	####################
-	#data
+	#data members
 	org_allele_name_desc_map=None
 	db_base=None
 	db_idx_extension=".acc_idx"
@@ -1203,7 +1203,7 @@ class imgt_db:
 		self.imgt_dat_path=self.db_base+"/"+imgt_dat_rel_path
 
 	####################
-	#functions
+	#function members
 
 	#return the organism list
 	def getOrganismList(self):
