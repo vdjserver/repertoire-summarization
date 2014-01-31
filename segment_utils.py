@@ -1,4 +1,4 @@
-
+#!/usr/bin/python
 
 from bs4 import BeautifulSoup
 from collections import defaultdict
@@ -127,6 +127,41 @@ def hierarchyTreeFromGenetableURL(url,locus,listOfAllowableNames=None,existingHi
 #"One-line Tree in Python"
 def tree(): return defaultdict(tree)
 def dicts(t): return {k: dicts(t[k]) for k in t}
+
+
+
+def getQueryIndexGivenSubjectIndexAndAlignment(query_aln,subject_aln,q_start,q_stop,s_start,s_stop,subject_pos):
+	if(not(s_start<=subject_pos and subject_pos<=s_stop)):
+		#invalid range!
+		return None
+	else:
+		s_counter=s_start
+		q_counter=q_start
+		delta=0
+		q_val=query_aln[delta]
+		s_val=subject_aln[delta]
+		#print query_aln+"\n"+subject_aln+"\n"
+		while(delta<len(query_aln)):
+			q_val=query_aln[delta]
+			s_val=subject_aln[delta]
+			#print "in while"
+			#print "delta=",delta
+			#print "len(query_aln[0])=",len(query_aln)
+			#print "s_counter=",s_counter
+			#print "q_counter=",q_counter
+			#print "q_val=",q_val
+			#print "s_val=",s_val
+			#print "delta+s_counter="+str(delta+s_counter)
+			#print "desired=",subject_pos
+			if(((delta)+s_counter)>subject_pos):
+				#print "got it"
+				return delta+q_counter-1
+			if(not(q_val=="-")):
+				q_counter+=1
+			if(not(s_val=="-")):
+				s_counter+=1
+			delta+=1
+			#print "\n\n"
 
 
 
@@ -435,3 +470,50 @@ def get_segment_count_map_from_blast_output(blast_out,fasta_file_list):
 		line_num+=1
 		#print "at line="+str(line_num)
 	return counts_map
+
+
+
+
+
+if (__name__=="__main__"):
+	import sys
+	q_aln="-ATTACA-ATTACA"
+	s_aln="GATTACAGATTACA"
+	s_f=10
+	s_t=22
+	q_f=30
+	q_t=42
+	d_sub=13
+	res=getQueryIndexGivenSubjectIndexAndAlignment(q_aln,s_aln,q_f,q_t,s_f,s_t,d_sub)
+	#print "first res is ",res
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
