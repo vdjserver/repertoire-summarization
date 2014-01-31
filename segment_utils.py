@@ -6,6 +6,7 @@ import pickle
 import urllib2
 import re
 import pprint
+from imgt_utils import *
 
 def removeTerminatingSemicolonIfItExists(s):
 	s=re.sub(r';+$',"",s)
@@ -473,6 +474,19 @@ def get_segment_count_map_from_blast_output(blast_out,fasta_file_list):
 
 
 
+def getCDR3StartFromVDataData(vdata):
+	pieces=vdata.split("\n")
+	cdr3re=re.compile("^FT\s+CDR3\-IMGT\s+<?(\d+)[^0-9]")
+	for i in range(len(pieces)):
+		#print "got line #",i," : ",pieces[i]
+		cdr3reMatchRes=cdr3re.match(pieces[i])
+		if(cdr3reMatchRes):
+			#print "MATCH!"
+			start=cdr3reMatchRes.group(1)
+			return start
+		else:
+			pass
+	return (-1)
 
 
 if (__name__=="__main__"):
@@ -486,9 +500,13 @@ if (__name__=="__main__"):
 	d_sub=13
 	res=getQueryIndexGivenSubjectIndexAndAlignment(q_aln,s_aln,q_f,q_t,s_f,s_t,d_sub)
 	#print "first res is ",res
-
-
-
+	allele="IGHV4-4*07"
+	imgtdb_obj=imgt_db("/home/data/DATABASE/01_22_2014/")
+	data_rec=imgtdb_obj.getIMGTDatGivenAllele(allele)
+	print "the rec is ",data_rec
+	s_start=getCDR3StartFromVDataData(data_rec)
+	print "the s_start is ",s_start
+	
 
 
 
