@@ -1257,6 +1257,8 @@ class imgt_db:
 	org_allele_name_desc_map=None
 	db_base=None
 	db_idx_extension=".acc_idx"
+	accession_start_stop_map=None
+	imgt_dat_path="www.imgt.org/download/LIGM-DB/imgt.dat"
 
 	####################
 	#constructor(s)
@@ -1266,8 +1268,60 @@ class imgt_db:
 	####################
 	#functions
 
+
+
+	#given a full fasta descriptor, get the record from IMGT.dat
+	#note that the descriptor should not have the ">" at the beginning
+	def extractIMGTDatRecordUsingRefDirSetDescriptor(self,descriptor):
+		if(self.db_base==None):
+			raise Exception("Error, db_base is not, must initialize first!")
+		pieces=descriptor.split("|")
+		accession=pieces[0]
+		ss=getStartStopFromIndexGivenAccession(accession)
+		start=ss[0]
+		stop=ss[1]
+		return fetchRecFromDat(start,stop)
+		
+
+
+
+
+	#read index into dict/map
+	def cacheIndex(self,indexPath):
+		if(not(accession_start_stop_map==None)):
+			#it's already initialized
+			return
+		indexPath=self.db_base+"/"+imgt_dat_path+db_idx_extension
+		if(not(os.path.exists(indexPath))):
+			indexIMGTDatFile(self.db_base+"/"+imgt_dat_path,indexPath)
+		accession_start_stop_map=dict()
+		idxReader=open(indexPath,'r')
+		for line in idxReader:
+			line=line.strip()
+			pieces=line.split("\t")
+			accession=pieces[0]
+			ss=[pieces[1],pieces[2]]
+			accession_start_stop_map[accession]=ss
+		idxReader.close()
+
+
+	#get the IMGT record given an allele name
+	def getIMGTDatGivenAllele(self,a,org="human"):
+		descriptor=extractDescriptorLine(a,self.db_base,org)
+		imgtDAT=extractIMGTDatRecordUsingRefDirSetDescriptor(descriptor)
+		return imgtDAT
+	
+
+
+	#get start/stop from index given accession
+	def getStartStopFromIndexGivenAccession(self,a):
+		if(accession_start_stop_map==None):
+			cacheIndex(db_base+"/"+imgt_dat_path+db_idx_extension)
+		return accession_start_stop_map[a]
+		
+
 	#given an allele name and an organism string, extract the fasta descriptor with the specified allele name
-	#use hashing for cache purposes
+	#use dictionary for cache purposes
 	def extractDescriptorLine(self,allele_name,db_base=None,org="human"):
 		if(db_base==None):
 			db_base=self.db_base
@@ -1304,7 +1358,7 @@ class imgt_db:
 	#fetch a record given position interval from the imgt.dat file
 	def fetchRecFromDat(self,start,stop,idxpath=None):
 		if(idxpath==None):
-			idxpath=self.db_base+"www.imgt.org/download/LIGM-DB/imgt.dat"
+			idxpath=self.db_base+imgt_dat_path
 		if(not(stop>start)):
 			return ""
 		reader=open(idxpath,'r')
