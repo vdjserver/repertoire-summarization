@@ -66,7 +66,7 @@ def hierarchyTreeFromGenetableURL(url,locus,listOfAllowableNames=None,existingHi
 					if(class_val_first_str=="subgroup_middle_note"):
 						text = td.find(text=True)# + ';'
 						if text is None:
-							text="NONE;"
+							text="UNDEFINED_SUBGROUP;"
 						else:
 							text+=";"
 						#print "GOT A SUBGROUP=",text
@@ -75,7 +75,7 @@ def hierarchyTreeFromGenetableURL(url,locus,listOfAllowableNames=None,existingHi
 					elif(class_val_first_str=="gene_note"):
 						text = td.find(text=True)# + ';'
 						if text is None:
-							text="NONE;"
+							text="UNDEFINED_GENE;"
 						else:
 							text+=";"
 						#print "GOT A GENE=",text
@@ -480,7 +480,7 @@ def get_segment_count_map_from_blast_output(blast_out,fasta_file_list):
 
 def getCDR3EndFromJData(jdata,allele,s_start,s_stop):
 	tmp_file_path="/dev/shm/"+re.sub(r'[^0-9\.a-zA-Z]','',allele)
-	print "tpath is ",tmp_file_path
+	#print "tpath is ",tmp_file_path
 	writer=open(tmp_file_path,'w')
 	writer.write(jdata)
 	writer.close()
@@ -504,25 +504,25 @@ def getCDR3EndFromJData(jdata,allele,s_start,s_stop):
 					actual_value=allele_qualifier_list[0]
 					#print "the actual is ",actual_value
 					if(actual_value==allele):
-						print "THIS IS THE RIIIIIIIIIIIIIIIIIIIIIGHT ONE!"
-						print "the start is ",feature.location.start
+						#print "THIS IS THE RIIIIIIIIIIIIIIIIIIIIIGHT ONE!"
+						#print "the start is ",feature.location.start
 						reg_start=int(re.sub(r'[^0-9]','',str(feature.location.start)))
-						print "fetched is ",reg_start
+						#print "fetched is ",reg_start
 						reg_end=int(re.sub(r'[^0-9]','',str(feature.location.end)))
 	records=SeqIO.parse(tmp_file_path,"imgt")
 	if(not(reg_start==None)):
 		for record in records:
 			feature_list=record.features
 			for feature in feature_list:
-				print "got a feature : ",feature
+				#print "got a feature : ",feature
 				ftype=feature.type
-				print "the type is ",ftype	
+				#print "the type is ",ftype	
 				qualifiers=feature.qualifiers
-				print "qualifiers : ",qualifiers
+				#print "qualifiers : ",qualifiers
 				if(ftype=="J-TRP" or ftype=="J-PHE"):
 					c_start=int(re.sub(r'[^0-9]','',str(feature.location.start)))
 					c_end=int(re.sub(r'[^0-9]','',str(feature.location.end)))
-					print "found a jtrp"
+					#print "found a jtrp"
 					if(reg_start<=c_end and c_end<=reg_end):
 						#this is it!
 						os.remove(tmp_file_path)
@@ -542,7 +542,7 @@ def getCDR3StartFromVData(vdata):
 		if(cdr3reMatchRes):
 			#print "MATCH!"
 			start=cdr3reMatchRes.group(1)
-			return start
+			return int(start)
 		else:
 			pass
 	return (-1)
@@ -561,7 +561,11 @@ if (__name__=="__main__"):
 	#print "first res is ",res
 	#allele="IGHV4-4*01"
 	#allele="IGHJ5*02"
-	#imgtdb_obj=imgt_db("/home/data/DATABASE/01_22_2014/")
+	imgtdb_obj=imgt_db("/home/data/DATABASE/01_22_2014/")
+	#print "indexing...\n"
+	#imgtdb_obj.indexIMGTDatFile()
+	#print "done indexing...."
+	#sys.exit(0)
 	#data_rec=imgtdb_obj.getIMGTDatGivenAllele(allele)
 	#print "the rec is ",data_rec
 	#s_start=getCDR3StartFromVDataa(data_rec)
@@ -581,8 +585,85 @@ if (__name__=="__main__"):
 	#dce=getCDR3EndFromJData(data_rec,allele,1,2)
 	#print "desired c_end=",dce
 	#print "ANALYSIS RESULTS : \n\n\n"
-	analyze_download_dir_forVDJserver("/home/data/DATABASE/01_22_2014/")
-			
+	#analyze_download_dir_forVDJserver("/home/data/DATABASE/01_22_2014/")
+	#heavy
+	#acc_test="X92266"
+	#all_test="IGHV4-55*05"
+	#my_res=vamd=imgtdb_obj.getIMGTDatGivenAllele(all_test,"human")
+	#print "\n\n"
+	#print "the res : "
+	#print my_res
+	#sys.exit(0)
+	vlist="IGHV","IGKV","IGLV"
+	jlist="IGHJ","IGKJ","IGLJ"
+	organisms=["human","Mus_musculus"]
+	#organisms=["human"]
+	flag=False
+	accession_noCDR3=dict()
+	allele_miss=dict()
+		
+	for organism in organisms:
+		accession_noCDR3[organism]=dict()
+		allele_miss[organism]=0
+		if(flag):
+			break;
+		for p in range(len(vlist)):
+			if(flag):
+				break;
+			vlocus=vlist[p]
+			jlocus=jlist[p]
+			print "working on ",vlocus," and ",jlocus," for organism ",organism
+			fna_v_glob="/home/data/DATABASE/01_22_2014/"+organism+"/ReferenceDirectorySet/"+vlocus+"*html.fna"
+			fna_j_glob="/home/data/DATABASE/01_22_2014/"+organism+"/ReferenceDirectorySet/"+jlocus+"*html.fna"
+			fna_v_files=glob.glob(fna_v_glob)
+			fna_j_files=glob.glob(fna_j_glob)
+			if(len(fna_v_files)!=1 or len(fna_j_files)!=1):
+				print "BAD"
+				flag=True
+				break;
+			vmap=read_fasta_file_into_map(fna_v_files[0])
+			jmap=read_fasta_file_into_map(fna_j_files[0])
+			for vdesc in vmap:
+				for jdesc in jmap:
+					#print "working with ",vdesc,"x",jdesc
+					v_allele=extractIMGTNameFromKey(vdesc)
+					j_allele=extractIMGTNameFromKey(jdesc)
+					print "working ",v_allele," and ",j_allele," for ",organism
+					vdata=imgtdb_obj.getIMGTDatGivenAllele(v_allele,organism)
+					v_accession=vdesc.split("|")[0]
+					jdata=imgtdb_obj.getIMGTDatGivenAllele(j_allele,organism)
+					cdr3_start=getCDR3StartFromVData(vdata)
+					if(cdr3_start==(-1)):
+						allele_miss[organism]+=1
+						if(v_accession in accession_noCDR3[organism]):
+							print "double count of accession on allele=",v_allele," for organism=",organism
+						accession_noCDR3[organism][v_accession]=v_allele
+					cdr3_end=getCDR3EndFromJData(jdata,j_allele,-1,-1)
+					print "CDR3 : ",[cdr3_start,cdr3_end]
+					print "\n\n\n"
+	print "***********************************\nEXAMINED ACCESSIONS\n*********************************"
+	for org in organisms:
+		for va in accession_noCDR3[org]:
+			print va,"HUM missing CDR3 start !"
+			allele_to_use=accession_noCDR3[org][va]
+			print "Using allele=",allele_to_use
+			print "Using organism=",org
+			vamd=imgtdb_obj.getIMGTDatGivenAllele(allele_to_use,org)
+			print "\n",vamd
+			print "\n\n\n\n"
+	#for va in accession_noCDR3['human']:
+	#	print va,"HUM missing CDR3 start !"
+	#	allele_to_use=accession_noCDR3['human'][va]
+	#	print "Using allele=",allele_to_use
+	#	vamd=imgtdb_obj.getIMGTDatGivenAllele(allele_to_use,"human")
+	#	print "\n\n\n\n\n"
+	#for va in accession_noCDR3['Mus_musculus']:
+	#	print va,"MUS missing CDR3 start !"
+	#	allele_to_use=accession_noCDR3['Mus_musculus'][va]
+	#	print "Using allele=",allele_to_use
+	#	vamd=imgtdb_obj.getIMGTDatGivenAllele(allele_to_use,"Mus_musculus")
+	#	print "\n\n\n\n\n"
+
 
 
 
