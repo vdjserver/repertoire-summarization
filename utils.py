@@ -322,6 +322,30 @@ def convertToDefaultStringDict(m,s):
 	return dd
 
 
+
+
+def uncompressFilesUnderDir(d):
+	uncompRE=re.compile(r'\.(Z|gz)$')
+	for root, dirs, files in os.walk(d, topdown=False):
+		for f in files:
+			print "a file=",f
+			compressed_path=root+"/"+f
+			search_result=re.search(uncompRE,f)
+			if(search_result):
+				#print "it matches!"
+				compEx=search_result.group(1)
+				#print "matched on ",compEx
+				uncompressed_name=f[0:(len(f)-len(compEx)-1)]
+				print "the uncompressed name is ",uncompressed_name
+				uncompressed_path=root+"/"+uncompressed_name
+				print "the uncompressed path is",uncompressed_path
+			else:
+				#print "no match"
+				pass
+
+
+
+
 def merge_maps(ma,mb):
 	mc=dict()
 	for a in ma:
