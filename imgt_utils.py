@@ -1192,8 +1192,10 @@ class imgt_db:
 	db_base=None
 	db_idx_extension=".acc_idx"
 	accession_start_stop_map=None
+	accession_dat_file_map=None
 	imgt_dat_rel_path="www.imgt.org/download/LIGM-DB/imgt.dat"
 	imgt_dat_path=None
+	indexPath=None
 	ol=["human","Mus_musculus"]
 
 	####################
@@ -1260,7 +1262,10 @@ class imgt_db:
 	#download from IMGT
 	def buildAndExecuteWGETDownloadScript(self):
 		refDBURL="http://www.imgt.org/download/"
-		wgetCMD="cd "+self.db_base+"\n/usr/bin/wget -r -np "+refDBURL+"GENE-DB/ "+refDBURL+"/LIGM-DB/"
+		wgetCMD="cd "+self.db_base+"\n"
+		wgetCMD+="/usr/bin/wget -r -np "+refDBURL+"GENE-DB/ "+refDBURL+"/LIGM-DB/\n"
+		#wgetCMD+
+		#add ensemble here?
 		wgetScriptPath=base_dir+"/wgetscript.sh"
 		wgetScriptOutLog=wgetScriptPath+".log.out"
 		wgetScriptErrLog=wgetScriptPath+".log.err"
@@ -1275,42 +1280,75 @@ class imgt_db:
 		if(self.db_base==None):
 			raise Exception("Error, db_base is not, must initialize first!")
 		pieces=descriptor.split("|")
+		#BN000872|IGHV5-9-1*02|Mus musculus_C57BL/6|F|V-REGION|2334745..2335041|294 nt|1| | | | |294+24=318| | |
 		accession=pieces[0]
-		print "accession=",accession
+		#print "accession=",accession
 		ss=self.getStartStopFromIndexGivenAccession(accession)
-		print "ss:",ss
-		start=ss[0]
-		stop=ss[1]
-		return self.fetchRecFromDat(start,stop)
-		
+		if(len(ss)==2):
+			#regular accession
+			start=ss[0]
+			stop=ss[1]
+			return self.fetchRecFromDat(start,stop)
+		else:
+			#irregular accession, use descriptor and index to find the correct accession
+			accession_rel_re=re.compile(r'^(\d+)\.+(\d+)')
+			accession_rel=pieces[5]
+			re_res=re.search(accession_rel_re,accession_rel)
+			if(re_res)
+				d1=re_res.group(1)
+				d2=re_res.group(2)
+				avg=(d1+d2)/2
+				indirect_accession=accession
+				accession_rel=pieces[5]
+				index_reader=open(indexPath,'r')
+				possible_accessions=list()
+				for line in index_reader:
+					line_pieces=line.split('\t')
+					if(line_pieces[0]==indirect_accession):
+						possible_accessions.append(line_pieces[1])
+					else:
+						pass
+				#now, go through possible accessions and see which one is in range!
+				return ""
+			else:
+				pass
+				return ""
 
 
 
 
 	#read index into dict/map
-	def cacheIndex(self,indexPath):
+	def cacheIndex(self,indexPath,existingCache=None):
 		if(not(self.accession_start_stop_map==None)):
 			#it's already initialized
 			return
-		indexPath=self.imgt_dat_path+self.db_idx_extension
+		self.indexPath=self.imgt_dat_path+self.db_idx_extension
 		if(not(os.path.exists(indexPath))):
 			indexIMGTDatFile(self.imgt_dat_path,self.indexPath)
-		self.accession_start_stop_map=dict()
+		if(not(existingCache==None)):
+			if(self.accession_start_stop_map==None):
+				self.accession_start_stop_map=dict()
+			self.accession_start_stop_map=merge_maps(self.accession_start_stop_map,existingCache)
+		else:
+			self.accession_start_stop_map=dict()
 		idxReader=open(indexPath,'r')
 		for line in idxReader:
 			line=line.strip()
 			pieces=line.split("\t")
 			accession=pieces[0]
-			ss=[pieces[1],pieces[2]]
+			if(len(pieces)==3):
+				ss=[pieces[1],pieces[2]]
+			else:
+				ss=[pieces[1]]
 			self.accession_start_stop_map[accession]=ss
 		idxReader.close()
 
 
 	#get the IMGT record given an allele name
 	def getIMGTDatGivenAllele(self,a,org="human"):
-		print "passed : ",a
+		#print "passed : ",a
 		descriptor=self.extractDescriptorLine(a,self.db_base,org)
-		print "descriptor = ",descriptor
+		#print "descriptor = ",descriptor
 		imgtDAT=self.extractIMGTDatRecordUsingRefDirSetDescriptor(descriptor)
 		return imgtDAT
 	
@@ -1320,7 +1358,10 @@ class imgt_db:
 	def getStartStopFromIndexGivenAccession(self,a):
 		if(self.accession_start_stop_map==None):
 			self.cacheIndex(self.imgt_dat_path+self.db_idx_extension)
-		return self.accession_start_stop_map[a]
+		if(a in self.accession_start_stop_map):
+			return self.accession_start_stop_map[a]
+		else:
+			pass 
 		
 
 	#given an allele name and an organism string, extract the fasta descriptor with the specified allele name
@@ -1362,7 +1403,7 @@ class imgt_db:
 	def fetchRecFromDat(self,start,stop,idxpath=None):
 		if(idxpath==None):
 			idxpath=self.imgt_dat_path
-		print "i want to open ",idxpath
+		#print "i want to open ",idxpath
 		if(not(stop>start)):
 			return ""
 		reader=open(idxpath,'r')
@@ -1376,7 +1417,7 @@ class imgt_db:
 		lines=data.split("\t")
 		for line in lines:
 			#FT   CDR3-IMGT           371..412
-			reg_regex="^FT\s+"+region_name+"\-IMGT\s+<?(\d+)\.+(\d+)>?\s*$"
+			reg_regex="^FT\s+"+region_name+"[^\s]*\s+<?(\d+)\.+(\d+)>?\s*$"
 			search_res=re.search(reg_regex,line)
 			if(search_res):
 				start=search_res.group(1)
@@ -1389,9 +1430,11 @@ class imgt_db:
 		if(filepath==None):
 			filepath=self.db_base+"www.imgt.org/download/LIGM-DB/imgt.dat"
 		if(indexfile==None):
-			indexfile=filepath+db_idx_extension
+			indexfile=filepath+self.db_idx_extension
 		reader=open(filepath,'r')
 		acc_re=re.compile(r'^ID\s+([A-Z0-9]+)\s')
+		embl_tpa_re=re.compile(r'^DR\s+EMBL\-TPA;\s+([^\s]+)\.\s*$')
+		current_embl_tpa=None
 		current_accession=None
 		rec_start=None
 		rec_end=None
@@ -1403,12 +1446,22 @@ class imgt_db:
 			line=reader.readline()
 			if(line):
 				rs=re.search(acc_re,line)
+				es=re.search(embl_tpa_re,line)
 				if(rs):
 					current_accession=rs.group(1)
 					rec_start=reader.tell()-len(line)
+					if(self.accession_dat_file_map==None):
+						self.accession_dat_file_map=dict()
+					self.accession_dat_file_map[current_accession]=filepath
+				elif(es):
+					current_embl_tpa=es.group(1)
 				elif(line.startswith("//")):
 					rec_end=reader.tell()-1
 					index_file.write(current_accession+"\t"+str(rec_start)+"\t"+str(rec_end)+"\n")
+					if(not(current_embl_tpa==None)):
+						#index_file.write(current_embl_tpa+"\t"+str(rec_start)+"\t"+str(rec_end)+"\n")
+						index_file.write(current_embl_tpa+"\t"+current_accession+"\n");
+					current_embl_tpa=None
 			else:
 				flag=False
 		index_file.close()	
