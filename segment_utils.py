@@ -535,7 +535,7 @@ def getCDR3EndFromJData(jdata,allele,s_start,s_stop):
 
 def getCDR3StartFromVData(vdata):
 	pieces=vdata.split("\n")
-	cdr3re=re.compile("^FT\s+CDR3\-IMGT\s+[<>]?(\d+)[^0-9]")
+	cdr3re=re.compile("^FT\s+[^\s]*CDR3[^\s]*\s+(\d+)[^0-9]")
 	for i in range(len(pieces)):
 		#print "got line #",i," : ",pieces[i]
 		cdr3reMatchRes=cdr3re.match(pieces[i])
