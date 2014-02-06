@@ -50,8 +50,11 @@ cdr3_hist=dict()
 query_seq_map=read_fasta_file_into_map("/home/esalina2/round1_imgt/all_data.processed.Q35.L200.R1.fna")
 for i in range(0,100):
 	cdr3_hist[i]=0
+v_alleles_review=dict()
 def CDR3ANAL(currentV,currentJ,vHitLine,jHitLine,currentD,currentQueryName):
 	global trans
+	global v_alleles_review
+	reason=None
 	vpieces=VHitLine.split("\t")
 	jpieces=JHitLine.split("\t")
 	if(vpieces[6]==currentV and jpieces[6]==currentJ):
@@ -97,23 +100,56 @@ def CDR3ANAL(currentV,currentJ,vHitLine,jHitLine,currentD,currentQueryName):
 					else:
 						J_CDR3_END=remap[currentJ]
 					print "ADJ. CDR3 END IN J : ",J_CDR3_END
-					query_cdr3_end=getQueryIndexGivenSubjectIndexAndAlignment(jq_aln,js_aln,jq_f,jq_t,js_f,js_t,J_CDR3_END)
-					print "QUERY cdr3 end is ",query_cdr3_end
-					if(query_cdr3_end!=(-1) and query_cdr3_start!=(-1)):
-						print "I want to translate!"
-						trans+=1
-						if(query_cdr3_end<=query_cdr3_start):
-							raise Exception("why is start>=end?????")
-						cdr3_len=int((query_cdr3_end-query_cdr3_start)/3.0)
-						print "CDR3_LEN="+str(cdr3_len)
-						cdr3_hist[cdr3_len]+=1
+					if(J_CDR3_END==(-1)):
+						reason="REASON: J RECORD HAS NO APPARENT CDR3_END"
+						print reason
+					else:
+						query_cdr3_end=getQueryIndexGivenSubjectIndexAndAlignment(jq_aln,js_aln,jq_f,jq_t,js_f,js_t,J_CDR3_END)
+						print "QUERY cdr3 end is ",query_cdr3_end
+						if(query_cdr3_end==(-1) and js_f>J_CDR3_END):
+							reason="REASON: JCDR3 END IS BEFORE THE ALIGNMENT STARTS"
+							print reason
+						if(query_cdr3_end==(-1) and js_t<J_CDR3_END):
+							reason="REASON: JCDR3 END IS AFTER THE ALIGNMENT ENDS"
+							print reason
+						if(query_cdr3_end!=(-1) and query_cdr3_start!=(-1)):
+							print "I want to translate!"
+							trans+=1
+							if(query_cdr3_end<=query_cdr3_start):
+								raise Exception("why is start>=end?????")
+							cdr3_len=int((query_cdr3_end-query_cdr3_start)/3.0)
+							print "CDR3_LEN="+str(cdr3_len)
+							cdr3_hist[cdr3_len]+=1
+							#if(currentV=="IGHV4-28*06"):
+							#	print">",currentQueryName
+							#	print query_seq_map[currentQueryName]
+							#	sys.exit(0)
+						else:
+							reason="REASON: J END NOT MAPPABLE VIA ALIGNMENT"
+							print reason
+				else:
+					reason="REASON: V START NOT MAPPABLE VIA ALIGNMENT"
+					print reason
+					if(V_CDR3_START>vs_t):
+						reason="REASON: THE CDR3 START IS AFTER THE ALIGNMENT ENDS"
+						print reason
+						reason="REASON: THE CDR3 START IS AFTER THE ALIGNMENT ENDS and D,J are :",str([currentD,currentJ])
+						print reason
+
+					
 		else:
 			#V_CDR3_START is (-1)
 			print "V_CDR3_START is negative 1"
 			print "c:v,d,j =",currentV,",",currentD,",",currentJ
-			print">",currentQueryName
-			print query_seq_map[currentQueryName]
-			
+			reason="REASON: V RECORD ",currentV," HAS NO APPARENT CDR3_START"
+			print reason
+			v_alleles_review[currentV]=imgtdb_obj.getIMGTDatGivenAllele(currentV)
+	else:
+		reason="REASON: currentJ, currentV, vline or jline None!"
+		print reason
+	if(reason):
+		print">",currentQueryName
+		print query_seq_map[currentQueryName]
 
 currentQuery=None
 for line in blast_data:
@@ -195,4 +231,13 @@ for i in range(0,100):
 	print "LEN=",i,"count=",cdr3_hist[i]
 
 
+print "***********************************************************"
+print "REVIEWING ALLELELS "
+for a in v_alleles_review:
+	print "********************************************"
+	print "REVIEW ",a
+	print "REVIEW DESCRIPTOR ",imgtdb_obj.extractDescriptorLine(a)
+	print "********************************************"
+	print v_alleles_review[a]
+	print "\n\n\n\n"		
 
