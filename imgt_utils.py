@@ -1287,16 +1287,17 @@ class imgt_db:
 			raise Exception("Error, db_base is not, must initialize first!")
 		pieces=descriptor.split("|")
 		#BN000872|IGHV5-9-1*02|Mus musculus_C57BL/6|F|V-REGION|2334745..2335041|294 nt|1| | | | |294+24=318| | |
-		print "got pieces ",pieces
+		#print "got pieces ",pieces
 		accession=pieces[0]
 		#print "accession=",accession
 		ss=self.getStartStopFromIndexGivenAccession(accession)
-		print "got start/stop : ",ss
+		#print "got start/stop : ",ss
 		if(len(ss)==2):
 			#regular accession
 			start=ss[0]
 			stop=ss[1]
-			return self.fetchBioPythonRecFromDat(start,stop,biopythonRec)
+			#return self.fetchBioPythonRecFromDat(start,stop,biopythonRec)
+			return self.fetchRecFromDat(start,stop,biopythonRec)
 		else:
 			#irregular accession, use descriptor and index to find the correct accession
 			raise Exception("Address irregular descriptor....")
@@ -1354,13 +1355,13 @@ class imgt_db:
 
 
 	#get the IMGT record given an allele name
-	def getIMGTDatGivenAllele(self,a,org="human"):
+	def getIMGTDatGivenAllele(self,a,biopythonrec=False,org="human"):
 		#print "passed : ",a," with org="+str(org)
 		descriptor=self.extractDescriptorLine(a,org)
 		#print "got descriptor = ",descriptor
-		imgtDAT=self.extractIMGTDatRecordUsingRefDirSetDescriptor(descriptor)
+		imgtDAT=self.extractIMGTDatRecordUsingRefDirSetDescriptor(descriptor,biopythonrec)
 		return imgtDAT
-	
+
 
 
 	#get start/stop from index given accession
@@ -1422,7 +1423,7 @@ class imgt_db:
 			if(not(to_be_returned==None)):
 				return to_be_returned
 			else:
-				raise Exception("Error, descriptor with allele name = '"+str(allele_name)+"' not found under "+str(db_base)+" for organism = "+str(org))
+				raise Exception("Error, descriptor with allele name = '"+str(allele_name)+"' not found under "+str(self.db_base)+" for organism = "+str(org))
 		else:
 			raise Exception("Error, invalid organism="+str(org)+", its directory doesn't exist under"+str(db_base)+"!")
 
