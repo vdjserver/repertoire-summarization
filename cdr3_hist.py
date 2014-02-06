@@ -148,7 +148,7 @@ def CDR3ANAL(currentV,currentJ,vHitLine,jHitLine,currentD,currentQueryName):
 		reason="REASON: currentJ, currentV, vline or jline None!"
 		print reason
 	if(reason):
-		print">",currentQueryName
+		print">"+currentQueryName
 		print query_seq_map[currentQueryName]
 
 currentQuery=None
