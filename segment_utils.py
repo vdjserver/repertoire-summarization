@@ -19,6 +19,10 @@ def prettyPrintTree(t):
 	
 
 
+
+
+
+
 def hierarchyTreeFromGenetableURL(url,locus,listOfAllowableNames=None,existingHierarchy=None):
 	f = urllib2.urlopen(url)
 	html=f.read()
@@ -533,6 +537,77 @@ def getCDR3EndFromJData(jdata,allele,s_start,s_stop):
 	return None
 
 
+def adjustCDR3StartToSubseq(cdr3_start,descriptor,imgtdb_obj,organism="human"):
+	desc_pieces=descriptor.split("|")
+	desc_range=desc_pieces[5]
+	interval_re=re.compile(r'(\d+)\.+(\d+)')
+	mr=re.search(interval_re,desc_range)
+	if(mr):
+		start=int(mr.group(1))
+		stop=int(mr.group(2))
+		if(not(start<=cdr3_start and cdr3_start<=stop)):
+			#not in range!
+			return (-1)
+		else:
+			print "cdr3_reg=",cdr3_start
+			cdr3_adj=start-cdr3_start
+			cdr3_adj*=(-1)
+			print "cdr3_adj=",cdr3_adj
+			return cdr3_adj
+	else:
+		print "raw cdr3=",cdr3_start
+		print "descriptor=",descriptor
+		allele=extractIMGTNameFromKey(descriptor)
+		print "allele\n"
+		vdata=imgtdb_obj.getIMGTDatGivenAllele(allele,organism)
+		print "vdata ",vdata
+		biopyrec=imgtdb_obj.extractIMGTDatRecordUsingRefDirSetDescriptor(descriptor,True)
+		mybiopyseq=str(biopyrec.seq)
+		mybiopyseq=mybiopyseq.upper()
+		print "the biopy seq :",mybiopyseq
+		refdirsetseq=imgtdb_obj.getRefDirSetFNAGivenCompleteDescriptor(descriptor,organism)
+		refdirsetseq=refdirsetseq.upper()
+		print "The ref dir set seq is ",refdirsetseq
+		refdirsetseq_noperiods=re.sub(r'[^ACTG]','',refdirsetseq)
+		print "The ref dir set seq (no periods)  is ",refdirsetseq_noperiods
+		found_res=mybiopyseq.find(refdirsetseq_noperiods)
+		if(found_res==(-1)):
+			raise Exception("Error, failed to get interval (start..stop) from "+descriptor," despite using biopython and subseq!")
+		else:
+			desc_start=found_res
+			desc_end=found_res+len(refdirsetseq_noperiods)
+			if(not(desc_start<=cdr3_start and cdr3_start<=desc_end)):
+				#not in range!
+				return (-1)
+			else:
+				print "cdr3_reg=",cdr3_start
+				cdr3_adj=desc_start-cdr3_start
+				cdr3_adj*=(-1)
+				print "cdr3_adj=",cdr3_adj
+				return cdr3_adj	
+
+
+
+def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human"):
+	if(organism=="human"):
+		#print "getAdjustedCDR3StartFromRefDirSetAllele called with a=",allele," and org=",organism
+		vdata=imgtdb_obj.getIMGTDatGivenAllele(allele,organism)
+		#print "getAdjustedCDR3StartFromRefDirSetAllele vdata is \n",vdata
+		cdr3_start=getCDR3StartFromVData(vdata)
+		#print "getAdjustedCDR3StartFromRefDirSetAllele raw cdr3_start is ",cdr3_start
+		if(cdr3_start==(-1)):
+			#print "getAdjustedCDR3StartFromRefDirSetAllele returning -1 because it is!\n"
+			return (-1)
+		else:
+		
+			descriptor=imgtdb_obj.extractDescriptorLine(allele,organism)
+			#print "The extracted descriptor is ",descriptor
+			cdr3_adjusted=adjustCDR3StartToSubseq(cdr3_start,descriptor,imgtdb_obj,organism)
+			return cdr3_adjusted
+	elif(organism=="Mus_musculus"):
+		
+
+
 def getCDR3StartFromVData(vdata):
 	pieces=vdata.split("\n")
 	cdr3re=re.compile("^FT\s+[^\s]*CDR3[^\s]*\s+(\d+)[^0-9]")
@@ -596,8 +671,8 @@ if (__name__=="__main__"):
 	#sys.exit(0)
 	vlist="IGHV","IGKV","IGLV"
 	jlist="IGHJ","IGKJ","IGLJ"
-	organisms=["human","Mus_musculus"]
-	#organisms=["human"]
+	#organisms=["human","Mus_musculus"]
+	organisms=["human"]
 	flag=False
 	accession_noCDR3=dict()
 	allele_miss=dict()
@@ -612,7 +687,7 @@ if (__name__=="__main__"):
 				break;
 			vlocus=vlist[p]
 			jlocus=jlist[p]
-			print "working on ",vlocus," and ",jlocus," for organism ",organism
+			print "working on ",vlocus," for organism ",organism
 			fna_v_glob="/home/data/DATABASE/01_22_2014/"+organism+"/ReferenceDirectorySet/"+vlocus+"*html.fna"
 			fna_j_glob="/home/data/DATABASE/01_22_2014/"+organism+"/ReferenceDirectorySet/"+jlocus+"*html.fna"
 			fna_v_files=glob.glob(fna_v_glob)
@@ -624,33 +699,47 @@ if (__name__=="__main__"):
 			vmap=read_fasta_file_into_map(fna_v_files[0])
 			jmap=read_fasta_file_into_map(fna_j_files[0])
 			for vdesc in vmap:
-				for jdesc in jmap:
-					#print "working with ",vdesc,"x",jdesc
-					v_allele=extractIMGTNameFromKey(vdesc)
-					j_allele=extractIMGTNameFromKey(jdesc)
-					print "working ",v_allele," and ",j_allele," for ",organism
-					vdata=imgtdb_obj.getIMGTDatGivenAllele(v_allele,organism)
-					v_accession=vdesc.split("|")[0]
-					jdata=imgtdb_obj.getIMGTDatGivenAllele(j_allele,organism)
-					cdr3_start=getCDR3StartFromVData(vdata)
-					if(cdr3_start==(-1)):
-						allele_miss[organism]+=1
-						if(v_accession in accession_noCDR3[organism]):
-							print "double count of accession on allele=",v_allele," for organism=",organism
-						accession_noCDR3[organism][v_accession]=v_allele
-					cdr3_end=getCDR3EndFromJData(jdata,j_allele,-1,-1)
-					print "CDR3 : ",[cdr3_start,cdr3_end]
-					print "\n\n\n"
-	print "***********************************\nEXAMINED ACCESSIONS\n*********************************"
-	for org in organisms:
-		for va in accession_noCDR3[org]:
-			print va,"HUM missing CDR3 start !"
-			allele_to_use=accession_noCDR3[org][va]
-			print "Using allele=",allele_to_use
-			print "Using organism=",org
-			vamd=imgtdb_obj.getIMGTDatGivenAllele(allele_to_use,org)
-			print "\n",vamd
-			print "\n\n\n\n"
+				print "Now have ",vdesc
+				v_allele=extractIMGTNameFromKey(vdesc)
+				print "got allele ",v_allele
+				print "working with ",v_allele," for ",organism
+				vdata=imgtdb_obj.getIMGTDatGivenAllele(v_allele,organism)
+				v_accession=vdesc.split("|")[0]
+				#cdr3_start=getAdjustedCDR3StartFromRefDirSetAllele(v_allele,imgtdb_obj,organism)
+				cdr3_start=getAdjustedCDR3StartFromRefDirSetAllele(v_allele,imgtdb_obj,organism)
+				if(cdr3_start==(-1)):
+					print "Missing CDR3 start for ",v_allele
+					allele_miss[organism]+=1
+					if(v_accession in accession_noCDR3[organism]):
+						print "double count of accession on allele=",v_allele," for organism=",organism
+					accession_noCDR3[organism][v_accession]=v_allele
+				#cdr3_end=getCDR3EndFromJData(jdata,j_allele,-1,-1)
+				print "CDR3 : ["+str(cdr3_start)+":]"
+				print "\n\n\n"				
+				logfile=None
+				if(v_accession in accession_noCDR3):
+					logFile="badcdr3start_"+organism+"_.txt"
+				else:
+					logFile="goodcdr3start_"+organism+"_.txt"
+				g=open(logFile,'a')
+				g.write(vdesc+", "+v_allele+", CDR3_START="+str(cdr3_start)+"\n")
+				g.write(vdata)
+				g.write("\n\n\n")
+				g.close()
+				#for jdesc in jmap:
+
+
+
+	#print "***********************************\nEXAMINED ACCESSIONS\n*********************************"
+	#for org in organisms:
+	#	for va in accession_noCDR3[org]:
+	#		print va,"HUM missing CDR3 start !"
+	#		allele_to_use=accession_noCDR3[org][va]
+	#		print "Using allele=",allele_to_use
+	#		print "Using organism=",org
+	#		vamd=imgtdb_obj.getIMGTDatGivenAllele(allele_to_use,org)
+	#		print "\n",vamd
+	#		print "\n\n\n\n"
 	#for va in accession_noCDR3['human']:
 	#	print va,"HUM missing CDR3 start !"
 	#	allele_to_use=accession_noCDR3['human'][va]
