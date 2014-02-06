@@ -136,9 +136,11 @@ def dicts(t): return {k: dicts(t[k]) for k in t}
 
 
 def getQueryIndexGivenSubjectIndexAndAlignment(query_aln,subject_aln,q_start,q_stop,s_start,s_stop,subject_pos):
-	if(not(s_start<=subject_pos and subject_pos<=s_stop)):
+	if(not((s_start<=subject_pos) and (subject_pos<=s_stop))):
 		#invalid range!
-		return None
+		print "INVALID RANGE!"
+		print "s_start=",s_start,"dbus=",subject_pos,"s_stop=",s_stop
+		return (-1)
 	else:
 		s_counter=s_start
 		q_counter=q_start
@@ -481,15 +483,46 @@ def get_segment_count_map_from_blast_output(blast_out,fasta_file_list):
 	return counts_map
 
 
+def getADJCDR3EndFromJAllele(jallele,imgtdb_obj,org="human"):
+	jdescriptor=imgtdb_obj.extractDescriptorLine(jallele,org)
+	cdr3_end_raw=getCDR3EndFromJData(jallele,imgtdb_obj,org)
+	#print "Got a descriptor ",jdescriptor
+	#print "got a raw cdr3 end=",cdr3_end_raw
+	desc_pieces=jdescriptor.split("|")
+	if(desc_pieces[14]=="rev-compl"):
+		desc_pieces[5]=swapIMGTDescInterval(desc_pieces[5])
+		sep="|"
+		jdescriptor=sep.join(desc_pieces)
+	#print "got a corrected jdescriptor ",jdescriptor
+	interval_re=re.compile(r'(\d+)\.+(\d+)')
+	desc_range=desc_pieces[5]
+	mr=re.search(interval_re,desc_range)
+	if(mr):
+		start=int(mr.group(1))
+		stop=int(mr.group(2))
+		if(start<=cdr3_end_raw and cdr3_end_raw<=stop):
+			return cdr3_end_raw-start
+		else:
+			#out of range
+			return (-1)
+	else:
+		print "FAILED TO MATCH ON INTERVAL REGEX!!!!\n"
+		return None
+		
 
-def getCDR3EndFromJData(jdata,allele,s_start,s_stop):
-	tmp_file_path="/dev/shm/"+re.sub(r'[^0-9\.a-zA-Z]','',allele)
+
+
+
+def getCDR3EndFromJData(allele,imgtdb_obj,org="human"):
+	#tmp_file_path="/dev/shm/"+re.sub(r'[^0-9\.a-zA-Z]','',allele)
 	#print "tpath is ",tmp_file_path
-	writer=open(tmp_file_path,'w')
-	writer.write(jdata)
-	writer.close()
-	from Bio import SeqIO
-	records=SeqIO.parse(tmp_file_path,"imgt")
+	#writer=open(tmp_file_path,'w')
+	#writer.write(jdata)
+	#writer.close()
+	#from Bio import SeqIO
+	#records=SeqIO.parse(tmp_file_path,"imgt")
+	biopyrec=imgtdb_obj.getIMGTDatGivenAllele(allele,True,org)
+	records=[biopyrec]
 	reg_start=None
 	reg_end=None
 	for record in records:
@@ -513,7 +546,7 @@ def getCDR3EndFromJData(jdata,allele,s_start,s_stop):
 						reg_start=int(re.sub(r'[^0-9]','',str(feature.location.start)))
 						#print "fetched is ",reg_start
 						reg_end=int(re.sub(r'[^0-9]','',str(feature.location.end)))
-	records=SeqIO.parse(tmp_file_path,"imgt")
+	#records=SeqIO.parse(tmp_file_path,"imgt")
 	if(not(reg_start==None)):
 		for record in records:
 			feature_list=record.features
@@ -529,16 +562,33 @@ def getCDR3EndFromJData(jdata,allele,s_start,s_stop):
 					#print "found a jtrp"
 					if(reg_start<=c_end and c_end<=reg_end):
 						#this is it!
-						os.remove(tmp_file_path)
+						#os.remove(tmp_file_path)
 						return c_end
 	else:
 		print "failed to get a start!"
-	os.remove(tmp_file_path)
+	#os.remove(tmp_file_path)
 	return None
+
+
+
+def swapIMGTDescInterval(i):
+	interval_re=re.compile(r'(\d+)(\.+)(\d+)')
+	mr=re.search(interval_re,i)	
+	if(mr):
+		p1=mr.group(1)
+		p2=mr.group(3)
+		dots=mr.group(2)
+		return p2+dots+p1
+	else:
+		raise Exception("Error, bad interval in IMGT descriptor "+i)
 
 
 def adjustCDR3StartToSubseq(cdr3_start,descriptor,imgtdb_obj,organism="human"):
 	desc_pieces=descriptor.split("|")
+	if(desc_pieces[14]=="rev-compl"):
+		desc_pieces[5]=swapIMGTDescInterval(desc_pieces[5])
+		sep="|"
+		descriptor=sep.join(desc_pieces)
 	desc_range=desc_pieces[5]
 	interval_re=re.compile(r'(\d+)\.+(\d+)')
 	mr=re.search(interval_re,desc_range)
@@ -549,27 +599,27 @@ def adjustCDR3StartToSubseq(cdr3_start,descriptor,imgtdb_obj,organism="human"):
 			#not in range!
 			return (-1)
 		else:
-			print "cdr3_reg=",cdr3_start
+			#print "cdr3_reg=",cdr3_start
 			cdr3_adj=start-cdr3_start
 			cdr3_adj*=(-1)
-			print "cdr3_adj=",cdr3_adj
+			#print "cdr3_adj=",cdr3_adj
 			return cdr3_adj
 	else:
-		print "raw cdr3=",cdr3_start
-		print "descriptor=",descriptor
+		#print "raw cdr3=",cdr3_start
+		#print "descriptor=",descriptor
 		allele=extractIMGTNameFromKey(descriptor)
-		print "allele\n"
+		#print "allele\n"
 		vdata=imgtdb_obj.getIMGTDatGivenAllele(allele,organism)
-		print "vdata ",vdata
+		#print "vdata ",vdata
 		biopyrec=imgtdb_obj.extractIMGTDatRecordUsingRefDirSetDescriptor(descriptor,True)
 		mybiopyseq=str(biopyrec.seq)
 		mybiopyseq=mybiopyseq.upper()
-		print "the biopy seq :",mybiopyseq
+		#print "the biopy seq :",mybiopyseq
 		refdirsetseq=imgtdb_obj.getRefDirSetFNAGivenCompleteDescriptor(descriptor,organism)
 		refdirsetseq=refdirsetseq.upper()
-		print "The ref dir set seq is ",refdirsetseq
+		#print "The ref dir set seq is ",refdirsetseq
 		refdirsetseq_noperiods=re.sub(r'[^ACTG]','',refdirsetseq)
-		print "The ref dir set seq (no periods)  is ",refdirsetseq_noperiods
+		#print "The ref dir set seq (no periods)  is ",refdirsetseq_noperiods
 		found_res=mybiopyseq.find(refdirsetseq_noperiods)
 		if(found_res==(-1)):
 			raise Exception("Error, failed to get interval (start..stop) from "+descriptor," despite using biopython and subseq!")
@@ -580,10 +630,10 @@ def adjustCDR3StartToSubseq(cdr3_start,descriptor,imgtdb_obj,organism="human"):
 				#not in range!
 				return (-1)
 			else:
-				print "cdr3_reg=",cdr3_start
+				#print "cdr3_reg=",cdr3_start
 				cdr3_adj=desc_start-cdr3_start
 				cdr3_adj*=(-1)
-				print "cdr3_adj=",cdr3_adj
+				#print "cdr3_adj=",cdr3_adj
 				return cdr3_adj	
 
 
@@ -591,9 +641,9 @@ def adjustCDR3StartToSubseq(cdr3_start,descriptor,imgtdb_obj,organism="human"):
 def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human"):
 	if(organism=="human"):
 		#print "getAdjustedCDR3StartFromRefDirSetAllele called with a=",allele," and org=",organism
-		vdata=imgtdb_obj.getIMGTDatGivenAllele(allele,organism)
+		vdata=imgtdb_obj.getIMGTDatGivenAllele(allele,False,organism)
 		#print "getAdjustedCDR3StartFromRefDirSetAllele vdata is \n",vdata
-		cdr3_start=getCDR3StartFromVData(vdata)
+		cdr3_start=getCDR3StartFromVData(vdata,allele,imgtdb_obj,organism)
 		#print "getAdjustedCDR3StartFromRefDirSetAllele raw cdr3_start is ",cdr3_start
 		if(cdr3_start==(-1)):
 			#print "getAdjustedCDR3StartFromRefDirSetAllele returning -1 because it is!\n"
@@ -604,22 +654,55 @@ def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human"):
 			#print "The extracted descriptor is ",descriptor
 			cdr3_adjusted=adjustCDR3StartToSubseq(cdr3_start,descriptor,imgtdb_obj,organism)
 			return cdr3_adjusted
-	elif(organism=="Mus_musculus"):
+	#elif(organism=="Mus_musculus"):
 		
 
 
-def getCDR3StartFromVData(vdata):
-	pieces=vdata.split("\n")
-	cdr3re=re.compile("^FT\s+[^\s]*CDR3[^\s]*\s+(\d+)[^0-9]")
-	for i in range(len(pieces)):
-		#print "got line #",i," : ",pieces[i]
-		cdr3reMatchRes=cdr3re.match(pieces[i])
-		if(cdr3reMatchRes):
-			#print "MATCH!"
-			start=cdr3reMatchRes.group(1)
-			return int(start)
-		else:
-			pass
+def getCDR3StartFromVData(vdata,allele,imgtdb_obj,organism):
+	pyobj=imgtdb_obj.getIMGTDatGivenAllele(allele,True,organism)
+	#find the v region with the allele name
+	#and get the range in the v region.
+	#find the CDR3 inside the v region.  Return it
+	record=pyobj
+	vregion_start=None
+	vregion_stop=None
+	#first find the region start, stop with the matching allele
+	for feature_list in record.features:
+		#print "got feature list : ",feature_list
+		ftype=feature_list.type
+		qualifiers=feature_list.qualifiers
+		if(ftype=="V-REGION"):
+			if("IMGT_allele" in qualifiers):
+				allele_val=str(qualifiers["IMGT_allele"][0])
+				#print "comparison allele : ",allele
+				#print "allele_val is ",allele_val
+				if(allele_val==allele):
+					print "\n\n*****MATCH!*****\n\n"
+					vregion_start=int(re.sub(r'[^0-9]','',str(feature_list.location.start)))
+					print "fetched is ",vregion_start
+					vregion_stop=int(re.sub(r'[^0-9]','',str(feature_list.location.end)))
+					#sys.exit(0)
+				else:
+					pass
+					#print "NO MATCH!"
+					#sys.exit(0)
+	
+	if(vregion_start==None or vregion_stop==None):
+		print "found an invalid region....!"
+		return (-1)
+	else:
+		#print "found a region start and stop, so look for cdr3 in it...."
+		for feature_list in record.features:
+			print "got a feature list"
+			print feature_list
+			ftype=feature_list.type
+			if(re.search(r'CDR3',ftype,re.IGNORECASE)):
+				#print "found a CDR3!"
+				cdr3_start=int(re.sub(r'[^0-9]','',str(feature_list.location.start)))
+				if(vregion_start<=cdr3_start and cdr3_start<=vregion_stop):
+					#print "returning ",cdr3_start
+					#sys.exit(0)		
+					return cdr3_start
 	return (-1)
 
 
