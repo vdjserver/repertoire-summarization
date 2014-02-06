@@ -583,27 +583,49 @@ def swapIMGTDescInterval(i):
 		raise Exception("Error, bad interval in IMGT descriptor "+i)
 
 
+
+def isValBetweenTwoNumsInc(n1,n2,val):
+	#print "in testing func"
+	if(int(n1)<=int(n2)):
+		#print "in first isv"
+		if(n1<=val and val<=n2):
+			return True
+	if(int(n2)<=int(n1)):
+		#print "in second isv"
+		if(n2<=val and val<=n1):
+			return True
+	#print "n1=",n1,"n2=",n2,"val=",val
+	return False
+
+
 def adjustCDR3StartToSubseq(cdr3_start,descriptor,imgtdb_obj,organism="human"):
 	desc_pieces=descriptor.split("|")
+	reversedFlag=False
 	if(desc_pieces[14]=="rev-compl"):
 		desc_pieces[5]=swapIMGTDescInterval(desc_pieces[5])
 		sep="|"
 		descriptor=sep.join(desc_pieces)
+		reversedFlag=True
+	#if(descriptor.find("IGHV4-28*06")!=(-1)):
+	#	#print "Trying to adjust cdr3start=",cdr3_start," for descriptor",descriptor
+	#	#print "The reversed flag is ",str(reversedFlag)
 	desc_range=desc_pieces[5]
 	interval_re=re.compile(r'(\d+)\.+(\d+)')
 	mr=re.search(interval_re,desc_range)
 	if(mr):
 		start=int(mr.group(1))
 		stop=int(mr.group(2))
-		if(not(start<=cdr3_start and cdr3_start<=stop)):
-			#not in range!
-			return (-1)
-		else:
-			#print "cdr3_reg=",cdr3_start
-			cdr3_adj=start-cdr3_start
-			cdr3_adj*=(-1)
-			#print "cdr3_adj=",cdr3_adj
+		#print "start and stop are ",start," and ",stop
+		if(isValBetweenTwoNumsInc(start,stop,cdr3_start)):
+			if(reversedFlag):
+				cdr3_adj=cdr3_start-min(start,stop)
+				cdr3_adj=max(start,stop)-cdr3_adj
+			else:
+				cdr3_adj=start-cdr3_start
+				cdr3_adj*=(-1)
 			return cdr3_adj
+		else:
+			return (-1)
 	else:
 		#print "raw cdr3=",cdr3_start
 		#print "descriptor=",descriptor
@@ -660,6 +682,11 @@ def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human"):
 
 def getCDR3StartFromVData(vdata,allele,imgtdb_obj,organism):
 	pyobj=imgtdb_obj.getIMGTDatGivenAllele(allele,True,organism)
+	#descriptor=imgtdb_obj.extractDescriptorLine(allele,organism)
+	#desc_pieces=descriptor.split("|")
+	##revCompFlag=False
+	#if(desc_pieces[14]=="rev-compl"):
+	#	revCompFlag=True
 	#find the v region with the allele name
 	#and get the range in the v region.
 	#find the CDR3 inside the v region.  Return it
@@ -677,9 +704,9 @@ def getCDR3StartFromVData(vdata,allele,imgtdb_obj,organism):
 				#print "comparison allele : ",allele
 				#print "allele_val is ",allele_val
 				if(allele_val==allele):
-					print "\n\n*****MATCH!*****\n\n"
+					#print "\n\n*****MATCH!*****\n\n"
 					vregion_start=int(re.sub(r'[^0-9]','',str(feature_list.location.start)))
-					print "fetched is ",vregion_start
+					#print "fetched is ",vregion_start
 					vregion_stop=int(re.sub(r'[^0-9]','',str(feature_list.location.end)))
 					#sys.exit(0)
 				else:
@@ -688,21 +715,30 @@ def getCDR3StartFromVData(vdata,allele,imgtdb_obj,organism):
 					#sys.exit(0)
 	
 	if(vregion_start==None or vregion_stop==None):
-		print "found an invalid region....!"
+		#print "found an invalid region....!"
 		return (-1)
 	else:
 		#print "found a region start and stop, so look for cdr3 in it...."
 		for feature_list in record.features:
-			print "got a feature list"
-			print feature_list
+			#print "got a feature list"
+			#print feature_list
 			ftype=feature_list.type
 			if(re.search(r'CDR3',ftype,re.IGNORECASE)):
 				#print "found a CDR3!"
 				cdr3_start=int(re.sub(r'[^0-9]','',str(feature_list.location.start)))
+				cdr3_stop=int(re.sub(r'[^0-9]','',str(feature_list.location.end)))
+				qualifiers=feature_list.qualifiers
+				if("complement" in qualifiers):
+					revCompFlag=True
+				else:
+					revCompFlag=False
 				if(vregion_start<=cdr3_start and cdr3_start<=vregion_stop):
 					#print "returning ",cdr3_start
-					#sys.exit(0)		
-					return cdr3_start
+					#sys.exit(0)
+					if(not(revCompFlag)):
+						return cdr3_start
+					else:
+						return cdr3_stop
 	return (-1)
 
 
@@ -710,16 +746,17 @@ if (__name__=="__main__"):
 	import sys
 	q_aln="-ATTACA-ATTACA"
 	s_aln="GATTACAGATTACA"
-	s_f=10
-	s_t=22
+	s_f=1
+	s_t=13
 	q_f=30
 	q_t=42
-	d_sub=13
-	#res=getQueryIndexGivenSubjectIndexAndAlignment(q_aln,s_aln,q_f,q_t,s_f,s_t,d_sub)
-	#print "first res is ",res
+	d_sub=1
+	res=getQueryIndexGivenSubjectIndexAndAlignment(q_aln,s_aln,q_f,q_t,s_f,s_t,d_sub)
+	print "first res is ",res
+	sys.exit(0)
 	#allele="IGHV4-4*01"
 	#allele="IGHJ5*02"
-	imgtdb_obj=imgt_db("/home/data/DATABASE/01_22_2014/")
+	#imgtdb_obj=imgt_db("/home/data/DATABASE/01_22_2014/")
 	#print "indexing...\n"
 	#imgtdb_obj.indexIMGTDatFile()
 	#print "done indexing...."
