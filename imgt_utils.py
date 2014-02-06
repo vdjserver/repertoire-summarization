@@ -18,6 +18,7 @@ import sys, traceback
 import pickle
 import ntpath
 from segment_utils import *
+from Bio import SeqIO
 
 
 def countNumTerminalEntriesInHierarchy(h):
@@ -1196,6 +1197,7 @@ class imgt_db:
 	imgt_dat_rel_path="www.imgt.org/download/LIGM-DB/imgt.dat"
 	imgt_dat_path=None
 	indexPath=None
+	ref_dir_set_desc_seqs_map=None
 	ol=["human","Mus_musculus"]
 
 	####################
@@ -1264,8 +1266,12 @@ class imgt_db:
 		refDBURL="http://www.imgt.org/download/"
 		wgetCMD="cd "+self.db_base+"\n"
 		wgetCMD+="/usr/bin/wget -r -np "+refDBURL+"GENE-DB/ "+refDBURL+"/LIGM-DB/\n"
-		#wgetCMD+
-		#add ensemble here?
+		wgetCMD+="/usr/bin/wget -m http://www.vbase2.org\n"
+		vbase_down="www.vbase2.org"
+		#don't download these fetch fasta from the data record queries
+		#down_human_vbase_cmd="/usr/bin/wget -O "+vbase_down+"/humanall.fasta http://www.vbase2.org/download/humanall.fasta"
+		#down_mouse_vbase_cmd="/usr/bin/wget -O "+vbase_down+"/mouseall.fasta http://www.vbase2.org/download/mouseall.fasta"
+		#wgetCMD+="if [ -d \""+vbase_down+"\" ] ; then "+down_human_vbase_cmd+" ; "+down_mouse_vbase_cmd+" ; else echo \"APPARENT ERROR IN DOWNLOADING VBASE!\" ; fi ;\n"
 		wgetScriptPath=base_dir+"/wgetscript.sh"
 		wgetScriptOutLog=wgetScriptPath+".log.out"
 		wgetScriptErrLog=wgetScriptPath+".log.err"
@@ -1276,25 +1282,28 @@ class imgt_db:
 
 	#given a full fasta descriptor, get the record from IMGT.dat
 	#note that the descriptor should not have the ">" at the beginning
-	def extractIMGTDatRecordUsingRefDirSetDescriptor(self,descriptor):
+	def extractIMGTDatRecordUsingRefDirSetDescriptor(self,descriptor,biopythonRec=False):
 		if(self.db_base==None):
 			raise Exception("Error, db_base is not, must initialize first!")
 		pieces=descriptor.split("|")
 		#BN000872|IGHV5-9-1*02|Mus musculus_C57BL/6|F|V-REGION|2334745..2335041|294 nt|1| | | | |294+24=318| | |
+		print "got pieces ",pieces
 		accession=pieces[0]
 		#print "accession=",accession
 		ss=self.getStartStopFromIndexGivenAccession(accession)
+		print "got start/stop : ",ss
 		if(len(ss)==2):
 			#regular accession
 			start=ss[0]
 			stop=ss[1]
-			return self.fetchRecFromDat(start,stop)
+			return self.fetchBioPythonRecFromDat(start,stop,biopythonRec)
 		else:
 			#irregular accession, use descriptor and index to find the correct accession
+			raise Exception("Address irregular descriptor....")
 			accession_rel_re=re.compile(r'^(\d+)\.+(\d+)')
 			accession_rel=pieces[5]
 			re_res=re.search(accession_rel_re,accession_rel)
-			if(re_res)
+			if(re_res):
 				d1=re_res.group(1)
 				d2=re_res.group(2)
 				avg=(d1+d2)/2
@@ -1346,9 +1355,9 @@ class imgt_db:
 
 	#get the IMGT record given an allele name
 	def getIMGTDatGivenAllele(self,a,org="human"):
-		#print "passed : ",a
-		descriptor=self.extractDescriptorLine(a,self.db_base,org)
-		#print "descriptor = ",descriptor
+		#print "passed : ",a," with org="+str(org)
+		descriptor=self.extractDescriptorLine(a,org)
+		#print "got descriptor = ",descriptor
 		imgtDAT=self.extractIMGTDatRecordUsingRefDirSetDescriptor(descriptor)
 		return imgtDAT
 	
@@ -1364,18 +1373,36 @@ class imgt_db:
 			pass 
 		
 
+	#given a complete descriptor and organism, fetch the corresponding reference directory set sequence
+	def getRefDirSetFNAGivenCompleteDescriptor(self,descriptor,organism):
+		if(self.ref_dir_set_desc_seqs_map==None):
+			self.ref_dir_set_desc_seqs_map=dict()
+		myloci=get_loci_list()
+		for locus in myloci:
+			html_fna_path=self.db_base+"/"+organism+"/ReferenceDirectorySet/"+locus+".html.fna"
+			fasta_recs=read_fasta_file_into_map(html_fna_path)
+			for fasta_desc in fasta_recs:
+				self.ref_dir_set_desc_seqs_map[fasta_desc]=fasta_recs[fasta_desc]
+		if(descriptor in self.ref_dir_set_desc_seqs_map):
+			return self.ref_dir_set_desc_seqs_map[descriptor]
+		else:
+			raise Exception("Error, descriptor "+descriptor+" points to a non-existent reference directory set sequence under "+organism+"???")
+
+
+
 	#given an allele name and an organism string, extract the fasta descriptor with the specified allele name
 	#use dictionary for cache purposes
-	def extractDescriptorLine(self,allele_name,db_base=None,org="human"):
-		if(db_base==None):
-			db_base=self.db_base
+	def extractDescriptorLine(self,allele_name,org="human"):
+		if(self.db_base==None):
+			#self.db_base=self.db_base
+			raise Exception("Error, db_base not set! Did you initialize???")
 		if(not(self.org_allele_name_desc_map==None)):
 			if(org in org_allele_name_desc_map):
 				if(allele_name in org_allele_name_desc_map[org]):
 					return org_allele_name_desc_map[org][allele_name]
 		else:
 			org_allele_name_desc_map=dict()
-		org_dir=db_base+"/"+org
+		org_dir=self.db_base+"/"+org
 		to_be_returned=None
 		if(os.path.isdir(org_dir)):
 			fna_glob_str=org_dir+"/ReferenceDirectorySet/*.html.fna"
@@ -1399,8 +1426,12 @@ class imgt_db:
 		else:
 			raise Exception("Error, invalid organism="+str(org)+", its directory doesn't exist under"+str(db_base)+"!")
 
+
+
+
+
 	#fetch a record given position interval from the imgt.dat file
-	def fetchRecFromDat(self,start,stop,idxpath=None):
+	def fetchRecFromDat(self,start,stop,biopython=False,idxpath=None):
 		if(idxpath==None):
 			idxpath=self.imgt_dat_path
 		#print "i want to open ",idxpath
@@ -1408,6 +1439,12 @@ class imgt_db:
 			return ""
 		reader=open(idxpath,'r')
 		reader.seek(int(start))
+		if(biopython):
+			records=SeqIO.parse(reader,"imgt")
+			for record in records:
+				my_rec=record
+				reader.close()
+				return my_rec
 		data=reader.read(int(stop)-int(start))
 		reader.close()
 		return data
