@@ -722,10 +722,24 @@ def basic_tree_test():
 	
 
 
+
+
+
+
+
+
+
 #from http://stackoverflow.com/questions/8384737/python-extract-file-name-from-path-no-matter-what-the-os-path-format
 def path_leaf(path):
 	head, tail = ntpath.split(path)
 	return tail or ntpath.basename(head)
+
+
+
+
+
+
+
 
 
 def hierarchy_jsonify_batch(in_hier_dir,out_hier_dir,count_map):
@@ -782,11 +796,21 @@ def getHierarchyTreeFromFile(hier_file):
 
 
 
+
+
+
+
 def trimList(l):
 	for idx, val in enumerate(l):
 		#print idx, val
 		l[idx]=l[idx].strip()
 	return l
+
+
+
+
+
+
 
 
 def getRootFromFile(hfile):
@@ -801,6 +825,17 @@ def getRootFromFile(hfile):
 	return root
 
 
+
+
+
+
+
+
+
+
+
+
+
 def doesThisHierarchyFileNeedToBeUsed(hfile,counts_map):
 	f = open(hier_file, 'r')
 	for line in f:
@@ -811,6 +846,12 @@ def doesThisHierarchyFileNeedToBeUsed(hfile,counts_map):
 	f.close()
 	return False
 	
+
+
+
+
+
+
 
 
 
@@ -831,6 +872,16 @@ def get_pmap(hier_file):
 	return mapping
 
 
+
+
+
+
+
+
+
+
+
+
 def hier_look(pmap,name,max_iter):
 	#here pmap is a map keys are children, values are parents
 	#name is a child whose lineage to root is desired
@@ -849,6 +900,20 @@ def hier_look(pmap,name,max_iter):
 		return "ERR"
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def init_hierarchy_count_map(hierarchy_file):
 	INPUT=open(hierarchy_file,'r')
 	count_map=dict()
@@ -858,6 +923,17 @@ def init_hierarchy_count_map(hierarchy_file):
 		pieces=line.split('\t')
 		count_map[pieces[0]]=0
 	return count_map
+
+
+
+
+
+
+
+
+
+
+
 
 
 

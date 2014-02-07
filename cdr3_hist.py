@@ -3,13 +3,16 @@
 import os
 import re
 import glob
+from os.path import basename
 from segment_utils import getFastaListOfDescs,getQueryIndexGivenSubjectIndexAndAlignment,getAdjustedCDR3StartFromRefDirSetAllele,getADJCDR3EndFromJAllele
 from imgt_utils import imgt_db
-from utils import read_fasta_file_into_map
+from utils import read_fasta_file_into_map,biopythonTranslate,rev_comp_dna
 
 
 def getCDR3Length(VLine,JLine):
 	return 1
+
+
 
 
 #define inputs for run
@@ -41,8 +44,10 @@ JHitLine=None
 currentV=None
 currentJ=None
 currentD=None
+
 trans=0
 tot=0
+nona=0
 max_len=0
 rsmap=dict()
 remap=dict()
@@ -51,10 +56,62 @@ query_seq_map=read_fasta_file_into_map("/home/esalina2/round1_imgt/all_data.proc
 for i in range(0,100):
 	cdr3_hist[i]=0
 v_alleles_review=dict()
+
+
+
+
+vqmap=dict()
+
+
+files=glob.glob("/home/esalina2/Downloads/HSEQS/IMGT_HighV-QUEST_individual_files_folder/*")
+for f in files:
+	reader=open(f,'r')
+	num=0
+	fbase=basename(f)
+	fbpieces=fbase.split("_")
+	readname=str(fbpieces[0].strip())
+	vqmap[readname]=dict()
+	for line in reader:
+		segs=['V','D','J']
+		for seg in segs:
+			if(not(seg in vqmap[readname])):
+				vqmap[readname][seg]=None
+			if(line.startswith(seg+"-GENE")):
+				pieces=line.split(";")
+				if(len(pieces)>=2):
+					info=pieces[1]
+					segre=re.compile(r'homsap\s+(\S+)\s+',re.IGNORECASE)
+					mr=re.search(segre,info)
+					if(mr):
+						seg_res=mr.group(1)
+						#print "readname is ",readname
+						vqmap[readname][seg]=seg_res
+						print "\n\n\n*************************"
+						print "readname="+readname
+						print "seg="+seg
+						print "storage="+seg_res
+						print "*******************************\n\n\n"
+							
+					else:
+						print "FAIL re MATCH ON ",readname," : ",info," for seg=",seg
+		if(num>=40):
+			break;
+		num+=1
+	reader.close()
+
+
+
+
+
+
 def CDR3ANAL(currentV,currentJ,vHitLine,jHitLine,currentD,currentQueryName):
-	global trans
+
+	global transbiopythonTranslate
 	global v_alleles_review
+	global trans
+	global nona
 	reason=None
+	currentQueryName=str(currentQueryName.strip())
 	vpieces=VHitLine.split("\t")
 	jpieces=JHitLine.split("\t")
 	if(vpieces[6]==currentV and jpieces[6]==currentJ):
@@ -101,7 +158,7 @@ def CDR3ANAL(currentV,currentJ,vHitLine,jHitLine,currentD,currentQueryName):
 						J_CDR3_END=remap[currentJ]
 					print "ADJ. CDR3 END IN J : ",J_CDR3_END
 					if(J_CDR3_END==(-1)):
-						reason="REASON: J RECORD HAS NO APPARENT CDR3_END"
+						reason="REASON: J RECORD HAS NO APPARENT CDR3_END in imgt.dat"
 						print reason
 					else:
 						query_cdr3_end=getQueryIndexGivenSubjectIndexAndAlignment(jq_aln,js_aln,jq_f,jq_t,js_f,js_t,J_CDR3_END)
@@ -113,27 +170,30 @@ def CDR3ANAL(currentV,currentJ,vHitLine,jHitLine,currentD,currentQueryName):
 							reason="REASON: JCDR3 END IS AFTER THE ALIGNMENT ENDS"
 							print reason
 						if(query_cdr3_end!=(-1) and query_cdr3_start!=(-1)):
-							print "I want to translate!"
-							trans+=1
 							if(query_cdr3_end<=query_cdr3_start):
 								raise Exception("why is start>=end?????")
+							print "I want to translate!"
+							query_coding_seq=query_seq_map[currentQueryName]
+							if(vHitLine.find("reversed|"+currentQueryName)!=(-1)):
+								query_coding_seq=rev_comp_dna(query_coding_seq)
+							coding_seq=query_coding_seq[(query_cdr3_start-1):(query_cdr3_end-1)]
+							if(coding_seq.find("N")==(-1)):
+								translation=biopythonTranslate(coding_seq)
+								print "The translation is : ",translation
+							trans+=1
 							cdr3_len=int((query_cdr3_end-query_cdr3_start)/3.0)
 							print "CDR3_LEN="+str(cdr3_len)
 							cdr3_hist[cdr3_len]+=1
-							#if(currentV=="IGHV4-28*06"):
-							#	print">",currentQueryName
-							#	print query_seq_map[currentQueryName]
-							#	sys.exit(0)
 						else:
 							reason="REASON: J END NOT MAPPABLE VIA ALIGNMENT"
 							print reason
 				else:
-					reason="REASON: V START NOT MAPPABLE VIA ALIGNMENT"
+					reason="REASON: CDR3 START NOT MAPPABLE VIA ALIGNMENT"
 					print reason
 					if(V_CDR3_START>vs_t):
 						reason="REASON: THE CDR3 START IS AFTER THE ALIGNMENT ENDS"
 						print reason
-						reason="REASON: THE CDR3 START IS AFTER THE ALIGNMENT ENDS and D,J are :",str([currentD,currentJ])
+						reason="REASON: THE CDR3 START IS AFTER THE ALIGNMENT ENDS and D,J are :"+str([currentD,currentJ])
 						print reason
 
 					
@@ -141,12 +201,22 @@ def CDR3ANAL(currentV,currentJ,vHitLine,jHitLine,currentD,currentQueryName):
 			#V_CDR3_START is (-1)
 			print "V_CDR3_START is negative 1"
 			print "c:v,d,j =",currentV,",",currentD,",",currentJ
-			reason="REASON: V RECORD ",currentV," HAS NO APPARENT CDR3_START"
+			reason="REASON: V RECORD "+currentV+" HAS NO APPARENT CDR3_START in imgt.dat"
 			print reason
 			v_alleles_review[currentV]=imgtdb_obj.getIMGTDatGivenAllele(currentV)
 	else:
 		reason="REASON: currentJ, currentV, vline or jline None!"
+		nona+=1
 		print reason
+	if(currentQueryName in vqmap):
+		if(vqmap[currentQueryName]['V']==currentV and vqmap[currentQueryName]['J']==currentJ):
+			print "FULL VQUEST MATCH ON ",currentQueryName," V=",currentV," J=",currentJ
+		elif(vqmap[currentQueryName]['V']==currentV):
+			print "VQUEST MATCH ONLY ON ",currentQueryName," for V=",currentV
+		elif(vqmap[currentQueryName]['J']==currentJ):
+			print "VQUEST MATCH ONLY ON ",currentQueryName," for J=",currentJ
+		else:
+			print "VQUEST mismatch on ",currentQueryName," V=",currentV," VQV=",vqmap[currentQueryName]['V']," J=",currentJ," VQJ=",vqmap[currentQueryName]['J']
 	if(reason):
 		print">"+currentQueryName
 		print query_seq_map[currentQueryName]
@@ -158,6 +228,8 @@ for line in blast_data:
 		#print "At a query : ",line
 		if(VHitLine!=None and JHitLine!=None and currentV!=None and currentJ!=None):
 			CDR3ANAL(currentV,currentJ,VHitLine,JHitLine,currentD,currentQuery)
+		else:
+			nona+=1
 		#reset values
 		VHitLine=None
 		JHitLine=None
@@ -224,6 +296,9 @@ for line in blast_data:
 
 print "tot ",tot
 print "trx ",trans
+diff=(tot-trans)
+print "dif ",diff
+print "nna ",nona
 print "tr/t",float(trans)/float(tot)
 
 print "HISTOGRAM"
@@ -231,13 +306,13 @@ for i in range(0,100):
 	print "LEN=",i,"count=",cdr3_hist[i]
 
 
-print "***********************************************************"
-print "REVIEWING ALLELELS "
-for a in v_alleles_review:
-	print "********************************************"
-	print "REVIEW ",a
-	print "REVIEW DESCRIPTOR ",imgtdb_obj.extractDescriptorLine(a)
-	print "********************************************"
-	print v_alleles_review[a]
-	print "\n\n\n\n"		
+#print "***********************************************************"
+#print "REVIEWING ALLELELS "
+#for a in v_alleles_review:
+#	print "********************************************"
+#	print "REVIEW ",a
+#	print "REVIEW DESCRIPTOR ",imgtdb_obj.extractDescriptorLine(a)
+#	print "********************************************"
+#	print v_alleles_review[a]
+#	print "\n\n\n\n"		
 

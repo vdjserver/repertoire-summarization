@@ -10,6 +10,54 @@ import nwalign as nw
 from imgt_utils import *
 import pickle
 
+
+
+def rev_dna(dna):
+	reversed_dna=""
+	for ub in range(len(dna)):
+		b=len(dna)-ub-1
+		reversed_dna+=dna[b]
+	return reversed_dna
+		
+
+def comp_dna(dna):
+	comped=""
+	comp=dict()
+	comp['A']='T'
+	comp['T']='A'
+	comp['G']='C'
+	comp['C']='G'
+	for b in range(len(dna)):
+		if(dna[b] in comp):
+			comped+=comp[dna[b]]
+		else:
+			comped+=dna[b]
+	return comped
+			
+
+def rev_comp_dna(dna):
+	return comp_dna(rev_dna(dna))
+
+
+def biopythonTranslate(dna):
+	from Bio.Seq import Seq
+	from Bio.Alphabet import IUPAC
+	coding_dna = Seq(dna, IUPAC.unambiguous_dna)
+	#print "coding_dna" ,  coding_dna
+	template_dna = coding_dna.reverse_complement()
+	#print "template_dna" , template_dna
+	messenger_rna = coding_dna.transcribe()
+	#print "messenger_rna" , messenger_rna
+	back_transcripted=messenger_rna.back_transcribe()
+	#print "back_transcripted" , back_transcripted
+	translation=messenger_rna.translate()
+	#print "translation ", translation
+	return translation
+
+
+
+
+
 def counter_map_inc(counter_map,key):
 	if key in counter_map:
 		counter_map[key]+=1
