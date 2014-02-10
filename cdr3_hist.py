@@ -184,17 +184,20 @@ def CDR3ANAL(currentV,currentJ,vHitLine,jHitLine,currentD,currentQueryName):
 							cdr3_len=int((query_cdr3_end-query_cdr3_start)/3.0)
 							print "CDR3_LEN="+str(cdr3_len)
 							cdr3_hist[cdr3_len]+=1
+							if(currentQueryName in vqmap):
+								if(vqmap[currentQueryName]['V']==currentV and vqmap[currentQueryName]['J']==currentJ and currentD==vqmap[currentQueryName]['D']):
+									print "THIS IS A SUPER_MATCH!"
 						else:
 							reason="REASON: J END NOT MAPPABLE VIA ALIGNMENT ; USE JUNCTION END"
 							print reason
-							query_cdr3_end=jq_f
+							query_cdr3_end=jq_f-1
 							#take CDR3 to be the junction end
 							query_coding_seq=query_seq_map[currentQueryName]
 							query_coding_seq=query_seq_map[currentQueryName]
 							if(vHitLine.find("reversed|"+currentQueryName)!=(-1)):
 								query_coding_seq=rev_comp_dna(query_coding_seq)
 							if(query_cdr3_end-3-query_cdr3_start>=3):
-								coding_seq=query_coding_seq[(query_cdr3_start):(query_cdr3_end-3)]
+								coding_seq=query_coding_seq[(query_cdr3_start):(query_cdr3_end)]
 								trans+=1
 								cdr3_len=int(len(coding_seq)/3)
 								cdr3_hist[cdr3_len]+=1
@@ -222,7 +225,7 @@ def CDR3ANAL(currentV,currentJ,vHitLine,jHitLine,currentD,currentQueryName):
 		nona+=1
 		print reason
 	if(currentQueryName in vqmap):
-		if(vqmap[currentQueryName]['V']==currentV and vqmap[currentQueryName]['J']==currentJ):
+		if(vqmap[currentQueryName]['V']==currentV and vqmap[currentQueryName]['J']==currentJ and currentD==vqmap[currentQueryName]['D']):
 			print "FULL VQUEST MATCH ON ",currentQueryName," V=",currentV," J=",currentJ
 		elif(vqmap[currentQueryName]['V']==currentV):
 			print "VQUEST MATCH ONLY ON ",currentQueryName," for V=",currentV
