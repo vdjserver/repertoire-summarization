@@ -176,7 +176,7 @@ def CDR3ANAL(currentV,currentJ,vHitLine,jHitLine,currentD,currentQueryName):
 							query_coding_seq=query_seq_map[currentQueryName]
 							if(vHitLine.find("reversed|"+currentQueryName)!=(-1)):
 								query_coding_seq=rev_comp_dna(query_coding_seq)
-							coding_seq=query_coding_seq[(query_cdr3_start-1):(query_cdr3_end-1)]
+							coding_seq=query_coding_seq[(query_cdr3_start):(query_cdr3_end)]
 							if(coding_seq.find("N")==(-1)):
 								translation=biopythonTranslate(coding_seq)
 								print "The translation is : ",translation
@@ -185,8 +185,23 @@ def CDR3ANAL(currentV,currentJ,vHitLine,jHitLine,currentD,currentQueryName):
 							print "CDR3_LEN="+str(cdr3_len)
 							cdr3_hist[cdr3_len]+=1
 						else:
-							reason="REASON: J END NOT MAPPABLE VIA ALIGNMENT"
+							reason="REASON: J END NOT MAPPABLE VIA ALIGNMENT ; USE JUNCTION END"
 							print reason
+							query_cdr3_end=jq_f
+							#take CDR3 to be the junction end
+							query_coding_seq=query_seq_map[currentQueryName]
+							query_coding_seq=query_seq_map[currentQueryName]
+							if(vHitLine.find("reversed|"+currentQueryName)!=(-1)):
+								query_coding_seq=rev_comp_dna(query_coding_seq)
+							if(query_cdr3_end-3-query_cdr3_start>=3):
+								coding_seq=query_coding_seq[(query_cdr3_start):(query_cdr3_end-3)]
+								trans+=1
+								cdr3_len=int(len(coding_seq)/3)
+								cdr3_hist[cdr3_len]+=1
+								if(coding_seq.find("N")==(-1)):
+									translation=biopythonTranslate(coding_seq)
+									print "The JUNCTION coding seq is :",coding_seq
+									print "The JUNCTION translation is : ",translation
 				else:
 					reason="REASON: CDR3 START NOT MAPPABLE VIA ALIGNMENT"
 					print reason
@@ -195,8 +210,6 @@ def CDR3ANAL(currentV,currentJ,vHitLine,jHitLine,currentD,currentQueryName):
 						print reason
 						reason="REASON: THE CDR3 START IS AFTER THE ALIGNMENT ENDS and D,J are :"+str([currentD,currentJ])
 						print reason
-
-					
 		else:
 			#V_CDR3_START is (-1)
 			print "V_CDR3_START is negative 1"

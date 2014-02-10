@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/local/bin/python
 
 from bs4 import BeautifulSoup
 from collections import defaultdict
@@ -599,23 +599,26 @@ def isValBetweenTwoNumsInc(n1,n2,val):
 
 
 def adjustCDR3StartToSubseq(cdr3_start,descriptor,imgtdb_obj,organism="human"):
+	print "in adjustCDR3StartToSubseq"
+	print "raw cdr3 start is ",cdr3_start
 	desc_pieces=descriptor.split("|")
+	print "before rev:"
+	print desc_pieces
 	reversedFlag=False
 	if(desc_pieces[14]=="rev-compl"):
 		desc_pieces[5]=swapIMGTDescInterval(desc_pieces[5])
 		sep="|"
 		descriptor=sep.join(desc_pieces)
 		reversedFlag=True
-	#if(descriptor.find("IGHV4-28*06")!=(-1)):
-	#	#print "Trying to adjust cdr3start=",cdr3_start," for descriptor",descriptor
-	#	#print "The reversed flag is ",str(reversedFlag)
 	desc_range=desc_pieces[5]
 	interval_re=re.compile(r'(\d+)\.+(\d+)')
 	mr=re.search(interval_re,desc_range)
+	print "after rev"
+	print desc_pieces
 	if(mr):
 		start=int(mr.group(1))
 		stop=int(mr.group(2))
-		#print "start and stop are ",start," and ",stop
+		print "start and stop are ",start," and ",stop
 		if(isValBetweenTwoNumsInc(start,stop,cdr3_start)):
 			if(reversedFlag):
 				cdr3_adj=cdr3_start-min(start,stop)
@@ -623,10 +626,16 @@ def adjustCDR3StartToSubseq(cdr3_start,descriptor,imgtdb_obj,organism="human"):
 			else:
 				cdr3_adj=start-cdr3_start
 				cdr3_adj*=(-1)
+				cdr3_adj+=1
+			print "rev status : ",str(reversedFlag)
+			print "Adjusted : ",cdr3_adj
+			#sys.exit(0)
 			return cdr3_adj
 		else:
+			#this ref dir seq sequence doesn't cover the CDR3 start! :(
 			return (-1)
 	else:
+		#ref dir set lacks the XX..YY interval markers
 		#print "raw cdr3=",cdr3_start
 		#print "descriptor=",descriptor
 		allele=extractIMGTNameFromKey(descriptor)
@@ -666,7 +675,7 @@ def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human"):
 		vdata=imgtdb_obj.getIMGTDatGivenAllele(allele,False,organism)
 		#print "getAdjustedCDR3StartFromRefDirSetAllele vdata is \n",vdata
 		cdr3_start=getCDR3StartFromVData(vdata,allele,imgtdb_obj,organism)
-		#print "getAdjustedCDR3StartFromRefDirSetAllele raw cdr3_start is ",cdr3_start
+		print "getAdjustedCDR3StartFromRefDirSetAllele raw cdr3_start is ",cdr3_start
 		if(cdr3_start==(-1)):
 			#print "getAdjustedCDR3StartFromRefDirSetAllele returning -1 because it is!\n"
 			return (-1)
@@ -724,39 +733,33 @@ def getCDR3StartFromVData(vdata,allele,imgtdb_obj,organism):
 			#print feature_list
 			ftype=feature_list.type
 			if(re.search(r'CDR3',ftype,re.IGNORECASE)):
-				#print "found a CDR3!"
+				print "found a CDR3!"
 				cdr3_start=int(re.sub(r'[^0-9]','',str(feature_list.location.start)))
 				cdr3_stop=int(re.sub(r'[^0-9]','',str(feature_list.location.end)))
 				qualifiers=feature_list.qualifiers
-				if("complement" in qualifiers):
-					revCompFlag=True
-				else:
-					revCompFlag=False
+				print feature_list
+				print qualifiers
+				#if("complement" in qualifiers):
+				#	revCompFlag=True
+				#else:
+				#	revCompFlag=False
 				if(vregion_start<=cdr3_start and cdr3_start<=vregion_stop):
-					#print "returning ",cdr3_start
+					print "returning ",cdr3_start
+					return cdr3_start
 					#sys.exit(0)
-					if(not(revCompFlag)):
-						return cdr3_start
-					else:
-						return cdr3_stop
+					#if(not(revCompFlag)):
+					#	return cdr3_start
+					#else:
+					#	return cdr3_stop
 	return (-1)
 
 
 if (__name__=="__main__"):
 	import sys
-	q_aln="-ATTACA-ATTACA"
-	s_aln="GATTACAGATTACA"
-	s_f=1
-	s_t=13
-	q_f=30
-	q_t=42
-	d_sub=1
-	res=getQueryIndexGivenSubjectIndexAndAlignment(q_aln,s_aln,q_f,q_t,s_f,s_t,d_sub)
-	print "first res is ",res
-	sys.exit(0)
+
 	#allele="IGHV4-4*01"
 	#allele="IGHJ5*02"
-	#imgtdb_obj=imgt_db("/home/data/DATABASE/01_22_2014/")
+	imgtdb_obj=imgt_db("/home/data/DATABASE/01_22_2014/")
 	#print "indexing...\n"
 	#imgtdb_obj.indexIMGTDatFile()
 	#print "done indexing...."
@@ -823,32 +826,18 @@ if (__name__=="__main__"):
 				v_allele=extractIMGTNameFromKey(vdesc)
 				print "got allele ",v_allele
 				print "working with ",v_allele," for ",organism
-				vdata=imgtdb_obj.getIMGTDatGivenAllele(v_allele,organism)
-				v_accession=vdesc.split("|")[0]
-				#cdr3_start=getAdjustedCDR3StartFromRefDirSetAllele(v_allele,imgtdb_obj,organism)
-				cdr3_start=getAdjustedCDR3StartFromRefDirSetAllele(v_allele,imgtdb_obj,organism)
-				if(cdr3_start==(-1)):
-					print "Missing CDR3 start for ",v_allele
-					allele_miss[organism]+=1
-					if(v_accession in accession_noCDR3[organism]):
-						print "double count of accession on allele=",v_allele," for organism=",organism
-					accession_noCDR3[organism][v_accession]=v_allele
-				#cdr3_end=getCDR3EndFromJData(jdata,j_allele,-1,-1)
-				print "CDR3 : ["+str(cdr3_start)+":]"
-				print "\n\n\n"				
-				logfile=None
-				if(v_accession in accession_noCDR3):
-					logFile="badcdr3start_"+organism+"_.txt"
+				cdr3_start_adj=getAdjustedCDR3StartFromRefDirSetAllele(v_allele,imgtdb_obj,organism="human")
+				if(cdr3_start_adj!=(-1)):
+					print "For rds allele=",v_allele," with vdesc=",vdesc," got adjusted cdr3start=",cdr3_start_adj
+					coding_seq=re.sub(r'\.','',vmap[vdesc])[cdr3_start_adj:]
+					print "Coding seq (preN) =",coding_seq
+					#coding_seq=add_necessary_trailing_N_for_mul3(coding_seq)
+					print "Coding seq (postN) =",coding_seq
+					translation=biopythonTranslate(coding_seq)
+					print "Translation=",translation
 				else:
-					logFile="goodcdr3start_"+organism+"_.txt"
-				g=open(logFile,'a')
-				g.write(vdesc+", "+v_allele+", CDR3_START="+str(cdr3_start)+"\n")
-				g.write(vdata)
-				g.write("\n\n\n")
-				g.close()
-				#for jdesc in jmap:
-
-
+					print "Adjusted CDR3 start is (-1)!"
+				print "\n\n\n"
 
 	#print "***********************************\nEXAMINED ACCESSIONS\n*********************************"
 	#for org in organisms:
