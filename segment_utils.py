@@ -606,9 +606,9 @@ def adjustCDR3StartToSubseq(cdr3_start,descriptor,imgtdb_obj,organism="human"):
 	print desc_pieces
 	reversedFlag=False
 	if(desc_pieces[14]=="rev-compl"):
-		desc_pieces[5]=swapIMGTDescInterval(desc_pieces[5])
-		sep="|"
-		descriptor=sep.join(desc_pieces)
+		#desc_pieces[5]=swapIMGTDescInterval(desc_pieces[5])
+		#sep="|"
+		#descriptor=sep.join(desc_pieces)
 		reversedFlag=True
 	desc_range=desc_pieces[5]
 	interval_re=re.compile(r'(\d+)\.+(\d+)')
@@ -620,9 +620,10 @@ def adjustCDR3StartToSubseq(cdr3_start,descriptor,imgtdb_obj,organism="human"):
 		stop=int(mr.group(2))
 		print "start and stop are ",start," and ",stop
 		if(isValBetweenTwoNumsInc(start,stop,cdr3_start)):
-			if(reversedFlag):
+			if(reversedFlag):			
 				cdr3_adj=cdr3_start-min(start,stop)
 				cdr3_adj=max(start,stop)-cdr3_adj
+				cdr3_adj-=start
 			else:
 				cdr3_adj=start-cdr3_start
 				cdr3_adj*=(-1)
@@ -691,11 +692,11 @@ def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human"):
 
 def getCDR3StartFromVData(vdata,allele,imgtdb_obj,organism):
 	pyobj=imgtdb_obj.getIMGTDatGivenAllele(allele,True,organism)
-	#descriptor=imgtdb_obj.extractDescriptorLine(allele,organism)
-	#desc_pieces=descriptor.split("|")
-	##revCompFlag=False
-	#if(desc_pieces[14]=="rev-compl"):
-	#	revCompFlag=True
+	descriptor=imgtdb_obj.extractDescriptorLine(allele,organism)
+	desc_pieces=descriptor.split("|")
+	revCompFlag=False
+	if(desc_pieces[14]=="rev-compl"):
+		revCompFlag=True
 	#find the v region with the allele name
 	#and get the range in the v region.
 	#find the CDR3 inside the v region.  Return it
@@ -739,18 +740,18 @@ def getCDR3StartFromVData(vdata,allele,imgtdb_obj,organism):
 				qualifiers=feature_list.qualifiers
 				print feature_list
 				print qualifiers
-				#if("complement" in qualifiers):
-				#	revCompFlag=True
-				#else:
-				#	revCompFlag=False
+				if("complement" in qualifiers):
+					revCompFlag=True
+				else:
+					revCompFlag=False
 				if(vregion_start<=cdr3_start and cdr3_start<=vregion_stop):
-					print "returning ",cdr3_start
-					return cdr3_start
+					#print "returning ",cdr3_start
+					#return cdr3_start
 					#sys.exit(0)
-					#if(not(revCompFlag)):
-					#	return cdr3_start
-					#else:
-					#	return cdr3_stop
+					if(not(revCompFlag)):
+						return cdr3_start
+					else:
+						return cdr3_stop
 	return (-1)
 
 
