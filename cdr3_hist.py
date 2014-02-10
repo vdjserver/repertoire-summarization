@@ -13,7 +13,7 @@ def getCDR3Length(VLine,JLine):
 	return 1
 
 
-
+#test
 
 #define inputs for run
 vfasta="/home/esalina2/round1_imgt/human_IG_V.fna"
