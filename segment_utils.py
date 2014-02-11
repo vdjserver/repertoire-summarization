@@ -670,7 +670,10 @@ def adjustCDR3StartToSubseq(cdr3_start,descriptor,imgtdb_obj,organism="human"):
 
 
 
+cdr3_adj_map=dict()
+
 def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human"):
+	global cdr3_adj_map
 	if(organism=="human"):
 		#print "getAdjustedCDR3StartFromRefDirSetAllele called with a=",allele," and org=",organism
 		vdata=imgtdb_obj.getIMGTDatGivenAllele(allele,False,organism)
@@ -686,8 +689,56 @@ def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human"):
 			#print "The extracted descriptor is ",descriptor
 			cdr3_adjusted=adjustCDR3StartToSubseq(cdr3_start,descriptor,imgtdb_obj,organism)
 			return cdr3_adjusted
-	#elif(organism=="Mus_musculus"):
+	elif(organism=="Mus_musculus"):
+		#read the HIGH-VQUEST ANNOTATION
+		if("Mus_musculus" in cdr3_adj_map):
+			if(allele in cdr3_adj_map["Mus_musculus"]):
+				return cdr3_adj_map["Mus_musculus"][allele]
+		else:
+			cdr3_adj_map["Mus_musculus"]=dict()
+		baseDir="/home/data/DATABASE/01_22_2014/Mus_musculus/ReferenceDirectorySet/MOUSE/IMGT_HighV-QUEST_individual_files_folder"
+		fglobstr=baseDir+"/*"
+		imgt_files=glob.glob(fglobstr)
+		fileToUse=None
+		annotationStartLine=None
+		for imgt_file in imgt_files:
+			if(fileToUse==None):
+				reader=open(imgt_file,'r')
+				lineNum=0
+				for line in reader:
+					sline=line.strip()
+					if(sline==">"+allele.strip()):
+						fileToUse=imgt_file
+					if(sline.startswith("13. Annotation by IMGT/Automat") and not(fileToUse==None)):
+						annotationStartLine=lineNum
+					lineNum+=1
+		if(fileToUse==None):
+			print "Found no file to use"
+		else:
+			print "Found file ",fileToUse,"to use to start at line=",annotationStartLine
+		cdr3_reader=open(fileToUse,'r')
+		lineNum=0
+		cdr3_re=re.compile(r'^CDR3(\-IMGT)?\s+(\d+)[^0-9]+(\d+)',re.IGNORECASE)
+		cdr3_start=None
+		for line in cdr3_reader:
+			if(lineNum>annotationStartLine):
+				sline=line.strip()
+				search_result=re.search(cdr3_re,sline)
+				if(cdr3_start!=None):
+					print "Looking at ",sline
+				if(search_result):
+					print "FOUND A CDR3 line: ",
+					leftInt=int(search_result.group(2))
+					rightInt=int(search_result.group(3))
+					cdr3_start=leftInt-1
+			lineNum+=1
+		if(cdr3_start==None):
+			cdr3_start=(-1)
+		cdr3_adj_map["Mus_musculus"][allele]=cdr3_start
+		return cdr3_adj_map["Mus_musculus"][allele]
 		
+		
+
 
 
 def getCDR3StartFromVData(vdata,allele,imgtdb_obj,organism):
@@ -796,7 +847,8 @@ if (__name__=="__main__"):
 	vlist="IGHV","IGKV","IGLV"
 	jlist="IGHJ","IGKJ","IGLJ"
 	#organisms=["human","Mus_musculus"]
-	organisms=["human"]
+	#organisms=["human"]
+	organisms=["Mus_musculus"]
 	flag=False
 	accession_noCDR3=dict()
 	allele_miss=dict()
@@ -827,18 +879,20 @@ if (__name__=="__main__"):
 				v_allele=extractIMGTNameFromKey(vdesc)
 				print "got allele ",v_allele
 				print "working with ",v_allele," for ",organism
-				cdr3_start_adj=getAdjustedCDR3StartFromRefDirSetAllele(v_allele,imgtdb_obj,organism="human")
+				cdr3_start_adj=getAdjustedCDR3StartFromRefDirSetAllele(v_allele,imgtdb_obj,organism)
 				if(cdr3_start_adj!=(-1)):
 					print "For rds allele=",v_allele," with vdesc=",vdesc," got adjusted cdr3start=",cdr3_start_adj
 					coding_seq=re.sub(r'\.','',vmap[vdesc])[cdr3_start_adj:]
-					print "Coding seq (preN) =",coding_seq
+					#print "Coding seq (preX) =",coding_seq
 					#coding_seq=add_necessary_trailing_N_for_mul3(coding_seq)
-					print "Coding seq (postN) =",coding_seq
+					#coding_seq=re.sub(r'N','X',coding_seq)
+					print "Coding seq (post) =",coding_seq
 					translation=biopythonTranslate(coding_seq)
-					print "Translation=",translation
+					print "FOUND Translation=",translation
 				else:
 					print "Adjusted CDR3 start is (-1)!"
-				print "\n\n\n"
+					print "FOUND Translation=NONE"
+				print "\n\n\n\n\n\n\n\n\n\n\n"
 
 	#print "***********************************\nEXAMINED ACCESSIONS\n*********************************"
 	#for org in organisms:
