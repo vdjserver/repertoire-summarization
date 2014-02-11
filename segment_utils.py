@@ -730,7 +730,7 @@ def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human"):
 					print "FOUND A CDR3 line: ",
 					leftInt=int(search_result.group(2))
 					rightInt=int(search_result.group(3))
-					cdr3_start=leftInt-1
+					cdr3_start=leftInt
 			lineNum+=1
 		if(cdr3_start==None):
 			cdr3_start=(-1)
