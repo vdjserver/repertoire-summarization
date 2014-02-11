@@ -42,7 +42,8 @@ def rev_comp_dna(dna):
 def biopythonTranslate(dna):
 	from Bio.Seq import Seq
 	from Bio.Alphabet import IUPAC
-	coding_dna = Seq(dna, IUPAC.unambiguous_dna)
+	#coding_dna = Seq(dna, IUPAC.unambiguous_dna)
+	coding_dna = Seq(dna, IUPAC.ambiguous_dna)
 	#print "coding_dna" ,  coding_dna
 	template_dna = coding_dna.reverse_complement()
 	#print "template_dna" , template_dna
