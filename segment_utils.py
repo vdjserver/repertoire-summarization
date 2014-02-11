@@ -882,7 +882,7 @@ if (__name__=="__main__"):
 				cdr3_start_adj=getAdjustedCDR3StartFromRefDirSetAllele(v_allele,imgtdb_obj,organism)
 				if(cdr3_start_adj!=(-1)):
 					print "For rds allele=",v_allele," with vdesc=",vdesc," got adjusted cdr3start=",cdr3_start_adj
-					coding_seq=re.sub(r'\.','',vmap[vdesc])[cdr3_start_adj:]
+					coding_seq=re.sub(r'\.','',vmap[vdesc])[cdr3_start_adj-1:]
 					#print "Coding seq (preX) =",coding_seq
 					#coding_seq=add_necessary_trailing_N_for_mul3(coding_seq)
 					#coding_seq=re.sub(r'N','X',coding_seq)
