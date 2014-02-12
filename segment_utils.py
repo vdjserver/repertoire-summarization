@@ -674,7 +674,7 @@ cdr3_adj_map=dict()
 
 def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human"):
 	global cdr3_adj_map
-	if(organism=="human"):
+	if(organism=="blah"):
 		#print "getAdjustedCDR3StartFromRefDirSetAllele called with a=",allele," and org=",organism
 		vdata=imgtdb_obj.getIMGTDatGivenAllele(allele,False,organism)
 		#print "getAdjustedCDR3StartFromRefDirSetAllele vdata is \n",vdata
@@ -689,14 +689,18 @@ def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human"):
 			#print "The extracted descriptor is ",descriptor
 			cdr3_adjusted=adjustCDR3StartToSubseq(cdr3_start,descriptor,imgtdb_obj,organism)
 			return cdr3_adjusted
-	elif(organism=="Mus_musculus"):
+	#elif(organism=="Mus_musculus" ):
+	else:
 		#read the HIGH-VQUEST ANNOTATION
-		if("Mus_musculus" in cdr3_adj_map):
-			if(allele in cdr3_adj_map["Mus_musculus"]):
-				return cdr3_adj_map["Mus_musculus"][allele]
+		if(organism in cdr3_adj_map):
+			if(allele in cdr3_adj_map[organism]):
+				return cdr3_adj_map[organism][allele]
 		else:
-			cdr3_adj_map["Mus_musculus"]=dict()
-		baseDir="/home/data/DATABASE/01_22_2014/Mus_musculus/ReferenceDirectorySet/MOUSE/IMGT_HighV-QUEST_individual_files_folder"
+			cdr3_adj_map[organism]=dict()
+		if(organism=="Mus_musculus"):
+			baseDir="/home/data/DATABASE/01_22_2014/Mus_musculus/ReferenceDirectorySet/MOUSE/IMGT_HighV-QUEST_individual_files_folder"
+		elif(organism=="human"):
+			baseDir="/home/esalina2/Downloads/HUMAN_REF/IMGT_HighV-QUEST_individual_files_folder"
 		fglobstr=baseDir+"/*"
 		imgt_files=glob.glob(fglobstr)
 		fileToUse=None
@@ -734,8 +738,8 @@ def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human"):
 			lineNum+=1
 		if(cdr3_start==None):
 			cdr3_start=(-1)
-		cdr3_adj_map["Mus_musculus"][allele]=cdr3_start
-		return cdr3_adj_map["Mus_musculus"][allele]
+		cdr3_adj_map[organism][allele]=cdr3_start
+		return cdr3_adj_map[organism][allele]
 		
 		
 
@@ -846,9 +850,9 @@ if (__name__=="__main__"):
 	#sys.exit(0)
 	vlist="IGHV","IGKV","IGLV"
 	jlist="IGHJ","IGKJ","IGLJ"
-	#organisms=["human","Mus_musculus"]
+	organisms=["human","Mus_musculus"]
 	#organisms=["human"]
-	organisms=["Mus_musculus"]
+	#organisms=["Mus_musculus"]
 	flag=False
 	accession_noCDR3=dict()
 	allele_miss=dict()
