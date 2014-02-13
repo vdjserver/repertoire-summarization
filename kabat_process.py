@@ -36,12 +36,25 @@ def writeKabatJCDR3End(k,o):
 		print query_trans
 		query_start=hsp.query_start
 		print "query_start is ",query_start
-		if(query_name.startswith("IGH"))
+		if(query_name.startswith("IGH")):
 			myre=heavy_re
 		else:
-			myre_light_re
-		sr=re.search(myre,query_trans):
+			myre=light_re
+		sr=re.search(myre,query_trans)
 		if(sr):
+			search_position=sr.start()
+			print "The start is ",search_position
+			#this is in zero space, so add 1
+			#search_position+=1
+			#we want the amino-residue BEFORE the match starts as the two REs tell what comes AFTER the CDR3
+			#search_position-=1
+			#by the logic above, just leave the value alone
+			#Now multiply by 3 to get answer in NA space
+			search_position*=3
+			#add the offset for query start
+			search_position+=query_start
+			#add TWO because we want the last NA base in the codon
+			search_position+=2
 			
 		else:
 			print "WARNING , NOT FOUND!"
