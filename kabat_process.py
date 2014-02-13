@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 import re
-
+from utils import printMap
+from Bio.Blast import NCBIXML
 
 def isIntegral(s):
 	ire=re.compile(r'^\s*(\d+)\s*$')
@@ -10,6 +11,41 @@ def isIntegral(s):
 		return True
 	else:
 		return False
+
+def writeKabatJCDR3End(k,o):
+	reader=open(k,'r')
+	blast_records = NCBIXML.parse(reader)
+	numRec=0
+	heavy_re=re.compile(r'WG.G')
+	light_re=re.compile(r'FG.G')
+	for record in blast_records:
+		numRec+=1
+		print "query : ",record.query
+		query_name=record.query
+		if(len(record.alignments)<1):
+				print "TOO FEW ALIGNMENTS",query_name
+				continue
+		alignment=record.alignments[0]
+		print "An alignment length is ",alignment.length
+		if(len(alignment.hsps)<1):
+			print "TOO FEW HSPs",query_name
+			continue
+		hsps=alignment.hsps
+		hsp=alignment.hsps[0]
+		query_trans=hsp.query
+		print query_trans
+		query_start=hsp.query_start
+		print "query_start is ",query_start
+		if(query_name.startswith("IGH"))
+			myre=heavy_re
+		else:
+			myre_light_re
+		sr=re.search(myre,query_trans):
+		if(sr):
+			
+		else:
+			print "WARNING , NOT FOUND!"
+	print "numRecs is ",numRec
 
 
 def writeKabatRegionsFromIGBLASTKabatResult(k,o):
@@ -32,13 +68,15 @@ def writeKabatRegionsFromIGBLASTKabatResult(k,o):
 					currentQuery=currentQuery.strip()
 			else:
 				currentMode=None
+		if( (not(currentQuery in reg_map)) and (not(currentQuery==None))     ):
+			reg_map[currentQuery]=dict()
 		if(currentMode=="summary"):
 			for region in regions:
+				if(not(region in reg_map[currentQuery])):
+					reg_map[currentQuery][region]=dict()
+					reg_map[currentQuery][region]["start"]=(-1)
+					reg_map[currentQuery][region]["stop"]=(-1)
 				if(line.startswith(region)):
-					if(not(currentQuery in reg_map)):
-						reg_map[currentQuery]=dict()
-					if(not(region in reg_map[currentQuery])):
-						reg_map[currentQuery][region]=dict()
 					pieces=line.split("\t")
 					start=pieces[1]
 					stop=pieces[2]
@@ -56,25 +94,33 @@ def writeKabatRegionsFromIGBLASTKabatResult(k,o):
 					else:
 						reg_map[currentQuery][region]["stop"]=(-1)
 	key_list=reg_map.keys()
-	Key_list.sort()
+	key_list.sort()
 	writer=open(o,'w')
 	for i in range(len(key_list)):
 		k=key_list[i]
-		writer.write(k+"\t")
-		for region in regions
-			writer.write(reg_map[k][region]["start"]+"\t"+reg_map[k][region]["stop"]
-		if(i<len(key_list)-1):
+		print "Now looking at ",str(k)
+		printMap(reg_map[k])
+		writer.write(str(k))
+		for region in regions:
+			writer.write("\t"+str(reg_map[k][region]["start"])+"\t"+str(reg_map[k][region]["stop"]))
+		#if(i<len(key_list)-1):
+		if(True):
 			writer.write("\n")
 	writer.close()
-
-			
-
-					
-					
-	
-	
 
 
 
 igblast="/home/data/DATABASE/01_22_2014/human/ReferenceDirectorySet/KABAT/igblastn.kabat.out"
-writeKabatRegionsFromIGBLASTKabatResult(igblast,"/dev/null")
+#writeKabatRegionsFromIGBLASTKabatResult(igblast,"/dev/stdout")
+xml="/home/data/DATABASE/01_22_2014/human/ReferenceDirectorySet/KABAT/blastx.out.xml"
+writeKabatJCDR3End(xml,"/dev/stdout")
+
+
+
+
+
+
+
+
+
+
