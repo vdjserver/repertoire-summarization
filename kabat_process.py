@@ -55,6 +55,20 @@ def writeKabatRegionsFromIGBLASTKabatResult(k,o):
 						print "got stop ",stop," for q=",currentQuery," region=",region
 					else:
 						reg_map[currentQuery][region]["stop"]=(-1)
+	key_list=reg_map.keys()
+	Key_list.sort()
+	writer=open(o,'w')
+	for i in range(len(key_list)):
+		k=key_list[i]
+		writer.write(k+"\t")
+		for region in regions
+			writer.write(reg_map[k][region]["start"]+"\t"+reg_map[k][region]["stop"]
+		if(i<len(key_list)-1):
+			writer.write("\n")
+	writer.close()
+
+			
+
 					
 					
 	
