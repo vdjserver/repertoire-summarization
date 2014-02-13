@@ -18,16 +18,19 @@ def writeKabatJCDR3End(k,o):
 	numRec=0
 	heavy_re=re.compile(r'WG.G')
 	light_re=re.compile(r'FG.G')
+	cdr_map=dict()
 	for record in blast_records:
 		numRec+=1
 		print "query : ",record.query
 		query_name=record.query
 		if(len(record.alignments)<1):
-				print "TOO FEW ALIGNMENTS",query_name
-				continue
+			print "TOO FEW ALIGNMENTS",query_name
+			cdr_map[query_name]=(-1)
+			continue
 		alignment=record.alignments[0]
 		print "An alignment length is ",alignment.length
 		if(len(alignment.hsps)<1):
+			cdr_map[query_name]=(-1)
 			print "TOO FEW HSPs",query_name
 			continue
 		hsps=alignment.hsps
@@ -43,21 +46,17 @@ def writeKabatJCDR3End(k,o):
 		sr=re.search(myre,query_trans)
 		if(sr):
 			search_position=sr.start()
-			print "The start is ",search_position
-			#this is in zero space, so add 1
-			#search_position+=1
-			#we want the amino-residue BEFORE the match starts as the two REs tell what comes AFTER the CDR3
-			#search_position-=1
-			#by the logic above, just leave the value alone
-			#Now multiply by 3 to get answer in NA space
+			print "The searched_position is ",search_position
+			#multipy by 3 to get into NA-space
 			search_position*=3
+			print "in na space no offset : ",search_position
 			#add the offset for query start
-			search_position+=query_start
-			#add TWO because we want the last NA base in the codon
-			search_position+=2
-			
+			search_position+=(query_start-1)
+			cdr_map[query_name]=int(search_position)
+			print query_name+" ---> "+str(cdr_map[query_name])
 		else:
 			print "WARNING , NOT FOUND!"
+		print "\n\n\n"
 	print "numRecs is ",numRec
 
 
