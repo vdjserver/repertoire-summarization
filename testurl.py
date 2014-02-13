@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 import urllib2
 from bs4 import BeautifulSoup
 from collections import defaultdict

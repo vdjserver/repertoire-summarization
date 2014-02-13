@@ -53,8 +53,11 @@ rsmap=dict()
 remap=dict()
 cdr3_hist=dict()
 query_seq_map=read_fasta_file_into_map("/home/esalina2/round1_imgt/all_data.processed.Q35.L200.R1.fna")
-for i in range(0,100):
-	cdr3_hist[i]=0
+domain_list=["imgt","kabat"]
+for d in domain_list:
+	cdr3_hist[d]=dict()
+	for i in range(0,100):
+		cdr3_hist[d][i]=0
 v_alleles_review=dict()
 
 
@@ -64,6 +67,7 @@ vqmap=dict()
 
 
 files=glob.glob("/home/esalina2/Downloads/HSEQS/IMGT_HighV-QUEST_individual_files_folder/*")
+files=[]
 for f in files:
 	reader=open(f,'r')
 	num=0
@@ -99,6 +103,79 @@ for f in files:
 		num+=1
 	reader.close()
 
+
+def getNumDashInStr(s):
+	orig_len=len(s)
+	s_no_dash=re.sub(r'\-','',s)
+	nodash_len=len(s_no_dash)
+	return orig_len-nodash_len
+
+
+def repStr(s,n):
+	if(n<=0):
+		return ""
+	else:
+		return s+repStr(s,n-1)
+
+
+
+def annotatedCDR3(s_aln,q_aln,s_c,q_c,s_s,q_s):
+	#get CDR3 starts relative to the alignment starts
+	aln_rel_s=s_c-s_s
+	aln_rel_q=q_c-q_s
+	print "subject from is ",s_s
+	print "subject cdr3 is ",s_c
+	print "aln rel sub is ",aln_rel_s
+	print "query from is ",q_s
+	print "query CDR3 is ",q_c
+	print "aln rel q is ",aln_rel_q
+	#sys.exit(0)
+
+
+	#find position including gaps in the alignment for the SUBJECT STAR
+	#all this code is 1-based indices
+	#except for actually doing string comparison and string-printing which is 0-based
+	s_temp=0
+	if(s_aln[0]=="-"):
+		s_pos=0
+	else:
+		s_pos=1
+	while(s_pos<=aln_rel_s):
+		if(s_aln[s_temp]!="-"):
+			s_pos+=1
+		s_temp+=1
+	s_actual=s_temp
+	#0-based indices!
+	q_temp=0
+	if(q_aln[0]=="-"):
+		q_pos=0
+	else:
+		q_pos=1
+	while(q_pos<=aln_rel_q):
+		if(q_aln[q_temp]!="-"):
+			q_pos+=1
+		q_temp+=1
+	q_actual=q_temp 
+	#0-based indices
+	#if(q_actual!=s_actual):
+	#	print "***WARNING***"
+	annLines=["","","",""]
+	annLines[0]=repStr(" ",s_actual)
+	annLines[0]+="X"
+	annLines[1]=s_aln
+	annLines[2]=q_aln
+	annLines[3]=repStr(" ",q_actual)
+	annLines[3]+="X"
+	annotated=""
+	for i in range(len(annLines)):
+		#print annLines[i]
+		annotated+=str(i)+" : "+annLines[i]
+		if(i<len(annLines)-1):
+			annotated+="\n"
+	return annotated
+	
+
+	
 
 
 
@@ -145,6 +222,12 @@ def CDR3ANAL(currentV,currentJ,vHitLine,jHitLine,currentD,currentQueryName):
 				print "QUERY cdr3 start is ",query_cdr3_start
 				#sys.exit(0)
 				if(not(query_cdr3_start==(-1))):
+					annotated=annotatedCDR3(vs_aln,vq_aln,V_CDR3_START,query_cdr3_start,vs_f,vq_f)
+					#annotated=annotatedCDR3(s_aln ,q_aln,s_c,q_c,s_s,q_s):
+					print "s_to=",vs_t
+					print "q_to=",vq_t
+					print "The annotated CDR3 area (queryname="+currentQueryName+") is :\n"
+					print annotated+"\n"
 					jq_aln=jpieces[18]
 					js_aln=jpieces[19]
 					jq_f=int(jpieces[14])
@@ -176,35 +259,40 @@ def CDR3ANAL(currentV,currentJ,vHitLine,jHitLine,currentD,currentQueryName):
 							query_coding_seq=query_seq_map[currentQueryName]
 							if(vHitLine.find("reversed|"+currentQueryName)!=(-1)):
 								query_coding_seq=rev_comp_dna(query_coding_seq)
-							coding_seq=query_coding_seq[(query_cdr3_start):(query_cdr3_end)]
+							coding_seq=query_coding_seq[(query_cdr3_start-1):(query_cdr3_end-1)]
 							if(coding_seq.find("N")==(-1)):
 								translation=biopythonTranslate(coding_seq)
+								print "the coding seq  is : ",coding_seq
 								print "The translation is : ",translation
 							trans+=1
+							#annotatedCDR3(s_aln,q_aln,s_c,q_c,s_s,q_s):
+							jAnnotated=annotatedCDR3(js_aln,jq_aln,J_CDR3_END,query_cdr3_end,js_f,jq_f)
+							print "THE_J_ANN IS"
+							print jAnnotated
 							cdr3_len=int((query_cdr3_end-query_cdr3_start)/3.0)
 							print "CDR3_LEN="+str(cdr3_len)
-							cdr3_hist[cdr3_len]+=1
-							if(currentQueryName in vqmap):
-								if(vqmap[currentQueryName]['V']==currentV and vqmap[currentQueryName]['J']==currentJ and currentD==vqmap[currentQueryName]['D']):
-									print "THIS IS A SUPER_MATCH!"
+							cdr3_hist["imgt"][cdr3_len]+=1
+							#if(currentQueryName in vqmap):
+							#	if(vqmap[currentQueryName]['V']==currentV and vqmap[currentQueryName]['J']==currentJ and currentD==vqmap[currentQueryName]['D']):
+							#		print "THIS IS A SUPER_MATCH!"
 						else:
 							reason="REASON: J END NOT MAPPABLE VIA ALIGNMENT ; USE JUNCTION END"
 							print reason
-							query_cdr3_end=jq_f-1
+							#query_cdr3_end=jq_f
 							#take CDR3 to be the junction end
-							query_coding_seq=query_seq_map[currentQueryName]
-							query_coding_seq=query_seq_map[currentQueryName]
-							if(vHitLine.find("reversed|"+currentQueryName)!=(-1)):
-								query_coding_seq=rev_comp_dna(query_coding_seq)
-							if(query_cdr3_end-3-query_cdr3_start>=3):
-								coding_seq=query_coding_seq[(query_cdr3_start):(query_cdr3_end)]
-								trans+=1
-								cdr3_len=int(len(coding_seq)/3)
-								cdr3_hist[cdr3_len]+=1
-								if(coding_seq.find("N")==(-1)):
-									translation=biopythonTranslate(coding_seq)
-									print "The JUNCTION coding seq is :",coding_seq
-									print "The JUNCTION translation is : ",translation
+							#query_coding_seq=query_seq_map[currentQueryName]
+							#query_coding_seq=query_seq_map[currentQueryName]
+							#if(vHitLine.find("reversed|"+currentQueryName)!=(-1)):
+							#	query_coding_seq=rev_comp_dna(query_coding_seq)
+							#if(query_cdr3_end-3-query_cdr3_start>=3):
+							#	coding_seq=query_coding_seq[(query_cdr3_start-1):(query_cdr3_end-1)]
+							#	trans+=1
+							#	cdr3_len=int(len(coding_seq)/3)
+							#	cdr3_hist[cdr3_len]+=1
+							#	if(coding_seq.find("N")==(-1)):
+							#		translation=biopythonTranslate(coding_seq)
+							#		print "The JUNCTION coding seq is :",coding_seq
+							#		print "The JUNCTION translation is : ",translation
 				else:
 					reason="REASON: CDR3 START NOT MAPPABLE VIA ALIGNMENT"
 					print reason
@@ -317,9 +405,10 @@ print "dif ",diff
 print "nna ",nona
 print "tr/t",float(trans)/float(tot)
 
-print "HISTOGRAM"
-for i in range(0,100):
-	print "LEN=",i,"count=",cdr3_hist[i]
+for d in domain_list:
+	print "HISTOGRAM",d
+	for i in range(0,100):
+		print "LEN=",i,"count=",cdr3_hist[d][i]
 
 
 #print "***********************************************************"

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 from datetime import datetime, date, time
 import pprint, pickle
 import os
@@ -39,10 +39,24 @@ def rev_comp_dna(dna):
 	return comp_dna(rev_dna(dna))
 
 
+
+
+
+
 def biopythonTranslate(dna):
 	from Bio.Seq import Seq
 	from Bio.Alphabet import IUPAC
 	#coding_dna = Seq(dna, IUPAC.unambiguous_dna)
+	if(len(dna)>0 and len(dna)<3):
+		return "X"
+	elif(len(dna)==0):
+		return ""
+	mod_3=((len(dna))%3)
+	#print "mod3=",mod_3
+	if(mod_3!=0):
+		dna_good=dna[0:(len(dna)-mod_3)]
+		dna=dna_good
+		return biopythonTranslate(dna)
 	coding_dna = Seq(dna, IUPAC.ambiguous_dna)
 	#print "coding_dna" ,  coding_dna
 	template_dna = coding_dna.reverse_complement()
@@ -54,6 +68,10 @@ def biopythonTranslate(dna):
 	translation=messenger_rna.translate()
 	#print "translation ", translation
 	return translation
+
+
+
+
 
 
 

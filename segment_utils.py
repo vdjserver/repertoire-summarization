@@ -1,4 +1,4 @@
-#!/usr/local/bin/python
+#!/usr/bin/env python
 
 from bs4 import BeautifulSoup
 from collections import defaultdict
@@ -132,44 +132,6 @@ def hierarchyTreeFromGenetableURL(url,locus,listOfAllowableNames=None,existingHi
 #"One-line Tree in Python"
 def tree(): return defaultdict(tree)
 def dicts(t): return {k: dicts(t[k]) for k in t}
-
-
-
-def getQueryIndexGivenSubjectIndexAndAlignment(query_aln,subject_aln,q_start,q_stop,s_start,s_stop,subject_pos):
-	if(not((s_start<=subject_pos) and (subject_pos<=s_stop))):
-		#invalid range!
-		print "INVALID RANGE!"
-		print "s_start=",s_start,"dbus=",subject_pos,"s_stop=",s_stop
-		return (-1)
-	else:
-		s_counter=s_start
-		q_counter=q_start
-		delta=0
-		q_val=query_aln[delta]
-		s_val=subject_aln[delta]
-		#print query_aln+"\n"+subject_aln+"\n"
-		while(delta<len(query_aln)):
-			q_val=query_aln[delta]
-			s_val=subject_aln[delta]
-			#print "in while"
-			#print "delta=",delta
-			#print "len(query_aln[0])=",len(query_aln)
-			#print "s_counter=",s_counter
-			#print "q_counter=",q_counter
-			#print "q_val=",q_val
-			#print "s_val=",s_val
-			#print "delta+s_counter="+str(delta+s_counter)
-			#print "desired=",subject_pos
-			if(((delta)+s_counter)>subject_pos):
-				#print "got it"
-				return delta+q_counter-1
-			if(not(q_val=="-")):
-				q_counter+=1
-			if(not(s_val=="-")):
-				s_counter+=1
-			delta+=1
-			#print "\n\n"
-
 
 
 
@@ -657,7 +619,6 @@ def adjustCDR3StartToSubseq(cdr3_start,descriptor,imgtdb_obj,organism="human"):
 			raise Exception("Error, failed to get interval (start..stop) from "+descriptor," despite using biopython and subseq!")
 		else:
 			desc_start=found_res
-			desc_end=found_res+len(refdirsetseq_noperiods)
 			if(not(desc_start<=cdr3_start and cdr3_start<=desc_end)):
 				#not in range!
 				return (-1)
@@ -810,8 +771,101 @@ def getCDR3StartFromVData(vdata,allele,imgtdb_obj,organism):
 	return (-1)
 
 
+
+
+
+def getQueryIndexGivenSubjectIndexAndAlignment(query_aln,subject_aln,q_start,q_stop,s_start,s_stop,subject_pos):
+	if(not((s_start<=subject_pos) and (subject_pos<=s_stop))):
+		#invalid range!
+		#print "INVALID RANGE!"
+		#print "s_start=",s_start,"dbus=",subject_pos,"s_stop=",s_stop
+		return (-1)
+	else:
+		s_counter=s_start
+		q_counter=q_start
+		delta=0
+		q_val=query_aln[delta]
+		s_val=subject_aln[delta]
+		
+		#print "s counter=",s_counter
+		#print "s_val=",s_val
+		#print "q counter=",q_counter
+		#print "q_val=",q_val
+		#print "alignment s, then q:"
+		#print subject_aln
+		#print query_aln
+		while(delta<len(query_aln)):
+			q_val=query_aln[delta]
+			s_val=subject_aln[delta]
+			#print "in while"
+			#print "delta=",delta
+			#print "len(query_aln[0])=",len(query_aln)
+			#print "s_counter=",s_counter
+			#print "q_counter=",q_counter
+			#print "q_val=",q_val
+			#print "s_val=",s_val
+			#print "delta+s_counter="+str(delta+s_counter)
+			#print "desired=",subject_pos
+			if(subject_pos<=s_counter):#: and s_val!="-"):
+				#print "got it"
+				#return 1-based index
+				#return q_counter
+				if(s_val!="-"):
+					return q_counter
+			if(not(q_val=="-")):
+				q_counter+=1
+			if(not(s_val=="-")):
+				s_counter+=1
+			delta+=1
+			#print "\n\n"
+
+
+
+
+
+
 if (__name__=="__main__"):
 	import sys
+	s_from=90
+	q_from=1
+	s_to=295
+	q_to=205
+	desired=289
+	sub_aln="CAGTAGTAACTGGTGGAGTTGGGTCCGCCAGCCCCCAGGGAAGGGGCTGGAGTGGATTGGGGAAATCTATCATAGTGGGAGCACCAACTACAACCCGTCCCTCAAGAGTCGAGTCACCATATCAGTAGACAAGTCCAAGAACCAGTTCTCCCTGAAGCTGAGCTCTGTGACCGCCGCGGACACGGCCGTGTATTACTGTGCGAGAGA"
+	qry_aln="CAGTAGTAACTGGTGGAGCTGGGTCCGCCAGCCCCCAGG-AAGGGGCTGGAGTGGATTGGGGAAATCTATCATAGTGGGAGCACCAACTACAATCCGTCCCTCAAGAGTCGAGTCACCATATCAGTAGACACGGCCAAGAACCAGTTCTCCCTGAAGCTGAGCTCTGTGACCGCCGCGGACACGGCCGTGTATTACTGTGCGAGAGA"
+	#res=getQueryIndexGivenSubjectIndexAndAlignment(Q_ALN,S_ALN,q_from,q_to,s_from,s_to,sub_desired)
+	res=getQueryIndexGivenSubjectIndexAndAlignment(qry_aln,sub_aln,q_from,q_to,s_from,s_to,desired)
+	print "***************result (for ",desired,") : ",res
+	#s_from=10
+	#s_to=20
+	#q_from=30
+	#q_to=43
+	#s_pos=15
+	#       0 2  45 67 89"
+	#S_ALN="-GATT-AC-AA-TT-"
+	#Q_ALN="TGA-TTACACCGTTC"
+	#      0   3 5    0 
+	# 10 31
+	# 11 32
+	# 12 33
+	# 13 33
+	# 14 35
+	# 15 36
+	# 16 38
+	# 17 39
+	# 18 41
+	# 19 42
+
+	#for sub_desired in range(20-10):
+	#	sub_desired+=s_from
+	#	print "DESIRED BEFORE PASS IN : ",sub_desired
+	#	res=getQueryIndexGivenSubjectIndexAndAlignment(Q_ALN,S_ALN,q_from,q_to,s_from,s_to,sub_desired)
+	#	print "***************result (for ",sub_desired,") : ",res
+	#	print "\n\n"
+	sys.exit(0)
+		
+
+
 
 	#allele="IGHV4-4*01"
 	#allele="IGHJ5*02"
