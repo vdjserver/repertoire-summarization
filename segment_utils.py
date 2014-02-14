@@ -472,6 +472,18 @@ def getADJCDR3EndFromJAllele(jallele,imgtdb_obj,org="human",mode="imgt"):
 			print "FAILED TO MATCH ON INTERVAL REGEX!!!!\n"
 			return None
 	elif(mode=="kabat")
+		kabat_file="/home/data/DATABASE/01_22_2014/"+organism+"/ReferenceDirectorySet/KABAT/Jlookup.tsv"
+		reader=open(kabat_file,'r')
+		cdr3_end_adj_kabat=(-1)
+		for line in reader:
+			line=line.strip()
+			if(line.startswith(jallele)):
+				pieces=line.split("\t")
+				cdr3_end_adj_kabat=int(pieces[2])
+		reader.close()
+		return cdr3_end_adj_kabat
+		
+		
 
 
 
@@ -720,6 +732,7 @@ def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human",m
 					pieces=line.split("\t")
 					cdr3_start=pieces[11]
 					cdr3_adj_map[organism]["kabat"][allele]=cdr3_start
+			reader.close()
 			if(allele in cdr3_adj_map[organism]["kabat"]):
 				return cdr3_adj_map[organism]["kabat"][allele]
 			else:
