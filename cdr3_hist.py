@@ -194,137 +194,46 @@ def CDR3ANAL(currentV,currentJ,vHitLine,jHitLine,currentD,currentQueryName):
 	jpieces=JHitLine.split("\t")
 	if(vpieces[6]==currentV and jpieces[6]==currentJ and (not(currentJ==None)) and (not(currentV==None))   ):
 		#print "WE'RE IN BUSINESS!"
-		if(not(currentV in rsmap)):
-			V_CDR3_START=getAdjustedCDR3StartFromRefDirSetAllele(currentV,imgtdb_obj,"human")
-			rsmap[currentV]=V_CDR3_START
-		else:
-			V_CDR3_START=rsmap[currentV]
-		print "The adjusted CDR3 start is ",V_CDR3_START
-		if(V_CDR3_START!=(-1)):
-			print "c:v,d,j =",currentV,",",currentD,",",currentJ
-			#print VHitLine
-			if(not(currentJ==None)):
-				#got both
-				#vdat=imgtdb_obj.getIMGTDatGivenAllele(currentV,"human")
-				#print vdat+"\n\n"
-				#jdat=imgtdb_obj.getIMGTDatGivenAllele(currentJ,"human")
-				#print jdat+"\n\n"
-				#ddat=imgtdb_obj.getIMGTDatGivenAllele(currentD,"human")
-				#print ddat+"\n\n\n"
+		domain_modes=["imgt","kabat"]
+		for dm in domain_modes:
+			if(not currentV in rsmap[d]):
+				ref_cdr3_start=getAdjustedCDR3StartFromRefDirSetAllele(currentV,imgtdb_obj,"human",dm)
+				rsmap[d][currentV]=ref_cdr3_start
+			else:
+				ref_cdr3_start=rsmap[d][currentV]
+			if(not currentJ in remap[d]):
+				ref_cdr3_end=getADJCDR3EndFromJAllele(currentJ,imgtdb_obj,"human",dm)
+				remap[d][currentJ]=ref_cdr3_end
+			else:
+				ref_cdr3_end=remap[d][currentJ]
+			if(ref_cdr3_start!=(-1) and ref_cdr3_end!=(-1)):
 				vq_aln=vpieces[18]
 				vs_aln=vpieces[19]
 				vq_f=int(vpieces[14])
 				vq_t=int(vpieces[15])
-				#print "qf,qt=",vq_f,",",vq_t
 				vs_f=int(vpieces[16])
 				vs_t=int(vpieces[17])
-				#print "sf,st=",vs_f,",",vs_t
-				query_cdr3_start=getQueryIndexGivenSubjectIndexAndAlignment(vq_aln,vs_aln,vq_f,vq_t,vs_f,vs_t,V_CDR3_START)
-				print "QUERY cdr3 start is ",query_cdr3_start
-				#sys.exit(0)
-				if(not(query_cdr3_start==(-1))):
-					annotated=annotatedCDR3(vs_aln,vq_aln,V_CDR3_START,query_cdr3_start,vs_f,vq_f)
-					#annotated=annotatedCDR3(s_aln ,q_aln,s_c,q_c,s_s,q_s):
-					print "s_to=",vs_t
-					print "q_to=",vq_t
-					print "The annotated CDR3 area (queryname="+currentQueryName+") is :\n"
-					print annotated+"\n"
-					jq_aln=jpieces[18]
-					js_aln=jpieces[19]
-					jq_f=int(jpieces[14])
-					jq_t=int(jpieces[15])
-					js_f=int(jpieces[16])
-					js_t=int(jpieces[17])
-					if(not(currentJ in remap)):
-						J_CDR3_END=getADJCDR3EndFromJAllele(currentJ,imgtdb_obj,"human")
-						remap[currentJ]=J_CDR3_END
-					else:
-						J_CDR3_END=remap[currentJ]
-					print "ADJ. CDR3 END IN J : ",J_CDR3_END
-					if(J_CDR3_END==(-1)):
-						reason="REASON: J RECORD HAS NO APPARENT CDR3_END in imgt.dat"
-						print reason
-					else:
-						query_cdr3_end=getQueryIndexGivenSubjectIndexAndAlignment(jq_aln,js_aln,jq_f,jq_t,js_f,js_t,J_CDR3_END)
-						print "QUERY cdr3 end is ",query_cdr3_end
-						if(query_cdr3_end==(-1) and js_f>J_CDR3_END):
-							reason="REASON: JCDR3 END IS BEFORE THE ALIGNMENT STARTS"
-							print reason
-						if(query_cdr3_end==(-1) and js_t<J_CDR3_END):
-							reason="REASON: JCDR3 END IS AFTER THE ALIGNMENT ENDS"
-							print reason
-						if(query_cdr3_end!=(-1) and query_cdr3_start!=(-1)):
-							if(query_cdr3_end<=query_cdr3_start):
-								raise Exception("why is start>=end?????")
-							print "I want to translate!"
-							query_coding_seq=query_seq_map[currentQueryName]
-							if(vHitLine.find("reversed|"+currentQueryName)!=(-1)):
-								query_coding_seq=rev_comp_dna(query_coding_seq)
-							coding_seq=query_coding_seq[(query_cdr3_start-1):(query_cdr3_end-1)]
-							if(coding_seq.find("N")==(-1)):
-								translation=biopythonTranslate(coding_seq)
-								print "the coding seq  is : ",coding_seq
-								print "The translation is : ",translation
-							trans+=1
-							#annotatedCDR3(s_aln,q_aln,s_c,q_c,s_s,q_s):
-							jAnnotated=annotatedCDR3(js_aln,jq_aln,J_CDR3_END,query_cdr3_end,js_f,jq_f)
-							print "THE_J_ANN IS"
-							print jAnnotated
-							cdr3_len=int((query_cdr3_end-query_cdr3_start)/3.0)
-							print "CDR3_LEN="+str(cdr3_len)
-							cdr3_hist["imgt"][cdr3_len]+=1
-							#if(currentQueryName in vqmap):
-							#	if(vqmap[currentQueryName]['V']==currentV and vqmap[currentQueryName]['J']==currentJ and currentD==vqmap[currentQueryName]['D']):
-							#		print "THIS IS A SUPER_MATCH!"
-						else:
-							reason="REASON: J END NOT MAPPABLE VIA ALIGNMENT ; USE JUNCTION END"
-							print reason
-							#query_cdr3_end=jq_f
-							#take CDR3 to be the junction end
-							#query_coding_seq=query_seq_map[currentQueryName]
-							#query_coding_seq=query_seq_map[currentQueryName]
-							#if(vHitLine.find("reversed|"+currentQueryName)!=(-1)):
-							#	query_coding_seq=rev_comp_dna(query_coding_seq)
-							#if(query_cdr3_end-3-query_cdr3_start>=3):
-							#	coding_seq=query_coding_seq[(query_cdr3_start-1):(query_cdr3_end-1)]
-							#	trans+=1
-							#	cdr3_len=int(len(coding_seq)/3)
-							#	cdr3_hist[cdr3_len]+=1
-							#	if(coding_seq.find("N")==(-1)):
-							#		translation=biopythonTranslate(coding_seq)
-							#		print "The JUNCTION coding seq is :",coding_seq
-							#		print "The JUNCTION translation is : ",translation
-				else:
-					reason="REASON: CDR3 START NOT MAPPABLE VIA ALIGNMENT"
-					print reason
-					if(V_CDR3_START>vs_t):
-						reason="REASON: THE CDR3 START IS AFTER THE ALIGNMENT ENDS"
-						print reason
-						reason="REASON: THE CDR3 START IS AFTER THE ALIGNMENT ENDS and D,J are :"+str([currentD,currentJ])
-						print reason
-		else:
-			#V_CDR3_START is (-1)
-			print "V_CDR3_START is negative 1"
-			print "c:v,d,j =",currentV,",",currentD,",",currentJ
-			reason="REASON: V RECORD "+currentV+" HAS NO APPARENT CDR3_START in imgt.dat"
-			print reason
-			v_alleles_review[currentV]=imgtdb_obj.getIMGTDatGivenAllele(currentV)
-	else:
-		reason="REASON: currentJ, currentV, vline or jline None!"
-		nona+=1
-		print reason
-	if(currentQueryName in vqmap):
-		if(vqmap[currentQueryName]['V']==currentV and vqmap[currentQueryName]['J']==currentJ and currentD==vqmap[currentQueryName]['D']):
-			print "FULL VQUEST MATCH ON ",currentQueryName," V=",currentV," J=",currentJ
-		elif(vqmap[currentQueryName]['V']==currentV):
-			print "VQUEST MATCH ONLY ON ",currentQueryName," for V=",currentV
-		elif(vqmap[currentQueryName]['J']==currentJ):
-			print "VQUEST MATCH ONLY ON ",currentQueryName," for J=",currentJ
-		else:
-			print "VQUEST mismatch on ",currentQueryName," V=",currentV," VQV=",vqmap[currentQueryName]['V']," J=",currentJ," VQJ=",vqmap[currentQueryName]['J']
-	if(reason):
-		print">"+currentQueryName
-		print query_seq_map[currentQueryName]
+				jq_aln=jpieces[18]
+				js_aln=jpieces[19]
+				jq_f=int(jpieces[14])
+				jq_t=int(jpieces[15])
+				js_f=int(jpieces[16])
+				js_t=int(jpieces[17])
+				qry_cdr3_start=getQueryIndexGivenSubjectIndexAndAlignment(vq_aln,vs_aln,vq_f,vq_t,vs_f,vs_t,ref_cdr3_start)
+				qry_cdr3_end=getQueryIndexGivenSubjectIndexAndAlignment(jq_aln,js_aln,jq_f,jq_t,js_f,js_t,ref_cdr3_end)
+				if(qry_cdr3_start!=(-1) and qry_cdr3_end!=(-1)):
+					query_coding_seq=query_seq_map[currentQueryName]
+					if(vHitLine.find("reversed|"+currentQueryName)!=(-1)):
+						query_coding_seq=rev_comp_dna(query_coding_seq)
+					coding_seq=query_coding_seq[(qry_cdr3_start-1):(qry_cdr3_end-1)]
+					cdr3_len=int((qry_cdr3_end-qry_cdr3_start)/3.0)
+					translation=biopythonTranslate(coding_seq)
+					print "the coding seq  is : ",coding_seq
+					print "The translation is : ",translation
+					print "CDR3_LEN="+str(cdr3_len)
+					cdr3_hist[dm][cdr3_len]+=1
+		
+
 
 currentQuery=None
 for line in blast_data:

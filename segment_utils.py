@@ -471,15 +471,15 @@ def getADJCDR3EndFromJAllele(jallele,imgtdb_obj,org="human",mode="imgt"):
 		else:
 			print "FAILED TO MATCH ON INTERVAL REGEX!!!!\n"
 			return None
-	elif(mode=="kabat")
-		kabat_file="/home/data/DATABASE/01_22_2014/"+organism+"/ReferenceDirectorySet/KABAT/Jlookup.tsv"
+	elif(mode=="kabat"):
+		kabat_file="/home/data/DATABASE/01_22_2014/"+org+"/ReferenceDirectorySet/KABAT/Jlookup.tsv"
 		reader=open(kabat_file,'r')
 		cdr3_end_adj_kabat=(-1)
 		for line in reader:
 			line=line.strip()
 			if(line.startswith(jallele)):
 				pieces=line.split("\t")
-				cdr3_end_adj_kabat=int(pieces[2])
+				cdr3_end_adj_kabat=int(pieces[1])
 		reader.close()
 		return cdr3_end_adj_kabat
 		
@@ -645,10 +645,12 @@ def adjustCDR3StartToSubseq(cdr3_start,descriptor,imgtdb_obj,organism="human"):
 
 
 cdr3_adj_map=dict()
-cdr3["human"]=dict()
-cdr3["Mus_musculus"]=dict()
+cdr3_adj_map["human"]=dict()
+cdr3_adj_map["Mus_musculus"]=dict()
 cdr3_adj_map["human"]["imgt"]=dict()
+cdr3_adj_map["human"]["kabat"]=dict()
 cdr3_adj_map["Mus_musculus"]["kabat"]=dict()
+cdr3_adj_map["Mus_musculus"]["imgt"]=dict()
 
 def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human",mode="imgt"):
 	global cdr3_adj_map
