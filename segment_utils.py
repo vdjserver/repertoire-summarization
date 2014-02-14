@@ -445,32 +445,33 @@ def get_segment_count_map_from_blast_output(blast_out,fasta_file_list):
 	return counts_map
 
 
-def getADJCDR3EndFromJAllele(jallele,imgtdb_obj,org="human"):
-	jdescriptor=imgtdb_obj.extractDescriptorLine(jallele,org)
-	cdr3_end_raw=getCDR3EndFromJData(jallele,imgtdb_obj,org)
-	#print "Got a descriptor ",jdescriptor
-	#print "got a raw cdr3 end=",cdr3_end_raw
-	desc_pieces=jdescriptor.split("|")
-	if(desc_pieces[14]=="rev-compl"):
-		desc_pieces[5]=swapIMGTDescInterval(desc_pieces[5])
-		sep="|"
-		jdescriptor=sep.join(desc_pieces)
-	#print "got a corrected jdescriptor ",jdescriptor
-	interval_re=re.compile(r'(\d+)\.+(\d+)')
-	desc_range=desc_pieces[5]
-	mr=re.search(interval_re,desc_range)
-	if(mr):
-		start=int(mr.group(1))
-		stop=int(mr.group(2))
-		if(start<=cdr3_end_raw and cdr3_end_raw<=stop):
-			return cdr3_end_raw-start
+def getADJCDR3EndFromJAllele(jallele,imgtdb_obj,org="human",mode="imgt"):
+	if(mode=="imgt"):
+		jdescriptor=imgtdb_obj.extractDescriptorLine(jallele,org)
+		cdr3_end_raw=getCDR3EndFromJData(jallele,imgtdb_obj,org)
+		#print "Got a descriptor ",jdescriptor
+		#print "got a raw cdr3 end=",cdr3_end_raw
+		desc_pieces=jdescriptor.split("|")
+		if(desc_pieces[14]=="rev-compl"):
+			desc_pieces[5]=swapIMGTDescInterval(desc_pieces[5])
+			sep="|"
+			jdescriptor=sep.join(desc_pieces)
+		#print "got a corrected jdescriptor ",jdescriptor
+		interval_re=re.compile(r'(\d+)\.+(\d+)')
+		desc_range=desc_pieces[5]
+		mr=re.search(interval_re,desc_range)
+		if(mr):
+			start=int(mr.group(1))
+			stop=int(mr.group(2))
+			if(start<=cdr3_end_raw and cdr3_end_raw<=stop):
+				return cdr3_end_raw-start
+			else:
+				#out of range
+				return (-1)
 		else:
-			#out of range
-			return (-1)
-	else:
-		print "FAILED TO MATCH ON INTERVAL REGEX!!!!\n"
-		return None
-		
+			print "FAILED TO MATCH ON INTERVAL REGEX!!!!\n"
+			return None
+	elif(mode=="kabat")
 
 
 
@@ -632,8 +633,12 @@ def adjustCDR3StartToSubseq(cdr3_start,descriptor,imgtdb_obj,organism="human"):
 
 
 cdr3_adj_map=dict()
+cdr3["human"]=dict()
+cdr3["Mus_musculus"]=dict()
+cdr3_adj_map["human"]["imgt"]=dict()
+cdr3_adj_map["Mus_musculus"]["kabat"]=dict()
 
-def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human"):
+def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human",mode="imgt"):
 	global cdr3_adj_map
 	if(organism=="blah"):
 		#print "getAdjustedCDR3StartFromRefDirSetAllele called with a=",allele," and org=",organism
@@ -652,56 +657,78 @@ def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human"):
 			return cdr3_adjusted
 	#elif(organism=="Mus_musculus" ):
 	else:
-		#read the HIGH-VQUEST ANNOTATION
-		if(organism in cdr3_adj_map):
-			if(allele in cdr3_adj_map[organism]):
-				return cdr3_adj_map[organism][allele]
-		else:
-			cdr3_adj_map[organism]=dict()
-		if(organism=="Mus_musculus"):
-			baseDir="/home/data/DATABASE/01_22_2014/Mus_musculus/ReferenceDirectorySet/MOUSE/IMGT_HighV-QUEST_individual_files_folder"
-		elif(organism=="human"):
-			baseDir="/home/esalina2/Downloads/HUMAN_REF/IMGT_HighV-QUEST_individual_files_folder"
-		fglobstr=baseDir+"/*"
-		imgt_files=glob.glob(fglobstr)
-		fileToUse=None
-		annotationStartLine=None
-		for imgt_file in imgt_files:
+		if(mode=="imgt"):
+			#read the HIGH-VQUEST ANNOTATION
+			if(organism in cdr3_adj_map):
+				if(allele in cdr3_adj_map[organism]["imgt"]):
+					return cdr3_adj_map[organism]["imgt"][allele]
+			else:
+				cdr3_adj_map[organism]=dict()
+			if(organism=="Mus_musculus"):
+				baseDir="/home/data/DATABASE/01_22_2014/Mus_musculus/ReferenceDirectorySet/MOUSE/IMGT_HighV-QUEST_individual_files_folder"
+			elif(organism=="human"):
+				baseDir="/home/esalina2/Downloads/HUMAN_REF/IMGT_HighV-QUEST_individual_files_folder"
+			fglobstr=baseDir+"/*"
+			imgt_files=glob.glob(fglobstr)
+			fileToUse=None
+			annotationStartLine=None
+			for imgt_file in imgt_files:
+				if(fileToUse==None):
+					reader=open(imgt_file,'r')
+					lineNum=0
+					for line in reader:
+						sline=line.strip()
+						if(sline==">"+allele.strip()):
+							fileToUse=imgt_file
+						if(sline.startswith("13. Annotation by IMGT/Automat") and not(fileToUse==None)):
+							annotationStartLine=lineNum
+						lineNum+=1
 			if(fileToUse==None):
-				reader=open(imgt_file,'r')
-				lineNum=0
-				for line in reader:
+				print "Found no file to use"
+			else:
+				print "Found file ",fileToUse,"to use to start at line=",annotationStartLine
+			cdr3_reader=open(fileToUse,'r')
+			lineNum=0
+			cdr3_re=re.compile(r'^CDR3(\-IMGT)?\s+(\d+)[^0-9]+(\d+)',re.IGNORECASE)
+			cdr3_start=None
+			for line in cdr3_reader:
+				if(lineNum>annotationStartLine):
 					sline=line.strip()
-					if(sline==">"+allele.strip()):
-						fileToUse=imgt_file
-					if(sline.startswith("13. Annotation by IMGT/Automat") and not(fileToUse==None)):
-						annotationStartLine=lineNum
-					lineNum+=1
-		if(fileToUse==None):
-			print "Found no file to use"
+					search_result=re.search(cdr3_re,sline)
+					if(cdr3_start!=None):
+						print "Looking at ",sline
+					if(search_result):
+						print "FOUND A CDR3 line: ",
+						leftInt=int(search_result.group(2))
+						rightInt=int(search_result.group(3))
+						cdr3_start=leftInt
+				lineNum+=1
+			if(cdr3_start==None):
+				cdr3_start=(-1)
+			cdr3_adj_map[organism]["imgt"][allele]=cdr3_start
+			return cdr3_adj_map[organism]["imgt"][allele]
+		elif(mode=="kabat"):
+			print "need to handle KABAT mode!"
+			if(organism in cdr3_adj_map):
+				if(allele in cdr3_adj_map[organism]["kabat"]):
+					return cdr3_adj_map[organism]["kabat"][allele]			
+			kabat_file="/home/data/DATABASE/01_22_2014/"+organism+"/ReferenceDirectorySet/KABAT/Vlookup.tsv"
+			reader=open(kabat_file,'r')
+			for line in reader:
+				line=line.strip()
+				if(line.startswith(allele)):
+					pieces=line.split("\t")
+					cdr3_start=pieces[11]
+					cdr3_adj_map[organism]["kabat"][allele]=cdr3_start
+			if(allele in cdr3_adj_map[organism]["kabat"]):
+				return cdr3_adj_map[organism]["kabat"][allele]
+			else:
+				cdr3_adj_map[organism]["kabat"][allele]=(-1)
+				return cdr3_adj_map[organism]["kabat"][allele]				
 		else:
-			print "Found file ",fileToUse,"to use to start at line=",annotationStartLine
-		cdr3_reader=open(fileToUse,'r')
-		lineNum=0
-		cdr3_re=re.compile(r'^CDR3(\-IMGT)?\s+(\d+)[^0-9]+(\d+)',re.IGNORECASE)
-		cdr3_start=None
-		for line in cdr3_reader:
-			if(lineNum>annotationStartLine):
-				sline=line.strip()
-				search_result=re.search(cdr3_re,sline)
-				if(cdr3_start!=None):
-					print "Looking at ",sline
-				if(search_result):
-					print "FOUND A CDR3 line: ",
-					leftInt=int(search_result.group(2))
-					rightInt=int(search_result.group(3))
-					cdr3_start=leftInt
-			lineNum+=1
-		if(cdr3_start==None):
-			cdr3_start=(-1)
-		cdr3_adj_map[organism][allele]=cdr3_start
-		return cdr3_adj_map[organism][allele]
-		
+			print "NON EXISTENT MODE : ",mode
+			sys.exit(0)
+
 		
 
 

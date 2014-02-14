@@ -49,12 +49,14 @@ trans=0
 tot=0
 nona=0
 max_len=0
-rsmap=dict()
-remap=dict()
 cdr3_hist=dict()
 query_seq_map=read_fasta_file_into_map("/home/esalina2/round1_imgt/all_data.processed.Q35.L200.R1.fna")
 domain_list=["imgt","kabat"]
+rsmap=dict()
+remap=dict()
 for d in domain_list:
+	rsmap[d]=dict()
+	remap[d]=dict()
 	cdr3_hist[d]=dict()
 	for i in range(0,100):
 		cdr3_hist[d][i]=0
@@ -182,7 +184,6 @@ def annotatedCDR3(s_aln,q_aln,s_c,q_c,s_s,q_s):
 
 
 def CDR3ANAL(currentV,currentJ,vHitLine,jHitLine,currentD,currentQueryName):
-
 	global transbiopythonTranslate
 	global v_alleles_review
 	global trans
@@ -191,7 +192,7 @@ def CDR3ANAL(currentV,currentJ,vHitLine,jHitLine,currentD,currentQueryName):
 	currentQueryName=str(currentQueryName.strip())
 	vpieces=VHitLine.split("\t")
 	jpieces=JHitLine.split("\t")
-	if(vpieces[6]==currentV and jpieces[6]==currentJ):
+	if(vpieces[6]==currentV and jpieces[6]==currentJ and (not(currentJ==None)) and (not(currentV==None))   ):
 		#print "WE'RE IN BUSINESS!"
 		if(not(currentV in rsmap)):
 			V_CDR3_START=getAdjustedCDR3StartFromRefDirSetAllele(currentV,imgtdb_obj,"human")
