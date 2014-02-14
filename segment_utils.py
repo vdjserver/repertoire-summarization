@@ -654,25 +654,26 @@ cdr3_adj_map["Mus_musculus"]["imgt"]=dict()
 
 def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human",mode="imgt"):
 	global cdr3_adj_map
-	if(organism=="blah"):
-		#print "getAdjustedCDR3StartFromRefDirSetAllele called with a=",allele," and org=",organism
-		vdata=imgtdb_obj.getIMGTDatGivenAllele(allele,False,organism)
-		#print "getAdjustedCDR3StartFromRefDirSetAllele vdata is \n",vdata
-		cdr3_start=getCDR3StartFromVData(vdata,allele,imgtdb_obj,organism)
-		print "getAdjustedCDR3StartFromRefDirSetAllele raw cdr3_start is ",cdr3_start
-		if(cdr3_start==(-1)):
-			#print "getAdjustedCDR3StartFromRefDirSetAllele returning -1 because it is!\n"
-			return (-1)
-		else:
-		
-			descriptor=imgtdb_obj.extractDescriptorLine(allele,organism)
-			#print "The extracted descriptor is ",descriptor
-			cdr3_adjusted=adjustCDR3StartToSubseq(cdr3_start,descriptor,imgtdb_obj,organism)
-			return cdr3_adjusted
+	#if(organism=="blah"):
+	#	#print "getAdjustedCDR3StartFromRefDirSetAllele called with a=",allele," and org=",organism
+	#	vdata=imgtdb_obj.getIMGTDatGivenAllele(allele,False,organism)
+	#	#print "getAdjustedCDR3StartFromRefDirSetAllele vdata is \n",vdata
+	#	cdr3_start=getCDR3StartFromVData(vdata,allele,imgtdb_obj,organism)
+	#	print "getAdjustedCDR3StartFromRefDirSetAllele raw cdr3_start is ",cdr3_start
+	#	if(cdr3_start==(-1)):
+	#		#print "getAdjustedCDR3StartFromRefDirSetAllele returning -1 because it is!\n"
+	#		return (-1)
+	#	else:
+	#	
+	#		descriptor=imgtdb_obj.extractDescriptorLine(allele,organism)
+	#		#print "The extracted descriptor is ",descriptor
+	#		cdr3_adjusted=adjustCDR3StartToSubseq(cdr3_start,descriptor,imgtdb_obj,organism)
+	#		return cdr3_adjusted
 	#elif(organism=="Mus_musculus" ):
-	else:
+	if(1==1):
 		if(mode=="imgt"):
 			#read the HIGH-VQUEST ANNOTATION
+			print "need to handle IMGT mode for get CDR3 start"
 			if(organism in cdr3_adj_map):
 				if(allele in cdr3_adj_map[organism]["imgt"]):
 					return cdr3_adj_map[organism]["imgt"][allele]
@@ -722,7 +723,7 @@ def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human",m
 			cdr3_adj_map[organism]["imgt"][allele]=cdr3_start
 			return cdr3_adj_map[organism]["imgt"][allele]
 		elif(mode=="kabat"):
-			print "need to handle KABAT mode!"
+			print "need to handle KABAT mode for CDR3 start!"
 			if(organism in cdr3_adj_map):
 				if(allele in cdr3_adj_map[organism]["kabat"]):
 					return cdr3_adj_map[organism]["kabat"][allele]			
@@ -735,11 +736,14 @@ def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human",m
 					cdr3_start=pieces[11]
 					cdr3_adj_map[organism]["kabat"][allele]=cdr3_start
 			reader.close()
+			toReturn=None
 			if(allele in cdr3_adj_map[organism]["kabat"]):
-				return cdr3_adj_map[organism]["kabat"][allele]
+				toReturn=cdr3_adj_map[organism]["kabat"][allele]
 			else:
 				cdr3_adj_map[organism]["kabat"][allele]=(-1)
-				return cdr3_adj_map[organism]["kabat"][allele]				
+				toReturn=cdr3_adj_map[organism]["kabat"][allele]				
+			print "for kabat (",allele,"), to return ",toReturn
+			return toReturn
 		else:
 			print "NON EXISTENT MODE : ",mode
 			sys.exit(0)
@@ -868,13 +872,13 @@ def getQueryIndexGivenSubjectIndexAndAlignment(query_aln,subject_aln,q_start,q_s
 
 if (__name__=="__main__"):
 	import sys
-	s_from=90
+	sub_aln="TAGTTACTACTGGAGCTGGATCCGGCAGCCCGCCGGGAAGGGACTGGAGTGGATTGGGCGTATCTATACCAGTGGGAGCACCAACTACAACCCCTCCCTCAAGAGTCGAGTCACCATGTCAGTAGACACGTCCAAGAACCAGTTCTCCCTGAAGCTGAGCTCTGTGACCGCCGCGGACACGGCCGTGTATTACTGTGCGAGAGA"
+	qry_aln="TAGTTACTACTGGAGCTGGATACGGCAGCCCGCCGGGAAGGGACTGGAGTGGATTGGGCGTATCTATACCAGTGGGAGCACCAACTACAACCCCTCCCTCAAGAGTCGAGTCACCATGTCAGTAGACACGTCCAAGAACCAGTTCTCACTGAAGCTGAGCTCTGTGACCGCCGCGGACACGGCCGTGTATTACTGTGCGAGAGA"
 	q_from=1
-	s_to=295
-	q_to=205
-	desired=289
-	sub_aln="CAGTAGTAACTGGTGGAGTTGGGTCCGCCAGCCCCCAGGGAAGGGGCTGGAGTGGATTGGGGAAATCTATCATAGTGGGAGCACCAACTACAACCCGTCCCTCAAGAGTCGAGTCACCATATCAGTAGACAAGTCCAAGAACCAGTTCTCCCTGAAGCTGAGCTCTGTGACCGCCGCGGACACGGCCGTGTATTACTGTGCGAGAGA"
-	qry_aln="CAGTAGTAACTGGTGGAGCTGGGTCCGCCAGCCCCCAGG-AAGGGGCTGGAGTGGATTGGGGAAATCTATCATAGTGGGAGCACCAACTACAATCCGTCCCTCAAGAGTCGAGTCACCATATCAGTAGACACGGCCAAGAACCAGTTCTCCCTGAAGCTGAGCTCTGTGACCGCCGCGGACACGGCCGTGTATTACTGTGCGAGAGA"
+	q_to=204
+	s_from=90
+	s_to=293
+	desired=292
 	#res=getQueryIndexGivenSubjectIndexAndAlignment(Q_ALN,S_ALN,q_from,q_to,s_from,s_to,sub_desired)
 	res=getQueryIndexGivenSubjectIndexAndAlignment(qry_aln,sub_aln,q_from,q_to,s_from,s_to,desired)
 	print "***************result (for ",desired,") : ",res

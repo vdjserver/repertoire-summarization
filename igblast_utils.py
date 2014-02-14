@@ -377,6 +377,8 @@ def getWholeChainAlignment(qvseq,vseq,qdseq,dseq,qjseq,jseq,btop_map):
 	
 
 
+
+
 def buildAlignmentWholeSeqsDirect(q,s):
 	aln=["","",""]
 	aln[0]=q
@@ -392,6 +394,11 @@ def buildAlignmentWholeSeqsDirect(q,s):
 			aln[1]+="|"
 	return aln		
 
+
+
+def printNiceAlignment(q,s):
+	joiner="\n"
+	return joiner.join(buildAlignmentWholeSeqsDirect(q,s))
 
 
 
@@ -502,8 +509,33 @@ def getDomainClasses():
 
 
 
+def printVDJBestAssignments(i):
+	reader=open(i,'r')
+	currentQuery=None
+	qre=re.compile(r'^#\s+Query:\s+([^\s]+)\s*$')
+	captureFlag=False
+	for line in reader:
+		line=line.strip()
+		qsr=re.search(qre,line)
+		if(qsr):
+			currentQuery=qsr.group(1)
+		elif(line.startswith("# V(D)J rearrangement summary")):
+			captureFlag=True
+		elif(captureFlag):
+			line=re.sub(r'\t',',',line)
+			print currentQuery+","+line
+			captureFlag=False
+		
+		
+
+
+
+
+
 def test():
 	pass
+	#scanOutputToSQLite("/home/mlevin/project/stanford_davis/run3/out4","/home/esalina2/FLORIAN/merged.igblast.db","/home/mlevin/project/stanford_davis/run3/out4/merged.fasta")
+	printVDJBestAssignments("/home/mlevin/project/stanford_davis/run3/out4/merged.iglbast.out")
 	#print "Running test...."
 	#counts_map=
 	#in_hier_dir="/home/data/vdj_server/pipeline/vdj_ann/17_way/"
@@ -587,5 +619,5 @@ def test():
 
 if (__name__=="__main__"):
 	import sys
-	print "call test"
+	#print "call test"
 	test()
