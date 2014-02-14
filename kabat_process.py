@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import re
+import os
 from utils import printMap
 from Bio.Blast import NCBIXML
 
@@ -19,6 +20,7 @@ def writeKabatJCDR3End(k,o):
 	heavy_re=re.compile(r'WG.G')
 	light_re=re.compile(r'FG.G')
 	cdr_map=dict()
+	writer=open(o,'w')
 	for record in blast_records:
 		numRec+=1
 		print "query : ",record.query
@@ -54,10 +56,12 @@ def writeKabatJCDR3End(k,o):
 			search_position+=(query_start-1)
 			cdr_map[query_name]=int(search_position)
 			print query_name+" ---> "+str(cdr_map[query_name])
+			writer.write(str(query_name)+"\t"+str(cdr_map[query_name])+"\n")
 		else:
 			print "WARNING , NOT FOUND!"
-		print "\n\n\n"
-	print "numRecs is ",numRec
+		#print "\n\n\n"
+	writer.close()
+	#print "numRecs is ",numRec
 
 
 def writeKabatRegionsFromIGBLASTKabatResult(k,o):
@@ -121,11 +125,20 @@ def writeKabatRegionsFromIGBLASTKabatResult(k,o):
 	writer.close()
 
 
+#organisms=["Mus_musculus","human"]
+organisms=["Mus_musculus"]
 
-igblast="/home/data/DATABASE/01_22_2014/human/ReferenceDirectorySet/KABAT/igblastn.kabat.out"
-#writeKabatRegionsFromIGBLASTKabatResult(igblast,"/dev/stdout")
-xml="/home/data/DATABASE/01_22_2014/human/ReferenceDirectorySet/KABAT/blastx.out.xml"
-writeKabatJCDR3End(xml,"/dev/stdout")
+for org in organisms:
+	igblast="/home/data/DATABASE/01_22_2014/"+org+"/ReferenceDirectorySet/KABAT/igblastn.kabat.out"
+	out="/home/data/DATABASE/01_22_2014/"+org+"/ReferenceDirectorySet/KABAT/Vlookup.tsv"
+	if(os.path.exists(igblast) and not os.path.exists(out)):
+		print "proceed on kabat V"
+		writeKabatRegionsFromIGBLASTKabatResult(igblast,out)
+	xml="/home/data/DATABASE/01_22_2014/"+org+"/ReferenceDirectorySet/KABAT/blastx.out.xml"
+	out="/home/data/DATABASE/01_22_2014/"+org+"/ReferenceDirectorySet/KABAT/Jlookup.tsv"
+	if(os.path.exists(xml) and not os.path.exists(out)):
+		print "proceed on kabat J"
+		writeKabatJCDR3End(xml,out)
 
 
 
