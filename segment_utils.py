@@ -734,7 +734,7 @@ def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human",m
 				if(line.startswith(allele)):
 					pieces=line.split("\t")
 					cdr3_start=pieces[11]
-					cdr3_adj_map[organism]["kabat"][allele]=cdr3_start
+					cdr3_adj_map[organism]["kabat"][allele]=int(cdr3_start)
 			reader.close()
 			toReturn=None
 			if(allele in cdr3_adj_map[organism]["kabat"]):
@@ -821,18 +821,34 @@ def getCDR3StartFromVData(vdata,allele,imgtdb_obj,organism):
 
 
 def getQueryIndexGivenSubjectIndexAndAlignment(query_aln,subject_aln,q_start,q_stop,s_start,s_stop,subject_pos):
-	if(not((s_start<=subject_pos) and (subject_pos<=s_stop))):
+	print "in getQueryIndexGivenSubjectIndexAndAlignment"
+	import hashlib
+	print "query_aln=",query_aln
+	print "query_aln_digest=",hashlib.md5(query_aln).hexdigest()
+	print "subct_aln=",subject_aln
+	print "subct_aln_digest=",hashlib.md5(subject_aln).hexdigest()	
+	print "q_start=",q_start
+	print "q_stop=",q_stop
+	print "s_start=",s_start
+	print "s_stop=",s_stop
+	print "desired=",subject_pos
+	firstCond=(s_start<=subject_pos)
+	secondCond=(subject_pos<=s_stop)
+	print "firstCond (s_start<=subject_pos) is ",firstCond
+	print "secondCond (subject_pos<=s_stup)   is ",secondCond
+	if(not(firstCond) or not(secondCond)):
 		#invalid range!
 		#print "INVALID RANGE!"
 		#print "s_start=",s_start,"dbus=",subject_pos,"s_stop=",s_stop
+		print "getQueryIndexGivenSubjectIndexAndAlignment to return (neg) (-1)"
 		return (-1)
-	else:
+	if(firstCond and secondCond):
+		#if within the boundaries!
 		s_counter=s_start
 		q_counter=q_start
 		delta=0
 		q_val=query_aln[delta]
 		s_val=subject_aln[delta]
-		
 		#print "s counter=",s_counter
 		#print "s_val=",s_val
 		#print "q counter=",q_counter
@@ -857,6 +873,7 @@ def getQueryIndexGivenSubjectIndexAndAlignment(query_aln,subject_aln,q_start,q_s
 				#return 1-based index
 				#return q_counter
 				if(s_val!="-"):
+					print "getQueryIndexGivenSubjectIndexAndAlignment to return (qcounter) ",q_counter
 					return q_counter
 			if(not(q_val=="-")):
 				q_counter+=1
@@ -864,7 +881,6 @@ def getQueryIndexGivenSubjectIndexAndAlignment(query_aln,subject_aln,q_start,q_s
 				s_counter+=1
 			delta+=1
 			#print "\n\n"
-
 
 
 
