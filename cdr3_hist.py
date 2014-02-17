@@ -52,14 +52,23 @@ nona=0
 max_len=0
 cdr3_hist=dict()
 query_seq_map=read_fasta_file_into_map("/home/esalina2/round1_imgt/all_data.processed.Q35.L200.R1.fna")
-domain_list=["imgt","kabat"]
+
+
+
+def get_domain_modes():
+	domain_list=["imgt","kabat"]
+	#domain_list=["kabat"]
+	return domain_list
+
+
 rsmap=dict()
 remap=dict()
+domain_list=get_domain_modes()
 for d in domain_list:
 	rsmap[d]=dict()
 	remap[d]=dict()
 	cdr3_hist[d]=dict()
-	for i in range(0,100):
+	for i in range(0,1000):
 		cdr3_hist[d][i]=0
 v_alleles_review=dict()
 
@@ -201,7 +210,7 @@ def CDR3ANAL(currentV,currentJ,vHitLine,jHitLine,currentD,currentQueryName):
 	jpieces=JHitLine.split("\t")
 	if(vpieces[6]==currentV and jpieces[6]==currentJ and (not(currentJ==None)) and (not(currentV==None))   ):
 		#print "WE'RE IN BUSINESS!"
-		domain_modes=["imgt","kabat"]
+		domain_modes=get_domain_modes()
 		for dm in domain_modes:
 			#print "processing in ",dm
 			if(not currentV in rsmap[dm]):
@@ -230,7 +239,7 @@ def CDR3ANAL(currentV,currentJ,vHitLine,jHitLine,currentD,currentQueryName):
 				js_f=int(jpieces[16])
 				js_t=int(jpieces[17])
 				qry_cdr3_start=getQueryIndexGivenSubjectIndexAndAlignment(vq_aln,vs_aln,vq_f,vq_t,vs_f,vs_t,ref_cdr3_start)
-				if(dm=="kabat"):
+				if(currentQueryName=="HZ8R54Q01AUSIL"):
 					print "mode=kabat"
 					print "ref cdr3_start=",ref_cdr3_start
 					print "ref from/to : ",vs_f,",",vs_t
@@ -239,13 +248,16 @@ def CDR3ANAL(currentV,currentJ,vHitLine,jHitLine,currentD,currentQueryName):
 					print printNiceAlignment(vq_aln,vs_aln)
 					print "QRY CDR3 START ",qry_cdr3_start
 					print "\n\n\n"
+					if(vq_aln=="TAGTTACTACTGGAGCTGGATACGGCAGCCCGCCGGGAAGGGACTGGAGTGGATTGGGCGTATCTATACCAGTGGGAGCACCAACTACAACCCCTCCCTCAAGAGTCGAGTCACCATGTCAGTAGACACGTCCAAGAACCAGTTCTCACTGAAGCTGAGCTCTGTGACCGCCGCGGACACGGCCGTGTATTACTGTGCGAGAGA" and vs_aln=="TAGTTACTACTGGAGCTGGATCCGGCAGCCCGCCGGGAAGGGACTGGAGTGGATTGGGCGTATCTATACCAGTGGGAGCACCAACTACAACCCCTCCCTCAAGAGTCGAGTCACCATGTCAGTAGACACGTCCAAGAACCAGTTCTCCCTGAAGCTGAGCTCTGTGACCGCCGCGGACACGGCCGTGTATTACTGTGCGAGAGA"):
+						print "am on ",currentQueryName
+						#sys.exit(0)
 				qry_cdr3_end=getQueryIndexGivenSubjectIndexAndAlignment(jq_aln,js_aln,jq_f,jq_t,js_f,js_t,ref_cdr3_end)
 				if(qry_cdr3_start!=(-1) and qry_cdr3_end!=(-1)):
 					query_coding_seq=query_seq_map[currentQueryName]
 					if(vHitLine.find("reversed|"+currentQueryName)!=(-1)):
 						query_coding_seq=rev_comp_dna(query_coding_seq)
 					coding_seq=query_coding_seq[(qry_cdr3_start-1):(qry_cdr3_end-1)]
-					cdr3_len=int((qry_cdr3_end-qry_cdr3_start)/3.0)
+					cdr3_len=qry_cdr3_end-qry_cdr3_start+1
 					translation=biopythonTranslate(coding_seq)
 					print "the coding seq ("+dm+") is : ",coding_seq
 					print "The translation ("+dm+") is : ",translation
@@ -339,8 +351,9 @@ print "nna ",nona
 print "tr/t",float(trans)/float(tot)
 
 for d in domain_list:
-	print "HISTOGRAM",d
-	for i in range(0,100):
+	print "\n\n\n\n\n\n\n\n\n"
+	print "HISTOGRAM FOR ",d
+	for i in range(0,1000):
 		print "LEN=",i,"count=",cdr3_hist[d][i]
 
 
