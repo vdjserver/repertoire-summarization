@@ -522,7 +522,15 @@ def printVDJBestAssignments(i):
 		elif(line.startswith("# V(D)J rearrangement summary")):
 			captureFlag=True
 		elif(captureFlag):
-			line=re.sub(r'\t',',',line)
+			pieces=line.split('\t')
+			for p in range(len(pieces)):
+				if ',' in pieces[p]:
+					#the piece is a string of comma-separated values
+					comma_pieces=pieces[p].split(',')
+					pieces[p]=comma_pieces[0]
+			joiner=','
+			line=joiner.join(pieces)			
+			#line=re.sub(r'\t',',',line)
 			print currentQuery+","+line
 			captureFlag=False
 		
