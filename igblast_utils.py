@@ -519,7 +519,7 @@ def printVDJBestAssignments(i):
 		qsr=re.search(qre,line)
 		if(qsr):
 			currentQuery=qsr.group(1)
-		elif(line.startswith("# V(D)J rearrangement summary")):
+		elif(line.startswith("# V(D)J rearrangement summary") or line.startswith("# V-(D)-J rearrangement summary")):
 			captureFlag=True
 		elif(captureFlag):
 			pieces=line.split('\t')
@@ -543,7 +543,7 @@ def printVDJBestAssignments(i):
 def test():
 	pass
 	#scanOutputToSQLite("/home/mlevin/project/stanford_davis/run3/out4","/home/esalina2/FLORIAN/merged.igblast.db","/home/mlevin/project/stanford_davis/run3/out4/merged.fasta")
-	printVDJBestAssignments("/home/mlevin/project/stanford_davis/run3/out4/merged.iglbast.out")
+	printVDJBestAssignments("/home/esalina2/FLORIAN/TR/merged.igblast.out")
 	#print "Running test...."
 	#counts_map=
 	#in_hier_dir="/home/data/vdj_server/pipeline/vdj_ann/17_way/"
