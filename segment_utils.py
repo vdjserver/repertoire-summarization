@@ -135,6 +135,8 @@ def dicts(t): return {k: dicts(t[k]) for k in t}
 
 
 
+
+
 def analyze_download_dir_forVDJserver(base_dir,countsMap=None,specifiedOrganism=None,specifiedLocus=None):
 	myDB=imgt_db(base_dir)
 	organisms=myDB.getOrganismList()
@@ -855,6 +857,21 @@ class IncrementMapWrapper():
 			for i in range(k_count):
 				self.increment(k)
 
+	#write JSON to file
+	def JSONIFYToFile(self,db_base,organism,filePath,filterbyFastaAlleles=False):
+		JSON=self.JSONIFYIntoHierarchy(db_base,organism,filterbyFastaAlleles)
+		writer=open(filePath,'w')
+		writer.write(JSON)
+		writer.close()
+
+
+	#JSONIFY into hierarchy
+	def JSONIFYIntoHierarchy(self,db_base,organism,filterbyFastaAlleles=False):
+		hierarchy=getHierarchyByOrganism(db_base+"/"+organism+"/GeneTables/",organism,filterbyFastaAlleles)
+		JSON=jsonify_hierarchy(hierarchy,"human",self.count_map,"value")
+		return JSON
+
+
 
 def getQueryIndexGivenSubjectIndexAndAlignment(query_aln,subject_aln,q_start,q_stop,s_start,s_stop,subject_pos):
 	print "in getQueryIndexGivenSubjectIndexAndAlignment"
@@ -930,6 +947,41 @@ def looksLikeAlleleStr(a):
 
 
 
+def getHierarchyByOrganism(geneTablesDirectoryOfHTMLFiles,org_name,filterbyFastaAlleles=False):
+	loci=get_loci_list()
+	hierarchy=tree()
+	for locus in loci:
+		htmlGeneTablesGlob=geneTablesDirectoryOfHTMLFiles+"/*"+locus+"*.html"
+		geneTableHTMLFiles=glob.glob(htmlGeneTablesGlob)
+		fastaAlleleList=None
+		if(filterbyFastaAlleles):
+			fastaFilesGlob=geneTablesDirectoryOfHTMLFiles+"/../ReferenceDirectorySet/*"+locus+"*.fna"
+			print "the fasta glob is ",fastaFilesGlob
+			fastaFiles=glob.glob(fastaFilesGlob)
+			fastaMainMap=dict()
+			for fastaFile in fastaFiles:
+				fastaString=readFileIntoString(fastaFile)
+				fastaList=read_fasta_string(fastaString)
+				fastaMap=read_fasta_into_map(fastaList)	
+				for fastaKey in fastaMap:
+					fastaMainMap[fastaKey]=fastaMap[fastaKey]
+			print "done loading into main map..."
+			fastaListOfNames=getIMGTNameListFromFastaMap(fastaMainMap)
+			print "FASTA LIST OF NAMES:"
+			fastaListOfNames.sort()
+			printList(fastaListOfNames)
+			print "got name list.... its length is",len(fastaListOfNames)
+			fastaAlleleList=allelifyList(fastaListOfNames)
+			print "The Fasta Allele list is ",fastaAlleleList
+		html_data=hierarchyTreeFromGenetableURL("file://"+geneTableHTMLFiles[0],locus,fastaAlleleList)
+		locusHierarchyData=html_data[0]
+		html_data=hierarchyTreeFromGenetableURL("file://"+geneTableHTMLFiles[1],locus,fastaAlleleList,locusHierarchyData)
+		locusHierarchyData=html_data[0]
+		hierarchy[locus]=locusHierarchyData
+	return hierarchy
+
+
+
 
 if (__name__=="__main__"):
 	import sys
@@ -943,16 +995,16 @@ if (__name__=="__main__"):
 	#res=getQueryIndexGivenSubjectIndexAndAlignment(Q_ALN,S_ALN,q_from,q_to,s_from,s_to,sub_desired)
 	res=getQueryIndexGivenSubjectIndexAndAlignment(qry_aln,sub_aln,q_from,q_to,s_from,s_to,desired)
 	print "***************result (for ",desired,") : ",res
-	a=IncrementMapWrapper()
-	b=IncrementMapWrapper()
-	a.increment("a")
-	a.increment("b")
-	b.increment("a")
-	b.increment("c")
-	a.mergeInto(b)
-	mm=a.get_map()
-	for k in mm:
-		print k,"->",mm[k]
+
+	mycounts=IncrementMapWrapper()
+	mycounts.increment("IGHV4-59*01")
+	mycounts.increment("IGHV4-59*02")
+	mycounts.increment("IGHV4-59*02")
+	mycounts.increment("IGHV4-59*03")
+	mycounts.increment("IGHV4-59*03")
+	mycounts.increment("IGHV4-59*03")
+	mycounts.JSONIFYToFile("/home/data/DATABASE/01_22_2014/","human","/home/data/vdj_server/repertoire-summarization/prettyPrintedProgrammatically.txt.json")
+	#print "***JSON",JSON	
 	#s_from=10
 	#s_to=20
 	#q_from=30
