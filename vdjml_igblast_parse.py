@@ -291,7 +291,7 @@ def scanOutputToVDJML(input_file,output_file,fasta_paths,db_fasta_list,jsonOutFi
 	for igblast_line in INPUT:
 		line_num+=1
 		igblast_line=igblast_line.strip()
-		print igblast_line
+		#print igblast_line
 		if(re.compile('^#').match(igblast_line)):
 			rem=re.search('^#\s+IGBLASTN\s([^\s]+)\s*$',igblast_line)
 			if rem:
@@ -299,6 +299,7 @@ def scanOutputToVDJML(input_file,output_file,fasta_paths,db_fasta_list,jsonOutFi
 				mode="IGB_VERSION"
 			rem=re.search('^#\s+Query:\s(.*)',igblast_line)
 			if(rem):# or ref):
+				#reset values for new IGBLAST set of results
 				current_query=rem.group(1)
 				vdjr_vals_list=list()
 				junction_vals_list=list()
@@ -351,16 +352,10 @@ def scanOutputToVDJML(input_file,output_file,fasta_paths,db_fasta_list,jsonOutFi
 				srem=re.search('\(([^\)]+)\):\s*$',igblast_line)
 				if srem:
 					headers=srem.group(1)
-					#print "headers is ",headers
-					#print "Now to replace commas with surrounding whitespace...."
 					headers=re.sub(r'\s*,\s*',',',headers)
-					#print "headers is ",headers
 					headers=re.sub(' ','_',headers,0)
-					#print "headers is ",headers
 					headers=re.sub('\-','_',headers,0)
-					#print "headers is ",headers
 					rearrangment_summary_fields=headers.split(',')
-					#print "rearrangment_summary_fields is ",rearrangment_summary_fields
 					rearrangement_summary_fields=trimList(rearrangment_summary_fields)
 			rem=re.search('#\sFields:',igblast_line)
 			if rem:
@@ -371,18 +366,11 @@ def scanOutputToVDJML(input_file,output_file,fasta_paths,db_fasta_list,jsonOutFi
 				hit_fields=headers.split(',')
 				hit_fields=trimList(hit_fields)
 				hit_fields.insert(0,"segment")
-				#for idx, val in enumerate(hit_fields):
-				#	hit_fields[idx]=re.compile('[\s\.]+').sub('_',hit_fields[idx],0)
-				#	hit_fields[idx]=re.compile('%').sub('pct',hit_fields[idx],0)
-				#	hit_fields[idx]=re.compile('[^a-zA-Z]+$').sub('',hit_fields[idx],0)
-				#	hit_fields[idx]=re.compile('^[^a-zA-Z]+').sub('',hit_fields[idx],0)
-				#	hit_fields[idx]=re.compile('\/').sub('_',hit_fields[idx],0)
 			rem=re.search('^#\s(\d+)\shits\sfound\s*',igblast_line)
 			if rem:
 				mode="hit_table"
 				current_num_hits=int(rem.group(1))
 		elif (not (re.compile('^\s*$').match(igblast_line))):
-			#print "mode=",mode
 			if(mode=="vdj_rearrangement"):
 				vdjr_vals_list.append(igblast_line)
 			elif(mode=="vdj_junction"):
@@ -390,9 +378,6 @@ def scanOutputToVDJML(input_file,output_file,fasta_paths,db_fasta_list,jsonOutFi
 			elif(mode=="vdj_alignment_summary"):
 				summary_vals_list.append(igblast_line)
 			elif(mode=="hit_table"):
-				#print "in mode=hit_table",
-				#print "hit_fields is ",hit_fields," with length=",len(hit_fields)
-				#print "hit_vals after split",hit_vals
 				hit_vals_list.append(igblast_line)
 				if(len(hit_vals_list)==current_num_hits):
 					print "HELLO!  THIS IS WHERE SERIALIZATION SHOULD OCCUR!!!!\n"
@@ -406,10 +391,11 @@ def scanOutputToVDJML(input_file,output_file,fasta_paths,db_fasta_list,jsonOutFi
 								hit_fields,					#list of hit fields
 								summary_fields,					#summary fields
 								summary_vals_list,				#summary values list (list of lists)
-								rearrangement_summary_fields,vdjr_vals_list,
-								junction_fields,junction_vals_list,
-								getMapToo
+								rearrangement_summary_fields,vdjr_vals_list,	#rearrangment values (list and list-of-lists)
+								junction_fields,junction_vals_list,		#junction fields/values (list and list of lists)
+								getMapToo					#flag to return 
 								)
+					
 					if(not(getMapToo)):
 						rb1=serialized
 						rrw1(rb1.get())
