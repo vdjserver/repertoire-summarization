@@ -4,6 +4,17 @@ import vdjml
 import re
 from imgt_utils import trimList
 from segment_utils import getFastaListOfDescs,getSegmentName,IncrementMapWrapper,looksLikeAlleleStr
+import argparse
+
+#parser = argparse.ArgumentParser(description='Process some integers.')
+#parser.add_argument('integers', metavar='N', type=int, nargs='+',
+#                   help='an integer for the accumulator')
+#parser.add_argument('--sum', dest='accumulate', action='store_const',
+#                   const=sum, default=max,
+#                   help='sum the integers (default: find the max)')
+#
+#args = parser.parse_args()
+#print args.accumulate(args.integers)
 
 
 
@@ -116,8 +127,8 @@ def vdjml_read_serialize(
 		junction_fields,junction_vals_list,		#junction (fields (list) and values (list of lists))
 		returnCountMapPackage=True			#return an array consisting of the result and an increment map count too 
 		):
-	print "*******************************************\n"
-	print "NEED TO SERIALIZE FOR QUERY=",current_query
+	#print "*******************************************\n"
+	#print "NEED TO SERIALIZE FOR QUERY=",current_query
 	rb1 = fact.new_result(current_query)
 	firstV=None
 	firstD=None
@@ -132,15 +143,15 @@ def vdjml_read_serialize(
 	valn=None
 	for h in range(len(hit_vals_list)):
 		kvmap=makeMap(hit_fields,hit_vals_list[h])
-		print "\n\n\nSHOWING A ",kvmap['segment']," segment! (hit #"+str(h+1)+" of "+str(len(hit_vals_list))+")"
-		printMap(kvmap)
+		#print "\n\n\nSHOWING A ",kvmap['segment']," segment! (hit #"+str(h+1)+" of "+str(len(hit_vals_list))+")"
+		#printMap(kvmap)
 		if(kvmap['segment']=="D"):
 			lookup=dlist
 		elif(kvmap['segment']=="V"):
 			lookup=vlist
 		else:
 			lookup=jlist
-		print "The nice name is ",getSegmentName(kvmap['subject acc.ver'],lookup)
+		#print "The nice name is ",getSegmentName(kvmap['subject acc.ver'],lookup)
 		btop_to_add=kvmap['BTOP']
 		#print "making interval with values : ",kvmap['q. start']," AND ",kvmap['q. end']
 		query_interval_to_add=vdjml.Interval.first_last_1(int(kvmap['q. start']),int(kvmap['q. end']))
@@ -181,9 +192,9 @@ def vdjml_read_serialize(
 	#note, because igBLAST "anchors" on the V alignment, 
 	#if V aligns, then D and J are both optional, but if V doesn't align, 
 	#then no D alignment exists and no J alignment exists!
-	print "FIRSTV=",firstV
-	print "FIRSTD=",firstD
-	print "FirstJ=",firstJ
+	#print "FIRSTV=",firstV
+	#print "FIRSTD=",firstD
+	#print "FirstJ=",firstJ
 	if(not(firstV==None)):
 		if(firstD==None):
 			if(not(firstJ==None)):
@@ -200,16 +211,16 @@ def vdjml_read_serialize(
 	else:
 		#firstV is none
 		pass
-	print "\n\n\tAlignment summary Info : "
-	print "Alignment summary fields : ",summary_fields
-	print "Alignment summary vals : "
+	#print "\n\n\tAlignment summary Info : "
+	#print "Alignment summary fields : ",summary_fields
+	#print "Alignment summary vals : "
 	for a in range(len(summary_vals_list)):
 		asMap=makeMap(summary_fields,summary_vals_list[a])
 		if(not(asMap['region'].startswith("Total") or asMap['region'].startswith("CDR3"))):
-			print "\tSummary item "+str(a)+" : "
-			print "\t",summary_vals_list[a]
-			print "\tThis is a particular alignment summary map : "
-			printMap(asMap)	
+			#print "\tSummary item "+str(a)+" : "
+			#print "\t",summary_vals_list[a]
+			#print "\tThis is a particular alignment summary map : "
+			#printMap(asMap)	
 			region_to_add=asMap['region']
 			interval_to_add=vdjml.Interval.first_last_1(int(asMap['from']),int(asMap['to']))
 			#metrics_to_add=makeRegionAlnMetricsFromValn(valn,valn_qstart,asMap)
@@ -217,33 +228,36 @@ def vdjml_read_serialize(
 			#	region_to_add,
 			#	interval_to_add,
 			#	metrics_to_add)
-	print "\n\n\n"
+	#print "\n\n\n"
 	topSegmentCounterMap=IncrementMapWrapper()
 	if(len(vdjr_vals_list)>0):
-		print "rearrangment summary "
-		print "\tFields : "
-		print rearrangement_summary_fields
+		#print "rearrangment summary "
+		#print "\tFields : "
+		#print rearrangement_summary_fields
 		for f in range(len(rearrangement_summary_fields)):
-			print "\t\tfield "+str(f)+" : "+rearrangement_summary_fields[f]
-		print "\tValues:"
-		print vdjr_vals_list
+			#print "\t\tfield "+str(f)+" : "+rearrangement_summary_fields[f]
+			pass
+		#print "\tValues:"
+		#print vdjr_vals_list
 		for v in range(len(vdjr_vals_list)):
-			print "\t\tval : "+str(v)+" : "+vdjr_vals_list[v]
+			#print "\t\tval : "+str(v)+" : "+vdjr_vals_list[v]
+			pass
 		kvmap=makeMap(rearrangement_summary_fields,vdjr_vals_list[0])
 		for k in kvmap:
-			print "\t"+k+"\t->\t"+kvmap[k]
+			#print "\t"+k+"\t->\t"+kvmap[k]
+			pass
 		top_segs=["V","D","J"]
 		for t in top_segs:
 			top_seg=kvmap["Top_"+t+"_gene_match"]
 			if(looksLikeAlleleStr(top_seg)):
 				topSegmentCounterMap.increment(top_seg)
 	if(len(junction_vals_list)>0):
-		print "\n\nJUNCTION summary:"
-		print "\tJunction Fields list : ",junction_fields
-		print "\tJunction vals list",junction_vals_list
+		#print "\n\nJUNCTION summary:"
+		#print "\tJunction Fields list : ",junction_fields
+		#print "\tJunction vals list",junction_vals_list
 		jmap=makeMap(junction_fields,junction_vals_list[0])
-		print "\tJunction map : "
-		printMap(jmap)
+		#print "\tJunction map : "
+		#printMap(jmap)
 	if(not(returnCountMapPackage)):
 		return rb1
 	else:
@@ -251,11 +265,7 @@ def vdjml_read_serialize(
 		
 
 
-def scanOutputToVDJML(input_file,output_file,fasta_paths,db_fasta_list,jsonOutFile,organism,db_base,debug=False):
-	if(debug):
-		print "debug is true"
-	else:
-		print "debug is false"
+def scanOutputToVDJML(input_file,output_file,db_fasta_list,jsonOutFile,organism,db_base,debug=False):
 	INPUT=open(input_file,'r')
 	line_num=0
 	mainCountMap=IncrementMapWrapper()
@@ -287,7 +297,7 @@ def scanOutputToVDJML(input_file,output_file,fasta_paths,db_fasta_list,jsonOutFi
 				     'http://www.blah.org'
 				     )
 	fact.set_default_num_system(vdjml.Num_system.imgt)
-	rrw1 = vdjml.Result_writer('py_out_2.vdjml', meta)
+	rrw1 = vdjml.Result_writer(output_file, meta)
 	for igblast_line in INPUT:
 		line_num+=1
 		igblast_line=igblast_line.strip()
@@ -380,7 +390,7 @@ def scanOutputToVDJML(input_file,output_file,fasta_paths,db_fasta_list,jsonOutFi
 			elif(mode=="hit_table"):
 				hit_vals_list.append(igblast_line)
 				if(len(hit_vals_list)==current_num_hits):
-					print "HELLO!  THIS IS WHERE SERIALIZATION SHOULD OCCUR!!!!\n"
+					#print "HELLO!  THIS IS WHERE SERIALIZATION SHOULD OCCUR!!!!\n"
 					#CALL SERIALIZER as the hits for this have been picked up
 					getMapToo=True
 					serialized=vdjml_read_serialize(
@@ -403,11 +413,40 @@ def scanOutputToVDJML(input_file,output_file,fasta_paths,db_fasta_list,jsonOutFi
 						rb1=serialized[0]
 						incMap=serialized[1]
 						mainCountMap.mergeInto(incMap)
+						rrw1(rb1.get())
 			else:
 				print "unhandled mode=",mode
 	mainCountMap.JSONIFYToFile(db_base,organism,jsonOutFile)
     
 
-scanOutputToVDJML("/home/esalina2/round1_imgt/all_data.processed.Q35.L200.R1.fna.igblastn.imgt.out.first5.out","/dev/null","/home/esalina2/round1_imgt/all_data.processed.Q35.L200.R1.fna",
-	["/home/esalina2/round1_imgt/human_IG_V.fna","/home/esalina2/round1_imgt/human_IG_D.fna","/home/esalina2/round1_imgt/human_IG_J.fna"],"/tmp/programmaticJSON.json","human","/home/data/DATABASE/01_22_2014/")
+
+
+
+
+
+parser = argparse.ArgumentParser(description='Parse IGBLAST output, write a VDJML output file, write JSON segment count data (using Gene tables for hierarchies and VDJ combinations for counts')
+parser.add_argument('germline_db_fasta_V',type=str,nargs=1,help='path to the FASTA file of the BLAST database for V segment')
+parser.add_argument('germline_db_fasta_D',type=str,nargs=1,help='path to the FASTA file of the BLAST database for D segment')
+parser.add_argument('germline_db_fasta_J',type=str,nargs=1,help='path to the FASTA file of the BLAST database for J segment')
+parser.add_argument('igblast_in',type=str,nargs=1,help="path to igblast analysis file of results, hits, segments, etc. *** NOTE *** SHOULD BE RUN WITH OUTFMT AS SEEN HERE -outfmt '7 qseqid qgi qacc qaccver qlen sseqid sallseqid sgi sallgi sacc saccver sallacc slen qstart qend sstart send qseq sseq evalue bitscore score length pident nident mismatch positive gapopen gaps ppos frames qframe sframe btop'")
+parser.add_argument('vdjml_out',type=str,nargs=1,help='path to the VDJML file to write to')
+parser.add_argument('jscon_counts',type=str,nargs=1,help='path to a JSON file of segment counts to be written to')
+parser.add_argument('vdjserver_dbbase',type=str,nargs=1,help='path to the root of the VDJServer database')
+parser.add_argument('organism',type=str,nargs=1,help='name of the organism (used for counting and JSON) ; must exist under the vdjserver_dbbase')
+
+
+#parser.print_help()
+args = parser.parse_args()
+if(args):
+	#print "success"
+	scanOutputToVDJML(
+		args.igblast_in[0],
+		args.vdjml_out[0],
+		[args.germline_db_fasta_V[0],args.germline_db_fasta_D[0],args.germline_db_fasta_J[0]],
+		args.jscon_counts[0],args.organism[0],args.vdjserver_dbbase[0]
+		)
+else:
+	#print "fail"
+	pass
+
 
