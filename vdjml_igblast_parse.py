@@ -166,8 +166,23 @@ def vdjml_read_serialize(
 			qvaseq=kvmap['query seq']
 			top_btop['V']=kvmap['BTOP']
 			alnDebugFlag=False
+		elif(firstD==None and segment_type_to_add=='D'):
+			firstD=smb1
+			daseq=kvmap['subject seq']
+			qdaseq=kvmap['query seq']
+			top_btop['D']=kvmap['BTOP']
+		elif(firstJ==None and segment_type_to_add=='J'):
+			firstJ=smb1
+			jaseq=kvmap['subject seq']
+			qjaseq=kvmap['query seq']
+			top_btop['J']=kvmap['BTOP']
 	scb=None
-	#note, because igBLAST "anchors" on the V alignment, if V aligns, then D and J are both optional, but if V doesn't align, then no D alignment exists and no J alignment exists!
+	#note, because igBLAST "anchors" on the V alignment, 
+	#if V aligns, then D and J are both optional, but if V doesn't align, 
+	#then no D alignment exists and no J alignment exists!
+	print "FIRSTV=",firstV
+	print "FIRSTD=",firstD
+	print "FirstJ=",firstJ
 	if(not(firstV==None)):
 		if(firstD==None):
 			if(not(firstJ==None)):
@@ -182,6 +197,7 @@ def vdjml_read_serialize(
 			else:
 				scb=rb1.add_segment_combination(firstV.get().id(),firstD.get().id())
 	else:
+		#firstV is none
 		pass
 	print "\n\n\tAlignment summary Info : "
 	print "Alignment summary fields : ",summary_fields
@@ -201,7 +217,7 @@ def vdjml_read_serialize(
 			#	interval_to_add,
 			#	metrics_to_add)
 	print "\n\n\n"
-	topSegmentCounterMap=IncrementMapWrapper()
+	#topSegmentCounterMap=IncrementMapWrapper()
 	if(len(vdjr_vals_list)>0):
 		print "rearrangment summary "
 		print "\tFields : "
@@ -215,11 +231,11 @@ def vdjml_read_serialize(
 		kvmap=makeMap(rearrangement_summary_fields,vdjr_vals_list[0])
 		for k in kvmap:
 			print "\t"+k+"\t->\t"+kvmap[k]
-		top_segs=["V","D","J"]
-		for t in top_segs:
-			top_seg=kvmap["Top_"+t+"_gene_match"]
-			if(looksLikeAlleleStr(top_seg)):
-				topSegmentCounterMap.increment(top_seg)
+		#top_segs=["V","D","J"]
+		#for t in top_segs:
+		#	top_seg=kvmap["Top_"+t+"_gene_match"]
+		#	if(looksLikeAlleleStr(top_seg)):
+		#		topSegmentCounterMap.increment(top_seg)
 	if(len(junction_vals_list)>0):
 		print "\n\nJUNCTION summary:"
 		print "\tJunction Fields list : ",junction_fields
@@ -227,7 +243,7 @@ def vdjml_read_serialize(
 		jmap=makeMap(junction_fields,junction_vals_list[0])
 		print "\tJunction map : "
 		printMap(jmap)
-	return [rb1,topSegmentCounterMap]
+	return rb1
 
 
 def scanOutputToVDJML(input_file,output_file,fasta_paths,db_fasta_list,debug=False):
@@ -291,10 +307,10 @@ def scanOutputToVDJML(input_file,output_file,fasta_paths,db_fasta_list,debug=Fal
 								rearrangement_summary_fields,vdjr_vals_list,
 								junction_fields,junction_vals_list
 								)
-					rb1=serialized[0]
-					count_map_wrapped=serialized[1]
-					count_map_wrapped.printMap()
-					rrw1(rb1.get())	
+					rb1=serialized
+					#count_map_wrapped=serialized[1]
+					#count_map_wrapped.printMap()
+					rrw1(rb1.get())
 				if(rem):
 					current_query=rem.group(1)
 				else:
