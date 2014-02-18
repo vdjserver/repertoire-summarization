@@ -104,6 +104,136 @@ def makeRegionAlnMetricsFromValn(valn,qstart,regionmap):
 
 
 
+def vdjml_read_serialize(current_query):
+	print "*******************************************\n"
+	print "NEED TO SERIALIZE FOR QUERY=",current_query
+	rb1 = fact.new_result(current_query)
+	firstV=None
+	firstD=None
+	firstJ=None
+	vaseq=None
+	qvaseq=None
+	daseq=None
+	qdaseq=None
+	jaseq=None
+	qjaseq=None
+	top_btop=dict()
+	valn=None
+	for h in range(len(hit_vals_list)):
+		kvmap=makeMap(hit_fields,hit_vals_list[h])
+		print "\n\n\nSHOWING A ",kvmap['segment']," segment! (hit #"+str(h+1)+" of "+str(len(hit_vals_list))+")"
+		printMap(kvmap)
+		if(kvmap['segment']=="D"):
+			lookup=dlist
+		elif(kvmap['segment']=="V"):
+			lookup=vlist
+		else:
+			lookup=jlist
+			print "The nice name is ",getSegmentName(kvmap['subject acc.ver'],lookup)
+			btop_to_add=kvmap['BTOP']
+			#print "making interval with values : ",kvmap['q. start']," AND ",kvmap['q. end']
+			query_interval_to_add=vdjml.Interval.first_last_1(int(kvmap['q. start']),int(kvmap['q. end']))
+			segment_type_to_add=kvmap['segment']
+			hit_name_to_add=kvmap['subject ids']
+			#hit_interval_to_add=vdjml.Interval.first_last_1(int(kvmap['s. start']),int(kvmap['s. end']))
+			if(int(kvmap['s. start'])<int(kvmap['s. end'])):
+				hit_interval_to_add=vdjml.Interval.first_last_1(int(kvmap['s. start']),int(kvmap['s. end']))
+			else:
+				#strand!
+				hit_interval_to_add=vdjml.Interval.first_last_1(int(kvmap['s. end']),int(kvmap['s. start']))							
+				#metrics_to_add=vdjml.Match_metrics(int(kvmap['score']),float(kvmap['% identity']),int(9999),int(9999),int(kvmap['mismatches']))
+				metrics_to_add=vdjml.Match_metrics(float(kvmap['% identity']),int(kvmap['score']),int(kvmap['mismatches']))
+				smb1 = rb1.add_segment_match(
+				btop_to_add,
+				query_interval_to_add,
+				segment_type_to_add,
+				hit_name_to_add,
+				hit_interval_to_add,
+				metrics_to_add)
+			if(firstV==None and segment_type_to_add=='V'):
+				firstV=smb1
+				vaseq=kvmap['subject seq']
+				qvaseq=kvmap['query seq']
+				top_btop['V']=kvmap['BTOP']
+				alnDebugFlag=False
+			if(current_query=="HZ8R54Q01C3N51"):
+				alnDebugFlag=True
+				#valn=buildAlignmentWholeSeqs(top_btop['V'],qvaseq,vaseq,alnDebugFlag)
+				valn=buildAlignmentWholeSeqsDirect(qvaseq,vaseq)
+				if(alnDebugFlag):
+					print "The debug is :",
+					print getNiceAlignment(valn)
+					#sys.exit(0)
+				valn_qstart=kvmap['q. start']
+				if(firstD==None and segment_type_to_add=='D'):
+					firstD=smb1
+					daseq=kvmap['subject seq']
+					qdaseq=kvmap['query seq']
+					top_btop['D']=kvmap['BTOP']
+				if(firstJ==None and segment_type_to_add=='J'):
+					firstJ=smb1
+					jaseq=kvmap['subject seq']
+					qjaseq=kvmap['query seq']
+					top_btop['J']=kvmap['BTOP']
+				#getWholeChainAlignment(qvaseq,vaseq,qdaseq,daseq,qjaseq,jaseq,top_btop)
+				scb=None
+				#note, because igBLAST "anchors" on the V alignment, if V aligns, then D and J are both optional, but if V doesn't align, then no D alignment exists and no J alignment exists!
+				if(not(firstV==None)):
+					if(firstD==None):
+						if(not(firstJ==None)):
+							scb=rb1.add_segment_combination(firstV.get().id(),firstJ.get().id())
+						else:
+							#firstJ is none
+							scb=rb1.add_segment_combination(firstV.get().id())
+					else:
+						#firstD not none
+						if(not(firstJ==None)):
+							scb=rb1.add_segment_combination(firstV.get().id(),firstD.get().id(),firstJ.get().id())						
+						else:
+							scb=rb1.add_segment_combination(firstV.get().id(),firstD.get().id())
+				else:
+					pass
+				print "\n\n\tAlignment summary Info : "
+				print "Alignment summary fields : ",summary_fields
+				print "Alignment summary vals : "
+				for a in range(len(summary_vals_list)):
+					asMap=makeMap(summary_fields,summary_vals_list[a])
+					if(not(asMap['region'].startswith("Total") or asMap['region'].startswith("CDR3"))):
+						print "\tSummary item "+str(a)+" : "
+						print "\t",summary_vals_list[a]
+						print "\tThis is a particular alignment summary map : "
+						printMap(asMap)	
+						region_to_add=asMap['region']
+						interval_to_add=vdjml.Interval.first_last_1(int(asMap['from']),int(asMap['to']))
+						metrics_to_add=makeRegionAlnMetricsFromValn(valn,valn_qstart,asMap)
+						scb.add_region(
+							region_to_add,
+							interval_to_add,
+							metrics_to_add)
+				rrw1(rb1.get())
+				#rrw1.close()
+				print "\n\n\n"
+				if(len(vdjr_vals_list)>0):
+					print "rearrangment summary "
+					print "\tFields : "
+					print rearrangement_summary_fields
+					for f in range(len(rearrangement_summary_fields)):
+						print "\t\tfield "+str(f)+" : "+rearrangement_summary_fields[f]
+					print "\tValues:"
+					print vdjr_vals_list
+					for v in range(len(vdjr_vals_list)):
+						print "\t\tval : "+str(v)+" : "+vdjr_vals_list[v]
+					kvmap=makeMap(rearrangement_summary_fields,vdjr_vals_list[0])
+					for k in kvmap:
+						print "\t"+k+"\t->\t"+kvmap[k]
+				if(len(junction_vals_list)>0):
+					print "\n\nJUNCTION summary:"
+					print "\tJunction Fields list : ",junction_fields
+					print "\tJunction vals list",junction_vals_list
+					jmap=makeMap(junction_fields,junction_vals_list[0])
+					print "\tJunction map : "
+					printMap(jmap)
+	return None
 
 
 
@@ -154,134 +284,7 @@ def scanOutputToVDJML(input_file,output_file,fasta_paths,db_fasta_list,debug=Fal
 			ref=re.search('^#\s+BLAST\s+processed\s+\d+\s+queries',igblast_line)
 			if(rem or ref):
 				if(not(current_query==None)):
-					print "*******************************************\n"
-					print "NEED TO SERIALIZE FOR QUERY=",current_query
-					rb1 = fact.new_result(current_query)
-					firstV=None
-					firstD=None
-					firstJ=None
-					vaseq=None
-					qvaseq=None
-					daseq=None
-					qdaseq=None
-					jaseq=None
-					qjaseq=None
-					top_btop=dict()
-					valn=None
-					for h in range(len(hit_vals_list)):
-						kvmap=makeMap(hit_fields,hit_vals_list[h])
-						print "\n\n\nSHOWING A ",kvmap['segment']," segment! (hit #"+str(h+1)+" of "+str(len(hit_vals_list))+")"
-						printMap(kvmap)
-						if(kvmap['segment']=="D"):
-							lookup=dlist
-						elif(kvmap['segment']=="V"):
-							lookup=vlist
-						else:
-							lookup=jlist
-						print "The nice name is ",getSegmentName(kvmap['subject acc.ver'],lookup)
-						btop_to_add=kvmap['BTOP']
-						#print "making interval with values : ",kvmap['q. start']," AND ",kvmap['q. end']
-						query_interval_to_add=vdjml.Interval.first_last_1(int(kvmap['q. start']),int(kvmap['q. end']))
-						segment_type_to_add=kvmap['segment']
-						hit_name_to_add=kvmap['subject ids']
-						#hit_interval_to_add=vdjml.Interval.first_last_1(int(kvmap['s. start']),int(kvmap['s. end']))
-						if(int(kvmap['s. start'])<int(kvmap['s. end'])):
-							hit_interval_to_add=vdjml.Interval.first_last_1(int(kvmap['s. start']),int(kvmap['s. end']))
-						else:
-							#strand!
-							hit_interval_to_add=vdjml.Interval.first_last_1(int(kvmap['s. end']),int(kvmap['s. start']))							
-						#metrics_to_add=vdjml.Match_metrics(int(kvmap['score']),float(kvmap['% identity']),int(9999),int(9999),int(kvmap['mismatches']))
-						metrics_to_add=vdjml.Match_metrics(float(kvmap['% identity']),int(kvmap['score']),int(kvmap['mismatches']))
-						smb1 = rb1.add_segment_match(
-							btop_to_add,
-							query_interval_to_add,
-							segment_type_to_add,
-							hit_name_to_add,
-							hit_interval_to_add,
-							metrics_to_add)
-						if(firstV==None and segment_type_to_add=='V'):
-							firstV=smb1
-							vaseq=kvmap['subject seq']
-							qvaseq=kvmap['query seq']
-							top_btop['V']=kvmap['BTOP']
-							alnDebugFlag=False
-							if(current_query=="HZ8R54Q01C3N51"):
-								alnDebugFlag=True
-							#valn=buildAlignmentWholeSeqs(top_btop['V'],qvaseq,vaseq,alnDebugFlag)
-							valn=buildAlignmentWholeSeqsDirect(qvaseq,vaseq)
-							if(alnDebugFlag):
-								print "The debug is :",
-								print getNiceAlignment(valn)
-								#sys.exit(0)
-							valn_qstart=kvmap['q. start']
-						if(firstD==None and segment_type_to_add=='D'):
-							firstD=smb1
-							daseq=kvmap['subject seq']
-							qdaseq=kvmap['query seq']
-							top_btop['D']=kvmap['BTOP']
-						if(firstJ==None and segment_type_to_add=='J'):
-							firstJ=smb1
-							jaseq=kvmap['subject seq']
-							qjaseq=kvmap['query seq']
-							top_btop['J']=kvmap['BTOP']
-					#getWholeChainAlignment(qvaseq,vaseq,qdaseq,daseq,qjaseq,jaseq,top_btop)
-					scb=None
-					#note, because igBLAST "anchors" on the V alignment, if V aligns, then D and J are both optional, but if V doesn't align, then no D alignment exists and no J alignment exists!
-					if(not(firstV==None)):
-						if(firstD==None):
-							if(not(firstJ==None)):
-								scb=rb1.add_segment_combination(firstV.get().id(),firstJ.get().id())
-							else:
-								#firstJ is none
-								scb=rb1.add_segment_combination(firstV.get().id())
-						else:
-							#firstD not none
-							if(not(firstJ==None)):
-								scb=rb1.add_segment_combination(firstV.get().id(),firstD.get().id(),firstJ.get().id())						
-							else:
-								scb=rb1.add_segment_combination(firstV.get().id(),firstD.get().id())
-					else:
-						pass
-					print "\n\n\tAlignment summary Info : "
-					print "Alignment summary fields : ",summary_fields
-					print "Alignment summary vals : "
-					for a in range(len(summary_vals_list)):
-						asMap=makeMap(summary_fields,summary_vals_list[a])
-						if(not(asMap['region'].startswith("Total") or asMap['region'].startswith("CDR3"))):
-							print "\tSummary item "+str(a)+" : "
-							print "\t",summary_vals_list[a]
-							print "\tThis is a particular alignment summary map : "
-							printMap(asMap)	
-							region_to_add=asMap['region']
-							interval_to_add=vdjml.Interval.first_last_1(int(asMap['from']),int(asMap['to']))
-							metrics_to_add=makeRegionAlnMetricsFromValn(valn,valn_qstart,asMap)
-							scb.add_region(
-								region_to_add,
-								interval_to_add,
-								metrics_to_add)
-					rrw1(rb1.get())
-					#rrw1.close()
-					print "\n\n\n"
-					if(len(vdjr_vals_list)>0):
-						print "rearrangment summary "
-						print "\tFields : "
-						print rearrangement_summary_fields
-						for f in range(len(rearrangement_summary_fields)):
-							print "\t\tfield "+str(f)+" : "+rearrangement_summary_fields[f]
-						print "\tValues:"
-						print vdjr_vals_list
-						for v in range(len(vdjr_vals_list)):
-							print "\t\tval : "+str(v)+" : "+vdjr_vals_list[v]
-						kvmap=makeMap(rearrangement_summary_fields,vdjr_vals_list[0])
-						for k in kvmap:
-							print "\t"+k+"\t->\t"+kvmap[k]
-					if(len(junction_vals_list)>0):
-						print "\n\nJUNCTION summary:"
-						print "\tJunction Fields list : ",junction_fields
-						print "\tJunction vals list",junction_vals_list
-						jmap=makeMap(junction_fields,junction_vals_list[0])
-						print "\tJunction map : "
-						printMap(jmap)
+					#CALL SERIALIZER
 				if(rem):
 					current_query=rem.group(1)
 				else:
