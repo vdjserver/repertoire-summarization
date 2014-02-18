@@ -4,7 +4,7 @@ import os
 import re
 import glob
 from os.path import basename
-from segment_utils import getFastaListOfDescs,getQueryIndexGivenSubjectIndexAndAlignment,getAdjustedCDR3StartFromRefDirSetAllele,getADJCDR3EndFromJAllele
+from segment_utils import getFastaListOfDescs,getQueryIndexGivenSubjectIndexAndAlignment,getAdjustedCDR3StartFromRefDirSetAllele,getADJCDR3EndFromJAllele,looksLikeAlleleStr
 from imgt_utils import imgt_db
 from utils import read_fasta_file_into_map,biopythonTranslate,rev_comp_dna
 from igblast_utils import printNiceAlignment
@@ -199,29 +199,28 @@ def getOtherMode(m):
 
 
 
-def CDR3ANAL(currentV,currentJ,vHitLine,jHitLine,currentD,currentQueryName):
-	global transbiopythonTranslate
-	global v_alleles_review
-	global trans
-	global nona
-	reason=None
+def CDR3LengthAnalysis(vHitLine,jHitLine,currentQueryName,currentQuerySeq,organism,imgtdb_obj):
 	currentQueryName=str(currentQueryName.strip())
 	vpieces=VHitLine.split("\t")
 	jpieces=JHitLine.split("\t")
-	if(vpieces[6]==currentV and jpieces[6]==currentJ and (not(currentJ==None)) and (not(currentV==None))   ):
+	currentV=vpieces[6]
+	currentJ=jpieces[6]
+	cdr3_hist=dict()
+	if(looksLikeAlleleStr(currentV) and looksLikeAlleleStr(currentJ)):
 		#print "WE'RE IN BUSINESS!"
-		domain_modes=get_domain_modes()
+		domain_modes=["kabat","imgt"]
 		for dm in domain_modes:
+			cdr3_hist[dm]=(-1)
 			#print "processing in ",dm
 			if(not currentV in rsmap[dm]):
 				#print currentV,"not in lookup for dm=",dm
-				ref_cdr3_start=getAdjustedCDR3StartFromRefDirSetAllele(currentV,imgtdb_obj,"human",dm)
+				ref_cdr3_start=getAdjustedCDR3StartFromRefDirSetAllele(currentV,imgtdb_obj,organism,dm)
 				rsmap[dm][currentV]=ref_cdr3_start
 			else:
 				ref_cdr3_start=rsmap[dm][currentV]
 			if(not currentJ in remap[dm]):
 				#print currentJ,"not in lookup for dm=",dm
-				ref_cdr3_end=getADJCDR3EndFromJAllele(currentJ,imgtdb_obj,"human",dm)
+				ref_cdr3_end=getADJCDR3EndFromJAllele(currentJ,imgtdb_obj,organism,dm)
 				remap[dm][currentJ]=ref_cdr3_end
 			else:
 				ref_cdr3_end=remap[dm][currentJ]
@@ -239,18 +238,6 @@ def CDR3ANAL(currentV,currentJ,vHitLine,jHitLine,currentD,currentQueryName):
 				js_f=int(jpieces[16])
 				js_t=int(jpieces[17])
 				qry_cdr3_start=getQueryIndexGivenSubjectIndexAndAlignment(vq_aln,vs_aln,vq_f,vq_t,vs_f,vs_t,ref_cdr3_start)
-				if(currentQueryName=="HZ8R54Q01AUSIL"):
-					print "mode=kabat"
-					print "ref cdr3_start=",ref_cdr3_start
-					print "ref from/to : ",vs_f,",",vs_t
-					print "qry from/to : ",vq_f,",",vq_t
-					print "V_ALN (q_top,s_bot) :"
-					print printNiceAlignment(vq_aln,vs_aln)
-					print "QRY CDR3 START ",qry_cdr3_start
-					print "\n\n\n"
-					if(vq_aln=="TAGTTACTACTGGAGCTGGATACGGCAGCCCGCCGGGAAGGGACTGGAGTGGATTGGGCGTATCTATACCAGTGGGAGCACCAACTACAACCCCTCCCTCAAGAGTCGAGTCACCATGTCAGTAGACACGTCCAAGAACCAGTTCTCACTGAAGCTGAGCTCTGTGACCGCCGCGGACACGGCCGTGTATTACTGTGCGAGAGA" and vs_aln=="TAGTTACTACTGGAGCTGGATCCGGCAGCCCGCCGGGAAGGGACTGGAGTGGATTGGGCGTATCTATACCAGTGGGAGCACCAACTACAACCCCTCCCTCAAGAGTCGAGTCACCATGTCAGTAGACACGTCCAAGAACCAGTTCTCCCTGAAGCTGAGCTCTGTGACCGCCGCGGACACGGCCGTGTATTACTGTGCGAGAGA"):
-						print "am on ",currentQueryName
-						#sys.exit(0)
 				qry_cdr3_end=getQueryIndexGivenSubjectIndexAndAlignment(jq_aln,js_aln,jq_f,jq_t,js_f,js_t,ref_cdr3_end)
 				if(qry_cdr3_start!=(-1) and qry_cdr3_end!=(-1)):
 					query_coding_seq=query_seq_map[currentQueryName]
@@ -259,15 +246,17 @@ def CDR3ANAL(currentV,currentJ,vHitLine,jHitLine,currentD,currentQueryName):
 					coding_seq=query_coding_seq[(qry_cdr3_start-1):(qry_cdr3_end-1)]
 					cdr3_len=qry_cdr3_end-qry_cdr3_start+1
 					translation=biopythonTranslate(coding_seq)
-					print "the coding seq ("+dm+") is : ",coding_seq
-					print "The translation ("+dm+") is : ",translation
-					print "CDR3_LEN ("+dm+") ="+str(cdr3_len)
-					cdr3_hist[dm][cdr3_len]+=1
+					#print "the coding seq ("+dm+") is : ",coding_seq
+					#print "The translation ("+dm+") is : ",translation
+					#print "CDR3_LEN ("+dm+") ="+str(cdr3_len)
+					cdr3_hist[dm]=cdr3_len
 				else:
-					print "BADQRYMAP Failure to map to query for mode=",dm," V=",currentV," J=",currentJ," read=",currentQueryName," REFSTART=",ref_cdr3_start,"QRYSTART=",qry_cdr3_start,"REFEND=",ref_cdr3_end,"QRYEND=",qry_cdr3_end
+					#print "BADQRYMAP Failure to map to query for mode=",dm," V=",currentV," J=",currentJ," read=",currentQueryName," REFSTART=",ref_cdr3_start,"QRYSTART=",qry_cdr3_start,"REFEND=",ref_cdr3_end,"QRYEND=",qry_cdr3_end
+					pass
 			else:
-				print "BADREFMAP mode=",dm," refVCDR3=(-1) for ",currentV," = ",ref_cdr3_start," or refJCDR3 ",currentJ," = ",ref_cdr3_end
-		
+				#print "BADREFMAP mode=",dm," refVCDR3=(-1) for ",currentV," = ",ref_cdr3_start," or refJCDR3 ",currentJ," = ",ref_cdr3_end
+				pass
+	return cdr3_hist
 
 
 currentQuery=None
@@ -276,7 +265,8 @@ for line in blast_data:
 		tot+=1
 		#print "At a query : ",line
 		if(VHitLine!=None and JHitLine!=None and currentV!=None and currentJ!=None):
-			CDR3ANAL(currentV,currentJ,VHitLine,JHitLine,currentD,currentQuery)
+			#CDR3ANAL(currentV,currentJ,VHitLine,JHitLine,currentD,currentQuery)
+			pass
 		else:
 			nona+=1
 		#reset values
@@ -343,18 +333,7 @@ for line in blast_data:
 
 
 
-print "tot ",tot
-print "trx ",trans
-diff=(tot-trans)
-print "dif ",diff
-print "nna ",nona
-print "tr/t",float(trans)/float(tot)
 
-for d in domain_list:
-	print "\n\n\n\n\n\n\n\n\n"
-	print "HISTOGRAM FOR ",d
-	for i in range(0,1000):
-		print "LEN=",i,"count=",cdr3_hist[d][i]
 
 
 #print "***********************************************************"
