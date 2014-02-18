@@ -401,6 +401,11 @@ def getFastaListOfDescs(fasta_file):
 			descs.append(to_append)
 	return descs
 
+
+
+
+
+
 def get_segment_count_map_from_blast_output(blast_out,fasta_file_list):
 	vlist=getFastaListOfDescs(fasta_file_list[0])
 	dlist=getFastaListOfDescs(fasta_file_list[1])
@@ -816,8 +821,39 @@ def getCDR3StartFromVData(vdata,allele,imgtdb_obj,organism):
 						return cdr3_stop
 	return (-1)
 
+#class for count map
+class IncrementMapWrapper():
+	#have a count map
+	count_map=None
 
+	def __init__(self):
+		self.count_map=dict()
 
+	#have a subroutine to return the map
+	def get_map(self):
+		return  self.count_map
+	
+	#increment the given value
+	def increment(self,val):
+		if(val in self.count_map):
+			self.count_map[val]+=1
+		else:
+			self.count_map[val]=1
+
+	#print it
+	def printMap(self):
+		print "I am an increment map."
+		for k in self.count_map:
+			print k+"\t"+str(self.count_map[k])
+
+	#given another increment map wrapper, merge its counts into this/self 
+	def mergeInto(self,other):
+		other_map=other.get_map()
+		for k in other_map:
+			k_count=other_map[k]
+			print "GOT k=",k," and k_count=",k_count," from other map"
+			for i in range(k_count):
+				self.increment(k)
 
 
 def getQueryIndexGivenSubjectIndexAndAlignment(query_aln,subject_aln,q_start,q_stop,s_start,s_stop,subject_pos):
@@ -884,6 +920,15 @@ def getQueryIndexGivenSubjectIndexAndAlignment(query_aln,subject_aln,q_start,q_s
 
 
 
+def looksLikeAlleleStr(a):
+	are=re.compile(r'\*\d+$')
+	res=re.search(are,a)
+	if(res):
+		return True
+	else:
+		return False
+
+
 
 
 if (__name__=="__main__"):
@@ -898,6 +943,16 @@ if (__name__=="__main__"):
 	#res=getQueryIndexGivenSubjectIndexAndAlignment(Q_ALN,S_ALN,q_from,q_to,s_from,s_to,sub_desired)
 	res=getQueryIndexGivenSubjectIndexAndAlignment(qry_aln,sub_aln,q_from,q_to,s_from,s_to,desired)
 	print "***************result (for ",desired,") : ",res
+	a=IncrementMapWrapper()
+	b=IncrementMapWrapper()
+	a.increment("a")
+	a.increment("b")
+	b.increment("a")
+	b.increment("c")
+	a.mergeInto(b)
+	mm=a.get_map()
+	for k in mm:
+		print k,"->",mm[k]
 	#s_from=10
 	#s_to=20
 	#q_from=30
