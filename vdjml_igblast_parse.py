@@ -5,6 +5,7 @@ import re
 from imgt_utils import trimList
 from segment_utils import getFastaListOfDescs,getSegmentName,IncrementMapWrapper,looksLikeAlleleStr
 import argparse
+from Bio import SeqIO
 
 #parser = argparse.ArgumentParser(description='Process some integers.')
 #parser.add_argument('integers', metavar='N', type=int, nargs='+',
@@ -125,7 +126,7 @@ def vdjml_read_serialize(
 		summary_vals_list,				#summary values list (list of lists)
 		rearrangement_summary_fields,vdjr_vals_list,	#rearrangment summary (fields (list) and values (list of lists))
 		junction_fields,junction_vals_list,		#junction (fields (list) and values (list of lists))
-		returnCountMapPackage=True			#return an array consisting of the result and an increment map count too 
+		returnCountMapPackage=True			#return an array consisting of the result and an increment map count too
 		):
 	#print "*******************************************\n"
 	#print "NEED TO SERIALIZE FOR QUERY=",current_query
@@ -141,6 +142,12 @@ def vdjml_read_serialize(
 	qjaseq=None
 	top_btop=dict()
 	valn=None
+	topSegmentCounterMap=IncrementMapWrapper()
+	if(len(hit_vals_list)==0):
+		if(returnCountMapPackage):
+			return [rb1,topSegmentCounterMap]
+		else:
+			rb1
 	for h in range(len(hit_vals_list)):
 		kvmap=makeMap(hit_fields,hit_vals_list[h])
 		#print "\n\n\nSHOWING A ",kvmap['segment']," segment! (hit #"+str(h+1)+" of "+str(len(hit_vals_list))+")"
@@ -229,7 +236,6 @@ def vdjml_read_serialize(
 			#	interval_to_add,
 			#	metrics_to_add)
 	#print "\n\n\n"
-	topSegmentCounterMap=IncrementMapWrapper()
 	if(len(vdjr_vals_list)>0):
 		#print "rearrangment summary "
 		#print "\tFields : "
@@ -265,7 +271,7 @@ def vdjml_read_serialize(
 		
 
 
-def scanOutputToVDJML(input_file,output_file,db_fasta_list,jsonOutFile,organism,db_base,debug=False):
+def scanOutputToVDJML(input_file,output_file,db_fasta_list,jsonOutFile,organism,db_base,queryFasta,debug=False):
 	INPUT=open(input_file,'r')
 	line_num=0
 	mainCountMap=IncrementMapWrapper()
@@ -298,6 +304,10 @@ def scanOutputToVDJML(input_file,output_file,db_fasta_list,jsonOutFile,organism,
 				     )
 	fact.set_default_num_system(vdjml.Num_system.imgt)
 	rrw1 = vdjml.Result_writer(output_file, meta)
+	firstV=None
+	firstJ=None
+	#open a biopython read to have current query name and sequence available for translation
+	query_fasta_iterator=SeqIO.parse(queryFasta, "fasta")
 	for igblast_line in INPUT:
 		line_num+=1
 		igblast_line=igblast_line.strip()
@@ -317,6 +327,10 @@ def scanOutputToVDJML(input_file,output_file,db_fasta_list,jsonOutFile,organism,
 				hit_vals_list=list()
 				mode="query_retrieve"
 				current_query_id+=1
+				#print "got current query name ",current_query
+				fasta_record=next(query_fasta_iterator)
+				#print(str(fasta_record.id))
+				#print(str(fasta_record.seq))
 			rem=re.search('^#\s+Database:\s(.*)$',igblast_line)
 			if rem:
 				igblast_databases=rem.group(1)
@@ -379,7 +393,8 @@ def scanOutputToVDJML(input_file,output_file,db_fasta_list,jsonOutFile,organism,
 			rem=re.search('^#\s(\d+)\shits\sfound\s*',igblast_line)
 			if rem:
 				mode="hit_table"
-				current_num_hits=int(rem.group(1))
+				num_hits_found=int(rem.group(1))
+				current_num_hits=num_hits_found
 		elif (not (re.compile('^\s*$').match(igblast_line))):
 			if(mode=="vdj_rearrangement"):
 				vdjr_vals_list.append(igblast_line)
@@ -390,7 +405,6 @@ def scanOutputToVDJML(input_file,output_file,db_fasta_list,jsonOutFile,organism,
 			elif(mode=="hit_table"):
 				hit_vals_list.append(igblast_line)
 				if(len(hit_vals_list)==current_num_hits):
-					#print "HELLO!  THIS IS WHERE SERIALIZATION SHOULD OCCUR!!!!\n"
 					#CALL SERIALIZER as the hits for this have been picked up
 					getMapToo=True
 					serialized=vdjml_read_serialize(
@@ -433,6 +447,7 @@ parser.add_argument('vdjml_out',type=str,nargs=1,help='path to the VDJML file to
 parser.add_argument('jscon_counts',type=str,nargs=1,help='path to a JSON file of segment counts to be written to')
 parser.add_argument('vdjserver_dbbase',type=str,nargs=1,help='path to the root of the VDJServer database')
 parser.add_argument('organism',type=str,nargs=1,help='name of the organism (used for counting and JSON) ; must exist under the vdjserver_dbbase')
+parser.add_argument('qry_fasta',type=str,nargs=1,help='path to the query fasta file')
 
 
 #parser.print_help()
@@ -443,7 +458,10 @@ if(args):
 		args.igblast_in[0],
 		args.vdjml_out[0],
 		[args.germline_db_fasta_V[0],args.germline_db_fasta_D[0],args.germline_db_fasta_J[0]],
-		args.jscon_counts[0],args.organism[0],args.vdjserver_dbbase[0]
+		args.jscon_counts[0],
+		args.organism[0],
+		args.vdjserver_dbbase[0],
+		args.qry_fasta[0],
 		)
 else:
 	#print "fail"
