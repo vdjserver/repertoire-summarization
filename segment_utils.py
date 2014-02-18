@@ -6,7 +6,9 @@ import pickle
 import urllib2
 import re
 import pprint
-from imgt_utils import *
+from imgt_utils import get_loci_list
+import glob
+
 
 def removeTerminatingSemicolonIfItExists(s):
 	s=re.sub(r';+$',"",s)
@@ -853,7 +855,7 @@ class IncrementMapWrapper():
 		other_map=other.get_map()
 		for k in other_map:
 			k_count=other_map[k]
-			print "GOT k=",k," and k_count=",k_count," from other map"
+			#print "GOT k=",k," and k_count=",k_count," from other map"
 			for i in range(k_count):
 				self.increment(k)
 

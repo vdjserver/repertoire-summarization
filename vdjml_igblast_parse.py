@@ -2,9 +2,9 @@
 
 import vdjml
 import re
-from utils import trimList
+from imgt_utils import trimList
 from segment_utils import getFastaListOfDescs,getSegmentName,IncrementMapWrapper,looksLikeAlleleStr
-from igblast_utils import *
+
 
 
 
@@ -113,7 +113,8 @@ def vdjml_read_serialize(
 		summary_fields,					#summary fields
 		summary_vals_list,				#summary values list (list of lists)
 		rearrangement_summary_fields,vdjr_vals_list,	#rearrangment summary (fields (list) and values (list of lists))
-		junction_fields,junction_vals_list		#junction (fields (list) and values (list of lists))
+		junction_fields,junction_vals_list,		#junction (fields (list) and values (list of lists))
+		returnCountMapPackage=True			#return an array consisting of the result and an increment map count too 
 		):
 	print "*******************************************\n"
 	print "NEED TO SERIALIZE FOR QUERY=",current_query
@@ -217,7 +218,7 @@ def vdjml_read_serialize(
 			#	interval_to_add,
 			#	metrics_to_add)
 	print "\n\n\n"
-	#topSegmentCounterMap=IncrementMapWrapper()
+	topSegmentCounterMap=IncrementMapWrapper()
 	if(len(vdjr_vals_list)>0):
 		print "rearrangment summary "
 		print "\tFields : "
@@ -231,11 +232,11 @@ def vdjml_read_serialize(
 		kvmap=makeMap(rearrangement_summary_fields,vdjr_vals_list[0])
 		for k in kvmap:
 			print "\t"+k+"\t->\t"+kvmap[k]
-		#top_segs=["V","D","J"]
-		#for t in top_segs:
-		#	top_seg=kvmap["Top_"+t+"_gene_match"]
-		#	if(looksLikeAlleleStr(top_seg)):
-		#		topSegmentCounterMap.increment(top_seg)
+		top_segs=["V","D","J"]
+		for t in top_segs:
+			top_seg=kvmap["Top_"+t+"_gene_match"]
+			if(looksLikeAlleleStr(top_seg)):
+				topSegmentCounterMap.increment(top_seg)
 	if(len(junction_vals_list)>0):
 		print "\n\nJUNCTION summary:"
 		print "\tJunction Fields list : ",junction_fields
@@ -243,16 +244,21 @@ def vdjml_read_serialize(
 		jmap=makeMap(junction_fields,junction_vals_list[0])
 		print "\tJunction map : "
 		printMap(jmap)
-	return rb1
+	if(not(returnCountMapPackage)):
+		return rb1
+	else:
+		return [rb1,topSegmentCounterMap]
+		
 
 
-def scanOutputToVDJML(input_file,output_file,fasta_paths,db_fasta_list,debug=False):
+def scanOutputToVDJML(input_file,output_file,fasta_paths,db_fasta_list,jsonOutFile,organism,db_base,debug=False):
 	if(debug):
 		print "debug is true"
 	else:
 		print "debug is false"
 	INPUT=open(input_file,'r')
 	line_num=0
+	mainCountMap=IncrementMapWrapper()
 	current_query=None
 	current_query_id=(-1)
 	vdjr_vals_list=list()
@@ -292,29 +298,8 @@ def scanOutputToVDJML(input_file,output_file,fasta_paths,db_fasta_list,debug=Fal
 				igblast_version=rem.group(1)
 				mode="IGB_VERSION"
 			rem=re.search('^#\s+Query:\s(.*)',igblast_line)
-			ref=re.search('^#\s+BLAST\s+processed\s+\d+\s+queries',igblast_line)
-			if(rem or ref):
-				if(not(current_query==None)):
-					#CALL SERIALIZER
-					serialized=vdjml_read_serialize(
-								vlist,dlist,jlist,				#list of valllels from fastaDB, and D and J,
-								current_query,					#current query name
-								fact, 						#handle to VDJML factory
-								hit_vals_list,					#hit values (list of lists)
-								hit_fields,					#list of hit fields
-								summary_fields,					#summary fields
-								summary_vals_list,				#summary values list (list of lists)
-								rearrangement_summary_fields,vdjr_vals_list,
-								junction_fields,junction_vals_list
-								)
-					rb1=serialized
-					#count_map_wrapped=serialized[1]
-					#count_map_wrapped.printMap()
-					rrw1(rb1.get())
-				if(rem):
-					current_query=rem.group(1)
-				else:
-					current_query=None
+			if(rem):# or ref):
+				current_query=rem.group(1)
 				vdjr_vals_list=list()
 				junction_vals_list=list()
 				summary_vals_list=list()
@@ -395,7 +380,7 @@ def scanOutputToVDJML(input_file,output_file,fasta_paths,db_fasta_list,debug=Fal
 			rem=re.search('^#\s(\d+)\shits\sfound\s*',igblast_line)
 			if rem:
 				mode="hit_table"
-				current_num_hits=rem.group(1)
+				current_num_hits=int(rem.group(1))
 		elif (not (re.compile('^\s*$').match(igblast_line))):
 			#print "mode=",mode
 			if(mode=="vdj_rearrangement"):
@@ -409,11 +394,34 @@ def scanOutputToVDJML(input_file,output_file,fasta_paths,db_fasta_list,debug=Fal
 				#print "hit_fields is ",hit_fields," with length=",len(hit_fields)
 				#print "hit_vals after split",hit_vals
 				hit_vals_list.append(igblast_line)
+				if(len(hit_vals_list)==current_num_hits):
+					print "HELLO!  THIS IS WHERE SERIALIZATION SHOULD OCCUR!!!!\n"
+					#CALL SERIALIZER as the hits for this have been picked up
+					getMapToo=True
+					serialized=vdjml_read_serialize(
+								vlist,dlist,jlist,				#list of valllels from fastaDB, and D and J,
+								current_query,					#current query name
+								fact, 						#handle to VDJML factory
+								hit_vals_list,					#hit values (list of lists)
+								hit_fields,					#list of hit fields
+								summary_fields,					#summary fields
+								summary_vals_list,				#summary values list (list of lists)
+								rearrangement_summary_fields,vdjr_vals_list,
+								junction_fields,junction_vals_list,
+								getMapToo
+								)
+					if(not(getMapToo)):
+						rb1=serialized
+						rrw1(rb1.get())
+					else:
+						rb1=serialized[0]
+						incMap=serialized[1]
+						mainCountMap.mergeInto(incMap)
 			else:
 				print "unhandled mode=",mode
-
+	mainCountMap.JSONIFYToFile(db_base,organism,jsonOutFile)
     
 
 scanOutputToVDJML("/home/esalina2/round1_imgt/all_data.processed.Q35.L200.R1.fna.igblastn.imgt.out.first5.out","/dev/null","/home/esalina2/round1_imgt/all_data.processed.Q35.L200.R1.fna",
-	["/home/esalina2/round1_imgt/human_IG_V.fna","/home/esalina2/round1_imgt/human_IG_D.fna","/home/esalina2/round1_imgt/human_IG_J.fna"])
+	["/home/esalina2/round1_imgt/human_IG_V.fna","/home/esalina2/round1_imgt/human_IG_D.fna","/home/esalina2/round1_imgt/human_IG_J.fna"],"/tmp/programmaticJSON.json","human","/home/data/DATABASE/01_22_2014/")
 

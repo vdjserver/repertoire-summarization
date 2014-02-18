@@ -17,7 +17,6 @@ from Bio.Blast import NCBIXML
 import sys, traceback
 import pickle
 import ntpath
-from segment_utils import *
 from Bio import SeqIO
 
 

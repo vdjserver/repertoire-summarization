@@ -7,7 +7,6 @@ import urllib2
 import re
 from subprocess import call
 import nwalign as nw
-from imgt_utils import *
 import pickle
 
 
