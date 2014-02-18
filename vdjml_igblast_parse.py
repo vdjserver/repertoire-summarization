@@ -104,7 +104,15 @@ def makeRegionAlnMetricsFromValn(valn,qstart,regionmap):
 
 
 
-def vdjml_read_serialize(current_query):
+def vdjml_read_serialize(
+		vlist,dlist,jlist,			#list of valllels from fastaDB, and D and J,
+		current_query,				#current query name
+		fact, 					#handle to VDJML factory
+		hit_vals_list,				#hit values
+		hit_fields,				#list of hit fields
+		summary_fields,				#summary fields
+		summary_vals_list			#summary values list
+		):
 	print "*******************************************\n"
 	print "NEED TO SERIALIZE FOR QUERY=",current_query
 	rb1 = fact.new_result(current_query)
@@ -156,85 +164,63 @@ def vdjml_read_serialize(current_query):
 				qvaseq=kvmap['query seq']
 				top_btop['V']=kvmap['BTOP']
 				alnDebugFlag=False
-			if(current_query=="HZ8R54Q01C3N51"):
-				alnDebugFlag=True
-				#valn=buildAlignmentWholeSeqs(top_btop['V'],qvaseq,vaseq,alnDebugFlag)
-				valn=buildAlignmentWholeSeqsDirect(qvaseq,vaseq)
-				if(alnDebugFlag):
-					print "The debug is :",
-					print getNiceAlignment(valn)
-					#sys.exit(0)
-				valn_qstart=kvmap['q. start']
-				if(firstD==None and segment_type_to_add=='D'):
-					firstD=smb1
-					daseq=kvmap['subject seq']
-					qdaseq=kvmap['query seq']
-					top_btop['D']=kvmap['BTOP']
-				if(firstJ==None and segment_type_to_add=='J'):
-					firstJ=smb1
-					jaseq=kvmap['subject seq']
-					qjaseq=kvmap['query seq']
-					top_btop['J']=kvmap['BTOP']
-				#getWholeChainAlignment(qvaseq,vaseq,qdaseq,daseq,qjaseq,jaseq,top_btop)
-				scb=None
-				#note, because igBLAST "anchors" on the V alignment, if V aligns, then D and J are both optional, but if V doesn't align, then no D alignment exists and no J alignment exists!
-				if(not(firstV==None)):
-					if(firstD==None):
-						if(not(firstJ==None)):
-							scb=rb1.add_segment_combination(firstV.get().id(),firstJ.get().id())
-						else:
-							#firstJ is none
-							scb=rb1.add_segment_combination(firstV.get().id())
+			scb=None
+			#note, because igBLAST "anchors" on the V alignment, if V aligns, then D and J are both optional, but if V doesn't align, then no D alignment exists and no J alignment exists!
+			if(not(firstV==None)):
+				if(firstD==None):
+					if(not(firstJ==None)):
+						scb=rb1.add_segment_combination(firstV.get().id(),firstJ.get().id())
 					else:
-						#firstD not none
-						if(not(firstJ==None)):
-							scb=rb1.add_segment_combination(firstV.get().id(),firstD.get().id(),firstJ.get().id())						
-						else:
-							scb=rb1.add_segment_combination(firstV.get().id(),firstD.get().id())
+						#firstJ is none
+						scb=rb1.add_segment_combination(firstV.get().id())
 				else:
-					pass
-				print "\n\n\tAlignment summary Info : "
-				print "Alignment summary fields : ",summary_fields
-				print "Alignment summary vals : "
-				for a in range(len(summary_vals_list)):
-					asMap=makeMap(summary_fields,summary_vals_list[a])
-					if(not(asMap['region'].startswith("Total") or asMap['region'].startswith("CDR3"))):
-						print "\tSummary item "+str(a)+" : "
-						print "\t",summary_vals_list[a]
-						print "\tThis is a particular alignment summary map : "
-						printMap(asMap)	
-						region_to_add=asMap['region']
-						interval_to_add=vdjml.Interval.first_last_1(int(asMap['from']),int(asMap['to']))
-						metrics_to_add=makeRegionAlnMetricsFromValn(valn,valn_qstart,asMap)
-						scb.add_region(
-							region_to_add,
-							interval_to_add,
-							metrics_to_add)
-				rrw1(rb1.get())
-				#rrw1.close()
-				print "\n\n\n"
-				if(len(vdjr_vals_list)>0):
-					print "rearrangment summary "
-					print "\tFields : "
-					print rearrangement_summary_fields
-					for f in range(len(rearrangement_summary_fields)):
-						print "\t\tfield "+str(f)+" : "+rearrangement_summary_fields[f]
-					print "\tValues:"
-					print vdjr_vals_list
-					for v in range(len(vdjr_vals_list)):
-						print "\t\tval : "+str(v)+" : "+vdjr_vals_list[v]
-					kvmap=makeMap(rearrangement_summary_fields,vdjr_vals_list[0])
-					for k in kvmap:
-						print "\t"+k+"\t->\t"+kvmap[k]
-				if(len(junction_vals_list)>0):
-					print "\n\nJUNCTION summary:"
-					print "\tJunction Fields list : ",junction_fields
-					print "\tJunction vals list",junction_vals_list
-					jmap=makeMap(junction_fields,junction_vals_list[0])
-					print "\tJunction map : "
-					printMap(jmap)
+					#firstD not none
+					if(not(firstJ==None)):
+						scb=rb1.add_segment_combination(firstV.get().id(),firstD.get().id(),firstJ.get().id())						
+					else:
+						scb=rb1.add_segment_combination(firstV.get().id(),firstD.get().id())
+			else:
+				pass
+			print "\n\n\tAlignment summary Info : "
+			print "Alignment summary fields : ",summary_fields
+			print "Alignment summary vals : "
+			for a in range(len(summary_vals_list)):
+				asMap=makeMap(summary_fields,summary_vals_list[a])
+				if(not(asMap['region'].startswith("Total") or asMap['region'].startswith("CDR3"))):
+					print "\tSummary item "+str(a)+" : "
+					print "\t",summary_vals_list[a]
+					print "\tThis is a particular alignment summary map : "
+					printMap(asMap)	
+					region_to_add=asMap['region']
+					interval_to_add=vdjml.Interval.first_last_1(int(asMap['from']),int(asMap['to']))
+					metrics_to_add=makeRegionAlnMetricsFromValn(valn,valn_qstart,asMap)
+					scb.add_region(
+						region_to_add,
+						interval_to_add,
+						metrics_to_add)
+			rrw1(rb1.get())
+			print "\n\n\n"
+			if(len(vdjr_vals_list)>0):
+				print "rearrangment summary "
+				print "\tFields : "
+				print rearrangement_summary_fields
+				for f in range(len(rearrangement_summary_fields)):
+					print "\t\tfield "+str(f)+" : "+rearrangement_summary_fields[f]
+				print "\tValues:"
+				print vdjr_vals_list
+				for v in range(len(vdjr_vals_list)):
+					print "\t\tval : "+str(v)+" : "+vdjr_vals_list[v]
+				kvmap=makeMap(rearrangement_summary_fields,vdjr_vals_list[0])
+				for k in kvmap:
+					print "\t"+k+"\t->\t"+kvmap[k]
+			if(len(junction_vals_list)>0):
+				print "\n\nJUNCTION summary:"
+				print "\tJunction Fields list : ",junction_fields
+				print "\tJunction vals list",junction_vals_list
+				jmap=makeMap(junction_fields,junction_vals_list[0])
+				print "\tJunction map : "
+				printMap(jmap)
 	return None
-
 
 
 def scanOutputToVDJML(input_file,output_file,fasta_paths,db_fasta_list,debug=False):
@@ -251,7 +237,9 @@ def scanOutputToVDJML(input_file,output_file,fasta_paths,db_fasta_list,debug=Fal
 	summary_vals_list=list()
 	hit_vals_list=list()
 	ddl=getListOfDescsFromDBList(db_fasta_list)
+	#print "DDL is ",ddl
 	vlist=ddl[0]
+	#print "vlist=",vlist
 	dlist=ddl[1]
 	jlist=ddl[2]
 	#print "VLIST :",vlist
@@ -285,6 +273,7 @@ def scanOutputToVDJML(input_file,output_file,fasta_paths,db_fasta_list,debug=Fal
 			if(rem or ref):
 				if(not(current_query==None)):
 					#CALL SERIALIZER
+					serialized=vdjml_read_serialize(vlist,dlist,jlist,current_query,fact,hit_vals_list,hit_fields,summary_fields,summary_vals_list)
 				if(rem):
 					current_query=rem.group(1)
 				else:
