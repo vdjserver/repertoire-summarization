@@ -1289,6 +1289,12 @@ class imgt_db:
 	def getOrganismList(self):
 		return self.ol
 
+
+
+	#return base directory
+	def getBaseDir():
+		return self.db_base
+
 	#download gene tables and reference directory sets from imgt
 	def download_imgt_RefDirSeqs_AndGeneTables_HumanAndMouse(self,unconditionalForceReplace=False):
 		base=self.db_base
