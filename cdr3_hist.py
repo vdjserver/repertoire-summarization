@@ -201,8 +201,8 @@ def getOtherMode(m):
 
 def CDR3LengthAnalysis(vHitLine,jHitLine,currentQueryName,currentQuerySeq,organism,imgtdb_obj):
 	currentQueryName=str(currentQueryName.strip())
-	vpieces=VHitLine.split("\t")
-	jpieces=JHitLine.split("\t")
+	vpieces=vHitLine.split("\t")
+	jpieces=jHitLine.split("\t")
 	currentV=vpieces[6]
 	currentJ=jpieces[6]
 	cdr3_hist=dict()
@@ -257,92 +257,4 @@ def CDR3LengthAnalysis(vHitLine,jHitLine,currentQueryName,currentQuerySeq,organi
 				#print "BADREFMAP mode=",dm," refVCDR3=(-1) for ",currentV," = ",ref_cdr3_start," or refJCDR3 ",currentJ," = ",ref_cdr3_end
 				pass
 	return cdr3_hist
-
-
-currentQuery=None
-for line in blast_data:
-	if(line.startswith("# Query")):
-		tot+=1
-		#print "At a query : ",line
-		if(VHitLine!=None and JHitLine!=None and currentV!=None and currentJ!=None):
-			#CDR3ANAL(currentV,currentJ,VHitLine,JHitLine,currentD,currentQuery)
-			pass
-		else:
-			nona+=1
-		#reset values
-		VHitLine=None
-		JHitLine=None
-		currentV=None
-		currentJ=None
-		currentD=None
-		# Query: G7Q0IVE01ADLSM
-		qr=re.compile(':\s+([A-Z0-9]+)\s*$')
-		mr=re.search(qr,line)
-		if(mr):
-			currentQuery=mr.group(1)
-		else:
-			print "fail qre!"
-			sys.exit(0)
-		print "\n\n\n"
-	elif(re.match(r'^[VJ]\s+',line)):
-		line_pieces=line.split("\t")
-		if(len(line_pieces)>=34):
-			#got data!
-			if(VHitLine==None and line.startswith("V\t")):
-				VHitLine=line
-			elif(JHitLine==None and line.startswith("J\t")):
-				JHitLine=line
-	if(capture_flag):
-		pieces=line.split('\t')
-		if(is_heavy):
-			max_range=3
-		else:
-			max_range=2
-		for i in range(max_range):
-			pieces[i]=pieces[i].strip()
-			list_to_use=vlist
-			if(i==1 and is_heavy):
-				list_to_use=dlist
-			elif(i==1 and not is_heavy):
-				list_to_use=jlist
-			elif(i==2):
-				list_to_use=jlist
-			if(not(pieces[i]=="N/A")):
-				#segment=getSegmentName(pieces[i],list_to_use)
-				segment=pieces[i]
-				#print "GOT A SEGMENT "+segment+" heavy_status="+str(is_heavy)
-				if(list_to_use==vlist):
-					currentV=segment
-					#print "saved as V",currentV
-				elif(list_to_use==jlist):
-					currentJ=segment
-					#print "saved as J",currentJ
-				elif(list_to_use==dlist):
-					currentD=segment
-		capture_flag=False
-	if(line.startswith("# V(D)J rearrangement")):
-		#print line
-		if(line.find('Top D')!=(-1)):
-			is_heavy=True
-		else:
-			is_heavy=False
-		capture_flag=True
-	line_num+=1
-	#print "at line="+str(line_num)
-
-
-
-
-
-
-
-#print "***********************************************************"
-#print "REVIEWING ALLELELS "
-#for a in v_alleles_review:
-#	print "********************************************"
-#	print "REVIEW ",a
-#	print "REVIEW DESCRIPTOR ",imgtdb_obj.extractDescriptorLine(a)
-#	print "********************************************"
-#	print v_alleles_review[a]
-#	print "\n\n\n\n"		
 
