@@ -271,10 +271,10 @@ def vdjml_read_serialize(
 		
 
 
-def scanOutputToVDJML(input_file,output_file,db_fasta_list,jsonOutFile,organism,db_base,queryFasta,debug=False):
+def scanOutputToVDJML(input_file,output_file,db_fasta_list,jsonOutFile,organism,db_base,queryFasta,cdr3_hist_out,debug=False):
 	INPUT=open(input_file,'r')
 	line_num=0
-	mainCountMap=IncrementMapWrapper()
+	segmentCountMap=IncrementMapWrapper()
 	current_query=None
 	current_query_id=(-1)
 	vdjr_vals_list=list()
@@ -419,7 +419,7 @@ def scanOutputToVDJML(input_file,output_file,db_fasta_list,jsonOutFile,organism,
 					else:
 						rb1=serialized[0]
 						incMap=serialized[1]
-						mainCountMap.mergeInto(incMap)
+						segmentCountMap.mergeInto(incMap)
 						rrw1(rb1.get())
 		elif (not (re.compile('^\s*$').match(igblast_line))):
 			if(mode=="vdj_rearrangement"):
@@ -452,10 +452,11 @@ def scanOutputToVDJML(input_file,output_file,db_fasta_list,jsonOutFile,organism,
 					else:
 						rb1=serialized[0]
 						incMap=serialized[1]
-						mainCountMap.mergeInto(incMap)
+						segmentCountMap.mergeInto(incMap)
 						rrw1(rb1.get())
 			else:
 				print "unhandled mode=",mode
+	jsonOutFile=jsonOutFile.strip()
 	if(jsonOutFile=="/dev/null"):
 		pass
 		#don't write JSON
@@ -463,7 +464,8 @@ def scanOutputToVDJML(input_file,output_file,db_fasta_list,jsonOutFile,organism,
 		#so that's why I did this
 	else:
 		mainCountMap.JSONIFYToFile(db_base,organism,jsonOutFile)
-
+	cdr3_hist_out=cdr3_hist_out.strip()
+	
 
 
 
@@ -479,6 +481,7 @@ parser.add_argument('jscon_counts',type=str,nargs=1,help='path to a JSON file of
 parser.add_argument('vdjserver_dbbase',type=str,nargs=1,help='path to the root of the VDJServer database')
 parser.add_argument('organism',type=str,nargs=1,help='name of the organism (used for counting and JSON) ; must exist under the vdjserver_dbbase')
 parser.add_argument('qry_fasta',type=str,nargs=1,help='path to the query fasta file')
+parser.add_argument('cdr3_hist_out',type=str,nargs=1,help='path to an output file of cdr3 length histogram/frequency data')
 
 
 #parser.print_help()
@@ -493,6 +496,7 @@ if(args):
 		args.organism[0],
 		args.vdjserver_dbbase[0],
 		args.qry_fasta[0],
+		args.cdr3_hist_out[0]
 		)
 else:
 	#print "fail"
