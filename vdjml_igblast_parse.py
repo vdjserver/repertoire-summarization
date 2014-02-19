@@ -395,6 +395,32 @@ def scanOutputToVDJML(input_file,output_file,db_fasta_list,jsonOutFile,organism,
 				mode="hit_table"
 				num_hits_found=int(rem.group(1))
 				current_num_hits=num_hits_found
+				if(num_hits_found==0):
+					#since there are zero hits, do a serialization now
+					#there's no hit data to pickup
+					#CALL SERIALIZER as the hits for this have been picked up
+					getMapToo=True
+					serialized=vdjml_read_serialize(
+								vlist,dlist,jlist,				#list of valllels from fastaDB, and D and J,
+								current_query,					#current query name
+								fact, 						#handle to VDJML factory
+								hit_vals_list,					#hit values (list of lists)
+								hit_fields,					#list of hit fields
+								summary_fields,					#summary fields
+								summary_vals_list,				#summary values list (list of lists)
+								rearrangement_summary_fields,vdjr_vals_list,	#rearrangment values (list and list-of-lists)
+								junction_fields,junction_vals_list,		#junction fields/values (list and list of lists)
+								getMapToo					#flag to return 
+								)
+					
+					if(not(getMapToo)):
+						rb1=serialized
+						rrw1(rb1.get())
+					else:
+						rb1=serialized[0]
+						incMap=serialized[1]
+						mainCountMap.mergeInto(incMap)
+						rrw1(rb1.get())
 		elif (not (re.compile('^\s*$').match(igblast_line))):
 			if(mode=="vdj_rearrangement"):
 				vdjr_vals_list.append(igblast_line)
@@ -430,8 +456,13 @@ def scanOutputToVDJML(input_file,output_file,db_fasta_list,jsonOutFile,organism,
 						rrw1(rb1.get())
 			else:
 				print "unhandled mode=",mode
-	mainCountMap.JSONIFYToFile(db_base,organism,jsonOutFile)
-    
+	if(jsonOutFile=="/dev/null"):
+		pass
+		#don't write JSON
+		#the parsing of the HTML can take a bit of time ("beautiful soup")
+		#so that's why I did this
+	else:
+		mainCountMap.JSONIFYToFile(db_base,organism,jsonOutFile)
 
 
 
