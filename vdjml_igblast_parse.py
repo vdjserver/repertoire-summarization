@@ -2,10 +2,12 @@
 
 import vdjml
 import re
-from imgt_utils import trimList
+from imgt_utils import trimList,imgt_db
 from segment_utils import getFastaListOfDescs,getSegmentName,IncrementMapWrapper,looksLikeAlleleStr
 import argparse
 from Bio import SeqIO
+from cdr3_hist import CDR3LengthAnalysis
+from igblast_utils import getDomainClasses
 
 #parser = argparse.ArgumentParser(description='Process some integers.')
 #parser.add_argument('integers', metavar='N', type=int, nargs='+',
@@ -271,6 +273,48 @@ def vdjml_read_serialize(
 		
 
 
+def getTopLineGivenSegment(line_data,segment):
+	for l in range(len(line_data)):
+		#print "Looking at ",line_data[l]
+		pieces=line_data[l].split("\t")
+		line_segment=pieces[0]
+		#print "The line segment is ",line_segment
+		if(line_segment==segment):
+			#print "To return ",line_data[l]
+			return line_data[l]
+	return None
+
+
+
+def writeModedHistogramFile(IncrementMapWrapper_count_map_dict,outfile):
+	max_list=list()
+	for d in IncrementMapWrapper_count_map_dict:
+		#print "have to write for ",d
+		max_d=IncrementMapWrapper_count_map_dict[d].getMaxKeyWithIntOrdering()
+		#print "for ",d," the max is ",max_d
+		max_list.append(max_d)
+	max_overall=max(max_list)
+	hist_writer=open(outfile,'w')
+	hist_writer.write("CDR3_LENGTH")
+	keys=IncrementMapWrapper_count_map_dict.keys()
+	keys.sort()
+	for d in keys:
+		hist_writer.write("\t"+d)
+	keys.sort()
+	hist_writer.write("\n")
+	cdr3_len=(-1)
+	while(cdr3_len<=max_overall):
+		if(cdr3_len!=0):
+			hist_writer.write(str(cdr3_len))
+			for d in keys:
+				hist_writer.write("\t"+str(IncrementMapWrapper_count_map_dict[d].get_val(cdr3_len)))
+			hist_writer.write("\n")
+		cdr3_len+=1
+	hist_writer.close()
+
+
+
+
 def scanOutputToVDJML(input_file,output_file,db_fasta_list,jsonOutFile,organism,db_base,queryFasta,cdr3_hist_out,debug=False):
 	INPUT=open(input_file,'r')
 	line_num=0
@@ -306,8 +350,15 @@ def scanOutputToVDJML(input_file,output_file,db_fasta_list,jsonOutFile,organism,
 	rrw1 = vdjml.Result_writer(output_file, meta)
 	firstV=None
 	firstJ=None
+	imgtdb_obj=imgt_db(db_base)
 	#open a biopython read to have current query name and sequence available for translation
 	query_fasta_iterator=SeqIO.parse(queryFasta, "fasta")
+	fasta_record=None
+	igblast_rec_id=0
+	IncrementMapWrapper_count_map_dict=dict()
+	domains=getDomainClasses()
+	for d in domains:
+		IncrementMapWrapper_count_map_dict[d]=IncrementMapWrapper()
 	for igblast_line in INPUT:
 		line_num+=1
 		igblast_line=igblast_line.strip()
@@ -331,6 +382,13 @@ def scanOutputToVDJML(input_file,output_file,db_fasta_list,jsonOutFile,organism,
 				fasta_record=next(query_fasta_iterator)
 				#print(str(fasta_record.id))
 				#print(str(fasta_record.seq))
+				igblast_rec_id+=1
+				if(not(str(fasta_record.id)==current_query)):
+					misOrderStr="WARNING ! WARNING ! WARNING !\n"
+					misOrderStr+="It appears that the query fasta and igblast output are not in the same order!\n"
+					misOrderStr+= "Query fasta name is ",str(fasta_record.id)," but IGBLAST has name ",current_query
+					misOrderStr+= "IGBLAST ouput line number ",line_num
+					raise Excpetion(misOrderStr)
 			rem=re.search('^#\s+Database:\s(.*)$',igblast_line)
 			if rem:
 				igblast_databases=rem.group(1)
@@ -454,6 +512,18 @@ def scanOutputToVDJML(input_file,output_file,db_fasta_list,jsonOutFile,organism,
 						incMap=serialized[1]
 						segmentCountMap.mergeInto(incMap)
 						rrw1(rb1.get())
+					topV=getTopLineGivenSegment(hit_vals_list,'V')
+					topJ=getTopLineGivenSegment(hit_vals_list,'J')
+					if(not(topV is None) and not(topJ is None)):
+						#print "TOP V IS ",topV
+						#print "TOP J IS ",topJ
+						cdr3_length_results=CDR3LengthAnalysis(topV,topJ,current_query,str(fasta_record.seq),organism,imgtdb_obj)
+						#printMap(cdr3_length_results)
+						for d in domains:
+							#print "for ",d," got length ",cdr3_length_results[d]
+							IncrementMapWrapper_count_map_dict[d].increment(cdr3_length_results[d])
+							#print "This map is now :",
+							#IncrementMapWrapper_count_map_dict[d].printMap()
 			else:
 				print "unhandled mode=",mode
 	jsonOutFile=jsonOutFile.strip()
@@ -465,7 +535,8 @@ def scanOutputToVDJML(input_file,output_file,db_fasta_list,jsonOutFile,organism,
 	else:
 		mainCountMap.JSONIFYToFile(db_base,organism,jsonOutFile)
 	cdr3_hist_out=cdr3_hist_out.strip()
-	
+	if(not(cdr3_hist_out=="/dev/null")):
+		writeModedHistogramFile(IncrementMapWrapper_count_map_dict,cdr3_hist_out)
 
 
 
