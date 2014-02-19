@@ -26,6 +26,7 @@ import time
 
 
 
+
 def makeRegionLookupTableFile(infile,outfile):
 	INPUT=open(infile,'r')
 	OUTPUT=open(outfile,'w')
