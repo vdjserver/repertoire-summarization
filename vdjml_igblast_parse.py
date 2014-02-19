@@ -396,7 +396,7 @@ def scanOutputToVDJML(input_file,output_file,db_fasta_list,jsonOutFile,organism,
 				num_hits_found=int(rem.group(1))
 				current_num_hits=num_hits_found
 				if(num_hits_found==0):
-					#since there are zero hits, do a serialization now
+					#since there are zero hits, do a serialization now.
 					#there's no hit data to pickup
 					#CALL SERIALIZER as the hits for this have been picked up
 					getMapToo=True
@@ -431,7 +431,7 @@ def scanOutputToVDJML(input_file,output_file,db_fasta_list,jsonOutFile,organism,
 			elif(mode=="hit_table"):
 				hit_vals_list.append(igblast_line)
 				if(len(hit_vals_list)==current_num_hits):
-					#CALL SERIALIZER as the hits for this have been picked up
+					#CALL SERIALIZER as the hits for this read/query been picked up
 					getMapToo=True
 					serialized=vdjml_read_serialize(
 								vlist,dlist,jlist,				#list of valllels from fastaDB, and D and J,
