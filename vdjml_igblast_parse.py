@@ -533,7 +533,7 @@ def scanOutputToVDJML(input_file,output_file,db_fasta_list,jsonOutFile,organism,
 		#the parsing of the HTML can take a bit of time ("beautiful soup")
 		#so that's why I did this
 	else:
-		mainCountMap.JSONIFYToFile(db_base,organism,jsonOutFile)
+		segmentCountMap.JSONIFYToFile(db_base,organism,jsonOutFile)
 	cdr3_hist_out=cdr3_hist_out.strip()
 	if(not(cdr3_hist_out=="/dev/null")):
 		writeModedHistogramFile(IncrementMapWrapper_count_map_dict,cdr3_hist_out)
