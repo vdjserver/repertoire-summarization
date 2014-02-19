@@ -682,7 +682,7 @@ def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human",m
 	if(1==1):
 		if(mode=="imgt"):
 			#read the HIGH-VQUEST ANNOTATION
-			print "need to handle IMGT mode for get CDR3 start"
+			#print "need to handle IMGT mode for get CDR3 start"
 			if(organism in cdr3_adj_map):
 				if(allele in cdr3_adj_map[organism]["imgt"]):
 					return cdr3_adj_map[organism]["imgt"][allele]
@@ -708,9 +708,11 @@ def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human",m
 							annotationStartLine=lineNum
 						lineNum+=1
 			if(fileToUse==None):
-				print "Found no file to use"
+				#print "Found no file to use"
+				pass
 			else:
-				print "Found file ",fileToUse,"to use to start at line=",annotationStartLine
+				#print "Found file ",fileToUse,"to use to start at line=",annotationStartLine
+				pass
 			cdr3_reader=open(fileToUse,'r')
 			lineNum=0
 			cdr3_re=re.compile(r'^CDR3(\-IMGT)?\s+(\d+)[^0-9]+(\d+)',re.IGNORECASE)
@@ -720,9 +722,10 @@ def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human",m
 					sline=line.strip()
 					search_result=re.search(cdr3_re,sline)
 					if(cdr3_start!=None):
-						print "Looking at ",sline
+						#print "Looking at ",sline
+						pass
 					if(search_result):
-						print "FOUND A CDR3 line: ",
+						#print "FOUND A CDR3 line: ",
 						leftInt=int(search_result.group(2))
 						rightInt=int(search_result.group(3))
 						cdr3_start=leftInt
@@ -732,7 +735,7 @@ def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human",m
 			cdr3_adj_map[organism]["imgt"][allele]=cdr3_start
 			return cdr3_adj_map[organism]["imgt"][allele]
 		elif(mode=="kabat"):
-			print "need to handle KABAT mode for CDR3 start!"
+			#print "need to handle KABAT mode for CDR3 start!"
 			if(organism in cdr3_adj_map):
 				if(allele in cdr3_adj_map[organism]["kabat"]):
 					return cdr3_adj_map[organism]["kabat"][allele]			
@@ -751,7 +754,7 @@ def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human",m
 			else:
 				cdr3_adj_map[organism]["kabat"][allele]=(-1)
 				toReturn=cdr3_adj_map[organism]["kabat"][allele]				
-			print "for kabat (",allele,"), to return ",toReturn
+			#print "for kabat (",allele,"), to return ",toReturn
 			return toReturn
 		else:
 			print "NON EXISTENT MODE : ",mode
@@ -809,8 +812,8 @@ def getCDR3StartFromVData(vdata,allele,imgtdb_obj,organism):
 				cdr3_start=int(re.sub(r'[^0-9]','',str(feature_list.location.start)))
 				cdr3_stop=int(re.sub(r'[^0-9]','',str(feature_list.location.end)))
 				qualifiers=feature_list.qualifiers
-				print feature_list
-				print qualifiers
+				#print feature_list
+				#print qualifiers
 				if("complement" in qualifiers):
 					revCompFlag=True
 				else:
@@ -829,13 +832,43 @@ def getCDR3StartFromVData(vdata,allele,imgtdb_obj,organism):
 class IncrementMapWrapper():
 	#have a count map
 	count_map=None
+	#have a default value
+	default_value=0
 
+	#constructor
 	def __init__(self):
 		self.count_map=dict()
+		self.default_value=0
+
+
+	#treating the keys as ints, find the max key
+	#return -1 if no keys
+	def getMaxKeyWithIntOrdering(self):
+		keys=self.count_map.keys()
+		int_keys=list()
+		for k in keys:
+			int_keys.append(int(k))
+		int_keys.sort()
+		if(len(int_keys)>0):
+			return max(int_keys)
+		else:
+			return (-1)
+
+	#be able to change the default value
+	def setDefault(self,d):
+		self.default_value=d
 
 	#have a subroutine to return the map
 	def get_map(self):
 		return  self.count_map
+
+
+	#have a getter method for the default value
+	def get_val(self,key):
+		if(key in self.count_map):
+			return self.count_map[key]
+		else:
+			return self.default_value
 	
 	#increment the given value
 	def increment(self,val):
@@ -848,7 +881,11 @@ class IncrementMapWrapper():
 	def printMap(self):
 		print "I am an increment map."
 		for k in self.count_map:
-			print k+"\t"+str(self.count_map[k])
+			print str(k)+"\t"+str(self.count_map[k])
+
+	#zero out at a key
+	def zeroOut(self,key):
+		self.count_map[key]=0
 
 	#given another increment map wrapper, merge its counts into this/self 
 	def mergeInto(self,other):
@@ -876,26 +913,26 @@ class IncrementMapWrapper():
 
 
 def getQueryIndexGivenSubjectIndexAndAlignment(query_aln,subject_aln,q_start,q_stop,s_start,s_stop,subject_pos):
-	print "in getQueryIndexGivenSubjectIndexAndAlignment"
-	import hashlib
-	print "query_aln=",query_aln
-	print "query_aln_digest=",hashlib.md5(query_aln).hexdigest()
-	print "subct_aln=",subject_aln
-	print "subct_aln_digest=",hashlib.md5(subject_aln).hexdigest()	
-	print "q_start=",q_start
-	print "q_stop=",q_stop
-	print "s_start=",s_start
-	print "s_stop=",s_stop
-	print "desired=",subject_pos
+	#print "in getQueryIndexGivenSubjectIndexAndAlignment"
+	#import hashlib
+	#print "query_aln=",query_aln
+	#print "query_aln_digest=",hashlib.md5(query_aln).hexdigest()
+	#print "subct_aln=",subject_aln
+	#print "subct_aln_digest=",hashlib.md5(subject_aln).hexdigest()	
+	#print "q_start=",q_start
+	#print "q_stop=",q_stop
+	#print "s_start=",s_start
+	#print "s_stop=",s_stop
+	#print "desired=",subject_pos
 	firstCond=(s_start<=subject_pos)
 	secondCond=(subject_pos<=s_stop)
-	print "firstCond (s_start<=subject_pos) is ",firstCond
-	print "secondCond (subject_pos<=s_stup)   is ",secondCond
+	#print "firstCond (s_start<=subject_pos) is ",firstCond
+	#print "secondCond (subject_pos<=s_stup)   is ",secondCond
 	if(not(firstCond) or not(secondCond)):
 		#invalid range!
 		#print "INVALID RANGE!"
 		#print "s_start=",s_start,"dbus=",subject_pos,"s_stop=",s_stop
-		print "getQueryIndexGivenSubjectIndexAndAlignment to return (neg) (-1)"
+		#print "getQueryIndexGivenSubjectIndexAndAlignment to return (neg) (-1)"
 		return (-1)
 	if(firstCond and secondCond):
 		#if within the boundaries!
@@ -928,7 +965,7 @@ def getQueryIndexGivenSubjectIndexAndAlignment(query_aln,subject_aln,q_start,q_s
 				#return 1-based index
 				#return q_counter
 				if(s_val!="-"):
-					print "getQueryIndexGivenSubjectIndexAndAlignment to return (qcounter) ",q_counter
+					#print "getQueryIndexGivenSubjectIndexAndAlignment to return (qcounter) ",q_counter
 					return q_counter
 			if(not(q_val=="-")):
 				q_counter+=1
