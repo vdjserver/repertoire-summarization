@@ -8,6 +8,7 @@ import argparse
 from Bio import SeqIO
 from cdr3_hist import CDR3LengthAnalysis
 from igblast_utils import getDomainClasses
+from segment_utils import getRegionAlignmentFromLargerVAlignment
 
 #parser = argparse.ArgumentParser(description='Process some integers.')
 #parser.add_argument('integers', metavar='N', type=int, nargs='+',
@@ -128,11 +129,14 @@ def vdjml_read_serialize(
 		summary_vals_list,				#summary values list (list of lists)
 		rearrangement_summary_fields,vdjr_vals_list,	#rearrangment summary (fields (list) and values (list of lists))
 		junction_fields,junction_vals_list,		#junction (fields (list) and values (list of lists))
-		returnCountMapPackage=True			#return an array consisting of the result and an increment map count too
+		imgtdb_obj,					#imgtdb_obj for region annotation
+		returnCountMapPackage=True,			#return an array consisting of the result and an increment map count too
+		organism="human"				#organism for region annotation							
 		):
 	#print "*******************************************\n"
 	#print "NEED TO SERIALIZE FOR QUERY=",current_query
 	rb1 = fact.new_result(current_query)
+	#print "the base is ",imgtdb_obj.getDirBase()
 	firstV=None
 	firstD=None
 	firstJ=None
@@ -144,6 +148,7 @@ def vdjml_read_serialize(
 	qjaseq=None
 	top_btop=dict()
 	valn=None
+	firstVMap=None
 	topSegmentCounterMap=IncrementMapWrapper()
 	if(len(hit_vals_list)==0):
 		if(returnCountMapPackage):
@@ -183,6 +188,7 @@ def vdjml_read_serialize(
 			metrics_to_add)
 		if(firstV==None and segment_type_to_add=='V'):
 			firstV=smb1
+			firstVMap=kvmap
 			vaseq=kvmap['subject seq']
 			qvaseq=kvmap['query seq']
 			top_btop['V']=kvmap['BTOP']
@@ -223,6 +229,11 @@ def vdjml_read_serialize(
 	#print "\n\n\tAlignment summary Info : "
 	#print "Alignment summary fields : ",summary_fields
 	#print "Alignment summary vals : "
+	valid_regions=["FR1","CDR1","FR2","CDR2","FR3","CDR3"]
+	for valid_region in valid_regions:
+		print "Now trying to do analysis at valid_region=",valid_region," with segment=",firstVMap['subject ids']
+		reg_kabat=getRegionAlignmentFromLargerVAlignment(firstVMap,organism,"kabat",valid_region,imgtdb_obj)
+		reg_imgt=getRegionAlignmentFromLargerVAlignment(firstVMap,organism,"imgt",valid_region,imgtdb_obj)
 	for a in range(len(summary_vals_list)):
 		asMap=makeMap(summary_fields,summary_vals_list[a])
 		if(not(asMap['region'].startswith("Total") or asMap['region'].startswith("CDR3"))):
@@ -468,7 +479,9 @@ def scanOutputToVDJML(input_file,output_file,db_fasta_list,jsonOutFile,organism,
 								summary_vals_list,				#summary values list (list of lists)
 								rearrangement_summary_fields,vdjr_vals_list,	#rearrangment values (list and list-of-lists)
 								junction_fields,junction_vals_list,		#junction fields/values (list and list of lists)
-								getMapToo					#flag to return 
+								imgtdb_obj,					#IMGT TABLE
+								getMapToo,					#flag to return 
+								organism
 								)
 					
 					if(not(getMapToo)):
@@ -501,7 +514,9 @@ def scanOutputToVDJML(input_file,output_file,db_fasta_list,jsonOutFile,organism,
 								summary_vals_list,				#summary values list (list of lists)
 								rearrangement_summary_fields,vdjr_vals_list,	#rearrangment values (list and list-of-lists)
 								junction_fields,junction_vals_list,		#junction fields/values (list and list of lists)
-								getMapToo					#flag to return 
+								imgtdb_obj,					#imgt
+								getMapToo,					#flag to return 
+								organism					#
 								)
 					
 					if(not(getMapToo)):
@@ -553,6 +568,8 @@ parser.add_argument('vdjserver_dbbase',type=str,nargs=1,help='path to the root o
 parser.add_argument('organism',type=str,nargs=1,help='name of the organism (used for counting and JSON) ; must exist under the vdjserver_dbbase')
 parser.add_argument('qry_fasta',type=str,nargs=1,help='path to the query fasta file')
 parser.add_argument('cdr3_hist_out',type=str,nargs=1,help='path to an output file of cdr3 length histogram/frequency data')
+
+
 
 
 #parser.print_help()

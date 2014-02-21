@@ -761,7 +761,34 @@ def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human",m
 			print "NON EXISTENT MODE : ",mode
 			sys.exit(0)
 
-		
+
+
+
+
+#given a V segment alignment extract from it the sub-portion for a given
+#region.  Return a 2-length array with subject and query alignment data
+#return None if alignment too short or doesn't cover region
+def getRegionAlignmentFromLargerVAlignment(sub_info_map,org,mode,region_name,imgtdb_obj):
+	print "using region=",region_name
+	valid_regions=["FR1","CDR1","FR2","CDR2","FR3"]
+	if(not(region_name in valid_regions)):
+		return None
+	sub_name=sub_info_map['subject ids']
+	ref_region_interval=getVRegionStartAndStopGivenRefData(sub_name,org,imgtdb_obj,region_name,mode)
+	print "For reference=",sub_name," for org=",org," region=",region_name," got region=",ref_region_interval
+	if(ref_region_interval[0]==(-1) or ref_region_interval[1]==(-1)):
+		return None
+	else:
+		reg_start=ref_region_interval[0]
+		reg_end=ref_region_interval[1]
+		s_start=sub_info_map['s. start']
+		s_end=sub_info_map['s. end']
+		if((s_start<=reg_start and reg_start<=s_end) and (s_start<=reg_end and reg_end<=s_end)):
+			temp_index=0
+			temp_index_sbjct=s_start
+		else:
+			return None
+
 #have a cache map for region information for reference data
 reg_adj_map=dict()
 reg_adj_map["human"]=dict()
@@ -837,7 +864,6 @@ def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 				reg_adj_map[refOrg]["kabat"][refName][region]=region_interval
 				kabat_reader.close()
 				return reg_adj_map[refOrg]["kabat"][refName][region]
-				#return reg_adj_map[refOrg]["kabat"][refName]
 		kabat_reader.close()
 		#print "ERROR, FAILED TO FIND KABAT REGION FOR REFERENCE NAMED "+refName+" in "+lookupFile
 		sys.exit(0)
@@ -1097,6 +1123,7 @@ def looksLikeAlleleStr(a):
 		return True
 	else:
 		return False
+
 
 
 

@@ -1295,6 +1295,10 @@ class imgt_db:
 	def getBaseDir(self):
 		return self.db_base
 
+	#return base directory alias
+	def getDirBase(self):
+		return self.getBaseDir()
+
 	#download gene tables and reference directory sets from imgt
 	def download_imgt_RefDirSeqs_AndGeneTables_HumanAndMouse(self,unconditionalForceReplace=False):
 		base=self.db_base
