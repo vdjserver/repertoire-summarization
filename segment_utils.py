@@ -786,6 +786,7 @@ def getRegionAlignmentFromLargerVAlignment(sub_info_map,org,mode,region_name,img
 		if((s_start<=reg_start and reg_start<=s_end) and (s_start<=reg_end and reg_end<=s_end)):
 			temp_index=0
 			temp_index_sbjct=s_start
+			
 		else:
 			return None
 
