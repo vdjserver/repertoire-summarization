@@ -463,7 +463,7 @@ def getADJCDR3EndFromJAllele(jallele,imgtdb_obj,org="human",mode="imgt"):
 		desc_pieces=jdescriptor.split("|")
 		if(desc_pieces[14]=="rev-compl"):
 			desc_pieces[5]=swapIMGTDescInterval(desc_pieces[5])
-			sep="|"
+			sep="|"q
 			jdescriptor=sep.join(desc_pieces)
 		#print "got a corrected jdescriptor ",jdescriptor
 		interval_re=re.compile(r'(\d+)\.+(\d+)')
@@ -473,7 +473,7 @@ def getADJCDR3EndFromJAllele(jallele,imgtdb_obj,org="human",mode="imgt"):
 			start=int(mr.group(1))
 			stop=int(mr.group(2))
 			if(start<=cdr3_end_raw and cdr3_end_raw<=stop):
-				return cdr3_end_raw-start
+				return cdr3_end_raw-start+1
 			else:
 				#out of range
 				return (-1)
@@ -772,7 +772,7 @@ reg_adj_map["Mus_musculus"]["kabat"]=dict()
 reg_adj_map["Mus_musculus"]["imgt"]=dict()
 def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 	global reg_adj_map
-	regions=["FWR1","CDR1","FWR2","CDR2","FWR3","CDR3"]
+	regions=["FR1","CDR1","FR2","CDR2","FR3","CDR3"]
 	if(refOrg in reg_adj_map):
 		if(mode in reg_adj_map[refOrg]):
 			if(refName in reg_adj_map[refOrg][mode]):
@@ -805,9 +805,9 @@ def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 			sys.exit(0)
 	elif(mode=="imgt" or mode=="IMGT"):
 		if(refOrg=="human"):
-			lookupFile=imgtdb_objgetBaseDir()+"/human/ReferenceDirectorySet/HUMAN_REF/IMGT_HighV-QUEST_individual_files_folder"
+			lookupFile=imgtdb_obj.getBaseDir()+"/human/ReferenceDirectorySet/HUMAN_REF/IMGT_HighV-QUEST_individual_files_folder"
 		elif(refOrg=="Mus_musculus"):
-			lookupFile=imgtdb_objgetBaseDir()+"/Mus_musculus/ReferenceDirectorySet/MOUSE/IMGT_HighV-QUEST_individual_files_folder"
+			lookupFile=imgtdb_obj.getBaseDir()+"/Mus_musculus/ReferenceDirectorySet/MOUSE/IMGT_HighV-QUEST_individual_files_folder"
 		else:
 			print "ERROR, UNKNOWN ORGANISM ",refOrg
 			sys.exit(0)
@@ -840,10 +840,28 @@ def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 		kabat_reader.close()
 		print "ERROR, FAILED TO FIND KABAT REGION FOR REFERENCE NAMED "+refName+" in "+lookupFile
 		sys.exit(0)
-	print "got to bad end...."
-			
-			
+	elif(mode=="IMGT" or mode=="imgt"):
+		lookupBase=lookupFile
+		filesToScan=lookupBase+"/*"
+		filesToScan=glob.glob(filesToScan)
+		for current_file in filesToScan:
+			#print "Now to scan in "+current_file
+			current_file_refname=None
+			target_file_flag=False
+			passed_annotation_flag=False
+			imgt_reader=open(current_file,'r')
+			for line in imgt_reader:
+				line=line.strip()
+				if(line.startswith(">"+refName.strip())):
+					target_file_flag=True
+				if(line.startswith("13. Annotation")):
+					passed_annotation_flag=True
+				if(passed_annotation_flag and target_file_flag and (line.startswith(region+"-IMGT"))):
+					print "Found target line "+line+" in file "+current_file
+			imgt_reader.close()
 		
+	
+			
 
 
 def getCDR3StartFromVData(vdata,allele,imgtdb_obj,organism):
@@ -1109,10 +1127,10 @@ if (__name__=="__main__"):
 	refOrg="human"
 	imgtdb_obj=imgt_db("/home/data/DATABASE/01_22_2014/")
 	print "MY BASE : ",imgtdb_obj.getBaseDir()
-	mode="kabat"
+	mode="imgt"
 	refName="IGHV1-69*13"
 	for i in range(3):
-		regions=["FWR1","CDR1","FWR2","CDR2","FWR3","CDR3"]
+		regions=["FR1","CDR1","FR2","CDR2","FR3","CDR3"]
 		for region in regions:
 			result=getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode)
 			print "THE ACTUAL RETURN IS ",result
