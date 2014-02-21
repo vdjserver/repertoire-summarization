@@ -762,9 +762,16 @@ def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human",m
 			sys.exit(0)
 
 		
-
-
+#have a cache map for region information for reference data
+reg_adj_map=dict()
+reg_adj_map["human"]=dict()
+reg_adj_map["Mus_musculus"]=dict()
+reg_adj_map["human"]["imgt"]=dict()
+reg_adj_map["human"]["kabat"]=dict()
+reg_adj_map["Mus_musculus"]["kabat"]=dict()
+reg_adj_map["Mus_musculus"]["imgt"]=dict()
 def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
+	global reg_adj_map
 	#first, form a path to a lookup.
 	#this depends on organis and mode
 	#for KABAT its a file
@@ -791,6 +798,16 @@ def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 	########################################
 	#now that a lookup is selected do an actual lookup!
 	if(mode=="KABAT"):
+		regions=["FWR1","CDR1","FWR2","CDR2","FWR3","CDR3"]
+		col_num==None
+		for i in range(len(regions)):
+			if(regions[i]==region):
+				col_num=i
+		if(col_num==None or not(region in regions)):
+			print "ERROR, UNKNOWN REGION : ",region
+			sys.exit(0)
+		
+			
 		
 
 
