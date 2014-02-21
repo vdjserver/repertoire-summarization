@@ -772,6 +772,24 @@ reg_adj_map["Mus_musculus"]["kabat"]=dict()
 reg_adj_map["Mus_musculus"]["imgt"]=dict()
 def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 	global reg_adj_map
+	regions=["FWR1","CDR1","FWR2","CDR2","FWR3","CDR3"]
+	if(refOrg in reg_adj_map):
+		if(mode in reg_adj_map[refOrg]):
+			if(refName in reg_adj_map[refOrg][mode])
+				if(region in reg_adj_map[refOrg][mode][refName]):
+					print "using cache for ",refName," o=",refOrg," region=",region," and mode=",mode
+					return reg_adj_map[refOrg][mode][refName][region]
+			else:
+				#refname not in it, so add it
+				reg_adj_map[refOrg][mode][refName]=dict()
+		else:
+			#mode not there! a bad mode!
+			print "unknown mode ",mode,"!"
+			sys.exit(0)
+	else:
+		#organism not in there!
+		print "unknown organism :",refOrf,"!"
+		sys.exit(0)
 	#first, form a path to a lookup.
 	#this depends on organis and mode
 	#for KABAT its a file
@@ -797,16 +815,30 @@ def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 		print "ERROR, undefined mode : ",mode
 	########################################
 	#now that a lookup is selected do an actual lookup!
+	print "TO USE LOOKUP : ",lookupFile
 	if(mode=="KABAT"):
-		regions=["FWR1","CDR1","FWR2","CDR2","FWR3","CDR3"]
-		col_num==None
+		idx_num==None
 		for i in range(len(regions)):
 			if(regions[i]==region):
-				col_num=i
-		if(col_num==None or not(region in regions)):
+				idx_num=i
+		if(idx_num==None or not(region in regions)):
 			print "ERROR, UNKNOWN REGION : ",region
 			sys.exit(0)
-		
+		kabat_reader=open(lookupFile,'r')
+		for line in kabat_reader:
+			line=line.strip()
+			line_pieces=line.split('\t')
+			line_segment=line_pieces[0]
+			if(line_segment==refName):
+				col_num=1+idx_num*2
+				region_interval=[int(line_pieces[col_num]),int(line_pieces[col_num+1])]
+				reg_adj_map[refOrg]["kabat"][refName][region]=region_interval
+				return reg_adj_map[refOrg]["kabat"][refName][region]
+				#return reg_adj_map[refOrg]["kabat"][refName]
+		print "ERROR, FAILED TO FIND KABAT REGION FOR REFERENCE NAMED "+refName+" in "+lookupFile
+		sys.exit(0)
+
+			
 			
 		
 
