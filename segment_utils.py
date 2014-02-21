@@ -662,6 +662,7 @@ cdr3_adj_map["Mus_musculus"]["kabat"]=dict()
 cdr3_adj_map["Mus_musculus"]["imgt"]=dict()
 
 def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human",mode="imgt"):
+	#use this map as a caching mechanism!
 	global cdr3_adj_map
 	#if(organism=="blah"):
 	#	#print "getAdjustedCDR3StartFromRefDirSetAllele called with a=",allele," and org=",organism
@@ -689,9 +690,9 @@ def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human",m
 			else:
 				cdr3_adj_map[organism]=dict()
 			if(organism=="Mus_musculus"):
-				baseDir="/home/data/DATABASE/01_22_2014/Mus_musculus/ReferenceDirectorySet/MOUSE/IMGT_HighV-QUEST_individual_files_folder"
+				baseDir=imgtdb_obj.getBaseDir()+"/Mus_musculus/ReferenceDirectorySet/MOUSE/IMGT_HighV-QUEST_individual_files_folder"
 			elif(organism=="human"):
-				baseDir="/home/esalina2/Downloads/HUMAN_REF/IMGT_HighV-QUEST_individual_files_folder"
+				baseDir=imgtdb_obj.getBaseDir()+"/human/ReferenceDirectorySet/HUMAN_REF/IMGT_HighV-QUEST_individual_files_folder"
 			fglobstr=baseDir+"/*"
 			imgt_files=glob.glob(fglobstr)
 			fileToUse=None
@@ -739,7 +740,7 @@ def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human",m
 			if(organism in cdr3_adj_map):
 				if(allele in cdr3_adj_map[organism]["kabat"]):
 					return cdr3_adj_map[organism]["kabat"][allele]			
-			kabat_file="/home/data/DATABASE/01_22_2014/"+organism+"/ReferenceDirectorySet/KABAT/Vlookup.tsv"
+			kabat_file=imgtdb_obj.getBaseDir()+"/"+organism+"/ReferenceDirectorySet/KABAT/Vlookup.tsv"
 			reader=open(kabat_file,'r')
 			for line in reader:
 				line=line.strip()
@@ -762,6 +763,35 @@ def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human",m
 
 		
 
+
+def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
+	#first, form a path to a lookup.
+	#this depends on organis and mode
+	#for KABAT its a file
+	#for IMGT it starts as a directory but later becomes a file!
+	lookupFile=None
+	if(mode=="kabat"):
+		if(refOrg=="human"):
+			lookupFile=imgtdb_objgetBaseDir()+"/human/ReferenceDirectorySet/KABAT/Vlookup.tsv"
+		elif(refOrg=="Mus_musculus"):
+			lookupFile=imgtdb_objgetBaseDir()+"/Mus_musculus/ReferenceDirectorySet/KABAT/Vlookup.tsv"
+		else:
+			print "ERROR, UNKNOWN ORGANISM ",refOrg
+			sys.exit(0)
+	elif(mode=="imgt" or mode=="IMGT"):
+		if(refOrg=="human"):
+			lookupFile=imgtdb_objgetBaseDir()+"/human/ReferenceDirectorySet/HUMAN_REF/IMGT_HighV-QUEST_individual_files_folder"
+		elif(refOrg=="Mus_musculus"):
+			lookupFile=imgtdb_objgetBaseDir()+"/Mus_musculus/ReferenceDirectorySet/MOUSE/IMGT_HighV-QUEST_individual_files_folder"
+		else:
+			print "ERROR, UNKNOWN ORGANISM ",refOrg
+			sys.exit(0)
+	else:
+		print "ERROR, undefined mode : ",mode
+	########################################
+	#now that a lookup is selected do an actual lookup!
+	if(mode=="KABAT"):
+		
 
 
 def getCDR3StartFromVData(vdata,allele,imgtdb_obj,organism):
