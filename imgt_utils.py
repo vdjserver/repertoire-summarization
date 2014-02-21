@@ -20,6 +20,7 @@ import ntpath
 from Bio import SeqIO
 
 
+
 def countNumTerminalEntriesInHierarchy(h):
 	num_kids=0
 	for k in h:
@@ -32,7 +33,7 @@ def countNumTerminalEntriesInHierarchy(h):
 
 
 def areTwoAllellesAlleleEquivalent(a1,a2):
-	#print "in comp, a1=",a1,"a2=",a2
+	#print "in comp, a1=",a1,"a2="
 	a1=re.sub(r'\*\d+$',"",a1)
 	a2=re.sub(r'\*\d+$',"",a2)
 	if(a1==a2):
@@ -1291,7 +1292,7 @@ class imgt_db:
 
 
 	#return base directory
-	def getBaseDir():
+	def getBaseDir(self):
 		return self.db_base
 
 	#download gene tables and reference directory sets from imgt

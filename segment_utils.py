@@ -6,7 +6,7 @@ import pickle
 import urllib2
 import re
 import pprint
-from imgt_utils import get_loci_list
+from imgt_utils import get_loci_list,imgt_db
 import glob
 
 
@@ -797,9 +797,9 @@ def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 	lookupFile=None
 	if(mode=="kabat"):
 		if(refOrg=="human"):
-			lookupFile=imgtdb_objgetBaseDir()+"/human/ReferenceDirectorySet/KABAT/Vlookup.tsv"
+			lookupFile=imgtdb_obj.getBaseDir()+"/human/ReferenceDirectorySet/KABAT/Vlookup.tsv"
 		elif(refOrg=="Mus_musculus"):
-			lookupFile=imgtdb_objgetBaseDir()+"/Mus_musculus/ReferenceDirectorySet/KABAT/Vlookup.tsv"
+			lookupFile=imgtdb_obj.getBaseDir()+"/Mus_musculus/ReferenceDirectorySet/KABAT/Vlookup.tsv"
 		else:
 			print "ERROR, UNKNOWN ORGANISM ",refOrg
 			sys.exit(0)
@@ -816,12 +816,12 @@ def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 	########################################
 	#now that a lookup is selected do an actual lookup!
 	print "TO USE LOOKUP : ",lookupFile
-	if(mode=="KABAT"):
-		idx_num==None
+	if(mode=="kabat"):
+		idx_num=None
 		for i in range(len(regions)):
 			if(regions[i]==region):
 				idx_num=i
-		if(idx_num==None or not(region in regions)):
+		if((idx_num is None) or not(region in regions)):
 			print "ERROR, UNKNOWN REGION : ",region
 			sys.exit(0)
 		kabat_reader=open(lookupFile,'r')
@@ -829,15 +829,18 @@ def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 			line=line.strip()
 			line_pieces=line.split('\t')
 			line_segment=line_pieces[0]
+			print "looking at ",line
 			if(line_segment==refName):
 				col_num=1+idx_num*2
 				region_interval=[int(line_pieces[col_num]),int(line_pieces[col_num+1])]
 				reg_adj_map[refOrg]["kabat"][refName][region]=region_interval
+				kabat_reader.close()
 				return reg_adj_map[refOrg]["kabat"][refName][region]
 				#return reg_adj_map[refOrg]["kabat"][refName]
+		kabat_reader.close()
 		print "ERROR, FAILED TO FIND KABAT REGION FOR REFERENCE NAMED "+refName+" in "+lookupFile
 		sys.exit(0)
-
+	print "got to bad end...."
 			
 			
 		
@@ -1105,6 +1108,7 @@ if (__name__=="__main__"):
 	import sys
 	refOrg="human"
 	imgtdb_obj=imgt_db("/home/data/DATABASE/01_22_2014/")
+	print "MY BASE : ",imgtdb_obj.getBaseDir()
 	mode="kabat"
 	refName="IGHV1-69*13"
 	for i in range(3):
