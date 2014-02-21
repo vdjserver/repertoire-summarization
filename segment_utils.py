@@ -777,19 +777,19 @@ def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 		if(mode in reg_adj_map[refOrg]):
 			if(refName in reg_adj_map[refOrg][mode]):
 				if(region in reg_adj_map[refOrg][mode][refName]):
-					print "using cache for ",refName," o=",refOrg," region=",region," and mode=",mode
+					#print "using cache for ",refName," o=",refOrg," region=",region," and mode=",mode
 					return reg_adj_map[refOrg][mode][refName][region]
 			else:
 				#refname not in it, so add it
-				print "adding refname key=",refName
+				#print "adding refname key=",refName
 				reg_adj_map[refOrg][mode][refName]=dict()
 		else:
 			#mode not there! a bad mode!
-			print "unknown mode ",mode,"!"
+			#print "unknown mode ",mode,"!"
 			sys.exit(0)
 	else:
 		#organism not in there!
-		print "unknown organism :",refOrf,"!"
+		#print "unknown organism :",refOrf,"!"
 		sys.exit(0)
 	#first, form a path to a lookup.
 	#this depends on organis and mode
@@ -816,7 +816,7 @@ def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 		print "ERROR, undefined mode : ",mode
 	########################################
 	#now that a lookup is selected do an actual lookup!
-	print "TO USE LOOKUP : ",lookupFile
+	#print "TO USE LOOKUP : ",lookupFile
 	if(mode=="kabat"):
 		idx_num=None
 		for i in range(len(regions)):
@@ -830,7 +830,7 @@ def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 			line=line.strip()
 			line_pieces=line.split('\t')
 			line_segment=line_pieces[0]
-			print "looking at ",line
+			#print "looking at ",line
 			if(line_segment==refName):
 				col_num=1+idx_num*2
 				region_interval=[int(line_pieces[col_num]),int(line_pieces[col_num+1])]
@@ -839,7 +839,7 @@ def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 				return reg_adj_map[refOrg]["kabat"][refName][region]
 				#return reg_adj_map[refOrg]["kabat"][refName]
 		kabat_reader.close()
-		print "ERROR, FAILED TO FIND KABAT REGION FOR REFERENCE NAMED "+refName+" in "+lookupFile
+		#print "ERROR, FAILED TO FIND KABAT REGION FOR REFERENCE NAMED "+refName+" in "+lookupFile
 		sys.exit(0)
 	elif(mode=="IMGT" or mode=="imgt"):
 		lookupBase=lookupFile
@@ -858,7 +858,7 @@ def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 				if(line.startswith("13. Annotation")):
 					passed_annotation_flag=True
 				if(passed_annotation_flag and target_file_flag and (line.startswith(region+"-IMGT"))):
-					print "Found target line "+line+" in file "+current_file
+					#print "Found target line "+line+" in file "+current_file
 					regRE=re.compile(r'(\-?IMGT)?\s+(\d+)[^0-9]+(\d+)',re.IGNORECASE)
 					matchRes=re.search(regRE,line)
 					if(matchRes):
@@ -1019,6 +1019,13 @@ class IncrementMapWrapper():
 
 
 
+
+
+
+
+
+
+
 def getQueryIndexGivenSubjectIndexAndAlignment(query_aln,subject_aln,q_start,q_stop,s_start,s_stop,subject_pos):
 	#print "in getQueryIndexGivenSubjectIndexAndAlignment"
 	#import hashlib
@@ -1140,7 +1147,7 @@ if (__name__=="__main__"):
 		regions=["FR1","CDR1","FR2","CDR2","FR3","CDR3"]
 		for region in regions:
 			result=getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode)
-			print "THE ACTUAL RETURN IS ",result
+			print "THE ACTUAL RETURN IS Allan Jones",result
 	#print "***JSON",JSON	
 	#s_from=10
 	#s_to=20
