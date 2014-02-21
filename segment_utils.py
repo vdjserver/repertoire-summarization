@@ -775,7 +775,7 @@ def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 	regions=["FWR1","CDR1","FWR2","CDR2","FWR3","CDR3"]
 	if(refOrg in reg_adj_map):
 		if(mode in reg_adj_map[refOrg]):
-			if(refName in reg_adj_map[refOrg][mode])
+			if(refName in reg_adj_map[refOrg][mode]):
 				if(region in reg_adj_map[refOrg][mode][refName]):
 					print "using cache for ",refName," o=",refOrg," region=",region," and mode=",mode
 					return reg_adj_map[refOrg][mode][refName][region]
@@ -1103,25 +1103,15 @@ def getHierarchyByOrganism(geneTablesDirectoryOfHTMLFiles,org_name,filterbyFasta
 
 if (__name__=="__main__"):
 	import sys
-	sub_aln="TAGTTACTACTGGAGCTGGATCCGGCAGCCCGCCGGGAAGGGACTGGAGTGGATTGGGCGTATCTATACCAGTGGGAGCACCAACTACAACCCCTCCCTCAAGAGTCGAGTCACCATGTCAGTAGACACGTCCAAGAACCAGTTCTCCCTGAAGCTGAGCTCTGTGACCGCCGCGGACACGGCCGTGTATTACTGTGCGAGAGA"
-	qry_aln="TAGTTACTACTGGAGCTGGATACGGCAGCCCGCCGGGAAGGGACTGGAGTGGATTGGGCGTATCTATACCAGTGGGAGCACCAACTACAACCCCTCCCTCAAGAGTCGAGTCACCATGTCAGTAGACACGTCCAAGAACCAGTTCTCACTGAAGCTGAGCTCTGTGACCGCCGCGGACACGGCCGTGTATTACTGTGCGAGAGA"
-	q_from=1
-	q_to=204
-	s_from=90
-	s_to=293
-	desired=292
-	#res=getQueryIndexGivenSubjectIndexAndAlignment(Q_ALN,S_ALN,q_from,q_to,s_from,s_to,sub_desired)
-	res=getQueryIndexGivenSubjectIndexAndAlignment(qry_aln,sub_aln,q_from,q_to,s_from,s_to,desired)
-	print "***************result (for ",desired,") : ",res
-
-	mycounts=IncrementMapWrapper()
-	mycounts.increment("IGHV4-59*01")
-	mycounts.increment("IGHV4-59*02")
-	mycounts.increment("IGHV4-59*02")
-	mycounts.increment("IGHV4-59*03")
-	mycounts.increment("IGHV4-59*03")
-	mycounts.increment("IGHV4-59*03")
-	mycounts.JSONIFYToFile("/home/data/DATABASE/01_22_2014/","human","/home/data/vdj_server/repertoire-summarization/prettyPrintedProgrammatically.txt.json")
+	refOrg="human"
+	imgtdb_obj=imgt_db("/home/data/DATABASE/01_22_2014/")
+	mode="kabat"
+	refName="IGHV1-69*13"
+	for i in range(3):
+		regions=["FWR1","CDR1","FWR2","CDR2","FWR3","CDR3"]
+		for region in regions:
+			result=getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode)
+			print "THE ACTUAL RETURN IS ",result
 	#print "***JSON",JSON	
 	#s_from=10
 	#s_to=20
