@@ -463,7 +463,7 @@ def getADJCDR3EndFromJAllele(jallele,imgtdb_obj,org="human",mode="imgt"):
 		desc_pieces=jdescriptor.split("|")
 		if(desc_pieces[14]=="rev-compl"):
 			desc_pieces[5]=swapIMGTDescInterval(desc_pieces[5])
-			sep="|"q
+			sep="|"
 			jdescriptor=sep.join(desc_pieces)
 		#print "got a corrected jdescriptor ",jdescriptor
 		interval_re=re.compile(r'(\d+)\.+(\d+)')
@@ -781,6 +781,7 @@ def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 					return reg_adj_map[refOrg][mode][refName][region]
 			else:
 				#refname not in it, so add it
+				print "adding refname key=",refName
 				reg_adj_map[refOrg][mode][refName]=dict()
 		else:
 			#mode not there! a bad mode!
@@ -858,10 +859,16 @@ def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 					passed_annotation_flag=True
 				if(passed_annotation_flag and target_file_flag and (line.startswith(region+"-IMGT"))):
 					print "Found target line "+line+" in file "+current_file
+					regRE=re.compile(r'(\-?IMGT)?\s+(\d+)[^0-9]+(\d+)',re.IGNORECASE)
+					matchRes=re.search(regRE,line)
+					if(matchRes):
+						reg_start=matchRes.group(2)
+						reg_end=matchRes.group(3)
+						region_interval=[int(reg_start),int(reg_end)]
+						reg_adj_map[refOrg]["imgt"][refName][region]=region_interval
+						imgt_reader.close()
+						return reg_adj_map[refOrg]["imgt"][refName][region]
 			imgt_reader.close()
-		
-	
-			
 
 
 def getCDR3StartFromVData(vdata,allele,imgtdb_obj,organism):
