@@ -814,6 +814,48 @@ def getRegionAlignmentFromLargerVAlignment(sub_info_map,org,mode,region_name,img
 			return None
 
 
+
+#from a codon list, get an amino list
+def getAminosFromCodonSpace(codon_space):
+	amino_list=list()
+	for codon in codon_space:
+		amino_list.append(str(biopythonTranslate(codon)))
+	return amino_list
+
+
+#given a codon, if there are gaps in it
+#return all possible codons that are the 
+#same but have all 4 nucleotides at the gaps
+def getCodonSpace(codon):
+	if(codon.find("-")==(-1)):
+		return [codon]
+	codon_space=list()
+	bs=['A','C','G','T']
+	for first in bs:
+		for second in bs:
+			for third in bs:
+				temp_codon=first+second+third
+				if(isInCodonSpace(codon,temp_codon)):
+					codon_space.append(temp_codon)
+	return codon_space
+	
+
+#it's in the space if it only differs at gap positions
+def isInCodonSpace(codon,proposal):
+	non_gap_differ=0
+	gap_differ=0
+	for pos in range(len(codon)):
+		if(codon[pos]=="-"):
+			gap_differ+=1
+		elif(codon[pos]!=proposal[pos]):
+			non_gap_differ+=1
+	if(non_gap_differ==0):
+		return True
+	else:
+		return False
+
+
+
 #given a sub alignment with a region, compute :
 #A) synonymous mutations, B) non-synonymous mutations
 #C) insertions, D) deletions, E) number stop codons
@@ -851,9 +893,9 @@ def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name):
 			print "q codon is ",q_codon
 			if(s_codon.find("-")==(-1) and q_codon.find("-")==(-1)):
 				#no gaps, perform analysis
-				s_amino=biopythonTranslate(s_codon)
+				s_amino=str(biopythonTranslate(s_codon))
 				print "subject amino :",s_amino
-				q_amino=biopythonTranslate(q_codon)
+				q_amino=str(biopythonTranslate(q_codon))
 				print "query amino ",q_amino
 				for cp in range(3):
 					if(s_codon[cp]!=q_codon[cp] and s_amino==q_amino):
@@ -862,6 +904,9 @@ def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name):
 						num_nsy+=1
 			else:
 				#codons have gaps, just count as regular mutations
+				codon_space=getCodonSpace(q_codon)
+				print "The codon space from ",q_codon," is ",codon_space
+				print "The amino space is ",getAminosFromCodonSpace(codon_space)
 				for cp in range(3):
 					if(s_codon[cp]!="-" and q_codon[cp]!="-" and s_codon[cp]!=q_codon[cp]):
 						num_bsb+=1
