@@ -8,6 +8,8 @@ import re
 import pprint
 from imgt_utils import get_loci_list,imgt_db
 import glob
+from utils import biopythonTranslate
+from igblast_utils import printNiceAlignment
 
 
 def removeTerminatingSemicolonIfItExists(s):
@@ -812,6 +814,68 @@ def getRegionAlignmentFromLargerVAlignment(sub_info_map,org,mode,region_name,img
 			return None
 
 
+#given a sub alignment with a region, compute :
+#A) synonymous mutations, B) non-synonymous mutations
+#C) insertions, D) deletions, E) number stop codons
+#F) mutation(sum A-D)
+#NOTE "A" and "B" are 'base substitutions'
+def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name):
+	char_map=dict()
+	num_ins=0
+	num_del=0
+	num_syn=0
+	num_nsy=0
+	num_bsb=0
+	if(len(s_aln)!=len(q_aln)):
+		raise Exception("ERROR, Q_ALN LENGTH NOT EQUAL TO S_ALN LENGTH!?!?!")
+	#do counts independent of codons/translations
+	for i in range(len(s_aln)):
+		if(s_aln[i]=="-"):
+			num_ins+=1
+		elif(q_aln[i]=="-"):
+			num_del+=1
+	#do counts with codon information
+	num_missed_bp_for_codon=(len(s_aln)%3)
+	if(num_missed_bp_for_codon!=0):
+		raise Exception("error, ref region len not multiple of three!!!")
+		#add extra BP????
+	else:
+		temp_index=0
+		while(temp_index<len(s_aln)):
+			s_codon=s_aln[temp_index:(temp_index+3)]
+			#s_codon=re.sub(r'\-','N',s_codon)
+			print "s codon is ",s_codon
+			q_codon=q_aln[temp_index:(temp_index+3)]
+			#q_codon=re.sub(r'\-','N',q_codon)
+			print "q codon is ",q_codon
+			if(s_codon.find("-")==(-1) and q_codon.find("-")==(-1)):
+				#no gaps, perform analysis
+				s_amino=biopythonTranslate(s_codon)
+				print "subject amino :",s_amino
+				q_amino=biopythonTranslate(q_codon)
+				print "query amino ",q_amino
+				for cp in range(3):
+					if(s_codon[cp]!=q_codon[cp] and s_amino==q_amino):
+						num_syn+=1
+					elif(s_codon[cp]!=q_codon[cp] and s_amino!=q_amino):
+						num_nsy+=1
+			else:
+				#codons have gaps, just count as regular mutations
+				for cp in range(3):
+					if(s_codon[cp]!="-" and q_codon[cp]!="-" and s_codon[cp]!=q_codon[cp]):
+						num_bsb+=1
+			temp_index+=3
+		char_map['insertions']=num_ins
+		char_map['deletions']=num_del
+		char_map['base_sub']=num_bsb
+		char_map['synonymous_bsb']=num_syn
+		char_map['nonsynonymous_bsb']=num_nsy
+		return char_map
+
+	
+
+
+
 #have a cache map for region information for reference data
 reg_adj_map=dict()
 reg_adj_map["human"]=dict()
@@ -835,7 +899,7 @@ def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 				reg_adj_map[refOrg][mode][refName]=dict()
 		else:
 			#mode not there! a bad mode!
-			#print "unknown mode ",mode,"!"
+			print "unknown mode ",mode," (expect kabat or imgt)!"
 			sys.exit(0)
 	else:
 		#organism not in there!
