@@ -230,10 +230,14 @@ def vdjml_read_serialize(
 	#print "Alignment summary fields : ",summary_fields
 	#print "Alignment summary vals : "
 	valid_regions=["FR1","CDR1","FR2","CDR2","FR3","CDR3"]
-	for valid_region in valid_regions:
+	for vi in range(len(valid_regions)):
+		valid_region=valid_regions[vi]
 		print "Now trying to do analysis at valid_region=",valid_region," with segment=",firstVMap['subject ids']
 		reg_kabat=getRegionAlignmentFromLargerVAlignment(firstVMap,organism,"kabat",valid_region,imgtdb_obj)
 		reg_imgt=getRegionAlignmentFromLargerVAlignment(firstVMap,organism,"imgt",valid_region,imgtdb_obj)
+		#subject at 0, query at 1
+		print "The kabat region is \n",reg_kabat
+		print "The imgt region is \n",reg_imgt
 	for a in range(len(summary_vals_list)):
 		asMap=makeMap(summary_fields,summary_vals_list[a])
 		if(not(asMap['region'].startswith("Total") or asMap['region'].startswith("CDR3"))):
