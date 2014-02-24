@@ -8,7 +8,7 @@ import argparse
 from Bio import SeqIO
 from cdr3_hist import CDR3LengthAnalysis
 from igblast_utils import getDomainClasses
-from segment_utils import getRegionAlignmentFromLargerVAlignment
+from segment_utils import getRegionAlignmentFromLargerVAlignment,getRegionSpecifcCharacterization
 
 #parser = argparse.ArgumentParser(description='Process some integers.')
 #parser.add_argument('integers', metavar='N', type=int, nargs='+',
@@ -237,7 +237,13 @@ def vdjml_read_serialize(
 		reg_imgt=getRegionAlignmentFromLargerVAlignment(firstVMap,organism,"imgt",valid_region,imgtdb_obj)
 		#subject at 0, query at 1
 		print "The kabat region is \n",reg_kabat
+		if(reg_kabat is not None):
+			reg_char=getRegionSpecifcCharacterization(reg_kabat[0],reg_kabat[1],valid_region)
+			printMap(reg_char)
 		print "The imgt region is \n",reg_imgt
+		if(reg_imgt is not None):
+			reg_char=getRegionSpecifcCharacterization(reg_imgt[0],reg_imgt[1],valid_region)
+			printMap(reg_char)
 	for a in range(len(summary_vals_list)):
 		asMap=makeMap(summary_fields,summary_vals_list[a])
 		if(not(asMap['region'].startswith("Total") or asMap['region'].startswith("CDR3"))):
