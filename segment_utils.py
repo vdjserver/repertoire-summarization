@@ -770,14 +770,14 @@ def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human",m
 #given a V segment alignment extract from it the sub-portion for a given
 #region.  Return a 2-length array with subject and query alignment data
 #return None if alignment too short or doesn't cover region
-def getRegionAlignmentFromLargerVAlignment(sub_info_map,org,mode,region_name,imgtdb_obj):
+def getRegionAlignmentFromLargerVAlignment(sub_info_map,org,mode,region_name,imgtdb_obj,wholeOnly=False):
 	#print "\n\n\n\nusing region=",region_name
 	valid_regions=["FR1","CDR1","FR2","CDR2","FR3"]
 	if(not(region_name in valid_regions)):
 		return None
 	sub_name=sub_info_map['subject ids']
 	ref_region_interval=getVRegionStartAndStopGivenRefData(sub_name,org,imgtdb_obj,region_name,mode)
-	#print "For reference=",sub_name," for org=",org," region=",region_name," got region=",ref_region_interval
+	print "For reference=",sub_name," for org=",org," region=",region_name," got (mode=",mode,")region=",ref_region_interval
 	if(ref_region_interval[0]==(-1) or ref_region_interval[1]==(-1)):
 		return None
 	else:
@@ -785,33 +785,27 @@ def getRegionAlignmentFromLargerVAlignment(sub_info_map,org,mode,region_name,img
 		reg_end=int(ref_region_interval[1])
 		s_start=int(sub_info_map['s. start'])
 		s_end=int(sub_info_map['s. end'])
-		#print "s_start=",s_start," and s_end=",s_end
+		print "s_start=",s_start," and s_end=",s_end
 		s_aln=sub_info_map['subject seq']
 		q_aln=sub_info_map['query seq']
 		region_alignment=["",""]
-		if(s_start<=reg_start and reg_start<=s_end):
-			if(s_start<=reg_end and reg_end<=s_end):
-				temp_index=0
-				temp_index_sbjct=s_start
-				while(temp_index<len(s_aln)):
-					if(reg_start<=temp_index_sbjct and temp_index_sbjct<=reg_end):
-						#in region
-						#subject at 0, query at 1
-						region_alignment[0]+=s_aln[temp_index]
-						region_alignment[1]+=q_aln[temp_index]					
-					else:
-						#not in region
-						pass
-					if(s_aln[temp_index]!="-"):
-						temp_index_sbjct+=1
-					temp_index+=1
-				return region_alignment
+		temp_index=0
+		temp_index_sbjct=s_start
+		frame_mask=list()
+		while(temp_index<len(s_aln)):
+			if(reg_start<=temp_index_sbjct and temp_index_sbjct<=reg_end):
+				#in region
+				#subject at 0, query at 1
+				region_alignment[0]+=s_aln[temp_index]
+				region_alignment[1]+=q_aln[temp_index]
+				frame_mask.append((temp_index_sbjct-reg_start)%3)
 			else:
-				#print "Returning None because reg_end is out of bounds..."
-				return None
-		else:
-			#print "Returning None because reg_start is out of bounds..."
-			return None
+				#not in region
+				pass
+			if(s_aln[temp_index]!="-"):
+				temp_index_sbjct+=1
+			temp_index+=1
+		return [region_alignment,frame_mask]
 
 
 
@@ -881,22 +875,15 @@ def getCDR3RegionSpecificCharacterization(vData,DData,JData,organism,imgtdb_obj,
 	v_ref_cdr3_start=getAdjustedCDR3StartFromRefDirSetAllele(VrefName,imgtdb_obj,organism,dMode)
 	j_ref_cdr3_end=getADJCDR3EndFromJAllele(Jrefname,imgtdb_obj,organism,dMode)
 	vRefTo=int(vData['s. end'])
-	vRefFrom=int(vData['s. start']
-	if(vRefTo<v_ref_cdr3_start or vRefFrom>v_ref_cdr3_start):
-		#cdr3 starts after the alignment ends!
-		#or the alignment begins before it starts
-		return None
+	vRefFrom=int(vData['s. start'])
 	jRefTo=int(jData['s. end'])
 	jRefFrom=int(jData['s. start'])
-	if(jRefFrom>j_ref_cdr3_end or j_ref_cdr3_end>jRefTo):
-		#cdr3 end is either before the alignment starts or after it ends
-		return None
 	print "The CDR3 start is ",v_ref_cdr3_start
 	temp_v=0
 	temp_v_pos=vData['s. start']
 	cdr3_s_aln=""
 	cdr3_q_aln=""
-	while(temp_v<len(v_s_aln))
+	while(temp_v<len(v_s_aln)):
 		if(temp_v_pos>=v_ref_cdr3_start):
 			cdr3_s_aln+=v_s_aln[temp_v]
 			cdr3_q_aln+=v_q_aln[temp_v]
@@ -908,6 +895,23 @@ def getCDR3RegionSpecificCharacterization(vData,DData,JData,organism,imgtdb_obj,
 	d_s_aln=dData['subject seq']
 	d_q_aln=dData['query seq']
 	#all of D is in CDR3!
+	cdr3_d_char_map=getRegionSpecifcCharacterization(d_s_aln,d_q_aln,"CDR3")
+	print "THE D CDR3 CHAR MAP is "
+	printMap(cdr3_d_char_map)
+	temp_j=0
+	temp_j_pos=int(jData['s. start'])
+	j_s_aln=vData['subject seq']
+	j_q_aln=vData['query seq']
+	cdr3_s_aln=""
+	cdr3_q_aln=""	
+	while(temp_j<len(j_s_aln)):
+		if(temp_j_pos<j_ref_cdr3_end):
+			cdr3_s_aln+=j_s_aln[temp_j]
+			cdr3_q_aln+=j_q_aln[temp_j]
+		if(j_s_aln[temp_j]!="-"):
+			temp_j_pos+=1
+	
+	
 	
 
 
@@ -917,7 +921,7 @@ def getCDR3RegionSpecificCharacterization(vData,DData,JData,organism,imgtdb_obj,
 #C) insertions, D) deletions, E) number stop codons
 #F) mutation(sum A-D)
 #NOTE "A" and "B" are 'base substitutions'
-def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name):
+def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name,frame_mask):
 	char_map=dict()
 	num_ins=0
 	num_del=0
@@ -934,13 +938,9 @@ def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name):
 		elif(q_aln[i]=="-"):
 			num_del+=1
 	#do counts with codon information
-	num_missed_bp_for_codon=(len(s_aln)%3)
-	if(num_missed_bp_for_codon!=0):
-		raise Exception("error, ref region len not multiple of three!!!")
-		#add extra BP????
-	else:
-		temp_index=0
-		while(temp_index<len(s_aln)):
+	temp_index=0
+	while(temp_index<len(s_aln)):
+		if(frame_mask[temp_index]==0 and temp_index<len(s_aln)-2 ):
 			s_codon=s_aln[temp_index:(temp_index+3)]
 			#s_codon=re.sub(r'\-','N',s_codon)
 			#print "s codon is ",s_codon
@@ -958,26 +958,29 @@ def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name):
 						num_syn+=1
 					elif(s_codon[cp]!=q_codon[cp] and s_amino!=q_amino):
 						num_nsy+=1
-			else:
-				#q_codon_space=getCodonSpace(q_codon)
-				#s_codon_space=getCodonSpace(s_codon)
-				#q_codon_set=getCodonSpaceAsSet(q_codon_space)
-				#s_codon_set=getCodonSpaceAsSet(s_codon_space)
-				#print "The codon space from query codon ",q_codon," is ",q_codon_space," and the set is ",q_codon_set
-				#print "The subject cd space from subject ",s_codon," is ",s_codon_space," and the set is ",s_codon_set
-				# "The query amino space is ",getAminosFromCodonSpace(s_codon_space)
-				for cp in range(3):
-					if(s_codon[cp]!="-" and q_codon[cp]!="-" and s_codon[cp]!=q_codon[cp]):
-						num_bsb+=1
+			#q_codon_space=getCodonSpace(q_codon)
+			#s_codon_space=getCodonSpace(s_codon)
+			#q_codon_set=getCodonSpaceAsSet(q_codon_space)
+			#s_codon_set=getCodonSpaceAsSet(s_codon_space)
+			#print "The codon space from query codon ",q_codon," is ",q_codon_space," and the set is ",q_codon_set
+			#print "The subject cd space from subject ",s_codon," is ",s_codon_space," and the set is ",s_codon_set
+			# "The query amino space is ",getAminosFromCodonSpace(s_codon_space)
+			for cp in range(3):
+				if(s_codon[cp]!="-" and q_codon[cp]!="-" and s_codon[cp]!=q_codon[cp]):
+					num_bsb+=1
 			temp_index+=3
-		char_map['insertions']=num_ins
-		char_map['deletions']=num_del
-		char_map['base_sub']=num_bsb
-		char_map['synonymous_bsb']=num_syn
-		char_map['nonsynonymous_bsb']=num_nsy
-		char_map['mutations']=num_nsy+num_syn+num_bsb+num_del+num_ins
-		return char_map
+		else:
+			if(s_aln[temp_index]!=q_aln[temp_index] and s_aln[temp_index]!="-" and q_aln[temp_index]!="-"):
+				num_bsb+=1
+			temp_index+=1	
 
+	char_map['insertions']=num_ins
+	char_map['deletions']=num_del
+	char_map['base_sub']=num_bsb
+	char_map['synonymous_bsb']=num_syn
+	char_map['nonsynonymous_bsb']=num_nsy
+	char_map['mutations']=num_nsy+num_syn+num_bsb+num_del+num_ins
+	return char_map
 	
 
 
