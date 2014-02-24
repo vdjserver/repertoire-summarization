@@ -769,26 +769,48 @@ def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human",m
 #region.  Return a 2-length array with subject and query alignment data
 #return None if alignment too short or doesn't cover region
 def getRegionAlignmentFromLargerVAlignment(sub_info_map,org,mode,region_name,imgtdb_obj):
-	print "using region=",region_name
+	#print "\n\n\n\nusing region=",region_name
 	valid_regions=["FR1","CDR1","FR2","CDR2","FR3"]
 	if(not(region_name in valid_regions)):
 		return None
 	sub_name=sub_info_map['subject ids']
 	ref_region_interval=getVRegionStartAndStopGivenRefData(sub_name,org,imgtdb_obj,region_name,mode)
-	print "For reference=",sub_name," for org=",org," region=",region_name," got region=",ref_region_interval
+	#print "For reference=",sub_name," for org=",org," region=",region_name," got region=",ref_region_interval
 	if(ref_region_interval[0]==(-1) or ref_region_interval[1]==(-1)):
 		return None
 	else:
-		reg_start=ref_region_interval[0]
-		reg_end=ref_region_interval[1]
-		s_start=sub_info_map['s. start']
-		s_end=sub_info_map['s. end']
-		if((s_start<=reg_start and reg_start<=s_end) and (s_start<=reg_end and reg_end<=s_end)):
-			temp_index=0
-			temp_index_sbjct=s_start
-			
+		reg_start=int(ref_region_interval[0])
+		reg_end=int(ref_region_interval[1])
+		s_start=int(sub_info_map['s. start'])
+		s_end=int(sub_info_map['s. end'])
+		#print "s_start=",s_start," and s_end=",s_end
+		s_aln=sub_info_map['subject seq']
+		q_aln=sub_info_map['query seq']
+		region_alignment=["",""]
+		if(s_start<=reg_start and reg_start<=s_end):
+			if(s_start<=reg_end and reg_end<=s_end):
+				temp_index=0
+				temp_index_sbjct=s_start
+				while(temp_index<len(s_aln)):
+					if(reg_start<=temp_index_sbjct and temp_index_sbjct<=reg_end):
+						#in region
+						#subject at 0, query at 1
+						region_alignment[0]+=s_aln[temp_index]
+						region_alignment[1]+=q_aln[temp_index]					
+					else:
+						#not in region
+						pass
+					if(s_aln[temp_index]!="-"):
+						temp_index_sbjct+=1
+					temp_index+=1
+				return region_alignment
+			else:
+				#print "Returning None because reg_end is out of bounds..."
+				return None
 		else:
+			#print "Returning None because reg_start is out of bounds..."
 			return None
+
 
 #have a cache map for region information for reference data
 reg_adj_map=dict()
