@@ -10,6 +10,7 @@ from imgt_utils import get_loci_list,imgt_db
 import glob
 from utils import biopythonTranslate
 from igblast_utils import printNiceAlignment
+from utils import printMap
 
 
 def removeTerminatingSemicolonIfItExists(s):
@@ -662,26 +663,9 @@ cdr3_adj_map["human"]["imgt"]=dict()
 cdr3_adj_map["human"]["kabat"]=dict()
 cdr3_adj_map["Mus_musculus"]["kabat"]=dict()
 cdr3_adj_map["Mus_musculus"]["imgt"]=dict()
-
 def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human",mode="imgt"):
 	#use this map as a caching mechanism!
 	global cdr3_adj_map
-	#if(organism=="blah"):
-	#	#print "getAdjustedCDR3StartFromRefDirSetAllele called with a=",allele," and org=",organism
-	#	vdata=imgtdb_obj.getIMGTDatGivenAllele(allele,False,organism)
-	#	#print "getAdjustedCDR3StartFromRefDirSetAllele vdata is \n",vdata
-	#	cdr3_start=getCDR3StartFromVData(vdata,allele,imgtdb_obj,organism)
-	#	print "getAdjustedCDR3StartFromRefDirSetAllele raw cdr3_start is ",cdr3_start
-	#	if(cdr3_start==(-1)):
-	#		#print "getAdjustedCDR3StartFromRefDirSetAllele returning -1 because it is!\n"
-	#		return (-1)
-	#	else:
-	#	
-	#		descriptor=imgtdb_obj.extractDescriptorLine(allele,organism)
-	#		#print "The extracted descriptor is ",descriptor
-	#		cdr3_adjusted=adjustCDR3StartToSubseq(cdr3_start,descriptor,imgtdb_obj,organism)
-	#		return cdr3_adjusted
-	#elif(organism=="Mus_musculus" ):
 	if(1==1):
 		if(mode=="imgt"):
 			#read the HIGH-VQUEST ANNOTATION
@@ -777,7 +761,7 @@ def getRegionAlignmentFromLargerVAlignment(sub_info_map,org,mode,region_name,img
 		return None
 	sub_name=sub_info_map['subject ids']
 	ref_region_interval=getVRegionStartAndStopGivenRefData(sub_name,org,imgtdb_obj,region_name,mode)
-	print "For reference=",sub_name," for org=",org," region=",region_name," got (mode=",mode,")region=",ref_region_interval
+	#print "For reference=",sub_name," for org=",org," region=",region_name," got (mode=",mode,")region=",ref_region_interval
 	if(ref_region_interval[0]==(-1) or ref_region_interval[1]==(-1)):
 		return None
 	else:
@@ -785,7 +769,7 @@ def getRegionAlignmentFromLargerVAlignment(sub_info_map,org,mode,region_name,img
 		reg_end=int(ref_region_interval[1])
 		s_start=int(sub_info_map['s. start'])
 		s_end=int(sub_info_map['s. end'])
-		print "s_start=",s_start," and s_end=",s_end
+		#print "s_start=",s_start," and s_end=",s_end
 		s_aln=sub_info_map['subject seq']
 		q_aln=sub_info_map['query seq']
 		region_alignment=["",""]
@@ -867,50 +851,57 @@ def getCDR3RegionSpecificCharacterization(vData,DData,JData,organism,imgtdb_obj,
 	num_syn=0
 	num_nsy=0
 	num_bsb=0
-	#get CDR3 from V characterization
-	v_s_aln=vData['subject seq']
-	v_q_aln=vData['query seq']
 	VrefName=vData['subject ids']
-	Jrefname=jData['subject ids']
+	#get CDR3 from V characterization
 	v_ref_cdr3_start=getAdjustedCDR3StartFromRefDirSetAllele(VrefName,imgtdb_obj,organism,dMode)
-	j_ref_cdr3_end=getADJCDR3EndFromJAllele(Jrefname,imgtdb_obj,organism,dMode)
-	vRefTo=int(vData['s. end'])
-	vRefFrom=int(vData['s. start'])
-	jRefTo=int(jData['s. end'])
-	jRefFrom=int(jData['s. start'])
-	print "The CDR3 start is ",v_ref_cdr3_start
-	temp_v=0
-	temp_v_pos=vData['s. start']
-	cdr3_s_aln=""
-	cdr3_q_aln=""
-	while(temp_v<len(v_s_aln)):
-		if(temp_v_pos>=v_ref_cdr3_start):
-			cdr3_s_aln+=v_s_aln[temp_v]
-			cdr3_q_aln+=v_q_aln[temp_v]
-		if(v_s_aln[temp_v]!="-"):
-			temp_v_pos+=1
-	cdr3_v_char_map=getRegionSpecifcCharacterization(cdr3_s_aln,cdr3_q_aln,"CDR3")
+	cdr3_v_char_map=getEmptyRegCharMap()
+	if(vData!=None):
+		v_s_aln=vData['subject seq']
+		v_q_aln=vData['query seq']
+		vRefTo=int(vData['s. end'])
+		vRefFrom=int(vData['s. start'])
+		print "The CDR3 start (mode=",dMode,") is ",v_ref_cdr3_start
+		temp_v=0
+		temp_v_pos=int(vData['s. start'])
+		cdr3_s_aln=""
+		cdr3_q_aln=""
+		frame_mask=list()
+		if(v_ref_cdr3_start!=(-1)):
+			while(temp_v<len(v_s_aln)):
+				if(temp_v_pos>=v_ref_cdr3_start):
+					cdr3_s_aln+=v_s_aln[temp_v]
+					cdr3_q_aln+=v_q_aln[temp_v]
+					frame_mask.append((temp_v_pos-v_ref_cdr3_start)%3)
+				if(v_s_aln[temp_v]!="-"):
+					temp_v_pos+=1
+				temp_v+=1
+		cdr3_v_char_map=getRegionSpecifcCharacterization(cdr3_s_aln,cdr3_q_aln,"CDR3",frame_mask)
 	print "THE V CDR3 CHAR MAP is "
 	printMap(cdr3_v_char_map)
-	d_s_aln=dData['subject seq']
-	d_q_aln=dData['query seq']
-	#all of D is in CDR3!
-	cdr3_d_char_map=getRegionSpecifcCharacterization(d_s_aln,d_q_aln,"CDR3")
-	print "THE D CDR3 CHAR MAP is "
-	printMap(cdr3_d_char_map)
-	temp_j=0
-	temp_j_pos=int(jData['s. start'])
-	j_s_aln=vData['subject seq']
-	j_q_aln=vData['query seq']
-	cdr3_s_aln=""
-	cdr3_q_aln=""	
-	while(temp_j<len(j_s_aln)):
-		if(temp_j_pos<j_ref_cdr3_end):
-			cdr3_s_aln+=j_s_aln[temp_j]
-			cdr3_q_aln+=j_q_aln[temp_j]
-		if(j_s_aln[temp_j]!="-"):
-			temp_j_pos+=1
-	
+	if(dData!=None):
+		d_s_aln=dData['subject seq']
+		d_q_aln=dData['query seq']
+		#all of D is in CDR3!
+		cdr3_d_char_map=getRegionSpecifcCharacterization(d_s_aln,d_q_aln,"CDR3")
+		print "THE D CDR3 CHAR MAP is "
+		printMap(cdr3_d_char_map)
+	if(jData!=None):
+	#temp_j=0
+	#temp_j_pos=int(jData['s. start'])
+	#j_s_aln=vData['subject seq']
+	#j_q_aln=vData['query seq']
+	#cdr3_s_aln=""
+	#cdr3_q_aln=""	
+	#while(temp_j<len(j_s_aln)):
+	#	if(temp_j_pos<j_ref_cdr3_end):
+	#		cdr3_s_aln+=j_s_aln[temp_j]
+	#		cdr3_q_aln+=j_q_aln[temp_j]
+	#	if(j_s_aln[temp_j]!="-"):
+	#		temp_j_pos+=1
+	#Jrefname=jData['subject ids']
+	#jRefTo=int(jData['s. end'])
+	#jRefFrom=int(jData['s. start'])
+	#j_ref_cdr3_end=getADJCDR3EndFromJAllele(Jrefname,imgtdb_obj,organism,dMode)
 	
 	
 
@@ -928,7 +919,7 @@ def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name,frame_mask):
 	num_syn=0
 	num_nsy=0
 	num_bsb=0
-	print "\n\nNice alignment query top, subject bottom : \n",printNiceAlignment(q_aln,s_aln),"\n"
+	print "\n\nNice alignment (region=",reg_name,") query top, subject bottom : \n",printNiceAlignment(q_aln,s_aln),"\n"
 	if(len(s_aln)!=len(q_aln)):
 		raise Exception("ERROR, Q_ALN LENGTH NOT EQUAL TO S_ALN LENGTH!?!?!")
 	#do counts independent of codons/translations
@@ -989,8 +980,14 @@ def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name,frame_mask):
 	char_map['mutations']=num_nsy+num_syn+num_bsb+num_del+num_ins
 	return char_map
 	
-
-
+#get an empty map as a placeholder
+def getEmptyRegCharMap():
+	char_map['insertions']=0
+	char_map['deletions']=0
+	char_map['base_sub']=0
+	char_map['synonymous_bsb']=0
+	char_map['nonsynonymous_bsb']=0
+	char_map['mutations']=0
 
 #have a cache map for region information for reference data
 reg_adj_map=dict()
