@@ -382,17 +382,20 @@ def getWholeChainAlignment(qvseq,vseq,qdseq,dseq,qjseq,jseq,btop_map):
 
 def buildAlignmentWholeSeqsDirect(q,s):
 	aln=["","",""]
-	aln[0]=q
-	aln[2]=s
+	aln[0]=str(q)
+	aln[2]=str(s)
 	for b in range(len(aln[0])):
 		qbase=aln[0][b]
-		sbase=aln[0][b]
+		sbase=aln[2][b]
 		if(qbase=="-" or sbase=="-"):
 			aln[1]+=" "
 		elif(not(qbase==sbase)):
 			aln[1]+="X"
 		else:
 			aln[1]+="|"
+	aln[0]="QURY:"+aln[0]
+	aln[1]="MDLN:"+aln[1]
+	aln[2]="SBCT:"+aln[2]
 	return aln		
 
 
