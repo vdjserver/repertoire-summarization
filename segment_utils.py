@@ -856,6 +856,13 @@ def isInCodonSpace(codon,proposal):
 
 
 
+#change a list of codons to a set
+def getCodonSpaceAsSet(codon_space):
+	css=set()
+	for codon in codon_space:
+		css.add(str(codon))
+	return css
+
 #given a sub alignment with a region, compute :
 #A) synonymous mutations, B) non-synonymous mutations
 #C) insertions, D) deletions, E) number stop codons
@@ -903,8 +910,10 @@ def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name):
 					elif(s_codon[cp]!=q_codon[cp] and s_amino!=q_amino):
 						num_nsy+=1
 			else:
-				#codons have gaps, just count as regular mutations
-				codon_space=getCodonSpace(q_codon)
+				q_codon_space=getCodonSpace(q_codon)
+				s_codon_space=getCodonSpace(s_codon)
+				q_codon_set=getCodonSpaceAsSet(q_codon_space)
+				s_codon_set=getCodonSpaceAsSet(s_codon_space)
 				print "The codon space from ",q_codon," is ",codon_space
 				print "The amino space is ",getAminosFromCodonSpace(codon_space)
 				for cp in range(3):
