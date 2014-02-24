@@ -855,11 +855,14 @@ def getCDR3RegionSpecificCharacterization(vData,DData,JData,organism,imgtdb_obj,
 	#get CDR3 from V characterization
 	v_ref_cdr3_start=getAdjustedCDR3StartFromRefDirSetAllele(VrefName,imgtdb_obj,organism,dMode)
 	cdr3_v_char_map=getEmptyRegCharMap()
+	qry_cdr3_start=(-1)
+	qry_cdr3_start_last_frame=(-1)
 	if(vData!=None):
 		v_s_aln=vData['subject seq']
 		v_q_aln=vData['query seq']
 		vRefTo=int(vData['s. end'])
 		vRefFrom=int(vData['s. start'])
+		qry_cdr3_start=getQueryIndexGivenSubjectIndexAndAlignment(v_q_aln,v_s_aln,int(vData['q. start']),int(vData['q. end']),vRefFrom,vFrefTo,v_ref_cdr3_start)
 		print "The CDR3 start (mode=",dMode,") is ",v_ref_cdr3_start
 		temp_v=0
 		temp_v_pos=int(vData['s. start'])
@@ -871,16 +874,27 @@ def getCDR3RegionSpecificCharacterization(vData,DData,JData,organism,imgtdb_obj,
 				if(temp_v_pos>=v_ref_cdr3_start):
 					cdr3_s_aln+=v_s_aln[temp_v]
 					cdr3_q_aln+=v_q_aln[temp_v]
-					frame_mask.append((temp_v_pos-v_ref_cdr3_start)%3)
+					qry_cdr3_start_last_frame=(temp_v_pos-v_ref_cdr3_start)%3
+					frame_mask.append(qry_cdr3_start_last_frame)
 				if(v_s_aln[temp_v]!="-"):
 					temp_v_pos+=1
 				temp_v+=1
 		cdr3_v_char_map=getRegionSpecifcCharacterization(cdr3_s_aln,cdr3_q_aln,"CDR3",frame_mask)
 	print "THE V CDR3 CHAR MAP is "
 	printMap(cdr3_v_char_map)
+	cdr3_d_char_map=getEmptyRegCharMap()
 	if(dData!=None):
-		d_s_aln=dData['subject seq']
-		d_q_aln=dData['query seq']
+		#d_s_aln=dData['subject seq']
+		#d_q_aln=dData['query seq']
+		#q_from=int(dData['q. start'])
+		#q_to=int(dData['q. end'])
+		#d_frame_mask=None
+		#for q_pos in range(q_from,q_to+1,1):
+		#	if(vData!=None):
+		#		diff=q_pos-
+		#	else:
+		#		d_frame_mask.append(
+		#	
 		#all of D is in CDR3!
 		cdr3_d_char_map=getRegionSpecifcCharacterization(d_s_aln,d_q_aln,"CDR3")
 		print "THE D CDR3 CHAR MAP is "
