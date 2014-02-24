@@ -826,6 +826,7 @@ def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name):
 	num_syn=0
 	num_nsy=0
 	num_bsb=0
+	print "\n",printNiceAlignment(q_aln,s_aln),"\n"
 	if(len(s_aln)!=len(q_aln)):
 		raise Exception("ERROR, Q_ALN LENGTH NOT EQUAL TO S_ALN LENGTH!?!?!")
 	#do counts independent of codons/translations
@@ -870,6 +871,7 @@ def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name):
 		char_map['base_sub']=num_bsb
 		char_map['synonymous_bsb']=num_syn
 		char_map['nonsynonymous_bsb']=num_nsy
+		char_map['mutations']=num_nsy+num_syn+num_bsb+num_del+num_ins
 		return char_map
 
 	
