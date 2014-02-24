@@ -863,6 +863,55 @@ def getCodonSpaceAsSet(codon_space):
 		css.add(str(codon))
 	return css
 
+
+
+#characterize CDR3
+def getCDR3RegionSpecificCharacterization(vData,DData,JData,organism,imgtdb_obj,dMode):
+	char_map=dict()
+	num_ins=0
+	num_del=0
+	num_syn=0
+	num_nsy=0
+	num_bsb=0
+	#get CDR3 from V characterization
+	v_s_aln=vData['subject seq']
+	v_q_aln=vData['query seq']
+	VrefName=vData['subject ids']
+	Jrefname=jData['subject ids']
+	v_ref_cdr3_start=getAdjustedCDR3StartFromRefDirSetAllele(VrefName,imgtdb_obj,organism,dMode)
+	j_ref_cdr3_end=getADJCDR3EndFromJAllele(Jrefname,imgtdb_obj,organism,dMode)
+	vRefTo=int(vData['s. end'])
+	vRefFrom=int(vData['s. start']
+	if(vRefTo<v_ref_cdr3_start or vRefFrom>v_ref_cdr3_start):
+		#cdr3 starts after the alignment ends!
+		#or the alignment begins before it starts
+		return None
+	jRefTo=int(jData['s. end'])
+	jRefFrom=int(jData['s. start'])
+	if(jRefFrom>j_ref_cdr3_end or j_ref_cdr3_end>jRefTo):
+		#cdr3 end is either before the alignment starts or after it ends
+		return None
+	print "The CDR3 start is ",v_ref_cdr3_start
+	temp_v=0
+	temp_v_pos=vData['s. start']
+	cdr3_s_aln=""
+	cdr3_q_aln=""
+	while(temp_v<len(v_s_aln))
+		if(temp_v_pos>=v_ref_cdr3_start):
+			cdr3_s_aln+=v_s_aln[temp_v]
+			cdr3_q_aln+=v_q_aln[temp_v]
+		if(v_s_aln[temp_v]!="-"):
+			temp_v_pos+=1
+	cdr3_v_char_map=getRegionSpecifcCharacterization(cdr3_s_aln,cdr3_q_aln,"CDR3")
+	print "THE V CDR3 CHAR MAP is "
+	printMap(cdr3_v_char_map)
+	d_s_aln=dData['subject seq']
+	d_q_aln=dData['query seq']
+	#all of D is in CDR3!
+	
+
+
+
 #given a sub alignment with a region, compute :
 #A) synonymous mutations, B) non-synonymous mutations
 #C) insertions, D) deletions, E) number stop codons
@@ -894,28 +943,29 @@ def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name):
 		while(temp_index<len(s_aln)):
 			s_codon=s_aln[temp_index:(temp_index+3)]
 			#s_codon=re.sub(r'\-','N',s_codon)
-			print "s codon is ",s_codon
+			#print "s codon is ",s_codon
 			q_codon=q_aln[temp_index:(temp_index+3)]
 			#q_codon=re.sub(r'\-','N',q_codon)
-			print "q codon is ",q_codon
+			#print "q codon is ",q_codon
 			if(s_codon.find("-")==(-1) and q_codon.find("-")==(-1)):
 				#no gaps, perform analysis
 				s_amino=str(biopythonTranslate(s_codon))
-				print "subject amino :",s_amino
+				#print "subject amino :",s_amino
 				q_amino=str(biopythonTranslate(q_codon))
-				print "query amino ",q_amino
+				#print "query amino ",q_amino
 				for cp in range(3):
 					if(s_codon[cp]!=q_codon[cp] and s_amino==q_amino):
 						num_syn+=1
 					elif(s_codon[cp]!=q_codon[cp] and s_amino!=q_amino):
 						num_nsy+=1
 			else:
-				q_codon_space=getCodonSpace(q_codon)
-				s_codon_space=getCodonSpace(s_codon)
-				q_codon_set=getCodonSpaceAsSet(q_codon_space)
-				s_codon_set=getCodonSpaceAsSet(s_codon_space)
-				print "The codon space from ",q_codon," is ",codon_space
-				print "The amino space is ",getAminosFromCodonSpace(codon_space)
+				#q_codon_space=getCodonSpace(q_codon)
+				#s_codon_space=getCodonSpace(s_codon)
+				#q_codon_set=getCodonSpaceAsSet(q_codon_space)
+				#s_codon_set=getCodonSpaceAsSet(s_codon_space)
+				#print "The codon space from query codon ",q_codon," is ",q_codon_space," and the set is ",q_codon_set
+				#print "The subject cd space from subject ",s_codon," is ",s_codon_space," and the set is ",s_codon_set
+				# "The query amino space is ",getAminosFromCodonSpace(s_codon_space)
 				for cp in range(3):
 					if(s_codon[cp]!="-" and q_codon[cp]!="-" and s_codon[cp]!=q_codon[cp]):
 						num_bsb+=1

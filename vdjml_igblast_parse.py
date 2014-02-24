@@ -8,7 +8,7 @@ import argparse
 from Bio import SeqIO
 from cdr3_hist import CDR3LengthAnalysis
 from igblast_utils import getDomainClasses
-from segment_utils import getRegionAlignmentFromLargerVAlignment,getRegionSpecifcCharacterization
+from segment_utils import getRegionAlignmentFromLargerVAlignment,getRegionSpecifcCharacterization,getCDR3RegionSpecificCharacterization
 
 #parser = argparse.ArgumentParser(description='Process some integers.')
 #parser.add_argument('integers', metavar='N', type=int, nargs='+',
@@ -149,6 +149,8 @@ def vdjml_read_serialize(
 	top_btop=dict()
 	valn=None
 	firstVMap=None
+	firstDMap=None
+	firstJMap=None
 	topSegmentCounterMap=IncrementMapWrapper()
 	if(len(hit_vals_list)==0):
 		if(returnCountMapPackage):
@@ -195,10 +197,12 @@ def vdjml_read_serialize(
 			alnDebugFlag=False
 		elif(firstD==None and segment_type_to_add=='D'):
 			firstD=smb1
+			firstDMap=kvmap
 			daseq=kvmap['subject seq']
 			qdaseq=kvmap['query seq']
 			top_btop['D']=kvmap['BTOP']
 		elif(firstJ==None and segment_type_to_add=='J'):
+			firstJMap=kvmap
 			firstJ=smb1
 			jaseq=kvmap['subject seq']
 			qjaseq=kvmap['query seq']
@@ -232,18 +236,26 @@ def vdjml_read_serialize(
 	valid_regions=["FR1","CDR1","FR2","CDR2","FR3","CDR3"]
 	for vi in range(len(valid_regions)):
 		valid_region=valid_regions[vi]
-		print "Now trying to do analysis at valid_region=",valid_region," with segment=",firstVMap['subject ids']
-		reg_kabat=getRegionAlignmentFromLargerVAlignment(firstVMap,organism,"kabat",valid_region,imgtdb_obj)
-		reg_imgt=getRegionAlignmentFromLargerVAlignment(firstVMap,organism,"imgt",valid_region,imgtdb_obj)
-		#subject at 0, query at 1
-		print "The kabat region is \n",reg_kabat
-		if(reg_kabat is not None):
-			reg_char=getRegionSpecifcCharacterization(reg_kabat[0],reg_kabat[1],valid_region)
-			printMap(reg_char)
-		print "The imgt region is \n",reg_imgt
-		if(reg_imgt is not None):
-			reg_char=getRegionSpecifcCharacterization(reg_imgt[0],reg_imgt[1],valid_region)
-			printMap(reg_char)
+		if(not(valid_region=="CDR3")):
+			print "Now trying to do analysis at valid_region=",valid_region," with segment=",firstVMap['subject ids']
+			reg_kabat=getRegionAlignmentFromLargerVAlignment(firstVMap,organism,"kabat",valid_region,imgtdb_obj)
+			reg_imgt=getRegionAlignmentFromLargerVAlignment(firstVMap,organism,"imgt",valid_region,imgtdb_obj)
+			#subject at 0, query at 1
+			print "The kabat region is \n",reg_kabat
+			if(reg_kabat is not None):
+				reg_char=getRegionSpecifcCharacterization(reg_kabat[0],reg_kabat[1],valid_region)
+				printMap(reg_char)
+			print "The imgt region is \n",reg_imgt
+			if(reg_imgt is not None):
+				reg_char=getRegionSpecifcCharacterization(reg_imgt[0],reg_imgt[1],valid_region)
+				printMap(reg_char)
+		else:
+			#for CDR3 region
+			#characterize CDR3
+			#def getCDR3RegionSpecificCharacterization(vData,DData,JData,organism,imgtdb_obj,dMode):
+			if(not(firstVMap==None) and not(firstDMap==None) and not(firstJMap==None)):			
+				getCDR3RegionSpecificCharacterization(firstVMap,firstDMap,firstJMap,organism,imgtdb_obj,"kabat")
+				getCDR3RegionSpecificCharacterization(firstVMap,firstDMap,firstJMap,organism,imgtdb_obj,"imgt")
 	for a in range(len(summary_vals_list)):
 		asMap=makeMap(summary_fields,summary_vals_list[a])
 		if(not(asMap['region'].startswith("Total") or asMap['region'].startswith("CDR3"))):
