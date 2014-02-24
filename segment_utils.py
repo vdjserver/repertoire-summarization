@@ -928,7 +928,7 @@ def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name,frame_mask):
 	num_syn=0
 	num_nsy=0
 	num_bsb=0
-	print "\n",printNiceAlignment(q_aln,s_aln),"\n"
+	print "\n\nNice alignment query top, subject bottom : \n",printNiceAlignment(q_aln,s_aln),"\n"
 	if(len(s_aln)!=len(q_aln)):
 		raise Exception("ERROR, Q_ALN LENGTH NOT EQUAL TO S_ALN LENGTH!?!?!")
 	#do counts independent of codons/translations
@@ -939,13 +939,16 @@ def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name,frame_mask):
 			num_del+=1
 	#do counts with codon information
 	temp_index=0
+	#print "Now doing codon-based counting..."
 	while(temp_index<len(s_aln)):
+		#print "temp_index=",temp_index," and frame mask is ",frame_mask[temp_index]
 		if(frame_mask[temp_index]==0 and temp_index<len(s_aln)-2 ):
+			#print "encountered a codon...."
 			s_codon=s_aln[temp_index:(temp_index+3)]
-			#s_codon=re.sub(r'\-','N',s_codon)
+			s_codon=re.sub(r'\-','N',s_codon)
 			#print "s codon is ",s_codon
 			q_codon=q_aln[temp_index:(temp_index+3)]
-			#q_codon=re.sub(r'\-','N',q_codon)
+			q_codon=re.sub(r'\-','N',q_codon)
 			#print "q codon is ",q_codon
 			if(s_codon.find("-")==(-1) and q_codon.find("-")==(-1)):
 				#no gaps, perform analysis
@@ -958,6 +961,11 @@ def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name,frame_mask):
 						num_syn+=1
 					elif(s_codon[cp]!=q_codon[cp] and s_amino!=q_amino):
 						num_nsy+=1
+			else:
+				#for codons with gaps
+				for cp in range(3):
+					if(s_codon[cp]!="-" and q_codon[cp]!="-" and s_codon[cp]!=q_codon[cp]):
+						num_bsb+=1
 			#q_codon_space=getCodonSpace(q_codon)
 			#s_codon_space=getCodonSpace(s_codon)
 			#q_codon_set=getCodonSpaceAsSet(q_codon_space)
@@ -965,15 +973,14 @@ def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name,frame_mask):
 			#print "The codon space from query codon ",q_codon," is ",q_codon_space," and the set is ",q_codon_set
 			#print "The subject cd space from subject ",s_codon," is ",s_codon_space," and the set is ",s_codon_set
 			# "The query amino space is ",getAminosFromCodonSpace(s_codon_space)
-			for cp in range(3):
-				if(s_codon[cp]!="-" and q_codon[cp]!="-" and s_codon[cp]!=q_codon[cp]):
-					num_bsb+=1
+
 			temp_index+=3
 		else:
+			#print "encountered a single...."
 			if(s_aln[temp_index]!=q_aln[temp_index] and s_aln[temp_index]!="-" and q_aln[temp_index]!="-"):
 				num_bsb+=1
-			temp_index+=1	
-
+			temp_index+=1
+	#print "done with codon-based counting...."
 	char_map['insertions']=num_ins
 	char_map['deletions']=num_del
 	char_map['base_sub']=num_bsb
