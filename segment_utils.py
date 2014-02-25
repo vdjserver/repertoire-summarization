@@ -773,17 +773,26 @@ def getRegionAlignmentFromLargerVAlignment(sub_info_map,org,mode,region_name,img
 		reg_end=int(ref_region_interval[1])
 		s_start=int(sub_info_map['s. start'])
 		s_end=int(sub_info_map['s. end'])
+		q_start=int(sub_info_map['q. start'])
+		q_end=sub_info_map['q. end'])
 		#print "s_start=",s_start," and s_end=",s_end
 		s_aln=sub_info_map['subject seq']
 		q_aln=sub_info_map['query seq']
 		region_alignment=["",""]
 		temp_index=0
 		temp_index_sbjct=s_start
+		temp_index_qury=q_start
 		frame_mask=list()
+		r_q_start=None
+		r_q_end=None
 		while(temp_index<len(s_aln)):
 			if(reg_start<=temp_index_sbjct and temp_index_sbjct<=reg_end):
 				#in region
 				#subject at 0, query at 1
+				if(r_q_start==None and q_aln[temp_index]!="-"):
+					r_q_start=temp_index_qury
+				if(q_aln[temp_index]!=(-1)):
+					r_q_end=temp_index_qury
 				region_alignment[0]+=s_aln[temp_index]
 				region_alignment[1]+=q_aln[temp_index]
 				frame_mask.append((temp_index_sbjct-reg_start)%3)
@@ -792,8 +801,10 @@ def getRegionAlignmentFromLargerVAlignment(sub_info_map,org,mode,region_name,img
 				pass
 			if(s_aln[temp_index]!="-"):
 				temp_index_sbjct+=1
+			if(q_aln[temp_index]!="-"):
+				temp_index_qury+=1
 			temp_index+=1
-		return [region_alignment,frame_mask]
+		return [region_alignment,frame_mask,r_q_start,r_q_end]
 
 
 
