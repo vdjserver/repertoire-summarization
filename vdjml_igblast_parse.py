@@ -124,6 +124,21 @@ def makeRegionAlnMetricsFromValn(valn,qstart,regionmap):
 
 
 
+#given a characterization map for a region, make a metrics object
+def makeMetricFromCharMap(charMap):
+	pct_id=float(charMap['pct_id'])
+	substitutions=charMap['base_sub']
+	insertions=charMap['insertions']
+	deletions=charMap['deletions']
+	aln_metric=vdjml.Match_metrics(
+		pct_id,
+		substitutions=substitutions,
+		insertions=insertions,
+		deletions=deletions
+		)
+	return aln_metric
+
+
 def vdjml_read_serialize(
 		vlist,dlist,jlist,				#list of valllels from fastaDB, and D and J,
 		current_query,					#current query name
@@ -258,6 +273,16 @@ def vdjml_read_serialize(
 				reg_start_stop=reg_kabat_and_mask[2:]
 				print "The query-based start/stop are ",reg_start_stop
 				reg_char=getRegionSpecifcCharacterization(reg_kabat[0],reg_kabat[1],valid_region,reg_kabat_and_mask[1],"kabat")
+				metrics_to_add=makeMetricFromCharMap(reg_char)
+				region_to_add=valid_region
+				if(reg_start_stop[0]!=(-1) and reg_start_stop[1]!=(-1)):
+					interval_to_add=vdjml.Interval.first_last_1(reg_start_stop[0],reg_start_stop[1])
+					scb.add_region(
+							region_to_add,
+							interval_to_add,
+							metrics_to_add,
+							vdjml.Num_system.kabat
+							)
 			if(reg_imgt_and_mask is not None):
 				print "The imgt region alignent (subject top, query bottom) is \n",reg_imgt_and_mask
 				reg_imgt=reg_imgt_and_mask[0]
@@ -265,6 +290,16 @@ def vdjml_read_serialize(
 				print "The query-based start/stop are ",reg_start_stop
 				print "The imgt region  alignent (subject top, query bottom) is \n",reg_imgt_and_mask
 				reg_char=getRegionSpecifcCharacterization(reg_imgt[0],reg_imgt[1],valid_region,reg_imgt_and_mask[1],"imgt")
+				metrics_to_add=makeMetricFromCharMap(reg_char)
+				region_to_add=valid_region
+				if(reg_start_stop[0]!=(-1) and reg_start_stop[1]!=(-1)):
+					interval_to_add=vdjml.Interval.first_last_1(reg_start_stop[0],reg_start_stop[1])
+					scb.add_region(
+							region_to_add,
+							interval_to_add,
+							metrics_to_add,
+							vdjml.Num_system.imgt
+							)
 		else:
 			#for CDR3 region
 			#characterize CDR3
@@ -275,22 +310,6 @@ def vdjml_read_serialize(
 				getCDR3RegionSpecificCharacterization(firstVMap,firstDMap,firstJMap,organism,imgtdb_obj,"imgt")
 		print "\n\n\n\n\n"
 	cdr3_len_map=CDR3LengthAnalysis(firstVMap,firstJMap,current_query,fasta_query_str,organism,imgtdb_obj)
-	print "A LEN MAP FROM REG CHAR :"
-	printMap(cdr3_len_map)
-	for a in range(len(summary_vals_list)):
-		asMap=makeMap(summary_fields,summary_vals_list[a])
-		if(not(asMap['region'].startswith("Total") or asMap['region'].startswith("CDR3"))):
-			#print "\tSummary item "+str(a)+" : "
-			#print "\t",summary_vals_list[a]
-			#print "\tThis is a particular alignment summary map : "
-			#printMap(asMap)	
-			region_to_add=asMap['region']
-			interval_to_add=vdjml.Interval.first_last_1(int(asMap['from']),int(asMap['to']))
-			#metrics_to_add=makeRegionAlnMetricsFromValn(valn,valn_qstart,asMap)
-			#scb.add_region(
-			#	region_to_add,
-			#	interval_to_add,
-			#	metrics_to_add)
 	#print "\n\n\n"
 	if(len(vdjr_vals_list)>0):
 		#print "rearrangment summary "
