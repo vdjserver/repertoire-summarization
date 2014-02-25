@@ -1037,13 +1037,25 @@ def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name,frame_mask,mode):
 			#print "The codon space from query codon ",q_codon," is ",q_codon_space," and the set is ",q_codon_set
 			#print "The subject cd space from subject ",s_codon," is ",s_codon_space," and the set is ",s_codon_set
 			# "The query amino space is ",getAminosFromCodonSpace(s_codon_space)
-
 			temp_index+=3
 		else:
 			#print "encountered a single...."
 			if(s_aln[temp_index]!=q_aln[temp_index] and s_aln[temp_index]!="-" and q_aln[temp_index]!="-"):
 				num_bsb+=1
 			temp_index+=1
+	#have this loop below for pct id
+	num_same=0
+	num_tot=0
+	temp_index=0
+	while(temp_index<len(s_aln)):
+		num_tot+=0
+		if(s_aln[temp_index]==q_aln[temp_index]):
+			num_same+=1
+	pct_id=0
+	if(num_tot==0):
+		pct_id=float(0)
+	else:
+		pct_id=float(num_same)/float(num_tot)
 	#print "done with codon-based counting...."
 	char_map['insertions']=num_ins
 	char_map['deletions']=num_del
@@ -1051,6 +1063,7 @@ def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name,frame_mask,mode):
 	char_map['synonymous_bsb']=num_syn
 	char_map['nonsynonymous_bsb']=num_nsy
 	char_map['mutations']=num_nsy+num_syn+num_bsb+num_del+num_ins
+	char_map['pct_id']=pct_id
 	return char_map
 	
 #get an empty map as a placeholder
@@ -1062,6 +1075,7 @@ def getEmptyRegCharMap():
 	char_map['synonymous_bsb']=0
 	char_map['nonsynonymous_bsb']=0
 	char_map['mutations']=0
+	char_map['pct_id']=0
 	return char_map
 
 #have a cache map for region information for reference data
