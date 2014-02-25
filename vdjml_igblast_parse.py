@@ -113,7 +113,12 @@ def makeRegionAlnMetricsFromValn(valn,qstart,regionmap):
 			insertions+=1
 		else:
 			substitutions+=1
-	#aln_metric=vdjml.Match_metrics(score,100.0*float(identity)/float(region_len+1),insertions,deletions,substitutions)
+	#aln_metric=vdjml.Match_metrics(
+	#		score,100.0*float(identity)/float(region_len+1),
+	#		insertions,
+	#		deletions,
+	#		substitutions
+	#)
 	aln_metric =vdjml.Match_metrics(100.0*float(identity)/float(region_len+1),substitutions=substitutions,insertions=insertions,deletions=deletions)
 	return aln_metric
 
