@@ -199,49 +199,47 @@ def getOtherMode(m):
 
 
 
-def CDR3LengthAnalysis(vHitLine,jHitLine,currentQueryName,currentQuerySeq,organism,imgtdb_obj):
+def CDR3LengthAnalysis(vMap,jMap,currentQueryName,currentQuerySeq,organism,imgtdb_obj):
 	currentQueryName=str(currentQueryName.strip())
-	vpieces=vHitLine.split("\t")
-	jpieces=jHitLine.split("\t")
-	currentV=vpieces[6]
-	currentJ=jpieces[6]
+	currentV=vMap['subject ids']
+	currentJ=jMap['subject ids']
 	cdr3_hist=dict()
 	if(looksLikeAlleleStr(currentV) and looksLikeAlleleStr(currentJ)):
-		#print "WE'RE IN BUSINESS!"
+		print "WE'RE IN BUSINESS!"
 		domain_modes=["kabat","imgt"]
 		for dm in domain_modes:
 			cdr3_hist[dm]=(-1)
-			#print "processing in ",dm
+			print "processing in ",dm
 			if(not currentV in rsmap[dm]):
-				#print currentV,"not in lookup for dm=",dm
+				print currentV,"not in lookup for dm=",dm
 				ref_cdr3_start=getAdjustedCDR3StartFromRefDirSetAllele(currentV,imgtdb_obj,organism,dm)
 				rsmap[dm][currentV]=ref_cdr3_start
 			else:
 				ref_cdr3_start=rsmap[dm][currentV]
 			if(not currentJ in remap[dm]):
-				#print currentJ,"not in lookup for dm=",dm
+				print currentJ,"not in lookup for dm=",dm
 				ref_cdr3_end=getADJCDR3EndFromJAllele(currentJ,imgtdb_obj,organism,dm)
 				remap[dm][currentJ]=ref_cdr3_end
 			else:
 				ref_cdr3_end=remap[dm][currentJ]
 			if(ref_cdr3_start!=(-1) and ref_cdr3_end!=(-1)):
-				vq_aln=vpieces[18]
-				vs_aln=vpieces[19]
-				vq_f=int(vpieces[14])
-				vq_t=int(vpieces[15])
-				vs_f=int(vpieces[16])
-				vs_t=int(vpieces[17])
-				jq_aln=jpieces[18]
-				js_aln=jpieces[19]
-				jq_f=int(jpieces[14])
-				jq_t=int(jpieces[15])
-				js_f=int(jpieces[16])
-				js_t=int(jpieces[17])
+				vq_aln=vMap['query seq']
+				vs_aln=vMap['subject seq']
+				vq_f=int(vMap['q. start'])
+				vq_t=int(vMap['q. end'])
+				vs_f=int(vMap['s. start'])
+				vs_t=int(vMap['s. end'])
+				jq_aln=jMap['query seq']
+				js_aln=jMap['subject seq']
+				jq_f=int(jMap['q. start'])
+				jq_t=int(jMap['q. end'])
+				js_f=int(jMap['s. start'])
+				js_t=int(jMap['s. end'])
 				qry_cdr3_start=getQueryIndexGivenSubjectIndexAndAlignment(vq_aln,vs_aln,vq_f,vq_t,vs_f,vs_t,ref_cdr3_start)
 				qry_cdr3_end=getQueryIndexGivenSubjectIndexAndAlignment(jq_aln,js_aln,jq_f,jq_t,js_f,js_t,ref_cdr3_end)
 				if(qry_cdr3_start!=(-1) and qry_cdr3_end!=(-1)):
 					query_coding_seq=query_seq_map[currentQueryName]
-					if(vHitLine.find("reversed|"+currentQueryName)!=(-1)):
+					if(vMap['query id'].find("reversed|"+currentQueryName)==(-1)):
 						query_coding_seq=rev_comp_dna(query_coding_seq)
 					coding_seq=query_coding_seq[(qry_cdr3_start-1):(qry_cdr3_end-1)]
 					cdr3_len=qry_cdr3_end-qry_cdr3_start+1
@@ -251,10 +249,12 @@ def CDR3LengthAnalysis(vHitLine,jHitLine,currentQueryName,currentQuerySeq,organi
 					#print "CDR3_LEN ("+dm+") ="+str(cdr3_len)
 					cdr3_hist[dm]=cdr3_len
 				else:
-					#print "BADQRYMAP Failure to map to query for mode=",dm," V=",currentV," J=",currentJ," read=",currentQueryName," REFSTART=",ref_cdr3_start,"QRYSTART=",qry_cdr3_start,"REFEND=",ref_cdr3_end,"QRYEND=",qry_cdr3_end
+					print "BADQRYMAP Failure to map to query for mode=",dm," V=",currentV," J=",currentJ," read=",currentQueryName," REFSTART=",ref_cdr3_start,"QRYSTART=",qry_cdr3_start,"REFEND=",ref_cdr3_end,"QRYEND=",qry_cdr3_end
 					pass
 			else:
-				#print "BADREFMAP mode=",dm," refVCDR3=(-1) for ",currentV," = ",ref_cdr3_start," or refJCDR3 ",currentJ," = ",ref_cdr3_end
+				print "BADREFMAP mode=",dm," refVCDR3=(-1) for ",currentV," = ",ref_cdr3_start," or refJCDR3 ",currentJ," = ",ref_cdr3_end
 				pass
+	else:
+		print "Ref names ",currentV," and ",currentJ," don't appear alleleic!"
 	return cdr3_hist
 
