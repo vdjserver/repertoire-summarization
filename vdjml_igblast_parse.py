@@ -250,10 +250,15 @@ def vdjml_read_serialize(
 			if(reg_kabat_and_mask is not None):
 				print "The kabat region alignent (subject top, query bottom) is \n",reg_kabat_and_mask
 				reg_kabat=reg_kabat_and_mask[0]
+				reg_start_stop=reg_kabat_and_mask[2:]
+				print "The query-based start/stop are ",reg_start_stop
 				reg_char=getRegionSpecifcCharacterization(reg_kabat[0],reg_kabat[1],valid_region,reg_kabat_and_mask[1],"kabat")
 			if(reg_imgt_and_mask is not None):
+				print "The imgt region alignent (subject top, query bottom) is \n",reg_imgt_and_mask
 				reg_imgt=reg_imgt_and_mask[0]
-				#print "The imgt region  alignent (subject top, query bottom) is \n",reg_imgt_and_mask
+				reg_start_stop=reg_imgt_and_mask[2:]
+				print "The query-based start/stop are ",reg_start_stop
+				print "The imgt region  alignent (subject top, query bottom) is \n",reg_imgt_and_mask
 				reg_char=getRegionSpecifcCharacterization(reg_imgt[0],reg_imgt[1],valid_region,reg_imgt_and_mask[1],"imgt")
 		else:
 			#for CDR3 region
