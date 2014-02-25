@@ -398,6 +398,10 @@ def getSegmentName(blast_hit,fastaListOfDescs):
 	else:
 		raise Exception("Error, unhandled blast segment rearrangment descriptor '"+blast_hit+"' !") 
 
+
+
+
+
 def getFastaListOfDescs(fasta_file):
 	fr=open(fasta_file,'r')
 	descs=list()
@@ -844,7 +848,7 @@ def getCodonSpaceAsSet(codon_space):
 
 
 #characterize CDR3
-def getCDR3RegionSpecificCharacterization(vData,DData,JData,organism,imgtdb_obj,dMode):
+def getCDR3RegionSpecificCharacterization(vData,dData,jData,organism,imgtdb_obj,dMode):
 	char_map=dict()
 	num_ins=0
 	num_del=0
@@ -857,12 +861,12 @@ def getCDR3RegionSpecificCharacterization(vData,DData,JData,organism,imgtdb_obj,
 	cdr3_v_char_map=getEmptyRegCharMap()
 	qry_cdr3_start=(-1)
 	qry_cdr3_start_last_frame=(-1)
-	if(vData!=None):
+	if(vData!=None and v_ref_cdr3_start!=(-1)):
 		v_s_aln=vData['subject seq']
 		v_q_aln=vData['query seq']
 		vRefTo=int(vData['s. end'])
 		vRefFrom=int(vData['s. start'])
-		qry_cdr3_start=getQueryIndexGivenSubjectIndexAndAlignment(v_q_aln,v_s_aln,int(vData['q. start']),int(vData['q. end']),vRefFrom,vFrefTo,v_ref_cdr3_start)
+		qry_cdr3_start=getQueryIndexGivenSubjectIndexAndAlignment(v_q_aln,v_s_aln,int(vData['q. start']),int(vData['q. end']),vRefFrom,vRefTo,v_ref_cdr3_start)
 		print "The CDR3 start (mode=",dMode,") is ",v_ref_cdr3_start
 		temp_v=0
 		temp_v_pos=int(vData['s. start'])
@@ -884,8 +888,9 @@ def getCDR3RegionSpecificCharacterization(vData,DData,JData,organism,imgtdb_obj,
 	printMap(cdr3_v_char_map)
 	cdr3_d_char_map=getEmptyRegCharMap()
 	if(dData!=None):
-		#d_s_aln=dData['subject seq']
-		#d_q_aln=dData['query seq']
+		d_s_aln=dData['subject seq']
+		d_q_aln=dData['query seq']
+		non_frame=[1]*len(d_s_aln)
 		#q_from=int(dData['q. start'])
 		#q_to=int(dData['q. end'])
 		#d_frame_mask=None
@@ -896,10 +901,33 @@ def getCDR3RegionSpecificCharacterization(vData,DData,JData,organism,imgtdb_obj,
 		#		d_frame_mask.append(
 		#	
 		#all of D is in CDR3!
-		cdr3_d_char_map=getRegionSpecifcCharacterization(d_s_aln,d_q_aln,"CDR3")
+		cdr3_d_char_map=getRegionSpecifcCharacterization(d_s_aln,d_q_aln,"CDR3",non_frame)
 		print "THE D CDR3 CHAR MAP is "
 		printMap(cdr3_d_char_map)
-	if(jData!=None):
+	cdr3_j_char_map=getEmptyRegCharMap()
+	if(jData!=None)
+		jDataRefName=jData['subject ids']
+		ref_cdr3_end=getADJCDR3EndFromJAllele(jDataRefName,imgtdb_obj,organism,dMode)
+		if(ref_cdr3_end!=(-1)):
+			j_s_aln=jData['subject seq']
+			q_s_aln=jData['query seq']
+			j_from=int(jData['s. start'])
+			j_to=int(jData['s. to'])
+			i_pos=0
+			sub_pos=j_from
+			cdr3_s_aln=""
+			cdr3_q_aln=""
+			while(i_pos<len(j_s_aln)):
+				if(sub_pos<=ref_cdr3_end):
+					cdr3_s_aln+=j_s_aln[i_pos]
+					cdr3_q_aln+=j_q_aln[i_pos]
+				if(j_s_aln[i_pos]!="-"):
+					sub_pos+=1
+				i_pos+=1
+			non_frame=[1]*len(cdr3_s_aln)
+			cdr3_j_char_map=getRegionSpecifcCharacterization(cdr3_s_aln,cdr3_q_aln,"CDR3",non_frame)
+	print "THE J CDR3 CHAR MAP "	
+	printMap(cdr3_j_char_map)
 	#temp_j=0
 	#temp_j_pos=int(jData['s. start'])
 	#j_s_aln=vData['subject seq']
@@ -996,12 +1024,14 @@ def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name,frame_mask):
 	
 #get an empty map as a placeholder
 def getEmptyRegCharMap():
+	char_map=dict()
 	char_map['insertions']=0
 	char_map['deletions']=0
 	char_map['base_sub']=0
 	char_map['synonymous_bsb']=0
 	char_map['nonsynonymous_bsb']=0
 	char_map['mutations']=0
+	return char_map
 
 #have a cache map for region information for reference data
 reg_adj_map=dict()
