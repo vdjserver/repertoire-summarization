@@ -1051,6 +1051,7 @@ def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name,frame_mask,mode):
 		num_tot+=0
 		if(s_aln[temp_index]==q_aln[temp_index]):
 			num_same+=1
+		temp_index+=1
 	pct_id=0
 	if(num_tot==0):
 		pct_id=float(0)
