@@ -517,7 +517,6 @@ def scanOutputToVDJML(input_file,output_file,db_fasta_list,jsonOutFile,organism,
 								getMapToo,					#flag to return 
 								organism
 								)
-					
 					if(not(getMapToo)):
 						rb1=serialized
 						rrw1(rb1.get())
