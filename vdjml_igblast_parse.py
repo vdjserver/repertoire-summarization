@@ -234,31 +234,29 @@ def vdjml_read_serialize(
 	#print "Alignment summary fields : ",summary_fields
 	#print "Alignment summary vals : "
 	valid_regions=["FR1","CDR1","FR2","CDR2","FR3","CDR3"]
+	print "REGION ANALYSIS FOR READ=",current_query
 	for vi in range(len(valid_regions)):
 		valid_region=valid_regions[vi]
-		if(not(valid_region=="CDR3")):
-			#print "Now trying to do analysis at valid_region=",valid_region," with segment=",firstVMap['subject ids']
+		if(not(valid_region=="CDR3" or (firstV is None))):
+			pass
+			#print "Now trying to do analysis at valid_region=",valid_region," with segment=",firstVMap['subject ids']," with sub from/to as ",firstVMap['s. start']," and ",firstVMap['s. end']
 			reg_kabat_and_mask=getRegionAlignmentFromLargerVAlignment(firstVMap,organism,"kabat",valid_region,imgtdb_obj,False)
 			reg_imgt_and_mask=getRegionAlignmentFromLargerVAlignment(firstVMap,organism,"imgt",valid_region,imgtdb_obj,False)
 			#subject at 0, query at 1
 			if(reg_kabat_and_mask is not None):
-				#print "The kabat region alignent (subject top, query bottom) is \n",reg_kabat_and_mask
+				print "The kabat region alignent (subject top, query bottom) is \n",reg_kabat_and_mask
 				reg_kabat=reg_kabat_and_mask[0]
-				reg_char=getRegionSpecifcCharacterization(reg_kabat[0],reg_kabat[1],valid_region,reg_kabat_and_mask[1])
-				printMap(reg_char)
-				pass
+				reg_char=getRegionSpecifcCharacterization(reg_kabat[0],reg_kabat[1],valid_region,reg_kabat_and_mask[1],"kabat")
 			if(reg_imgt_and_mask is not None):
 				reg_imgt=reg_imgt_and_mask[0]
 				#print "The imgt region  alignent (subject top, query bottom) is \n",reg_imgt_and_mask
-				reg_char=getRegionSpecifcCharacterization(reg_imgt[0],reg_imgt[1],valid_region,reg_imgt_and_mask[1])
-				printMap(reg_char)
-				pass
+				reg_char=getRegionSpecifcCharacterization(reg_imgt[0],reg_imgt[1],valid_region,reg_imgt_and_mask[1],"imgt")
 		else:
 			#for CDR3 region
 			#characterize CDR3
 			#def getCDR3RegionSpecificCharacterization(vData,DData,JData,organism,imgtdb_obj,dMode):
-			if(not(firstVMap==None) and not(firstDMap==None) and not(firstJMap==None)):		
-				pass	
+			print "Now trying to do analysis at valid_region=",valid_region," with segment=",firstVMap['subject ids']," with sub from/to as ",firstVMap['s. start']," and ",firstVMap['s. end']
+			if(firstVMap!=None or firstDMap!=None or firstJMap!=None):			
 				getCDR3RegionSpecificCharacterization(firstVMap,firstDMap,firstJMap,organism,imgtdb_obj,"kabat")
 				getCDR3RegionSpecificCharacterization(firstVMap,firstDMap,firstJMap,organism,imgtdb_obj,"imgt")
 		print "\n\n\n\n\n"

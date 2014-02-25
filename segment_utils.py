@@ -847,6 +847,17 @@ def getCodonSpaceAsSet(codon_space):
 
 
 
+#combine two maps (assuming same keysets!)
+#by adding the values
+#c[x]=a[x]+b[x]
+def combineCharMaps(map_1,map_2):
+	combo_map=dict()
+	for k in map_1:
+		combo_map[k]=map_1[k]+map_2[k]
+	return combo_map
+
+
+
 #characterize CDR3
 def getCDR3RegionSpecificCharacterization(vData,dData,jData,organism,imgtdb_obj,dMode):
 	char_map=dict()
@@ -870,6 +881,7 @@ def getCDR3RegionSpecificCharacterization(vData,dData,jData,organism,imgtdb_obj,
 		print "The CDR3 start (mode=",dMode,") is ",v_ref_cdr3_start
 		temp_v=0
 		temp_v_pos=int(vData['s. start'])
+		print "sub start and end are ",temp_v_pos," and ",vRefTo
 		cdr3_s_aln=""
 		cdr3_q_aln=""
 		frame_mask=list()
@@ -883,7 +895,7 @@ def getCDR3RegionSpecificCharacterization(vData,dData,jData,organism,imgtdb_obj,
 				if(v_s_aln[temp_v]!="-"):
 					temp_v_pos+=1
 				temp_v+=1
-		cdr3_v_char_map=getRegionSpecifcCharacterization(cdr3_s_aln,cdr3_q_aln,"CDR3",frame_mask)
+		cdr3_v_char_map=getRegionSpecifcCharacterization(cdr3_s_aln,cdr3_q_aln,"CDR3",frame_mask,dMode)
 	print "THE V CDR3 CHAR MAP is "
 	printMap(cdr3_v_char_map)
 	cdr3_d_char_map=getEmptyRegCharMap()
@@ -901,18 +913,18 @@ def getCDR3RegionSpecificCharacterization(vData,dData,jData,organism,imgtdb_obj,
 		#		d_frame_mask.append(
 		#	
 		#all of D is in CDR3!
-		cdr3_d_char_map=getRegionSpecifcCharacterization(d_s_aln,d_q_aln,"CDR3",non_frame)
+		cdr3_d_char_map=getRegionSpecifcCharacterization(d_s_aln,d_q_aln,"CDR3",non_frame,dMode)
 		print "THE D CDR3 CHAR MAP is "
 		printMap(cdr3_d_char_map)
 	cdr3_j_char_map=getEmptyRegCharMap()
-	if(jData!=None)
+	if(jData!=None):
 		jDataRefName=jData['subject ids']
 		ref_cdr3_end=getADJCDR3EndFromJAllele(jDataRefName,imgtdb_obj,organism,dMode)
 		if(ref_cdr3_end!=(-1)):
 			j_s_aln=jData['subject seq']
-			q_s_aln=jData['query seq']
+			j_q_aln=jData['query seq']
 			j_from=int(jData['s. start'])
-			j_to=int(jData['s. to'])
+			j_to=int(jData['s. end'])
 			i_pos=0
 			sub_pos=j_from
 			cdr3_s_aln=""
@@ -925,9 +937,15 @@ def getCDR3RegionSpecificCharacterization(vData,dData,jData,organism,imgtdb_obj,
 					sub_pos+=1
 				i_pos+=1
 			non_frame=[1]*len(cdr3_s_aln)
-			cdr3_j_char_map=getRegionSpecifcCharacterization(cdr3_s_aln,cdr3_q_aln,"CDR3",non_frame)
+			#print "pass in ",cdr3_s_aln," and ",cdr3_q_aln
+			print "jcdr3 end is ",ref_cdr3_end," but s_from and to are ",j_from," and ",j_to
+			cdr3_j_char_map=getRegionSpecifcCharacterization(cdr3_s_aln,cdr3_q_aln,"CDR3",non_frame,dMode)
 	print "THE J CDR3 CHAR MAP "	
 	printMap(cdr3_j_char_map)
+	combo_map=combineCharMaps(cdr3_v_char_map,cdr3_d_char_map)
+	combo_map=combineCharMaps(combo_map,cdr3_j_char_map)
+	print "THE COMBO MAP is ",
+	printMap(combo_map)
 	#temp_j=0
 	#temp_j_pos=int(jData['s. start'])
 	#j_s_aln=vData['subject seq']
@@ -954,7 +972,7 @@ def getCDR3RegionSpecificCharacterization(vData,dData,jData,organism,imgtdb_obj,
 #C) insertions, D) deletions, E) number stop codons
 #F) mutation(sum A-D)
 #NOTE "A" and "B" are 'base substitutions'
-def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name,frame_mask):
+def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name,frame_mask,mode):
 	char_map=dict()
 	num_ins=0
 	num_del=0
