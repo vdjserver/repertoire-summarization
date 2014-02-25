@@ -130,8 +130,9 @@ def vdjml_read_serialize(
 		rearrangement_summary_fields,vdjr_vals_list,	#rearrangment summary (fields (list) and values (list of lists))
 		junction_fields,junction_vals_list,		#junction (fields (list) and values (list of lists))
 		imgtdb_obj,					#imgtdb_obj for region annotation
+		fasta_query_str,				#the query from the fasta
 		returnCountMapPackage=True,			#return an array consisting of the result and an increment map count too
-		organism="human"				#organism for region annotation							
+		organism="human"				#organism for region annotation		
 		):
 	#print "*******************************************\n"
 	#print "NEED TO SERIALIZE FOR QUERY=",current_query
@@ -151,6 +152,9 @@ def vdjml_read_serialize(
 	firstVMap=None
 	firstDMap=None
 	firstJMap=None
+	firstVLine=None
+	firstDLine=None
+	firstJLine=None
 	topSegmentCounterMap=IncrementMapWrapper()
 	if(len(hit_vals_list)==0):
 		if(returnCountMapPackage):
@@ -260,6 +264,9 @@ def vdjml_read_serialize(
 				getCDR3RegionSpecificCharacterization(firstVMap,firstDMap,firstJMap,organism,imgtdb_obj,"kabat")
 				getCDR3RegionSpecificCharacterization(firstVMap,firstDMap,firstJMap,organism,imgtdb_obj,"imgt")
 		print "\n\n\n\n\n"
+	cdr3_len_map=CDR3LengthAnalysis(firstVMap,firstJMap,current_query,fasta_query_str,organism,imgtdb_obj)
+	print "A LEN MAP FROM REG CHAR :"
+	printMap(cdr3_len_map)
 	for a in range(len(summary_vals_list)):
 		asMap=makeMap(summary_fields,summary_vals_list[a])
 		if(not(asMap['region'].startswith("Total") or asMap['region'].startswith("CDR3"))):
@@ -506,6 +513,7 @@ def scanOutputToVDJML(input_file,output_file,db_fasta_list,jsonOutFile,organism,
 								rearrangement_summary_fields,vdjr_vals_list,	#rearrangment values (list and list-of-lists)
 								junction_fields,junction_vals_list,		#junction fields/values (list and list of lists)
 								imgtdb_obj,					#IMGT TABLE
+								str(fasta_record.seq),				#fasta query string
 								getMapToo,					#flag to return 
 								organism
 								)
@@ -541,6 +549,7 @@ def scanOutputToVDJML(input_file,output_file,db_fasta_list,jsonOutFile,organism,
 								rearrangement_summary_fields,vdjr_vals_list,	#rearrangment values (list and list-of-lists)
 								junction_fields,junction_vals_list,		#junction fields/values (list and list of lists)
 								imgtdb_obj,					#imgt
+								str(fasta_record.seq),				#query fasta string
 								getMapToo,					#flag to return 
 								organism					#
 								)
@@ -558,8 +567,11 @@ def scanOutputToVDJML(input_file,output_file,db_fasta_list,jsonOutFile,organism,
 					if(not(topV is None) and not(topJ is None)):
 						#print "TOP V IS ",topV
 						#print "TOP J IS ",topJ
-						cdr3_length_results=CDR3LengthAnalysis(topV,topJ,current_query,str(fasta_record.seq),organism,imgtdb_obj)
-						#printMap(cdr3_length_results)
+						topVMap=makeMap(hit_fields,topV)
+						topJMap=makeMap(hit_fields,topJ)
+						cdr3_length_results=CDR3LengthAnalysis(topVMap,topJMap,current_query,str(fasta_record.seq),organism,imgtdb_obj)
+						print "PRINCIPAL CDR3 FOR ",current_query
+						printMap(cdr3_length_results)
 						for d in domains:
 							#print "for ",d," got length ",cdr3_length_results[d]
 							IncrementMapWrapper_count_map_dict[d].increment(cdr3_length_results[d])
