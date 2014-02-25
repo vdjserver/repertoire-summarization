@@ -762,11 +762,13 @@ def getRegionAlignmentFromLargerVAlignment(sub_info_map,org,mode,region_name,img
 	#print "\n\n\n\nusing region=",region_name
 	valid_regions=["FR1","CDR1","FR2","CDR2","FR3"]
 	if(not(region_name in valid_regions)):
+		print region_name," is an invalid region!!!!"
 		return None
 	sub_name=sub_info_map['subject ids']
 	ref_region_interval=getVRegionStartAndStopGivenRefData(sub_name,org,imgtdb_obj,region_name,mode)
 	#print "For reference=",sub_name," for org=",org," region=",region_name," got (mode=",mode,")region=",ref_region_interval
 	if(ref_region_interval[0]==(-1) or ref_region_interval[1]==(-1)):
+		print "Can't get region info, start or stop of ref region is neg 1...."
 		return None
 	else:
 		reg_start=int(ref_region_interval[0])
@@ -774,7 +776,7 @@ def getRegionAlignmentFromLargerVAlignment(sub_info_map,org,mode,region_name,img
 		s_start=int(sub_info_map['s. start'])
 		s_end=int(sub_info_map['s. end'])
 		q_start=int(sub_info_map['q. start'])
-		q_end=sub_info_map['q. end'])
+		q_end=int(sub_info_map['q. end'])
 		#print "s_start=",s_start," and s_end=",s_end
 		s_aln=sub_info_map['subject seq']
 		q_aln=sub_info_map['query seq']
@@ -783,13 +785,13 @@ def getRegionAlignmentFromLargerVAlignment(sub_info_map,org,mode,region_name,img
 		temp_index_sbjct=s_start
 		temp_index_qury=q_start
 		frame_mask=list()
-		r_q_start=None
-		r_q_end=None
+		r_q_start=(-1)
+		r_q_end=(-1)
 		while(temp_index<len(s_aln)):
 			if(reg_start<=temp_index_sbjct and temp_index_sbjct<=reg_end):
 				#in region
 				#subject at 0, query at 1
-				if(r_q_start==None and q_aln[temp_index]!="-"):
+				if(r_q_start==(-1) and q_aln[temp_index]!="-"):
 					r_q_start=temp_index_qury
 				if(q_aln[temp_index]!=(-1)):
 					r_q_end=temp_index_qury
