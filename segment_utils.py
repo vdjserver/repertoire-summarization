@@ -1161,7 +1161,8 @@ def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 				kabat_reader.close()
 				return reg_adj_map[refOrg]["kabat"][refName][region]
 		kabat_reader.close()
-		#print "ERROR, FAILED TO FIND KABAT REGION FOR REFERENCE NAMED "+refName+" in "+lookupFile
+		print "ERROR, FAILED TO FIND KABAT REGION FOR REFERENCE NAMED "+refName+" in "+lookupFile
+		#return [(-1),(-1)]
 		sys.exit(0)
 	elif(mode=="IMGT" or mode=="imgt"):
 		lookupBase=lookupFile
@@ -1198,6 +1199,8 @@ def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 						imgt_reader.close()
 						return reg_adj_map[refOrg]["imgt"][refName][region]
 			imgt_reader.close()
+		reg_adj_map[refOrg]["imgt"][refName][region]=[(-1),(-1)]
+		return reg_adj_map[refOrg]["imgt"][refName][region]
 
 
 def getCDR3StartFromVData(vdata,allele,imgtdb_obj,organism):
