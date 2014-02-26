@@ -322,8 +322,8 @@ def vdjml_read_serialize(
 			#def getCDR3RegionSpecificCharacterization(vData,DData,JData,organism,imgtdb_obj,dMode):
 			print "Now trying to do analysis at valid_region=",valid_region," with segment=",firstVMap['subject ids']," with sub from/to as ",firstVMap['s. start']," and ",firstVMap['s. end']
 			if(firstVMap!=None or firstDMap!=None or firstJMap!=None):			
-				getCDR3RegionSpecificCharacterization(firstVMap,firstDMap,firstJMap,organism,imgtdb_obj,"kabat")
-				getCDR3RegionSpecificCharacterization(firstVMap,firstDMap,firstJMap,organism,imgtdb_obj,"imgt")
+				combo_map_kabat=getCDR3RegionSpecificCharacterization(firstVMap,firstDMap,firstJMap,organism,imgtdb_obj,"kabat")
+				combo_map_imgt=getCDR3RegionSpecificCharacterization(firstVMap,firstDMap,firstJMap,organism,imgtdb_obj,"imgt")
 		print "\n\n\n\n\n"
 	
 	#print "\n\n\n"
