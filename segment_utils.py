@@ -924,7 +924,27 @@ def getCDR3RegionSpecificCharacterization(vData,dData,jData,organism,imgtdb_obj,
 		cdr3_v_char_map=getRegionSpecifcCharacterization(cdr3_s_aln,cdr3_q_aln,"CDR3",frame_mask,dMode)
 	print "THE V CDR3 CHAR MAP is "
 	printMap(cdr3_v_char_map)
+	#D CDR3
+	cdr3_d_char_map=getEmptyRegCharMap()
+	if(dData!=None):
+		d_s_aln=dData['subject seq']
+		d_q_aln=dData['query seq']
+		#non_frame=[1]*len(d_s_aln)
+		d_frame=[]
+		q_d_start=int(dData['q. start'])
+		temp_q_d_pos=q_d_start
+		temp_d=0
+		while(temp_d<len(d_s_aln)):
+			if(lastVPos!=(-1)):
+				d_frame.append((temp_q_d_pos-qry_cdr3_start_last_frame)%3)
+			else:
+				d_frame.append(1)
+			if(d_q_aln[temp_d]!="-"):
+				temp_q_d_pos+=1
+			temp_d+=1
+		cdr3_d_char_map=getRegionSpecifcCharacterization(d_s_aln,d_q_aln,"CDR3",d_frame,dMode)
 	cdr3_j_char_map=getEmptyRegCharMap()
+	firstJFrame=(-1)
 	if(jData!=None):
 		jDataRefName=jData['subject ids']
 		ref_cdr3_end=getADJCDR3EndFromJAllele(jDataRefName,imgtdb_obj,organism,dMode)
@@ -939,6 +959,8 @@ def getCDR3RegionSpecificCharacterization(vData,dData,jData,organism,imgtdb_obj,
 			cdr3_q_aln=""
 			j_frame=[]
 			while(i_pos<len(j_s_aln)):
+				if(j_q_aln[i_pos]!="-" and firstJFrame==(-1)):
+					firstJFrame=(ref_cdr3_end+1-sub_pos)%3
 				if(sub_pos<=ref_cdr3_end):
 					j_frame.append((ref_cdr3_end+1-sub_pos)%3)
 					cdr3_s_aln+=j_s_aln[i_pos]
@@ -950,26 +972,6 @@ def getCDR3RegionSpecificCharacterization(vData,dData,jData,organism,imgtdb_obj,
 	print "THE J CDR3 CHAR MAP "	
 	printMap(cdr3_j_char_map)
 
-
-
-
-
-
-
-	cdr3_d_char_map=getEmptyRegCharMap()
-	if(dData!=None):
-		d_s_aln=dData['subject seq']
-		d_q_aln=dData['query seq']
-		#non_frame=[1]*len(d_s_aln)
-		d_frame=[]
-		q_d_start=int(dData['q. start'])
-		temp_q_d_pos=q_d_start
-		temp_d=0
-		while(temp_d<len(d_s_aln)):
-			if(lastVPos!=(-1)):
-				d_frame.append(temp_q_d_pos-
-			if(d_q_aln[temp_d]!="-"):
-				temp_q_d_pos+=1
 		#q_from=int(dData['q. start'])
 		#q_to=int(dData['q. end'])
 		#d_frame_mask=None
@@ -1061,8 +1063,10 @@ def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name,frame_mask,mode):
 				for cp in range(3):
 					if(s_codon[cp]!=q_codon[cp] and s_amino==q_amino):
 						num_syn+=1
+						num_bsb+=1
 					elif(s_codon[cp]!=q_codon[cp] and s_amino!=q_amino):
 						num_nsy+=1
+						num_bsb+=1
 			else:
 				#for codons with gaps
 				for cp in range(3):
