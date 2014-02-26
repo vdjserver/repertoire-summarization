@@ -1181,11 +1181,18 @@ def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 					passed_annotation_flag=True
 				if(passed_annotation_flag and target_file_flag and (line.startswith(region+"-IMGT"))):
 					#print "Found target line "+line+" in file "+current_file
-					regRE=re.compile(r'(\-?IMGT)?\s+(\d+)[^0-9]+(\d+)',re.IGNORECASE)
+					regRE=re.compile(r'(\-?IMGT)?\s+(<?)(\d+)[^0-9]+(\d+)(>?)\s*',re.IGNORECASE)
+					#note that this regex PROHIBITS the <,> signs
 					matchRes=re.search(regRE,line)
 					if(matchRes):
-						reg_start=matchRes.group(2)
-						reg_end=matchRes.group(3)
+						lt=matchRes.group(2)
+						gt=matchRes.group(5)
+						reg_start=matchRes.group(3)
+						if(lt=="<"):
+							reg_start=(-1)
+						reg_end=matchRes.group(4)
+						if(gt==">"):
+							reg_end=(-1)
 						region_interval=[int(reg_start),int(reg_end)]
 						reg_adj_map[refOrg]["imgt"][refName][region]=region_interval
 						imgt_reader.close()
