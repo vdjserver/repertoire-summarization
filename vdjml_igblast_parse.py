@@ -8,7 +8,7 @@ import argparse
 from Bio import SeqIO
 from cdr3_hist import CDR3LengthAnalysis
 from igblast_utils import getDomainClasses
-from segment_utils import getRegionAlignmentFromLargerVAlignment,getRegionSpecifcCharacterization,getCDR3RegionSpecificCharacterization
+from segment_utils import getRegionAlignmentFromLargerVAlignment,getRegionSpecifcCharacterization,getCDR3RegionSpecificCharacterization,getVRegionStartAndStopGivenRefData,getADJCDR3EndFromJAllele
 
 #parser = argparse.ArgumentParser(description='Process some integers.')
 #parser.add_argument('integers', metavar='N', type=int, nargs='+',
@@ -232,25 +232,34 @@ def vdjml_read_serialize(
 			qjaseq=kvmap['query seq']
 			top_btop['J']=kvmap['BTOP']
 	scb=None
-	#note, because igBLAST "anchors" on the V alignment, 
-	#if V aligns, then D and J are both optional, but if V doesn't align, 
-	#then no D alignment exists and no J alignment exists!
-	#print "FIRSTV=",firstV
-	#print "FIRSTD=",firstD
-	#print "FirstJ=",firstJ
+	cdr3_len_map=CDR3LengthAnalysis(firstVMap,firstJMap,current_query,fasta_query_str,organism,imgtdb_obj)
+	imgt_cdr3_len=cdr3_len_map["imgt"]
+	productive_flag=(imgt_cdr3_len%3)==0
 	if(not(firstV==None)):
+		#find last bp in V alignment
+		v_s_end=int(firstVMap['s. end'])
+		#get the frame of it
+		v_s_fr3_imgt_start=getVRegionStartAndStopGivenRefData(firstVMap['subject ids'],organism,imgtdb_obj,"FR3","imgt")[0]
+		v_s_end_frame=(v_s_end-v_s_fr3_imgt_start)%3
 		if(firstD==None):
+			#no D, so maybe a light chain?
 			if(not(firstJ==None)):
-				scb=rb1.add_segment_combination(firstV.get().id(),firstJ.get().id())
+				scb=rb1.add_segment_combination(firstV.get().id(),firstJ.get().id())#,productive=productive_flag)
 			else:
 				#firstJ is none
-				scb=rb1.add_segment_combination(firstV.get().id())
+				scb=rb1.add_segment_combination(firstV.get().id())#,productive=False)
 		else:
 			#firstD not none
 			if(not(firstJ==None)):
-				scb=rb1.add_segment_combination(firstV.get().id(),firstD.get().id(),firstJ.get().id())						
+				j_s_start=int(firstJMap['s. start'])
+				j_s_imgt_cdr3_end=int(getADJCDR3EndFromJAllele(firstJMap['subject ids'],imgtdb_obj,organism,"imgt"))
+				j_s_start_frame=(j_s_start-j_s_imgt_cdr3_end)%3
+				num_bp_between_V_and_J=int(firstJMap['q. start'])-int(firstVMap['q. end'])-1
+				if((v_s_end_frame+num_bp_between_V_and_J+j_s_start_frame)%3==0):
+					print "TESTED PRODUCTIVE BY ALIGNMENT"
+				scb=rb1.add_segment_combination(firstV.get().id(),firstD.get().id(),firstJ.get().id())#,productive=productive_flag)						
 			else:
-				scb=rb1.add_segment_combination(firstV.get().id(),firstD.get().id())
+				scb=rb1.add_segment_combination(firstV.get().id(),firstD.get().id())#,productive=False)
 	else:
 		#firstV is none
 		pass
@@ -309,7 +318,7 @@ def vdjml_read_serialize(
 				getCDR3RegionSpecificCharacterization(firstVMap,firstDMap,firstJMap,organism,imgtdb_obj,"kabat")
 				getCDR3RegionSpecificCharacterization(firstVMap,firstDMap,firstJMap,organism,imgtdb_obj,"imgt")
 		print "\n\n\n\n\n"
-	cdr3_len_map=CDR3LengthAnalysis(firstVMap,firstJMap,current_query,fasta_query_str,organism,imgtdb_obj)
+	
 	#print "\n\n\n"
 	if(len(vdjr_vals_list)>0):
 		#print "rearrangment summary "
