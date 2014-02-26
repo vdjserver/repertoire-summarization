@@ -896,6 +896,7 @@ def getCDR3RegionSpecificCharacterization(vData,dData,jData,organism,imgtdb_obj,
 	cdr3_v_char_map=getEmptyRegCharMap()
 	qry_cdr3_start=(-1)
 	qry_cdr3_start_last_frame=(-1)
+	lastVPos=(-1)
 	if(vData!=None and v_ref_cdr3_start!=(-1)):
 		v_s_aln=vData['subject seq']
 		v_q_aln=vData['query seq']
@@ -917,29 +918,12 @@ def getCDR3RegionSpecificCharacterization(vData,dData,jData,organism,imgtdb_obj,
 					qry_cdr3_start_last_frame=getTheFrameForThisReferenceAtThisPosition(VrefName,organism,imgtdb_obj,temp_v_pos)
 					frame_mask.append(qry_cdr3_start_last_frame)
 				if(v_s_aln[temp_v]!="-"):
+					lastVPos=temp_v_pos
 					temp_v_pos+=1
 				temp_v+=1
 		cdr3_v_char_map=getRegionSpecifcCharacterization(cdr3_s_aln,cdr3_q_aln,"CDR3",frame_mask,dMode)
 	print "THE V CDR3 CHAR MAP is "
 	printMap(cdr3_v_char_map)
-	cdr3_d_char_map=getEmptyRegCharMap()
-	if(dData!=None):
-		d_s_aln=dData['subject seq']
-		d_q_aln=dData['query seq']
-		non_frame=[1]*len(d_s_aln)
-		#q_from=int(dData['q. start'])
-		#q_to=int(dData['q. end'])
-		#d_frame_mask=None
-		#for q_pos in range(q_from,q_to+1,1):
-		#	if(vData!=None):
-		#		diff=q_pos-
-		#	else:
-		#		d_frame_mask.append(
-		#	
-		#all of D is in CDR3!
-		cdr3_d_char_map=getRegionSpecifcCharacterization(d_s_aln,d_q_aln,"CDR3",non_frame,dMode)
-		print "THE D CDR3 CHAR MAP is "
-		printMap(cdr3_d_char_map)
 	cdr3_j_char_map=getEmptyRegCharMap()
 	if(jData!=None):
 		jDataRefName=jData['subject ids']
@@ -953,19 +937,57 @@ def getCDR3RegionSpecificCharacterization(vData,dData,jData,organism,imgtdb_obj,
 			sub_pos=j_from
 			cdr3_s_aln=""
 			cdr3_q_aln=""
+			j_frame=[]
 			while(i_pos<len(j_s_aln)):
 				if(sub_pos<=ref_cdr3_end):
+					j_frame.append((ref_cdr3_end+1-sub_pos)%3)
 					cdr3_s_aln+=j_s_aln[i_pos]
 					cdr3_q_aln+=j_q_aln[i_pos]
 				if(j_s_aln[i_pos]!="-"):
 					sub_pos+=1
-				i_pos+=1
-			non_frame=[1]*len(cdr3_s_aln)
-			#print "pass in ",cdr3_s_aln," and ",cdr3_q_aln
 			print "jcdr3 end is ",ref_cdr3_end," but s_from and to are ",j_from," and ",j_to
 			cdr3_j_char_map=getRegionSpecifcCharacterization(cdr3_s_aln,cdr3_q_aln,"CDR3",non_frame,dMode)
 	print "THE J CDR3 CHAR MAP "	
 	printMap(cdr3_j_char_map)
+
+
+
+
+
+
+
+	cdr3_d_char_map=getEmptyRegCharMap()
+	if(dData!=None):
+		d_s_aln=dData['subject seq']
+		d_q_aln=dData['query seq']
+		#non_frame=[1]*len(d_s_aln)
+		d_frame=[]
+		q_d_start=int(dData['q. start'])
+		temp_q_d_pos=q_d_start
+		temp_d=0
+		while(temp_d<len(d_s_aln)):
+			if(lastVPos!=(-1)):
+				d_frame.append(temp_q_d_pos-
+			if(d_q_aln[temp_d]!="-"):
+				temp_q_d_pos+=1
+		#q_from=int(dData['q. start'])
+		#q_to=int(dData['q. end'])
+		#d_frame_mask=None
+		#for q_pos in range(q_from,q_to+1,1):
+		#	if(vData!=None):
+		#		diff=q_pos-
+		#	else:
+		#		d_frame_mask.append(
+		#	
+		#all of D is in CDR3!
+		cdr3_d_char_map=getRegionSpecifcCharacterization(d_s_aln,d_q_aln,"CDR3",non_frame,dMode)
+		print "THE D CDR3 CHAR MAP is "
+		printMap(cdr3_d_char_map)
+
+
+
+
+
 	combo_map=combineCharMaps(cdr3_v_char_map,cdr3_d_char_map)
 	combo_map=combineCharMaps(combo_map,cdr3_j_char_map)
 	print "THE COMBO MAP is ",
