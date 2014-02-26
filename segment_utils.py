@@ -766,6 +766,7 @@ def getRegionAlignmentFromLargerVAlignment(sub_info_map,org,mode,region_name,img
 		return None
 	sub_name=sub_info_map['subject ids']
 	ref_region_interval=getVRegionStartAndStopGivenRefData(sub_name,org,imgtdb_obj,region_name,mode)
+	ref_region_transcript_start=getVRegionStartAndStopGivenRefData(sub_name,org,imgtdb_obj,region_name,"imgt")[0]
 	#print "For reference=",sub_name," for org=",org," region=",region_name," got (mode=",mode,")region=",ref_region_interval
 	if(ref_region_interval[0]==(-1) or ref_region_interval[1]==(-1)):
 		print "Can't get region info, start or stop of ref region is neg 1...."
@@ -797,7 +798,12 @@ def getRegionAlignmentFromLargerVAlignment(sub_info_map,org,mode,region_name,img
 					r_q_end=temp_index_qury
 				region_alignment[0]+=s_aln[temp_index]
 				region_alignment[1]+=q_aln[temp_index]
-				frame_mask.append((temp_index_sbjct-reg_start)%3)
+				if(ref_region_transcript_start!=(-1)):
+					#if the frame is knowable, use it
+					frame_mask.append((temp_index_sbjct-ref_region_transcript_start)%3)
+				else:
+					#if the frame is not knowable, put 1 everywhere for the frame to trigger plain sub cts
+					frame_mask.append(1)					
 			else:
 				#not in region
 				pass
