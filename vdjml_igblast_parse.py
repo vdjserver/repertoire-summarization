@@ -8,7 +8,7 @@ import argparse
 from Bio import SeqIO
 from cdr3_hist import CDR3LengthAnalysis
 from igblast_utils import getDomainClasses
-from segment_utils import getRegionAlignmentFromLargerVAlignment,getRegionSpecifcCharacterization,getCDR3RegionSpecificCharacterization,getVRegionStartAndStopGivenRefData,getADJCDR3EndFromJAllele
+from segment_utils import getRegionAlignmentFromLargerVAlignment,getRegionSpecifcCharacterization,getCDR3RegionSpecificCharacterization,getVRegionStartAndStopGivenRefData,getADJCDR3EndFromJAllele,getTheFrameForThisReferenceAtThisPosition
 
 #parser = argparse.ArgumentParser(description='Process some integers.')
 #parser.add_argument('integers', metavar='N', type=int, nargs='+',
@@ -238,7 +238,8 @@ def vdjml_read_serialize(
 	if(firstVMap!=None and firstJMap!=None):
 		v_s_fr3_imgt_start=getVRegionStartAndStopGivenRefData(firstVMap['subject ids'],organism,imgtdb_obj,"FR3","imgt")[0]
 		if(v_s_fr3_imgt_start!=(-1)):
-			v_s_end_frame=(v_s_end-v_s_fr3_imgt_start)%3		
+			v_s_end=int(firstVMap['s. end'])
+			v_s_end_frame=getTheFrameForThisReferenceAtThisPosition(firstVMap['subject ids'],organism,imgtdb_obj,v_s_end)
 			j_s_start=int(firstJMap['s. start'])
 			j_s_imgt_cdr3_end=int(getADJCDR3EndFromJAllele(firstJMap['subject ids'],imgtdb_obj,organism,"imgt"))
 			j_s_start_frame=(j_s_start-j_s_imgt_cdr3_end)%3
@@ -247,7 +248,7 @@ def vdjml_read_serialize(
 				#print "TESTED PRODUCTIVE BY ALIGNMENT"
 				productive_flag=True
 			else:
-				productive_flag=False		
+				productive_flag=False
 	if(not(firstV==None)):
 		#find last bp in V alignment
 		v_s_end=int(firstVMap['s. end'])
