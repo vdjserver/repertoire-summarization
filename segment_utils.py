@@ -897,6 +897,8 @@ def getCDR3RegionSpecificCharacterization(vData,dData,jData,organism,imgtdb_obj,
 	qry_cdr3_start=(-1)
 	qry_cdr3_start_last_frame=(-1)
 	lastVPos=(-1)
+	v_tot=0
+	v_same=0
 	if(vData!=None and v_ref_cdr3_start!=(-1)):
 		v_s_aln=vData['subject seq']
 		v_q_aln=vData['query seq']
@@ -916,6 +918,10 @@ def getCDR3RegionSpecificCharacterization(vData,dData,jData,organism,imgtdb_obj,
 					cdr3_s_aln+=v_s_aln[temp_v]
 					cdr3_q_aln+=v_q_aln[temp_v]
 					qry_cdr3_start_last_frame=getTheFrameForThisReferenceAtThisPosition(VrefName,organism,imgtdb_obj,temp_v_pos)
+					if(v_s_aln[temp_v]!="-" and v_q_aln[temp_v]!="-"):
+						v_tot+=1
+						if(v_s_aln[temp_v]==v_q_aln[temp_v]):
+							v_same+=1
 					frame_mask.append(qry_cdr3_start_last_frame)
 				if(v_s_aln[temp_v]!="-"):
 					lastVPos=temp_v_pos
@@ -926,6 +932,8 @@ def getCDR3RegionSpecificCharacterization(vData,dData,jData,organism,imgtdb_obj,
 	printMap(cdr3_v_char_map)
 	#D CDR3
 	cdr3_d_char_map=getEmptyRegCharMap()
+	d_tot=0
+	d_same=0
 	if(dData!=None):
 		d_s_aln=dData['subject seq']
 		d_q_aln=dData['query seq']
@@ -935,6 +943,11 @@ def getCDR3RegionSpecificCharacterization(vData,dData,jData,organism,imgtdb_obj,
 		temp_q_d_pos=q_d_start
 		temp_d=0
 		while(temp_d<len(d_s_aln)):
+			if(d_s_aln[temp_d]!="-" and d_q_aln[temp_d]!="-"):
+				d_tot=+=1
+				if(d_s_aln[temp_d]==d_q_aln[temp_d]):
+					d_same+=1
+			if(d_s_aln[temp_d]==d_q_aln[temp_d]
 			if(lastVPos!=(-1)):
 				d_frame.append((temp_q_d_pos-qry_cdr3_start_last_frame)%3)
 			else:
@@ -945,6 +958,8 @@ def getCDR3RegionSpecificCharacterization(vData,dData,jData,organism,imgtdb_obj,
 		cdr3_d_char_map=getRegionSpecifcCharacterization(d_s_aln,d_q_aln,"CDR3",d_frame,dMode)
 	cdr3_j_char_map=getEmptyRegCharMap()
 	firstJFrame=(-1)
+	j_tot=0
+	j_same=0
 	if(jData!=None):
 		jDataRefName=jData['subject ids']
 		ref_cdr3_end=getADJCDR3EndFromJAllele(jDataRefName,imgtdb_obj,organism,dMode)
@@ -961,6 +976,11 @@ def getCDR3RegionSpecificCharacterization(vData,dData,jData,organism,imgtdb_obj,
 			while(i_pos<len(j_s_aln)):
 				if(j_q_aln[i_pos]!="-" and firstJFrame==(-1)):
 					firstJFrame=(ref_cdr3_end+1-sub_pos)%3
+					j_tot+=1
+				if(j_q_aln[i_pos]!="-" and j_s_aln[i_pos]!="-")
+					j_tot+=1
+					if(j_q_aln[i_pos]==j_s_aln[i_pos]):
+						j_same+=1
 				if(sub_pos<=ref_cdr3_end):
 					j_frame.append((ref_cdr3_end+1-sub_pos)%3)
 					cdr3_s_aln+=j_s_aln[i_pos]
@@ -985,13 +1005,12 @@ def getCDR3RegionSpecificCharacterization(vData,dData,jData,organism,imgtdb_obj,
 		cdr3_d_char_map=getRegionSpecifcCharacterization(d_s_aln,d_q_aln,"CDR3",non_frame,dMode)
 		print "THE D CDR3 CHAR MAP is "
 		printMap(cdr3_d_char_map)
-
-
-
-
-
 	combo_map=combineCharMaps(cdr3_v_char_map,cdr3_d_char_map)
 	combo_map=combineCharMaps(combo_map,cdr3_j_char_map)
+	cum_tot=v_tot+d_tot+d_tot
+	cum_sme=v_same+d_same+j_same
+	cum_pct_id=float(cum_sme)/float(cum_tot)
+	combo_map['pct_id']=cum_pct_id
 	print "THE COMBO MAP is ",
 	printMap(combo_map)
 	#temp_j=0
