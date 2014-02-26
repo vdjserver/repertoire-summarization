@@ -914,7 +914,7 @@ def getCDR3RegionSpecificCharacterization(vData,dData,jData,organism,imgtdb_obj,
 				if(temp_v_pos>=v_ref_cdr3_start):
 					cdr3_s_aln+=v_s_aln[temp_v]
 					cdr3_q_aln+=v_q_aln[temp_v]
-					qry_cdr3_start_last_frame=(temp_v_pos-v_ref_cdr3_start)%3
+					qry_cdr3_start_last_frame=getTheFrameForThisReferenceAtThisPosition(VrefName,organism,imgtdb_obj,temp_v_pos)
 					frame_mask.append(qry_cdr3_start_last_frame)
 				if(v_s_aln[temp_v]!="-"):
 					temp_v_pos+=1
