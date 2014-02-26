@@ -1072,6 +1072,9 @@ def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name,frame_mask,mode):
 	char_map['mutations']=num_nsy+num_syn+num_bsb+num_del+num_ins
 	char_map['pct_id']=pct_id
 	return char_map
+
+
+
 	
 #get an empty map as a placeholder
 def getEmptyRegCharMap():
@@ -1084,6 +1087,25 @@ def getEmptyRegCharMap():
 	char_map['mutations']=0
 	char_map['pct_id']=0
 	return char_map
+
+
+
+
+
+#at the indicated position find the frame by using the first imgt delineation start as a "base" or "frame of reference"
+def getTheFrameForThisReferenceAtThisPosition(refName,organism,imgtdb_obj,refPos):
+	regions=["FR1","CDR1","FR2","CDR2","FR3"]
+	for region in regions:
+		interval=getVRegionStartAndStopGivenRefData(refName,organism,imgtdb_obj,region,"imgt")
+		if(not(interval is None)):
+			start=int(interval[0])
+			if(start!=(-1)):
+				#assume start is in frame 0
+				return (start-refPos)%3
+	raise Exception("ERROR, COULD NOT FIND ANY FRAME POSITION AT ALL FOR ",refName," with organism=",organism
+
+
+
 
 #have a cache map for region information for reference data
 reg_adj_map=dict()
@@ -1117,7 +1139,7 @@ def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 	#first, form a path to a lookup.
 	#this depends on organis and mode
 	#for KABAT its a file
-	#for IMGT it starts as a directory but later becomes a file!
+	#for IMGT it st(<?arts as a directory but later becomes a file!
 	lookupFile=None
 	if(mode=="kabat"):
 		if(refOrg=="human"):
