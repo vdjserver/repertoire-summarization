@@ -768,12 +768,16 @@ def getRegionAlignmentFromLargerVAlignment(sub_info_map,org,mode,region_name,img
 	ref_region_interval=getVRegionStartAndStopGivenRefData(sub_name,org,imgtdb_obj,region_name,mode)
 	ref_region_transcript_start=getVRegionStartAndStopGivenRefData(sub_name,org,imgtdb_obj,region_name,"imgt")[0]
 	#print "For reference=",sub_name," for org=",org," region=",region_name," got (mode=",mode,")region=",ref_region_interval
-	if(ref_region_interval[0]==(-1) or ref_region_interval[1]==(-1)):
-		print "Can't get region info, start or stop of ref region is neg 1...."
+	if(ref_region_interval[0]==(-1) and ref_region_interval[1]==(-1)):
+		print "Can't get region info, start and stop of ref region is neg 1...."
 		return None
 	else:
 		reg_start=int(ref_region_interval[0])
+		if(reg_start==(-1)):
+			reg_start=int(sub_info_map['s. start'])
 		reg_end=int(ref_region_interval[1])
+		if(reg_end==(-1)):
+			reg_end=int(sub_info_map['s. end'])
 		s_start=int(sub_info_map['s. start'])
 		s_end=int(sub_info_map['s. end'])
 		q_start=int(sub_info_map['q. start'])
@@ -788,6 +792,7 @@ def getRegionAlignmentFromLargerVAlignment(sub_info_map,org,mode,region_name,img
 		frame_mask=list()
 		r_q_start=(-1)
 		r_q_end=(-1)
+		refName=sub_info_map['subject ids']
 		while(temp_index<len(s_aln)):
 			if(reg_start<=temp_index_sbjct and temp_index_sbjct<=reg_end):
 				#in region
@@ -798,9 +803,9 @@ def getRegionAlignmentFromLargerVAlignment(sub_info_map,org,mode,region_name,img
 					r_q_end=temp_index_qury
 				region_alignment[0]+=s_aln[temp_index]
 				region_alignment[1]+=q_aln[temp_index]
-				if(ref_region_transcript_start!=(-1)):
+				if(s_aln[temp_index]!="-"):
 					#if the frame is knowable, use it
-					frame_mask.append((temp_index_sbjct-ref_region_transcript_start)%3)
+					frame_mask.append(getTheFrameForThisReferenceAtThisPosition(refName,org,imgtdb_obj,temp_index_sbjct))
 				else:
 					#if the frame is not knowable, put 1 everywhere for the frame to trigger plain sub cts
 					frame_mask.append(1)					
@@ -1012,7 +1017,12 @@ def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name,frame_mask,mode):
 	#print "Now doing codon-based counting..."
 	while(temp_index<len(s_aln)):
 		#print "temp_index=",temp_index," and frame mask is ",frame_mask[temp_index]
-		if(frame_mask[temp_index]==0 and temp_index<len(s_aln)-2 ):
+		if(
+			temp_index<len(s_aln)-2 and 
+			frame_mask[temp_index]==0 and 
+			frame_mask[temp_index+1]==1 and 
+			frame_mask[temp_index+2]==2
+			):
 			#print "encountered a codon...."
 			s_codon=s_aln[temp_index:(temp_index+3)]
 			s_codon=re.sub(r'\-','N',s_codon)
@@ -1055,8 +1065,10 @@ def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name,frame_mask,mode):
 	temp_index=0
 	while(temp_index<len(s_aln)):
 		num_tot+=0
-		if(s_aln[temp_index]==q_aln[temp_index]):
+		if(s_aln[temp_index]==q_aln[temp_index] and s_aln[temp_index]!="-" and q_aln[temp_index]!="-"):
 			num_same+=1
+		if(s_aln[temp_index]!="-" and q_aln[temp_index]!="-"):
+			num_tot+=1
 		temp_index+=1
 	pct_id=0
 	if(num_tot==0):
@@ -1101,8 +1113,8 @@ def getTheFrameForThisReferenceAtThisPosition(refName,organism,imgtdb_obj,refPos
 			start=int(interval[0])
 			if(start!=(-1)):
 				#assume start is in frame 0
-				return (start-refPos)%3
-	raise Exception("ERROR, COULD NOT FIND ANY FRAME POSITION AT ALL FOR ",refName," with organism=",organism
+				return (refPos-start)%3
+	raise Exception("ERROR, COULD NOT FIND ANY FRAME POSITION AT ALL FOR ",refName," with organism=",organism)
 
 
 
