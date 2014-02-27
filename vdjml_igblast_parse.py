@@ -2,13 +2,12 @@
 
 import vdjml
 import re
-from imgt_utils import trimList,imgt_db
-from segment_utils import getFastaListOfDescs,getSegmentName,IncrementMapWrapper,looksLikeAlleleStr
+#from segment_utils import getFastaListOfDescs,getSegmentName,IncrementMapWrapper,looksLikeAlleleStr
 import argparse
 from Bio import SeqIO
-from cdr3_hist import CDR3LengthAnalysisVDMLOBJ
-from igblast_utils import getDomainClasses
-from segment_utils import getRegionAlignmentFromLargerVAlignment,getRegionSpecifcCharacterization,getCDR3RegionSpecificCharacterization,getVRegionStartAndStopGivenRefData,getADJCDR3EndFromJAllele,getTheFrameForThisReferenceAtThisPosition
+#from cdr3_hist import CDR3LengthAnalysisVDMLOBJ
+#from igblast_utils import getDomainClasses
+#from segment_utils import getRegionAlignmentFromLargerVAlignment,getRegionSpecifcCharacterization,getCDR3RegionSpecificCharacterization,getVRegionStartAndStopGivenRefData,getADJCDR3EndFromJAllele,getTheFrameForThisReferenceAtThisPosition
 
 #parser = argparse.ArgumentParser(description='Process some integers.')
 #parser.add_argument('integers', metavar='N', type=int, nargs='+',
@@ -156,7 +155,6 @@ def vdjml_read_serialize(
 	firstVLine=None
 	firstDLine=None
 	firstJLine=None
-	topSegmentCounterMap=IncrementMapWrapper()
 	##################################################################################
 	#if there are no hits, return an empty object..... that contains just the read name! :(
 	if(len(hit_vals_list)==0):
@@ -332,12 +330,19 @@ def writeModedHistogramFile(IncrementMapWrapper_count_map_dict,outfile):
 	hist_writer.close()
 
 
+def trimList(l):
+	for idx, val in enumerate(l):
+		#print idx, val
+		l[idx]=l[idx].strip()
+	return l
+
+
+
 
 
 def scanOutputToVDJML(input_file,fact):
 	INPUT=open(input_file,'r')
 	line_num=0
-	segmentCountMap=IncrementMapWrapper()
 	current_query=None
 	current_query_id=(-1)
 	vdjr_vals_list=list()
@@ -508,14 +513,14 @@ def makeVDJMLFileFromArgs(args):
 	#result_store = vdjml.Result_store(meta)
 	print "vdjml is ",str(args.vdjml[0])
 	rrw = vdjml.Result_writer(str(args.vdjml[0]), meta)
-	imgtdb_obj=imgt_db("/home/data/DATABASE/01_22_2014/")
 	for read_result in scanOutputToVDJML(args.igblast_in[0],fact):
 		#result_store.insert(read_result)
 		rrw(read_result)
 		
 
 
-if (__name__=="__main__"):
+#return an argument parser
+def makeParserArgs():
 	parser = argparse.ArgumentParser(description='Parse IGBLAST output, write a VDJML output file')
 	parser.add_argument('igblast_in',type=str,nargs=1,help="path to igblast analysis file of results, hits, segments, etc. *** NOTE *** SHOULD BE RUN WITH OUTFMT AS SEEN HERE -outfmt '7 qseqid qgi qacc qaccver qlen sseqid sallseqid sgi sallgi sacc saccver sallacc slen qstart qend sstart send qseq sseq evalue bitscore score length pident nident mismatch positive gapopen gaps ppos frames qframe sframe btop'")
 	parser.add_argument('vdjml',type=str,nargs=1,help="the path to the output vdjml")
@@ -526,7 +531,15 @@ if (__name__=="__main__"):
 	parser.add_argument('-db_ver',type=str,nargs=1,default="DB_VER",help="a version string associated with the database")
 	parser.add_argument('-db_species',type=str,nargs=1,default="human",help="species of the db")
 	parser.add_argument('-db_uri',type=str,nargs=1,default="http://www.vdjserver.org",help="a URI associated with the database")
-	parser.add_argument('-igblast_dc',type=str,nargs=1,default="imgt",help="the domain classification system used",choices=["imgt","kabat"])
+	parser.add_argument('-igblast_dc',type=str,nargs=1,default="imgt",help="the domain classification system used",choices=["imgt","kabat"])	
+	return parser
+
+
+
+
+
+if (__name__=="__main__"):
+	parser=makeParserArgs()
 	args = parser.parse_args()
 	if(args): 
 		makeVDJMLFileFromArgs(args)
