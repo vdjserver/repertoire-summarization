@@ -1382,7 +1382,6 @@ class IncrementMapWrapper():
 		self.count_map=dict()
 		self.default_value=0
 
-
 	#treating the keys as ints, find the max key
 	#return -1 if no keys
 	def getMaxKeyWithIntOrdering(self):

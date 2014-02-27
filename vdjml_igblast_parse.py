@@ -6,7 +6,7 @@ from imgt_utils import trimList,imgt_db
 from segment_utils import getFastaListOfDescs,getSegmentName,IncrementMapWrapper,looksLikeAlleleStr
 import argparse
 from Bio import SeqIO
-from cdr3_hist import CDR3LengthAnalysis
+from cdr3_hist import CDR3LengthAnalysisVDMLOBJ
 from igblast_utils import getDomainClasses
 from segment_utils import getRegionAlignmentFromLargerVAlignment,getRegionSpecifcCharacterization,getCDR3RegionSpecificCharacterization,getVRegionStartAndStopGivenRefData,getADJCDR3EndFromJAllele,getTheFrameForThisReferenceAtThisPosition
 
@@ -42,20 +42,6 @@ def getListOfDescsFromDBList(db_fasta_list):
 def makeMap(col_list,val_tab_str):
 	val_list=val_tab_str.split("\t")
 	kvmap=dict()
-	#if(len(val_list)!=len(col_list)):
-		#print "ERROR, COL_LIST LENGTH NOT SAME AS VAL LENGTH : "
-		#for x in range(max(len(val_list),len(col_list))):
-		#	if(x<len(col_list)):
-		#		print col_list[x]+"\t->\t",
-		#	else:
-		#	if(x<len(val_list)):
-		#		print val_list[x]
-		#	else:
-		#		print "EMPTY"
-		#print "col list:"
-		#print col_list
-		#print "val list:"
-		#print val_list
 	for c in range(len(col_list)):
 		if(c<len(val_list)):
 			kvmap[col_list[c]]=val_list[c]
@@ -140,7 +126,6 @@ def makeMetricFromCharMap(charMap):
 
 
 def vdjml_read_serialize(
-		vlist,dlist,jlist,				#list of valllels from fastaDB, and D and J,
 		current_query,					#current query name
 		fact, 						#handle to VDJML factory
 		hit_vals_list,					#hit values (list of lists)
@@ -148,11 +133,7 @@ def vdjml_read_serialize(
 		summary_fields,					#summary fields
 		summary_vals_list,				#summary values list (list of lists)
 		rearrangement_summary_fields,vdjr_vals_list,	#rearrangment summary (fields (list) and values (list of lists))
-		junction_fields,junction_vals_list,		#junction (fields (list) and values (list of lists))
-		imgtdb_obj,					#imgtdb_obj for region annotation
-		fasta_query_str,				#the query from the fasta
-		returnCountMapPackage=True,			#return an array consisting of the result and an increment map count too
-		organism="human"				#organism for region annotation		
+		junction_fields,junction_vals_list		#junction (fields (list) and values (list of lists))
 		):
 	#print "*******************************************\n"
 	#print "NEED TO SERIALIZE FOR QUERY=",current_query
@@ -176,42 +157,42 @@ def vdjml_read_serialize(
 	firstDLine=None
 	firstJLine=None
 	topSegmentCounterMap=IncrementMapWrapper()
+	##################################################################################
+	#if there are no hits, return an empty object..... that contains just the read name! :(
 	if(len(hit_vals_list)==0):
-		if(returnCountMapPackage):
-			return [rb1,topSegmentCounterMap]
-		else:
-			rb1
+		return rb1
+	################################################################
+	#this is where the hits are picked up and put in VDJML objects
 	for h in range(len(hit_vals_list)):
 		kvmap=makeMap(hit_fields,hit_vals_list[h])
-		#print "\n\n\nSHOWING A ",kvmap['segment']," segment! (hit #"+str(h+1)+" of "+str(len(hit_vals_list))+")"
-		#printMap(kvmap)
-		if(kvmap['segment']=="D"):
-			lookup=dlist
-		elif(kvmap['segment']=="V"):
-			lookup=vlist
-		else:
-			lookup=jlist
-		#print "The nice name is ",getSegmentName(kvmap['subject acc.ver'],lookup)
 		btop_to_add=kvmap['BTOP']
-		#print "making interval with values : ",kvmap['q. start']," AND ",kvmap['q. end']
 		query_interval_to_add=vdjml.Interval.first_last_1(int(kvmap['q. start']),int(kvmap['q. end']))
+		if(int(kvmap['q. start'])>int(kvmap['q. end'])):
+			query_interval_to_add=vdjml.Interval.first_last_1(int(kvmap['q. end']),int(kvmap['q. start']))
 		segment_type_to_add=kvmap['segment']
 		hit_name_to_add=kvmap['subject ids']
-		#hit_interval_to_add=vdjml.Interval.first_last_1(int(kvmap['s. start']),int(kvmap['s. end']))
+		read_interval_to_add=vdjml.Interval.first_last_1(int(kvmap['q. start']),int(kvmap['q. end']))
 		if(int(kvmap['s. start'])<int(kvmap['s. end'])):
 			hit_interval_to_add=vdjml.Interval.first_last_1(int(kvmap['s. start']),int(kvmap['s. end']))
 		else:
 			#strand!
 			hit_interval_to_add=vdjml.Interval.first_last_1(int(kvmap['s. end']),int(kvmap['s. start']))							
-		#metrics_to_add=vdjml.Match_metrics(int(kvmap['score']),float(kvmap['% identity']),int(9999),int(9999),int(kvmap['mismatches']))
-		metrics_to_add=vdjml.Match_metrics(float(kvmap['% identity']),int(kvmap['score']),int(kvmap['mismatches']))
+		#printMap(kvmap)
+		metrics_to_add=vdjml.Match_metrics(
+			identity=float(kvmap['% identity']),
+			score=int(kvmap['score']),
+			)
+		#this is where the hit is added to the general list
 		smb1 = rb1.add_segment_match(
-			btop_to_add,
-			query_interval_to_add,
-			segment_type_to_add,
-			hit_name_to_add,
-			hit_interval_to_add,
-			metrics_to_add)
+			btop=btop_to_add,
+			read_range=read_interval_to_add,
+			seg_name=hit_name_to_add,
+			vdj=segment_type_to_add,
+			gl_range=hit_interval_to_add,
+			metric=metrics_to_add
+			)
+		#################################################################
+		#this is where the top hits are retrieved for the combination/rearrangement
 		if(firstV==None and segment_type_to_add=='V'):
 			firstV=smb1
 			firstVMap=kvmap
@@ -232,28 +213,10 @@ def vdjml_read_serialize(
 			qjaseq=kvmap['query seq']
 			top_btop['J']=kvmap['BTOP']
 	scb=None
-	###########################################
-	#some code to look at the 'productive rearrangement
-	productive_flag=None
-	if(firstVMap!=None and firstJMap!=None):
-		v_s_fr3_imgt_start=getVRegionStartAndStopGivenRefData(firstVMap['subject ids'],organism,imgtdb_obj,"FR3","imgt")[0]
-		if(v_s_fr3_imgt_start!=(-1)):
-			v_s_end=int(firstVMap['s. end'])
-			v_s_end_frame=getTheFrameForThisReferenceAtThisPosition(firstVMap['subject ids'],organism,imgtdb_obj,v_s_end)
-			j_s_start=int(firstJMap['s. start'])
-			j_s_imgt_cdr3_end=int(getADJCDR3EndFromJAllele(firstJMap['subject ids'],imgtdb_obj,organism,"imgt"))
-			j_s_start_frame=(j_s_start-j_s_imgt_cdr3_end)%3
-			num_bp_between_V_and_J=int(firstJMap['q. start'])-int(firstVMap['q. end'])-1
-			if((v_s_end_frame+num_bp_between_V_and_J+j_s_start_frame+1)%3==0):
-				#print "TESTED PRODUCTIVE BY ALIGNMENT"
-				productive_flag=True
-			else:
-				productive_flag=False
-	if(not(firstV==None)):
-		#find last bp in V alignment
-		v_s_end=int(firstVMap['s. end'])
-		#get the frame of it
 
+	####################################################################################
+	#this is where the combination is added based on the firstV,firstD,firstJ from above
+	if(not(firstV==None)):
 		if(firstD==None):
 			#no D, so maybe a light chain?
 			if(not(firstJ==None)):
@@ -270,63 +233,37 @@ def vdjml_read_serialize(
 	else:
 		#firstV is none
 		pass
-	#print "\n\n\tAlignment summary Info : "
-	#print "Alignment summary fields : ",summary_fields
-	#print "Alignment summary vals : "
-	valid_regions=["FR1","CDR1","FR2","CDR2","FR3","CDR3"]
-	print "REGION ANALYSIS FOR READ=",current_query
-	for vi in range(len(valid_regions)):
-		valid_region=valid_regions[vi]
-		if(not(valid_region=="CDR3" or (firstV is None))):
-			pass
-			#print "Now trying to do analysis at valid_region=",valid_region," with segment=",firstVMap['subject ids']," with sub from/to as ",firstVMap['s. start']," and ",firstVMap['s. end']
-			reg_kabat_and_mask=getRegionAlignmentFromLargerVAlignment(firstVMap,organism,"kabat",valid_region,imgtdb_obj,False)
-			reg_imgt_and_mask=getRegionAlignmentFromLargerVAlignment(firstVMap,organism,"imgt",valid_region,imgtdb_obj,False)
-			#subject at 0, query at 1
-			if(reg_kabat_and_mask is not None):
-				print "The kabat region alignent (subject top, query bottom) is \n",reg_kabat_and_mask
-				reg_kabat=reg_kabat_and_mask[0]
-				reg_start_stop=reg_kabat_and_mask[2:]
-				print "The query-based start/stop are ",reg_start_stop
-				reg_char=getRegionSpecifcCharacterization(reg_kabat[0],reg_kabat[1],valid_region,reg_kabat_and_mask[1],"kabat")
-				metrics_to_add=makeMetricFromCharMap(reg_char)
-				region_to_add=valid_region
-				if(reg_start_stop[0]!=(-1) and reg_start_stop[1]!=(-1)):
-					interval_to_add=vdjml.Interval.first_last_1(reg_start_stop[0],reg_start_stop[1])
-					scb.add_region(
-							region_to_add,
-							interval_to_add,
-							metrics_to_add,
-							vdjml.Num_system.kabat
-							)
-			if(reg_imgt_and_mask is not None):
-				print "The imgt region alignent (subject top, query bottom) is \n",reg_imgt_and_mask
-				reg_imgt=reg_imgt_and_mask[0]
-				reg_start_stop=reg_imgt_and_mask[2:]
-				print "The query-based start/stop are ",reg_start_stop
-				print "The imgt region  alignent (subject top, query bottom) is \n",reg_imgt_and_mask
-				reg_char=getRegionSpecifcCharacterization(reg_imgt[0],reg_imgt[1],valid_region,reg_imgt_and_mask[1],"imgt")
-				metrics_to_add=makeMetricFromCharMap(reg_char)
-				region_to_add=valid_region
-				if(reg_start_stop[0]!=(-1) and reg_start_stop[1]!=(-1)):
-					interval_to_add=vdjml.Interval.first_last_1(reg_start_stop[0],reg_start_stop[1])
-					scb.add_region(
-							region_to_add,
-							interval_to_add,
-							metrics_to_add,
-							vdjml.Num_system.imgt
-							)
-		else:
-			#for CDR3 region
-			#characterize CDR3
-			#def getCDR3RegionSpecificCharacterization(vData,DData,JData,organism,imgtdb_obj,dMode):
-			print "Now trying to do analysis at valid_region=",valid_region," with segment=",firstVMap['subject ids']," with sub from/to as ",firstVMap['s. start']," and ",firstVMap['s. end']
-			if(firstVMap!=None or firstDMap!=None or firstJMap!=None):			
-				combo_map_kabat=getCDR3RegionSpecificCharacterization(firstVMap,firstDMap,firstJMap,organism,imgtdb_obj,"kabat")
-				combo_map_imgt=getCDR3RegionSpecificCharacterization(firstVMap,firstDMap,firstJMap,organism,imgtdb_obj,"imgt")
-		print "\n\n\n\n\n"
+
 	
-	#print "\n\n\n"
+
+	##############################################################
+	# rearrangment summary
+	# TOPV, TOPD, TOPJ
+	#for f in range(len(rearrangement_summary_fields)):
+	#	#print "\t\tfield "+str(f)+" : "+rearrangement_summary_fields[f]
+	#	pass
+
+	###############################################################
+	#alignment summary (regions)
+	for r in range(len(summary_vals_list)):
+		kvmap=makeMap(summary_fields,summary_vals_list[r])
+		region=kvmap['region'].strip()
+		if(not(region.startswith("Total")) and not(region.startswith("CDR3"))):
+			reg_from=kvmap['from']
+			reg_to=kvmap['to']
+			gaps=kvmap['gaps']
+			length=kvmap['length']
+			matches=kvmap['matches']
+			pct_id=kvmap['percent_identity']
+			try:
+				reg_name=region
+				reg_interval=vdjml.Interval.first_last_1(int(reg_from),int(reg_to))
+				mm=vdjml.Match_metrics(identity=float(pct_id))
+				#print "adding a region"
+				scb.add_region(name=reg_name,read_range=reg_interval,metric=mm)
+			except:
+				#print "got an exception!"
+				pass
 	if(len(vdjr_vals_list)>0):
 		#print "rearrangment summary "
 		#print "\tFields : "
@@ -344,10 +281,6 @@ def vdjml_read_serialize(
 			#print "\t"+k+"\t->\t"+kvmap[k]
 			pass
 		top_segs=["V","D","J"]
-		for t in top_segs:
-			top_seg=kvmap["Top_"+t+"_gene_match"]
-			if(looksLikeAlleleStr(top_seg)):
-				topSegmentCounterMap.increment(top_seg)
 	if(len(junction_vals_list)>0):
 		#print "\n\nJUNCTION summary:"
 		#print "\tJunction Fields list : ",junction_fields
@@ -355,10 +288,7 @@ def vdjml_read_serialize(
 		jmap=makeMap(junction_fields,junction_vals_list[0])
 		#print "\tJunction map : "
 		#printMap(jmap)
-	if(not(returnCountMapPackage)):
-		return rb1
-	else:
-		return [rb1,topSegmentCounterMap]
+	return rb1
 		
 
 
@@ -404,7 +334,7 @@ def writeModedHistogramFile(IncrementMapWrapper_count_map_dict,outfile):
 
 
 
-def scanOutputToVDJML(input_file,output_file,db_fasta_list,jsonOutFile,organism,db_base,queryFasta,cdr3_hist_out,debug=False):
+def scanOutputToVDJML(input_file,fact):
 	INPUT=open(input_file,'r')
 	line_num=0
 	segmentCountMap=IncrementMapWrapper()
@@ -414,40 +344,14 @@ def scanOutputToVDJML(input_file,output_file,db_fasta_list,jsonOutFile,organism,
 	junction_vals_list=list()
 	summary_vals_list=list()
 	hit_vals_list=list()
-	ddl=getListOfDescsFromDBList(db_fasta_list)
-	#print "DDL is ",ddl
-	vlist=ddl[0]
-	#print "vlist=",vlist
-	dlist=ddl[1]
-	jlist=ddl[2]
-	#print "VLIST :",vlist
-	#print "DLIST :",dlist
-	#print "JLIST :",jlist
+	#ddl=getListOfDescsFromDBList(db_fasta_list)
+	#vlist=ddl[0]
+	#dlist=ddl[1]
+	#jlist=ddl[2]
 	meta=None
-	fact=None
-	rb1=None
-	meta = vdjml.Results_meta()
-	fact=vdjml.Result_factory(meta)
-	fact.set_default_aligner('IGBLAST', '123', '45', 67)
-	fact.set_default_gl_database(
-				     'human_gl_S', 
-				     '123-5', 
-				     'blah', 
-				     'http://www.blah.org'
-				     )
-	fact.set_default_num_system(vdjml.Num_system.imgt)
-	rrw1 = vdjml.Result_writer(output_file, meta)
 	firstV=None
 	firstJ=None
-	imgtdb_obj=imgt_db(db_base)
-	#open a biopython read to have current query name and sequence available for translation
-	query_fasta_iterator=SeqIO.parse(queryFasta, "fasta")
-	fasta_record=None
 	igblast_rec_id=0
-	IncrementMapWrapper_count_map_dict=dict()
-	domains=getDomainClasses()
-	for d in domains:
-		IncrementMapWrapper_count_map_dict[d]=IncrementMapWrapper()
 	for igblast_line in INPUT:
 		line_num+=1
 		igblast_line=igblast_line.strip()
@@ -467,17 +371,7 @@ def scanOutputToVDJML(input_file,output_file,db_fasta_list,jsonOutFile,organism,
 				hit_vals_list=list()
 				mode="query_retrieve"
 				current_query_id+=1
-				#print "got current query name ",current_query
-				fasta_record=next(query_fasta_iterator)
-				#print(str(fasta_record.id))
-				#print(str(fasta_record.seq))
 				igblast_rec_id+=1
-				if(not(str(fasta_record.id)==current_query)):
-					misOrderStr="WARNING ! WARNING ! WARNING !\n"
-					misOrderStr+="It appears that the query fasta and igblast output are not in the same order!\n"
-					misOrderStr+= "Query fasta name is ",str(fasta_record.id)," but IGBLAST has name ",current_query
-					misOrderStr+= "IGBLAST ouput line number ",line_num
-					raise Excpetion(misOrderStr)
 			rem=re.search('^#\s+Database:\s(.*)$',igblast_line)
 			if rem:
 				igblast_databases=rem.group(1)
@@ -548,28 +442,17 @@ def scanOutputToVDJML(input_file,output_file,db_fasta_list,jsonOutFile,organism,
 					#CALL SERIALIZER as the hits for this have been picked up
 					getMapToo=True
 					serialized=vdjml_read_serialize(
-								vlist,dlist,jlist,				#list of valllels from fastaDB, and D and J,
-								current_query,					#current query name
-								fact, 						#handle to VDJML factory
-								hit_vals_list,					#hit values (list of lists)
-								hit_fields,					#list of hit fields
-								summary_fields,					#summary fields
-								summary_vals_list,				#summary values list (list of lists)
-								rearrangement_summary_fields,vdjr_vals_list,	#rearrangment values (list and list-of-lists)
-								junction_fields,junction_vals_list,		#junction fields/values (list and list of lists)
-								imgtdb_obj,					#IMGT TABLE
-								str(fasta_record.seq),				#fasta query string
-								getMapToo,					#flag to return 
-								organism
-								)
-					if(not(getMapToo)):
-						rb1=serialized
-						rrw1(rb1.get())
-					else:
-						rb1=serialized[0]
-						incMap=serialized[1]
-						segmentCountMap.mergeInto(incMap)
-						rrw1(rb1.get())
+						current_query,					#current query name
+						fact, 						#handle to VDJML factory
+						hit_vals_list,					#hit values (list of lists)
+						hit_fields,					#list of hit fields
+						summary_fields,					#summary fields
+						summary_vals_list,				#summary values list (list of lists)
+						rearrangement_summary_fields,vdjr_vals_list,	#rearrangment values (list and list-of-lists)
+						junction_fields,junction_vals_list,		#junction fields/values (list and list of lists)
+						)
+					rb1=serialized
+					yield rb1.release()
 		elif (not (re.compile('^\s*$').match(igblast_line))):
 			if(mode=="vdj_rearrangement"):
 				vdjr_vals_list.append(igblast_line)
@@ -583,93 +466,72 @@ def scanOutputToVDJML(input_file,output_file,db_fasta_list,jsonOutFile,organism,
 					#CALL SERIALIZER as the hits for this read/query been picked up
 					getMapToo=True
 					serialized=vdjml_read_serialize(
-								vlist,dlist,jlist,				#list of valllels from fastaDB, and D and J,
-								current_query,					#current query name
-								fact, 						#handle to VDJML factory
-								hit_vals_list,					#hit values (list of lists)
-								hit_fields,					#list of hit fields
-								summary_fields,					#summary fields
-								summary_vals_list,				#summary values list (list of lists)
-								rearrangement_summary_fields,vdjr_vals_list,	#rearrangment values (list and list-of-lists)
-								junction_fields,junction_vals_list,		#junction fields/values (list and list of lists)
-								imgtdb_obj,					#imgt
-								str(fasta_record.seq),				#query fasta string
-								getMapToo,					#flag to return 
-								organism					#
-								)
-					
-					if(not(getMapToo)):
-						rb1=serialized
-						rrw1(rb1.get())
-					else:
-						rb1=serialized[0]
-						incMap=serialized[1]
-						segmentCountMap.mergeInto(incMap)
-						rrw1(rb1.get())
-					topV=getTopLineGivenSegment(hit_vals_list,'V')
-					topJ=getTopLineGivenSegment(hit_vals_list,'J')
-					if(not(topV is None) and not(topJ is None)):
-						#print "TOP V IS ",topV
-						#print "TOP J IS ",topJ
-						topVMap=makeMap(hit_fields,topV)
-						topJMap=makeMap(hit_fields,topJ)
-						cdr3_length_results=CDR3LengthAnalysis(topVMap,topJMap,current_query,str(fasta_record.seq),organism,imgtdb_obj)
-						print "PRINCIPAL CDR3 FOR ",current_query
-						printMap(cdr3_length_results)
-						for d in domains:
-							#print "for ",d," got length ",cdr3_length_results[d]
-							IncrementMapWrapper_count_map_dict[d].increment(cdr3_length_results[d])
-							#print "This map is now :",
-							#IncrementMapWrapper_count_map_dict[d].printMap()
+						current_query,					#current query name
+						fact, 						#handle to VDJML factory
+						hit_vals_list,					#hit values (list of lists)
+						hit_fields,					#list of hit fields
+						summary_fields,					#summary fields
+						summary_vals_list,				#summary values list (list of lists)
+						rearrangement_summary_fields,vdjr_vals_list,	#rearrangment values (list and list-of-lists)
+						junction_fields,junction_vals_list,		#junction fields/values (list and list of lists)
+						)
+					rb1=serialized
+					yield rb1.release()
 			else:
 				print "unhandled mode=",mode
-	jsonOutFile=jsonOutFile.strip()
-	if(jsonOutFile=="/dev/null"):
-		pass
-		#don't write JSON
-		#the parsing of the HTML can take a bit of time ("beautiful soup")
-		#so that's why I did this
-	else:
-		segmentCountMap.JSONIFYToFile(db_base,organism,jsonOutFile)
-	cdr3_hist_out=cdr3_hist_out.strip()
-	if(not(cdr3_hist_out=="/dev/null")):
-		writeModedHistogramFile(IncrementMapWrapper_count_map_dict,cdr3_hist_out)
 
 
 
-
-
-parser = argparse.ArgumentParser(description='Parse IGBLAST output, write a VDJML output file, write JSON segment count data (using Gene tables for hierarchies and VDJ combinations for counts')
-parser.add_argument('germline_db_fasta_V',type=str,nargs=1,help='path to the FASTA file of the BLAST database for V segment')
-parser.add_argument('germline_db_fasta_D',type=str,nargs=1,help='path to the FASTA file of the BLAST database for D segment')
-parser.add_argument('germline_db_fasta_J',type=str,nargs=1,help='path to the FASTA file of the BLAST database for J segment')
-parser.add_argument('igblast_in',type=str,nargs=1,help="path to igblast analysis file of results, hits, segments, etc. *** NOTE *** SHOULD BE RUN WITH OUTFMT AS SEEN HERE -outfmt '7 qseqid qgi qacc qaccver qlen sseqid sallseqid sgi sallgi sacc saccver sallacc slen qstart qend sstart send qseq sseq evalue bitscore score length pident nident mismatch positive gapopen gaps ppos frames qframe sframe btop'")
-parser.add_argument('vdjml_out',type=str,nargs=1,help='path to the VDJML file to write to')
-parser.add_argument('jscon_counts',type=str,nargs=1,help='path to a JSON file of segment counts to be written to')
-parser.add_argument('vdjserver_dbbase',type=str,nargs=1,help='path to the root of the VDJServer database')
-parser.add_argument('organism',type=str,nargs=1,help='name of the organism (used for counting and JSON) ; must exist under the vdjserver_dbbase')
-parser.add_argument('qry_fasta',type=str,nargs=1,help='path to the query fasta file')
-parser.add_argument('cdr3_hist_out',type=str,nargs=1,help='path to an output file of cdr3 length histogram/frequency data')
-
-
-
-
-#parser.print_help()
-args = parser.parse_args()
-if(args):
-	#print "success"
-	scanOutputToVDJML(
-		args.igblast_in[0],
-		args.vdjml_out[0],
-		[args.germline_db_fasta_V[0],args.germline_db_fasta_D[0],args.germline_db_fasta_J[0]],
-		args.jscon_counts[0],
-		args.organism[0],
-		args.vdjserver_dbbase[0],
-		args.qry_fasta[0],
-		args.cdr3_hist_out[0]
+#given the arguments, make a VDJML
+def makeVDJMLFileFromArgs(args):
+	#build a factory for initialization
+	meta = vdjml.Results_meta()
+	fact=vdjml.Result_factory(meta)
+	fact.set_default_aligner(
+			"IgBLAST",			#aligner name
+			args.igblast_version,		#aligner ver
+			args.igblast_params,		#aligner params
+			args.igblast_runid)		#run id
+	fact.set_default_gl_database(
+		args.db_name,		#db name
+		args.db_ver,		#db ver
+		args.db_species,	#db species
+		args.db_uri		#db uri
 		)
-else:
-	#print "fail"
-	pass
+	dom_class=args.igblast_dc
+	if(dom_class=="imgt"):
+		#print "setting imgt for factory...."
+		fact.set_default_num_system(vdjml.Num_system.imgt)
+	elif(dom_class=="kabat"):
+		fact.set_default_num_system(vdjml.Num_system.kabat)
+	#create a result store and begin to write output
+	#result_store = vdjml.Result_store(meta)
+	print "vdjml is ",str(args.vdjml[0])
+	rrw = vdjml.Result_writer(str(args.vdjml[0]), meta)
+	imgtdb_obj=imgt_db("/home/data/DATABASE/01_22_2014/")
+	for read_result in scanOutputToVDJML(args.igblast_in[0],fact):
+		#result_store.insert(read_result)
+		rrw(read_result)
+		CDR3LengthAnalysisVDMLOBJ(read_result,"human",imgtdb_obj)
+		
 
+
+if (__name__=="__main__"):
+	parser = argparse.ArgumentParser(description='Parse IGBLAST output, write a VDJML output file')
+	parser.add_argument('igblast_in',type=str,nargs=1,help="path to igblast analysis file of results, hits, segments, etc. *** NOTE *** SHOULD BE RUN WITH OUTFMT AS SEEN HERE -outfmt '7 qseqid qgi qacc qaccver qlen sseqid sallseqid sgi sallgi sacc saccver sallacc slen qstart qend sstart send qseq sseq evalue bitscore score length pident nident mismatch positive gapopen gaps ppos frames qframe sframe btop'")
+	parser.add_argument('vdjml',type=str,nargs=1,help="the path to the output vdjml")
+	parser.add_argument('-igblast_version',type=str,nargs=1,default="2.2.27+",help="the version of igblast used")
+	parser.add_argument('-igblast_params',type=str,nargs=1,default="IG_BLAST_PARAMETERS",help="the parameters passed to igblast")
+	parser.add_argument('-igblast_runid',type=int,nargs=1,default=0,help="the ID assigned to the run")
+	parser.add_argument('-db_name',type=str,nargs=1,default="DB_NAME",help="the name of the IgBLAST database")
+	parser.add_argument('-db_ver',type=str,nargs=1,default="DB_VER",help="a version string associated with the database")
+	parser.add_argument('-db_species',type=str,nargs=1,default="human",help="species of the db")
+	parser.add_argument('-db_uri',type=str,nargs=1,default="http://www.vdjserver.org",help="a URI associated with the database")
+	parser.add_argument('-igblast_dc',type=str,nargs=1,default="imgt",help="the domain classification system used",choices=["imgt","kabat"])
+	args = parser.parse_args()
+	if(args): 
+		makeVDJMLFileFromArgs(args)
+	else:
+		#print "error in args!"
+		parser.print_help()
 

@@ -8,6 +8,7 @@ from segment_utils import getFastaListOfDescs,getQueryIndexGivenSubjectIndexAndA
 from imgt_utils import imgt_db
 from utils import read_fasta_file_into_map,biopythonTranslate,rev_comp_dna
 from igblast_utils import printNiceAlignment
+import vdjml
 
 
 def getCDR3Length(VLine,JLine):
@@ -199,7 +200,27 @@ def getOtherMode(m):
 
 
 
-def CDR3LengthAnalysis(vMap,jMap,currentQueryName,currentQuerySeq,organism,imgtdb_obj):
+def CDR3LengthAnalysisVDMLOBJ(read_result_obj,organism,imgtdb_obj):
+	#for V and J require:
+	# 1) allele names
+	# 2) alignment from BTOP reconstruction both Q and S
+	# 3) q. start and q. end and s. start and s. end
+	print "got into cdr3 hist wrapper"
+	read_name=read_result_obj.id()
+	print "got read name ",read_name
+	segment_combinations=read_result_obj.segment_combinations()
+	#if(len(segment_combinations)
+	#print "the length is ",len(segment_combinations)
+	
+	
+	pass
+
+
+
+
+
+
+def CDR3LengthAnalysis(vMap,jMap,currentQueryName,organism,imgtdb_obj):
 	currentQueryName=str(currentQueryName.strip())
 	currentV=vMap['subject ids']
 	currentJ=jMap['subject ids']
