@@ -3,8 +3,12 @@
 from vdjml_igblast_parse import scanOutputToVDJML
 
 
-# use a 
-def rep_char(read_result_obj,query_file,json_out,cdr3_hist_out,vdjml_reg_out):
+# use a read_result_ojbect return several things:
+# 1) the segment counts, 
+# 2) the cdr3_lengths (kabat and imgt)
+# 3) a clone of the object, but with additional 
+def rep_char_read(read_result_obj):
+	
 
 
 
