@@ -512,7 +512,6 @@ def makeVDJMLFileFromArgs(args):
 	for read_result in scanOutputToVDJML(args.igblast_in[0],fact):
 		#result_store.insert(read_result)
 		rrw(read_result)
-		CDR3LengthAnalysisVDMLOBJ(read_result,"human",imgtdb_obj)
 		
 
 
