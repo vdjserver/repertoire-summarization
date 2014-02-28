@@ -9,6 +9,7 @@ from imgt_utils import imgt_db
 from utils import read_fasta_file_into_map,biopythonTranslate,rev_comp_dna
 from igblast_utils import printNiceAlignment
 import vdjml
+from vdjml_utils import getTopVDJItems,getHitInfo
 
 
 def getCDR3Length(VLine,JLine):
@@ -200,7 +201,7 @@ def getOtherMode(m):
 
 
 
-def CDR3LengthAnalysisVDMLOBJ(read_result_obj,organism,imgtdb_obj):
+def CDR3LengthAnalysisVDMLOBJ(read_result_obj,meta,organism,imgtdb_obj):
 	#for V and J require:
 	# 1) allele names
 	# 2) alignment from BTOP reconstruction both Q and S
@@ -211,8 +212,15 @@ def CDR3LengthAnalysisVDMLOBJ(read_result_obj,organism,imgtdb_obj):
 	segment_combinations=read_result_obj.segment_combinations()
 	#if(len(segment_combinations)
 	#print "the length is ",len(segment_combinations)
-	
-	
+	VDJMap=getTopVDJItems(read_result_obj,meta)
+	vAllele=VDJMap['V']
+	jAllele=VDJMap['J']
+	if(vAllele!=None and jAllele!=None):
+		vData=getHitInfo(read_result_obj,meta,vAllele)
+		jData=getHitInfo(read_result_obj,meta,jAllele)
+		print "got sufficient data!"
+	else:
+		print "insufficient data!"
 	pass
 
 
