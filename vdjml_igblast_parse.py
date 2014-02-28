@@ -161,10 +161,14 @@ def vdjml_read_serialize(
 		return rb1
 	################################################################
 	#this is where the hits are picked up and put in VDJML objects
+	print "to enter hit area...."
 	for h in range(len(hit_vals_list)):
+		print "h=",h
 		kvmap=makeMap(hit_fields,hit_vals_list[h])
 		btop_to_add=kvmap['BTOP']
+		print "about to make interval..."
 		query_interval_to_add=vdjml.Interval.first_last_1(int(kvmap['q. start']),int(kvmap['q. end']))
+		print "done with interval...."
 		if(int(kvmap['q. start'])>int(kvmap['q. end'])):
 			query_interval_to_add=vdjml.Interval.first_last_1(int(kvmap['q. end']),int(kvmap['q. start']))
 		segment_type_to_add=kvmap['segment']
@@ -180,6 +184,7 @@ def vdjml_read_serialize(
 			identity=float(kvmap['% identity']),
 			score=int(kvmap['score']),
 			)
+		print "to make an smb1...."
 		#this is where the hit is added to the general list
 		smb1 = rb1.add_segment_match(
 			btop=btop_to_add,
@@ -191,6 +196,7 @@ def vdjml_read_serialize(
 			)
 		#################################################################
 		#this is where the top hits are retrieved for the combination/rearrangement
+		print "to get to first areas...."
 		if(firstV==None and segment_type_to_add=='V'):
 			firstV=smb1
 			firstVMap=kvmap
@@ -210,10 +216,11 @@ def vdjml_read_serialize(
 			jaseq=kvmap['subject seq']
 			qjaseq=kvmap['query seq']
 			top_btop['J']=kvmap['BTOP']
-	scb=None
 
 	####################################################################################
 	#this is where the combination is added based on the firstV,firstD,firstJ from above
+	scb=None
+	print "to enter combo area...."
 	if(not(firstV==None)):
 		if(firstD==None):
 			#no D, so maybe a light chain?
@@ -240,7 +247,7 @@ def vdjml_read_serialize(
 	#for f in range(len(rearrangement_summary_fields)):
 	#	#print "\t\tfield "+str(f)+" : "+rearrangement_summary_fields[f]
 	#	pass
-
+	print "to enter alignment summary (regions) area....."
 	###############################################################
 	#alignment summary (regions)
 	for r in range(len(summary_vals_list)):
@@ -341,6 +348,7 @@ def trimList(l):
 
 
 def scanOutputToVDJML(input_file,fact):
+	#print "got into func"
 	INPUT=open(input_file,'r')
 	line_num=0
 	current_query=None
@@ -360,6 +368,7 @@ def scanOutputToVDJML(input_file,fact):
 	for igblast_line in INPUT:
 		line_num+=1
 		igblast_line=igblast_line.strip()
+		print "read ",igblast_line
 		#print igblast_line
 		if(re.compile('^#').match(igblast_line)):
 			rem=re.search('^#\s+IGBLASTN\s([^\s]+)\s*$',igblast_line)
@@ -470,6 +479,7 @@ def scanOutputToVDJML(input_file,fact):
 				if(len(hit_vals_list)==current_num_hits):
 					#CALL SERIALIZER as the hits for this read/query been picked up
 					getMapToo=True
+					print "entering serializer...."
 					serialized=vdjml_read_serialize(
 						current_query,					#current query name
 						fact, 						#handle to VDJML factory
@@ -487,8 +497,12 @@ def scanOutputToVDJML(input_file,fact):
 
 
 
-#given the arguments, make a VDJML
-def makeVDJMLFileFromArgs(args):
+
+
+
+
+
+def makeVDJMLDefaultFactoryFromArgs(args):
 	#build a factory for initialization
 	meta = vdjml.Results_meta()
 	fact=vdjml.Result_factory(meta)
@@ -509,6 +523,13 @@ def makeVDJMLFileFromArgs(args):
 		fact.set_default_num_system(vdjml.Num_system.imgt)
 	elif(dom_class=="kabat"):
 		fact.set_default_num_system(vdjml.Num_system.kabat)
+	return fact	
+
+
+
+#given the arguments, make a VDJML
+def makeVDJMLFileFromArgs(args):
+	fact=makeVDJMLDefaultFactoryFromArgs(args)
 	#create a result store and begin to write output
 	#result_store = vdjml.Result_store(meta)
 	print "vdjml is ",str(args.vdjml[0])
