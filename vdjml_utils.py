@@ -1,12 +1,49 @@
 #!/usr/bin/env python
 
-
+from pprint import pprint
+from utils import printMap
 
 #given a read object, meta object, and an allele name
 #known to already HIT to the read, find the following info
 #and put it in a dict 'q. start', 'q. end', 's. start', 's. end'
 def getHitInfo(read_result_obj,meta,alleleName):
-	pass
+	print "Need to extract info for ",alleleName
+	segment_matches=read_result_obj.segment_matches() 
+	ret_map=dict()
+	for segment_match in segment_matches:
+			#segment_match = read_result_obj[i]
+			#print "got a segment match, id=",i," from combination # ",str(int(s+1))
+			for gls_match in segment_match.germline_segments():
+				#print "in inner most loop...."
+				#print "gls_match=",gls_match
+				hit_name=meta[gls_match.gl_segment_].name_
+				#print "the hit name is ",hit_name
+				if(hit_name==alleleName):
+					#print "TARGET FOUND!"
+					match_range=gls_match.range_
+					#print "got a range : ",match_range
+					pos1=match_range.pos_1()
+					pose=pos1+match_range.length()
+					#print "retrieved ",pos1
+					#pprint(match_range)
+					#match_pos1=match_range.first_last_1
+					#print "p1=",match_pos1("pos1")
+					#match_len=match_range.length()
+					ret_map['s. start']=int(pos1)
+					ret_map['s. end']=int(pose)-1
+					#	1       59      90      148
+					query_range=segment_match.range()
+					query_start=query_range.pos_1()
+					quern_end=query_start+query_range.length()
+					ret_map['q. start']=query_start
+					ret_map['q. end']=quern_end-1
+					btop=segment_match.btop()
+				else:
+					#print "skipping ",hit_name
+					pass
+	#print "For ",alleleName," the map is :"
+	printMap(ret_map)
+
 
 
 
