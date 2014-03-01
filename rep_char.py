@@ -15,21 +15,18 @@ from segment_utils import IncrementMapWrapper
 # 2) the cdr3_lengths (kabat and imgt) ( a dict() with two keys)
 # 3) a clone of the object, but with additional (with additional read information)
 def rep_char_read(read_result_obj,meta,organism,imgtdb_obj,read_rec):
-	print "In loop analyzing ",read_result_obj.id()
+	#print "In loop analyzing ",read_result_obj.id()
 
 
 	#prepare an object to return
 	return_obj=dict()
 
 	#retrieve the top VDJ
-	#topVDJ=getTopVDJItems(read_result_obj,meta)
-	#printMap(topVDJ)
-	#return_obj['VDJ']=topVDJ
+	topVDJ=getTopVDJItems(read_result_obj,meta)
+	return_obj['VDJ']=topVDJ
 
 	#retrieve the CDR3 lengths
 	cdr3_length_results=CDR3LengthAnalysisVDMLOBJ(read_result_obj,meta,organism,imgtdb_obj,read_rec)
-	#print "THE RETURNED RESULTS ARE :"
-	#printMap(cdr3_length_results)
 	return_obj['cdr3_length_results']=cdr3_length_results
 
 
@@ -79,32 +76,68 @@ def getTopVDJItems(read_result_obj,meta):
 	
 
 
+def add_rep_char_args_to_parser(parser):
+	parser.add_argument('-json_out',type=str,nargs=1,default="/dev/stdout",help="output file for the JSON segment count IMGT hierarchy")
+	parser.add_argument('-cdr3_hist_out',type=str,nargs=1,default="/dev/stdout",help="output file for the JSON segment count IMGT hierarchy")
+	parser.add_argument('vdj_db',type=str,nargs=1,help="path to the VDJ root REQUIRED")
+	parser.add_argument('qry_fasta',type=str,nargs=1,help="path to the input fasta file of query (Rep-Seq) data input to IgBLAST")
+	#parser.add_argument('-region_out'
+	#parser.add_argument('-db_species',type=str,nargs=1,default="human",help="species of the db")
+	return parser
+
+
 
 
 if (__name__=="__main__"):
 	parser=makeParserArgs()
+	parser=add_rep_char_args_to_parser(parser)
 	args = parser.parse_args()
-	#args.
 	if(args): 
 		mf=makeVDJMLDefaultMetaAndFactoryFromArgs(args)
 		meta=mf[0]
 		fact=mf[1]
-		imgtdb_obj=imgt_db("/home/data/DATABASE/01_22_2014/")
-		print "a fact is ",fact
-		print "the file is ",args.igblast_in[0]
-		fasta_reader=SeqIO.parse(open("/home/esalina2/round1_imgt/all_data.processed.Q35.L200.R1.fna", "r"), "fasta")
+		imgtdb_obj=imgt_db(args.vdj_db[0])
+		#print "a fact is ",fact
+		#print "the file is ",args.igblast_in[0]
+		query_fasta=args.qry_fasta[0]
+		fasta_reader=SeqIO.parse(open(query_fasta, "r"), "fasta")
 		modes=['kabat','imgt']
+		organism=args.db_species
 		my_cdr3_map=histoMapClass(modes)
+		cdr3_hist_out_file=args.cdr3_hist_out
+		segment_counter=IncrementMapWrapper()
+		read_num=1
+		segments_json_out=args.json_out
 		for read_result_obj in scanOutputToVDJML(args.igblast_in[0],fact):
+			#prepare for the iteration and give a possible status message...
+			if(read_num>1 and read_num%1000==0):
+				print "Processed read ",read_num,"..."
 			query_record=fasta_reader.next()
-			#print "got a result from ",args.igblast_in[0]
-			read_analysis_results=rep_char_read(read_result_obj,meta,"human",imgtdb_obj,query_record)
+			
+			#analyze a read's results
+			read_analysis_results=rep_char_read(read_result_obj,meta,organism,imgtdb_obj,query_record)
+
+			#handle cdr3 length/histogram
 			cdr3_res=read_analysis_results['cdr3_length_results']
 			for mode in modes:
-				#print "mode and val are ",mode," , ",cdr3_res[mode]
-				my_cdr3_map.inc(mode,cdr3_res[mode])			
-		#my_cdr3_map.printMaps()
-		my_cdr3_map.writeToFile("/dev/stdout")
+				my_cdr3_map.inc(mode,cdr3_res[mode])
+
+			#handle segment counting
+			segments=read_analysis_results['VDJ']
+			possible_segments=['V','D','J']
+			for s in segments:
+				actual=segments[s]
+				if(actual is not None):
+					segment_counter.increment(actual)
+
+			read_num+=1
+
+		#write the CDR3 hist	
+		my_cdr3_map.writeToFile(cdr3_hist_out_file)
+
+		#write the segment counts
+		segment_counter.JSONIFYToFile(args.vdj_db[0],organism,segments_json_out)
+
 	else:
 		#print "error in args!"
 		parser.print_help()
