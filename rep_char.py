@@ -7,12 +7,13 @@ from pprint import pprint
 from imgt_utils import imgt_db
 from cdr3_hist import CDR3LengthAnalysisVDMLOBJ
 from vdjml_utils import getTopVDJItems
+from Bio import SeqIO
 
 # use a read_result_ojbect return several things:
 # 1) the segment counts (a list of 1, 2, or 3 items) , 
 # 2) the cdr3_lengths (kabat and imgt) ( a dict() with two keys)
 # 3) a clone of the object, but with additional (with additional read information)
-def rep_char_read(read_result_obj,meta,organism,imgtdb_obj):
+def rep_char_read(read_result_obj,meta,organism,imgtdb_obj,read_rec):
 	print "In loop analyzing ",read_result_obj.id()
 
 
@@ -25,7 +26,7 @@ def rep_char_read(read_result_obj,meta,organism,imgtdb_obj):
 	#return_obj['VDJ']=topVDJ
 
 	#retrieve the CDR3 length
-	cdr3_length_results=CDR3LengthAnalysisVDMLOBJ(read_result_obj,meta,organism,imgtdb_obj)
+	cdr3_length_results=CDR3LengthAnalysisVDMLOBJ(read_result_obj,meta,organism,imgtdb_obj,read_rec)
 	print 
 
 
@@ -84,9 +85,11 @@ if (__name__=="__main__"):
 		imgtdb_obj=imgt_db("/home/data/DATABASE/01_22_2014/")
 		print "a fact is ",fact
 		print "the file is ",args.igblast_in[0]
+		fasta_reader=SeqIO.parse(open("/home/esalina2/round1_imgt/all_data.processed.Q35.L200.R1.fna", "r"), "fasta")
 		for read_result_obj in scanOutputToVDJML(args.igblast_in[0],fact):
+			query_record=fasta_reader.next()
 			#print "got a result from ",args.igblast_in[0]
-			rep_char_read(read_result_obj,meta,"human",imgtdb_obj)
+			rep_char_read(read_result_obj,meta,"human",imgtdb_obj,query_record)
 	else:
 		#print "error in args!"
 		parser.print_help()

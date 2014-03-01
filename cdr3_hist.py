@@ -6,8 +6,8 @@ import glob
 from os.path import basename
 from segment_utils import getFastaListOfDescs,getQueryIndexGivenSubjectIndexAndAlignment,getAdjustedCDR3StartFromRefDirSetAllele,getADJCDR3EndFromJAllele,looksLikeAlleleStr
 from imgt_utils import imgt_db
-from utils import read_fasta_file_into_map,biopythonTranslate,rev_comp_dna
-from igblast_utils import printNiceAlignment
+from utils import read_fasta_file_into_map,biopythonTranslate,rev_comp_dna,printMap
+from igblast_utils import printNiceAlignment,buildAlignmentWholeSeqs,buildAlignmentWholeSeqsDirect
 import vdjml
 from vdjml_utils import getTopVDJItems,getHitInfo
 
@@ -200,12 +200,28 @@ def getOtherMode(m):
 
 
 
+def addAlignmentsPreCDR3(dataMap,alleleName,imgtdb_obj,organism,query_record):
+	btop=dataMap['btop']
+	bopyname=str(query_record.id)
+	#print "the biopython name is ",bopyname
+	query_seq=str(query_record.seq)
+	if(dataMap['is_inverted']):
+		#print "inversion is necessary...."
+		query_seq=rev_comp_dna(query_seq)
+	query_seq=query_seq[int(dataMap['q. start']-1):int(dataMap['q. end'])]
+	subject_seq=imgtdb_obj.getRefDirSetFNASeqGivenOrgAndAllele(alleleName,organism)
+	subject_seq=subject_seq[int(dataMap['s. start']-1):int(dataMap['s. end'])]
+	qsAlgn=buildAlignmentWholeSeqs(btop,query_seq,subject_seq)
+	dataMap['query seq']=qsAlgn[0]
+	dataMap['subject seq']=qsAlgn[2]
+	return dataMap
 
-def CDR3LengthAnalysisVDMLOBJ(read_result_obj,meta,organism,imgtdb_obj):
+def CDR3LengthAnalysisVDMLOBJ(read_result_obj,meta,organism,imgtdb_obj,query_record):
 	#for V and J require:
 	# 1) allele names
 	# 2) alignment from BTOP reconstruction both Q and S
 	# 3) q. start and q. end and s. start and s. end
+	# 4) read inversion flags
 	print "got into cdr3 hist wrapper"
 	read_name=read_result_obj.id()
 	print "got read name ",read_name
@@ -217,8 +233,14 @@ def CDR3LengthAnalysisVDMLOBJ(read_result_obj,meta,organism,imgtdb_obj):
 	jAllele=VDJMap['J']
 	if(vAllele!=None and jAllele!=None):
 		vData=getHitInfo(read_result_obj,meta,vAllele)
+		#print "Vdata IS "
+		vData=addAlignmentsPreCDR3(vData,vAllele,imgtdb_obj,organism,query_record)
 		jData=getHitInfo(read_result_obj,meta,jAllele)
-		print "got sufficient data!"
+		jData=addAlignmentsPreCDR3(jData,jAllele,imgtdb_obj,organism,query_record)
+		printMap(vData)
+		printMap(jData)
+		cdr3_analysis_map=CDR3LengthAnalysis(vData,jData,vData['query id'],organism,imgtdb_obj)
+		printMap(cdr3_analysis_map)
 	else:
 		print "insufficient data!"
 	pass
@@ -234,19 +256,19 @@ def CDR3LengthAnalysis(vMap,jMap,currentQueryName,organism,imgtdb_obj):
 	currentJ=jMap['subject ids']
 	cdr3_hist=dict()
 	if(looksLikeAlleleStr(currentV) and looksLikeAlleleStr(currentJ)):
-		print "WE'RE IN BUSINESS!"
+		#print "WE'RE IN BUSINESS!"
 		domain_modes=["kabat","imgt"]
 		for dm in domain_modes:
 			cdr3_hist[dm]=(-1)
-			print "processing in ",dm
+			#print "processing in ",dm
 			if(not currentV in rsmap[dm]):
-				print currentV,"not in lookup for dm=",dm
+				#print currentV,"not in lookup for dm=",dm
 				ref_cdr3_start=getAdjustedCDR3StartFromRefDirSetAllele(currentV,imgtdb_obj,organism,dm)
 				rsmap[dm][currentV]=ref_cdr3_start
 			else:
 				ref_cdr3_start=rsmap[dm][currentV]
 			if(not currentJ in remap[dm]):
-				print currentJ,"not in lookup for dm=",dm
+				#print currentJ,"not in lookup for dm=",dm
 				ref_cdr3_end=getADJCDR3EndFromJAllele(currentJ,imgtdb_obj,organism,dm)
 				remap[dm][currentJ]=ref_cdr3_end
 			else:
@@ -278,12 +300,13 @@ def CDR3LengthAnalysis(vMap,jMap,currentQueryName,organism,imgtdb_obj):
 					#print "CDR3_LEN ("+dm+") ="+str(cdr3_len)
 					cdr3_hist[dm]=cdr3_len
 				else:
-					print "BADQRYMAP Failure to map to query for mode=",dm," V=",currentV," J=",currentJ," read=",currentQueryName," REFSTART=",ref_cdr3_start,"QRYSTART=",qry_cdr3_start,"REFEND=",ref_cdr3_end,"QRYEND=",qry_cdr3_end
+					#print "BADQRYMAP Failure to map to query for mode=",dm," V=",currentV," J=",currentJ," read=",currentQueryName," REFSTART=",ref_cdr3_start,"QRYSTART=",qry_cdr3_start,"REFEND=",ref_cdr3_end,"QRYEND=",qry_cdr3_end
 					pass
 			else:
-				print "BADREFMAP mode=",dm," refVCDR3=(-1) for ",currentV," = ",ref_cdr3_start," or refJCDR3 ",currentJ," = ",ref_cdr3_end
+				#print "BADREFMAP mode=",dm," refVCDR3=(-1) for ",currentV," = ",ref_cdr3_start," or refJCDR3 ",currentJ," = ",ref_cdr3_end
 				pass
 	else:
-		print "Ref names ",currentV," and ",currentJ," don't appear alleleic!"
+		#print "Ref names ",currentV," and ",currentJ," don't appear alleleic!"
+		pass
 	return cdr3_hist
 

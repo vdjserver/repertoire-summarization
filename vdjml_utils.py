@@ -5,7 +5,7 @@ from utils import printMap
 
 #given a read object, meta object, and an allele name
 #known to already HIT to the read, find the following info
-#and put it in a dict 'q. start', 'q. end', 's. start', 's. end'
+#and put it in a dict 'q. start', 'q. end', 's. start', 's. end', & btop
 def getHitInfo(read_result_obj,meta,alleleName):
 	print "Need to extract info for ",alleleName
 	segment_matches=read_result_obj.segment_matches() 
@@ -38,11 +38,18 @@ def getHitInfo(read_result_obj,meta,alleleName):
 					ret_map['q. start']=query_start
 					ret_map['q. end']=quern_end-1
 					btop=segment_match.btop()
+					ret_map['btop']=str(btop)
+					ret_map['subject ids']=alleleName
+					ret_map['is_inverted']=gls_match.is_inverted()
+					ret_map['query id']=read_result_obj.id()
+					if(ret_map['is_inverted']):
+						ret_map['query id']="reversed|"+read_result_obj.id()
 				else:
 					#print "skipping ",hit_name
 					pass
 	#print "For ",alleleName," the map is :"
-	printMap(ret_map)
+	#printMap(ret_map)
+	return ret_map
 
 
 

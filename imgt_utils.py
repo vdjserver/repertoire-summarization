@@ -1475,6 +1475,17 @@ class imgt_db:
 		else:
 			raise Exception("Error, descriptor "+descriptor+" points to a non-existent reference directory set sequence under "+organism+"???")
 
+	#get the sequence optionally removing gaps
+	def getRefDirSetFNASeqGivenOrgAndAllele(self,allele_name,organism,removeGaps=True):
+		#get the descriptor
+		subject_descriptor=self.extractDescriptorLine(allele_name,organism)
+		#use the descriptor to get the sequence
+		subject_sequence=self.getRefDirSetFNAGivenCompleteDescriptor(subject_descriptor,organism)
+		if(removeGaps):
+			repPattern=re.compile(r'[^A-Za-z]')
+			subject_sequence=re.sub(repPattern,"",subject_sequence)
+		return subject_sequence
+
 
 
 	#given an allele name and an organism string, extract the fasta descriptor with the specified allele name

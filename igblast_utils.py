@@ -19,14 +19,6 @@ import time
 
 
 
-
-
-
-
-
-
-
-
 def makeRegionLookupTableFile(infile,outfile):
 	INPUT=open(infile,'r')
 	OUTPUT=open(outfile,'w')
@@ -399,14 +391,14 @@ def buildAlignmentWholeSeqsDirect(q,s):
 	return aln		
 
 
-
+#returns a string given query first, then subject
 def printNiceAlignment(q,s):
 	joiner="\n"
 	return joiner.join(buildAlignmentWholeSeqsDirect(q,s))
 
 
 
-
+#returns array of query, then match/midline, then subject based on btop alignment specification
 def buildAlignmentWholeSeqs(btop,q,s,debug=False,level=0):
 	if(debug):	
 		print repeatString("\t",level)+"At begging of call, btop=",btop,"q=",q,"s=",s
