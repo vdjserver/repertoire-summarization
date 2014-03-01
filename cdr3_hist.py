@@ -304,7 +304,7 @@ class histoMapClass:
 		writer=open(ofile,'w')
 		min_val=self.gminVal()
 		max_val=self.gmaxVal()
-		print "min and max are ",min_val,max_val
+		#print "min and max are ",min_val,max_val
 		round_num=0
 		for v in range(min_val,max_val+1):
 			if(round_num==0):
