@@ -1372,8 +1372,10 @@ def getCDR3StartFromVData(vdata,allele,imgtdb_obj,organism):
 
 #class for count map
 class IncrementMapWrapper():
+
 	#have a count map
 	count_map=None
+
 	#have a default value
 	default_value=0
 
