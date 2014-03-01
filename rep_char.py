@@ -5,9 +5,10 @@ from vdjml_igblast_parse import scanOutputToVDJML,makeParserArgs,makeVDJMLDefaul
 from utils import printMap
 from pprint import pprint
 from imgt_utils import imgt_db
-from cdr3_hist import CDR3LengthAnalysisVDMLOBJ
+from cdr3_hist import CDR3LengthAnalysisVDMLOBJ,histoMapClass
 from vdjml_utils import getTopVDJItems
 from Bio import SeqIO
+from segment_utils import IncrementMapWrapper
 
 # use a read_result_ojbect return several things:
 # 1) the segment counts (a list of 1, 2, or 3 items) , 
@@ -25,9 +26,15 @@ def rep_char_read(read_result_obj,meta,organism,imgtdb_obj,read_rec):
 	#printMap(topVDJ)
 	#return_obj['VDJ']=topVDJ
 
-	#retrieve the CDR3 length
+	#retrieve the CDR3 lengths
 	cdr3_length_results=CDR3LengthAnalysisVDMLOBJ(read_result_obj,meta,organism,imgtdb_obj,read_rec)
-	print 
+	#print "THE RETURNED RESULTS ARE :"
+	#printMap(cdr3_length_results)
+	return_obj['cdr3_length_results']=cdr3_length_results
+
+
+	return return_obj
+	
 
 
 
@@ -86,10 +93,18 @@ if (__name__=="__main__"):
 		print "a fact is ",fact
 		print "the file is ",args.igblast_in[0]
 		fasta_reader=SeqIO.parse(open("/home/esalina2/round1_imgt/all_data.processed.Q35.L200.R1.fna", "r"), "fasta")
+		modes=['kabat','imgt']
+		my_cdr3_map=histoMapClass(modes)
 		for read_result_obj in scanOutputToVDJML(args.igblast_in[0],fact):
 			query_record=fasta_reader.next()
 			#print "got a result from ",args.igblast_in[0]
-			rep_char_read(read_result_obj,meta,"human",imgtdb_obj,query_record)
+			read_analysis_results=rep_char_read(read_result_obj,meta,"human",imgtdb_obj,query_record)
+			cdr3_res=read_analysis_results['cdr3_length_results']
+			for mode in modes:
+				print "mode and val are ",mode," , ",cdr3_res[mode]
+				my_cdr3_map.inc(mode,cdr3_res[mode])			
+		#my_cdr3_map.printMaps()
+		my_cdr3_map.writeToFile("/dev/stdout")
 	else:
 		#print "error in args!"
 		parser.print_help()

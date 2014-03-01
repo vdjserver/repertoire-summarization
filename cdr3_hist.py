@@ -12,9 +12,6 @@ import vdjml
 from vdjml_utils import getTopVDJItems,getHitInfo
 
 
-def getCDR3Length(VLine,JLine):
-	return 1
-
 
 #test
 
@@ -222,30 +219,108 @@ def CDR3LengthAnalysisVDMLOBJ(read_result_obj,meta,organism,imgtdb_obj,query_rec
 	# 2) alignment from BTOP reconstruction both Q and S
 	# 3) q. start and q. end and s. start and s. end
 	# 4) read inversion flags
-	print "got into cdr3 hist wrapper"
+	#print "got into cdr3 hist wrapper"
 	read_name=read_result_obj.id()
-	print "got read name ",read_name
+	#print "got read name ",read_name
 	segment_combinations=read_result_obj.segment_combinations()
 	#if(len(segment_combinations)
 	#print "the length is ",len(segment_combinations)
 	VDJMap=getTopVDJItems(read_result_obj,meta)
 	vAllele=VDJMap['V']
 	jAllele=VDJMap['J']
+	empty_map=dict()
+	empty_map['kabat']=(-1)
+	empty_map['imgt']=(-1)
 	if(vAllele!=None and jAllele!=None):
 		vData=getHitInfo(read_result_obj,meta,vAllele)
 		#print "Vdata IS "
 		vData=addAlignmentsPreCDR3(vData,vAllele,imgtdb_obj,organism,query_record)
 		jData=getHitInfo(read_result_obj,meta,jAllele)
 		jData=addAlignmentsPreCDR3(jData,jAllele,imgtdb_obj,organism,query_record)
-		printMap(vData)
-		printMap(jData)
+		#printMap(vData)
+		#printMap(jData)
 		cdr3_analysis_map=CDR3LengthAnalysis(vData,jData,vData['query id'],organism,imgtdb_obj)
-		printMap(cdr3_analysis_map)
+		return cdr3_analysis_map
+		#printMap(cdr3_analysis_map)
 	else:
-		print "insufficient data!"
+		#print "insufficient data!"
+		return empty_map
 	pass
 
 
+
+class histoMapClass:
+
+	#counter
+	count_map=dict()
+	modes=None
+
+	#constructor
+	def __init__(self,modes):
+		self.count_map=dict()
+		self.modes=modes
+		for mode in modes:
+			self.count_map[mode]=dict()
+
+	#increment
+	def inc(self,mode,val):
+		val=int(val)
+		if(not val in self.count_map[mode]):
+			self.count_map[mode][val]=1
+		else:
+			self.count_map[mode][val]+=1
+
+	#get min val over all vals
+	def gminVal(self):
+		min_val=float("inf")
+		for mode in self.modes:
+			for val in self.count_map[mode]:
+				if(val<min_val):
+					min_val=val
+		return min_val
+
+	#get max val over all vals
+	def gmaxVal(self):
+		max_val=float("-inf")
+		for mode in self.modes:
+			for val in self.count_map[mode]:
+				if(val>max_val):
+					max_val=val
+		return max_val
+							
+
+
+				
+
+	#print maps basic
+	def printMaps(self):
+		for mode in self.modes:
+			print "SHOWING MAP FOR ",mode
+			for val in self.count_map[mode]:
+				print val,"\t",self.count_map[mode][val]
+
+	#write a basic histogram to a file!
+	def writeToFile(self,ofile):
+		writer=open(ofile,'w')
+		min_val=self.gminVal()
+		max_val=self.gmaxVal()
+		print "min and max are ",min_val,max_val
+		round_num=0
+		for v in range(min_val,max_val+1):
+			if(round_num==0):
+				writer.write("VALUE")
+				for mode in self.modes:
+					writer.write("\t"+mode)
+				writer.write("\n")
+			writer.write(str(v))
+			for mode in self.modes:
+				actual_val=0
+				if(v in self.count_map[mode]):
+					actual_val=self.count_map[mode][v]
+				writer.write("\t"+str(actual_val))
+			writer.write("\n")
+			round_num+=1
+		writer.close()
 
 
 

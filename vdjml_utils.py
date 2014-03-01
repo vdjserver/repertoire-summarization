@@ -7,7 +7,7 @@ from utils import printMap
 #known to already HIT to the read, find the following info
 #and put it in a dict 'q. start', 'q. end', 's. start', 's. end', & btop
 def getHitInfo(read_result_obj,meta,alleleName):
-	print "Need to extract info for ",alleleName
+	#print "Need to extract info for ",alleleName
 	segment_matches=read_result_obj.segment_matches() 
 	ret_map=dict()
 	for segment_match in segment_matches:
