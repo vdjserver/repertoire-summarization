@@ -101,7 +101,7 @@ if (__name__=="__main__"):
 			read_analysis_results=rep_char_read(read_result_obj,meta,"human",imgtdb_obj,query_record)
 			cdr3_res=read_analysis_results['cdr3_length_results']
 			for mode in modes:
-				print "mode and val are ",mode," , ",cdr3_res[mode]
+				#print "mode and val are ",mode," , ",cdr3_res[mode]
 				my_cdr3_map.inc(mode,cdr3_res[mode])			
 		#my_cdr3_map.printMaps()
 		my_cdr3_map.writeToFile("/dev/stdout")
