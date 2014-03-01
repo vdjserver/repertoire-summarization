@@ -365,11 +365,11 @@ def CDR3LengthAnalysis(vMap,jMap,currentQueryName,organism,imgtdb_obj):
 				qry_cdr3_end=getQueryIndexGivenSubjectIndexAndAlignment(jq_aln,js_aln,jq_f,jq_t,js_f,js_t,ref_cdr3_end)
 				if(qry_cdr3_start!=(-1) and qry_cdr3_end!=(-1)):
 					query_coding_seq=query_seq_map[currentQueryName]
-					if(vMap['query id'].find("reversed|"+currentQueryName)==(-1)):
-						query_coding_seq=rev_comp_dna(query_coding_seq)
-					coding_seq=query_coding_seq[(qry_cdr3_start-1):(qry_cdr3_end-1)]
+					#if(vMap['query id'].find("reversed|"+currentQueryName)==(-1)):
+					#	query_coding_seq=rev_comp_dna(query_coding_seq)
+					#coding_seq=query_coding_seq[(qry_cdr3_start-1):(qry_cdr3_end-1)]
 					cdr3_len=qry_cdr3_end-qry_cdr3_start+1
-					translation=biopythonTranslate(coding_seq)
+					#translation=biopythonTranslate(coding_seq)
 					#print "the coding seq ("+dm+") is : ",coding_seq
 					#print "The translation ("+dm+") is : ",translation
 					#print "CDR3_LEN ("+dm+") ="+str(cdr3_len)
