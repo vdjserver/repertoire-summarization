@@ -364,7 +364,7 @@ def CDR3LengthAnalysis(vMap,jMap,currentQueryName,organism,imgtdb_obj):
 				qry_cdr3_start=getQueryIndexGivenSubjectIndexAndAlignment(vq_aln,vs_aln,vq_f,vq_t,vs_f,vs_t,ref_cdr3_start)
 				qry_cdr3_end=getQueryIndexGivenSubjectIndexAndAlignment(jq_aln,js_aln,jq_f,jq_t,js_f,js_t,ref_cdr3_end)
 				if(qry_cdr3_start!=(-1) and qry_cdr3_end!=(-1)):
-					query_coding_seq=query_seq_map[currentQueryName]
+					#query_coding_seq=query_seq_map[currentQueryName]
 					#if(vMap['query id'].find("reversed|"+currentQueryName)==(-1)):
 					#	query_coding_seq=rev_comp_dna(query_coding_seq)
 					#coding_seq=query_coding_seq[(qry_cdr3_start-1):(qry_cdr3_end-1)]
