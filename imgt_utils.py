@@ -1464,6 +1464,8 @@ class imgt_db:
 	def getRefDirSetFNAGivenCompleteDescriptor(self,descriptor,organism):
 		if(self.ref_dir_set_desc_seqs_map==None):
 			self.ref_dir_set_desc_seqs_map=dict()
+		if(descriptor in self.ref_dir_set_desc_seqs_map):
+			return self.ref_dir_set_desc_seqs_map[descriptor]
 		myloci=get_loci_list()
 		for locus in myloci:
 			html_fna_path=self.db_base+"/"+organism+"/ReferenceDirectorySet/"+locus+".html.fna"
@@ -1494,6 +1496,7 @@ class imgt_db:
 		if(self.db_base==None):
 			#self.db_base=self.db_base
 			raise Exception("Error, db_base not set! Did you initialize???")
+		#this little code here does a cache lookup
 		if(not(self.org_allele_name_desc_map==None)):
 			if(org in org_allele_name_desc_map):
 				if(allele_name in org_allele_name_desc_map[org]):
