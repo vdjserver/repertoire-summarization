@@ -272,7 +272,7 @@ class histoMapClass:
 
 	#get min val over all vals
 	def gminVal(self):
-		min_val=float("inf")
+		min_val=1000
 		for mode in self.modes:
 			for val in self.count_map[mode]:
 				if(val<min_val):
@@ -281,7 +281,7 @@ class histoMapClass:
 
 	#get max val over all vals
 	def gmaxVal(self):
-		max_val=float("-inf")
+		max_val=(-1)
 		for mode in self.modes:
 			for val in self.count_map[mode]:
 				if(val>max_val):
@@ -306,7 +306,11 @@ class histoMapClass:
 		max_val=self.gmaxVal()
 		#print "min and max are ",min_val,max_val
 		round_num=0
-		for v in range(min_val,max_val+1):
+		if((type(min_val)!=int) or (type(max_val)!=int)):
+			min_val=(-1)
+			max_val=(-1)
+			print "Warning, could not determine min/max values for CDR3 lengths!  Output may not be defined!"
+		for v in range(min(min_val,max_val),max(min_val,max_val)+1):
 			if(round_num==0):
 				writer.write("VALUE")
 				for mode in self.modes:
