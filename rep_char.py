@@ -108,10 +108,12 @@ if (__name__=="__main__"):
 		segment_counter=IncrementMapWrapper()
 		read_num=1
 		segments_json_out=args.json_out
+		print "to write vdjml to ",args.vdjml_out
+		rrw = vdjml.Result_writer(str(args.vdjml_out[0]), meta)
 		for read_result_obj in scanOutputToVDJML(args.igblast_in[0],fact):
 			#prepare for the iteration and give a possible status message...
 			if(read_num>1 and read_num%1000==0):
-				print "Processed read ",read_num,"..."
+				print "Processed read",read_num,"..."
 			query_record=fasta_reader.next()
 			
 			#analyze a read's results
@@ -130,6 +132,10 @@ if (__name__=="__main__"):
 				if(actual is not None):
 					segment_counter.increment(actual)
 
+			#process for writing
+			rrw(read_result_obj)
+
+			#increment the read number
 			read_num+=1
 
 		#write the CDR3 hist	
