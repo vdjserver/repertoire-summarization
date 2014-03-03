@@ -1287,7 +1287,16 @@ class imgt_db:
 
 	#return the organism list
 	def getOrganismList(self):
-		return self.ol
+		thedir=self.db_base
+		org_list=list()
+		total_list=[ name for name in os.listdir(thedir) if os.path.isdir(os.path.join(thedir, name)) ]
+		for tl in total_list:
+			tls=str(tl.strip())
+			if(tls.startswith("www.") or tls.startswith("ftp.")):
+				pass
+			else:
+				org_list.append(tl.strip())
+		return org_list
 
 
 
