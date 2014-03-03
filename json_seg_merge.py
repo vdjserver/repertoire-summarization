@@ -29,10 +29,6 @@ def get_json_terminals_and_counts(j_data,existing_map):
 
 
 
-
-
-
-
 #use the first label found
 def readOrganismFromJSON(j):
 	#print "got a json"
