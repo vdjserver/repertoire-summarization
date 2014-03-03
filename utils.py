@@ -337,6 +337,8 @@ def formatNiceDateTimeStamp():
 
 
 
+
+
 def removeHeadAndTailMultiDash(s):
 	s=re.sub(r'\-+$',"",s)
 	s=re.sub(r'^\-+',"",s)
