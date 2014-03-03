@@ -10,7 +10,7 @@ from utils import read_fasta_file_into_map,biopythonTranslate,rev_comp_dna,print
 from igblast_utils import printNiceAlignment,buildAlignmentWholeSeqs,buildAlignmentWholeSeqsDirect
 import vdjml
 from vdjml_utils import getTopVDJItems,getHitInfo
-
+import argparse
 
 
 
@@ -149,6 +149,7 @@ def CDR3LengthAnalysisVDMLOBJ(read_result_obj,meta,organism,imgtdb_obj,query_rec
 #class for CDR3 histogram
 class histoMapClass:
 
+
 	#counter
 	count_map=dict()
 	modes=None
@@ -160,9 +161,54 @@ class histoMapClass:
 		for mode in modes:
 			self.count_map[mode]=dict()
 
+	#verify integer string
+	def appearsAsInt(self,s):
+		ire=re.compile(r'^\-?\d+$')
+		if(re.match(ire,s)):
+			return True
+		else:
+			return False
+
+
+	#read a file into the object!
+	def read_from_file(self,infile):
+		line_num=1
+		try:
+			reader=open(infile,'r')
+			modes=list()
+			for line in reader:
+				line=line.strip()
+				line_pieces=line.split('\t')
+				#print "got line=",line," and line_pieces=",line_pieces
+				if(line_num==1 and len(line_pieces)>=2):
+					for m in range(1,len(line_pieces)):
+						modes.append(line_pieces[m].strip())
+				elif(line_num==1 and len(line_pieces)<2):
+					raise Exception('Error, invalid header in histogram file '+str(infile))
+				elif(len(line_pieces)==len(modes)+1):
+					#got data!
+					for lp in line_pieces:
+						if(not(self.appearsAsInt(lp))):
+							raise Exception("Error, data ",lp," on line # ",line_num," appears as non-integral!  Integer values are expected!")
+					val=line_pieces[0]
+					for m in range(0,len(modes)):
+						#print "for val=",val," and mode=",modes[m]," need to inc count ",line_pieces[m+1]
+						for i in range(int(line_pieces[m+1])):
+							mode=modes[m]
+							#print "calling inc with mode=",mode," val=",val
+							self.inc(mode,val)
+				else:
+					print "warning, bad data in file ",infile," line ",line_num
+				line_num+=1				
+			reader.close()
+		except Exception as my_exception:
+			print my_exception," line #",line_num
+
+
 	#increment
 	def inc(self,mode,val):
 		val=int(val)
+		#print "INC CALLED"
 		if(not val in self.count_map[mode]):
 			self.count_map[mode][val]=1
 		else:
@@ -188,12 +234,25 @@ class histoMapClass:
 							
 
 
-				
+	#merge from other hist
+	def merge(self,other):
+		#print "MERGE IS CALLED"
+		other_map=other.count_map
+		#print "other_map is ",other_map
+		for mode in other_map:
+			if(not mode in self.count_map):
+				self.count_map[mode]=dict()
+			for val in other_map[mode]:
+				#print "for mode=",mode," at val=",val
+				other_count=other_map[mode][val]
+				#print "the count is ",other_count
+				for i in range(other_count):
+					self.inc(mode,val)
 
 	#print maps basic
 	def printMaps(self):
 		for mode in self.modes:
-			print "SHOWING MAP FOR ",mode
+			#print "SHOWING MAP FOR ",mode
 			for val in self.count_map[mode]:
 				print val,"\t",self.count_map[mode][val]
 
@@ -210,17 +269,18 @@ class histoMapClass:
 			print "Warning, could not determine min/max values for CDR3 lengths!  Output may not be defined!"
 		for v in range(min(min_val,max_val),max(min_val,max_val)+1):
 			if(round_num==0):
-				writer.write("VALUE")
+				writer.write("CDR3_LENGTH")
 				for mode in self.modes:
 					writer.write("\t"+mode)
 				writer.write("\n")
-			writer.write(str(v))
-			for mode in self.modes:
-				actual_val=0
-				if(v in self.count_map[mode]):
-					actual_val=self.count_map[mode][v]
-				writer.write("\t"+str(actual_val))
-			writer.write("\n")
+			if(v!=(0)):
+				writer.write(str(v))
+				for mode in self.modes:
+					actual_val=0
+					if(v in self.count_map[mode]):
+						actual_val=self.count_map[mode][v]
+					writer.write("\t"+str(actual_val))
+				writer.write("\n")
 			round_num+=1
 		writer.close()
 
@@ -289,9 +349,24 @@ def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
 	return cdr3_hist
 
 
-
-
-
+#program to merge CDR3 histograms for kabat and imgt modes
+if (__name__=="__main__"):
+	parser=argparse.ArgumentParser(description='Merge multiple CDR3 length histograms into a single histogram.  Write the merged result to stdout')
+	parser.add_argument('cdr3_hist_in',type=str,nargs='+',help="path(s) to CDR3 histograms to merge.  At least one is requried!")
+	args=parser.parse_args()
+	if(args):
+		#print "in args"
+		cdr3_hist_in_list=args.cdr3_hist_in
+		main_hist=histoMapClass(get_domain_modes())
+		#print "got ",cdr3_hist_in_list
+		for infile in cdr3_hist_in_list:
+			#print "now to analyze for ",infile
+			temp_hist=histoMapClass(get_domain_modes())
+			temp_hist.read_from_file(infile)
+			main_hist.merge(temp_hist)
+		main_hist.writeToFile("/dev/stdout")
+	else:
+		parser.print_help()
 
 
 
