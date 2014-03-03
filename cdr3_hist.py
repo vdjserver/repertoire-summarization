@@ -6,115 +6,16 @@ import glob
 from os.path import basename
 from segment_utils import getFastaListOfDescs,getQueryIndexGivenSubjectIndexAndAlignment,getAdjustedCDR3StartFromRefDirSetAllele,getADJCDR3EndFromJAllele,looksLikeAlleleStr
 from imgt_utils import imgt_db
-from utils import read_fasta_file_into_map,biopythonTranslate,rev_comp_dna,printMap
+from utils import read_fasta_file_into_map,biopythonTranslate,rev_comp_dna,printMap,get_domain_modes,repStr
 from igblast_utils import printNiceAlignment,buildAlignmentWholeSeqs,buildAlignmentWholeSeqsDirect
 import vdjml
 from vdjml_utils import getTopVDJItems,getHitInfo
 
 
 
-#test
-
-#define inputs for run
-vfasta="/home/esalina2/round1_imgt/human_IG_V.fna"
-dfasta="/home/esalina2/round1_imgt/human_IG_D.fna"
-jfasta="/home/esalina2/round1_imgt/human_IG_J.fna"
-fasta_file_list=[vfasta,dfasta,jfasta]
-blast_out="/home/esalina2/round1_imgt/all_data.processed.Q35.L200.R1.fna.igblastn.imgt.out"
-
-#define inputs for database
-base_dir="/home/data/DATABASE/01_22_2014/"
-organism="human"
-
-#create DB OBJ
-imgtdb_obj=imgt_db(base_dir)
-#getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human"):
-
-vlist=getFastaListOfDescs(fasta_file_list[0])
-dlist=getFastaListOfDescs(fasta_file_list[1])
-jlist=getFastaListOfDescs(fasta_file_list[2])
-
-blast_data=open(blast_out,'r')
-line_num=0
-counts_map=dict()
-capture_flag=False
-is_heavy=True
-VHitLine=None
-JHitLine=None
-currentV=None
-currentJ=None
-currentD=None
-
-trans=0
-tot=0
-nona=0
-max_len=0
-cdr3_hist=dict()
-query_seq_map=read_fasta_file_into_map("/home/esalina2/round1_imgt/all_data.processed.Q35.L200.R1.fna")
 
 
-
-def get_domain_modes():
-	domain_list=["imgt","kabat"]
-	#domain_list=["kabat"]
-	return domain_list
-
-
-rsmap=dict()
-remap=dict()
-domain_list=get_domain_modes()
-for d in domain_list:
-	rsmap[d]=dict()
-	remap[d]=dict()
-	cdr3_hist[d]=dict()
-	for i in range(0,1000):
-		cdr3_hist[d][i]=0
-v_alleles_review=dict()
-
-
-
-
-vqmap=dict()
-
-
-files=glob.glob("/home/esalina2/Downloads/HSEQS/IMGT_HighV-QUEST_individual_files_folder/*")
-files=[]
-for f in files:
-	reader=open(f,'r')
-	num=0
-	fbase=basename(f)
-	fbpieces=fbase.split("_")
-	readname=str(fbpieces[0].strip())
-	vqmap[readname]=dict()
-	for line in reader:
-		segs=['V','D','J']
-		for seg in segs:
-			if(not(seg in vqmap[readname])):
-				vqmap[readname][seg]=None
-			if(line.startswith(seg+"-GENE")):
-				pieces=line.split(";")
-				if(len(pieces)>=2):
-					info=pieces[1]
-					segre=re.compile(r'homsap\s+(\S+)\s+',re.IGNORECASE)
-					mr=re.search(segre,info)
-					if(mr):
-						seg_res=mr.group(1)
-						#print "readname is ",readname
-						vqmap[readname][seg]=seg_res
-						print "\n\n\n*************************"
-						print "readname="+readname
-						print "seg="+seg
-						print "storage="+seg_res
-						print "*******************************\n\n\n"
-							
-					else:
-						print "FAIL re MATCH ON ",readname," : ",info," for seg=",seg
-		if(num>=40):
-			break;
-		num+=1
-	reader.close()
-
-
+#how many deletions???
 def getNumDashInStr(s):
 	orig_len=len(s)
 	s_no_dash=re.sub(r'\-','',s)
@@ -122,14 +23,7 @@ def getNumDashInStr(s):
 	return orig_len-nodash_len
 
 
-def repStr(s,n):
-	if(n<=0):
-		return ""
-	else:
-		return s+repStr(s,n-1)
-
-
-
+#from an alignment mark where CDR3 is with X
 def annotatedCDR3(s_aln,q_aln,s_c,q_c,s_s,q_s):
 	#get CDR3 starts relative to the alignment starts
 	aln_rel_s=s_c-s_s
@@ -196,7 +90,8 @@ def getOtherMode(m):
 		return "imgt"
 
 
-
+#utility to reconstruct alignments from a BTOP and data map and add it to the 
+#data map and return the data map
 def addAlignmentsPreCDR3(dataMap,alleleName,imgtdb_obj,organism,query_record):
 	btop=dataMap['btop']
 	bopyname=str(query_record.id)
@@ -213,6 +108,9 @@ def addAlignmentsPreCDR3(dataMap,alleleName,imgtdb_obj,organism,query_record):
 	dataMap['subject seq']=qsAlgn[2]
 	return dataMap
 
+
+
+#wrapper for getting CDR3 length using pyVDJML objects as input
 def CDR3LengthAnalysisVDMLOBJ(read_result_obj,meta,organism,imgtdb_obj,query_record):
 	#for V and J require:
 	# 1) allele names
@@ -248,7 +146,7 @@ def CDR3LengthAnalysisVDMLOBJ(read_result_obj,meta,organism,imgtdb_obj,query_rec
 	pass
 
 
-
+#class for CDR3 histogram
 class histoMapClass:
 
 	#counter
@@ -328,7 +226,8 @@ class histoMapClass:
 
 
 
-#given info maps for V and J and the 
+#given info maps for V and J and the returnd a 
+#dictionary with kabat and imgt lengths
 def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
 	#currentQueryName=str(currentQueryName.strip())
 	currentV=vMap['subject ids']
@@ -336,7 +235,7 @@ def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
 	cdr3_hist=dict()
 	if(looksLikeAlleleStr(currentV) and looksLikeAlleleStr(currentJ)):
 		#print "WE'RE IN BUSINESS!"
-		domain_modes=["kabat","imgt"]
+		domain_modes=get_domain_modes()
 		for dm in domain_modes:
 			cdr3_hist[dm]=(-1)
 			#print "processing in ",dm

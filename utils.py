@@ -312,6 +312,13 @@ def read_fasta(fasta_path,alwaysSeqToUpper=True):
 	return data
 
 
+#repeat a string a given number of times
+def repStr(s,n):
+	if(n<=0):
+		return ""
+	else:
+		return s+repStr(s,n-1)
+
 
 
 
@@ -334,6 +341,15 @@ def removeHeadAndTailMultiDash(s):
 	s=re.sub(r'\-+$',"",s)
 	s=re.sub(r'^\-+',"",s)
 	return s
+
+
+
+#little utility to return the modes
+def get_domain_modes():
+	domain_list=["imgt","kabat"]
+	#domain_list=["kabat"]
+	return domain_list
+
 
 
 
