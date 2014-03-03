@@ -239,7 +239,7 @@ def CDR3LengthAnalysisVDMLOBJ(read_result_obj,meta,organism,imgtdb_obj,query_rec
 		jData=addAlignmentsPreCDR3(jData,jAllele,imgtdb_obj,organism,query_record)
 		#printMap(vData)
 		#printMap(jData)
-		cdr3_analysis_map=CDR3LengthAnalysis(vData,jData,vData['query id'],organism,imgtdb_obj)
+		cdr3_analysis_map=CDR3LengthAnalysis(vData,jData,organism,imgtdb_obj)
 		return cdr3_analysis_map
 		#printMap(cdr3_analysis_map)
 	else:
@@ -328,9 +328,9 @@ class histoMapClass:
 
 
 
-
-def CDR3LengthAnalysis(vMap,jMap,currentQueryName,organism,imgtdb_obj):
-	currentQueryName=str(currentQueryName.strip())
+#given info maps for V and J and the 
+def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
+	#currentQueryName=str(currentQueryName.strip())
 	currentV=vMap['subject ids']
 	currentJ=jMap['subject ids']
 	cdr3_hist=dict()
@@ -388,4 +388,11 @@ def CDR3LengthAnalysis(vMap,jMap,currentQueryName,organism,imgtdb_obj):
 		#print "Ref names ",currentV," and ",currentJ," don't appear alleleic!"
 		pass
 	return cdr3_hist
+
+
+
+
+
+
+
 
