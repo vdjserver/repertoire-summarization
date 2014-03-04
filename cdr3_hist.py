@@ -286,6 +286,16 @@ class histoMapClass:
 
 
 
+#cache for CDR3 start/end
+rsmap=dict()
+remap=dict()
+domain_list=get_domain_modes()
+for d in domain_list:
+       rsmap[d]=dict()
+       remap[d]=dict()
+
+
+
 #given info maps for V and J and the returnd a 
 #dictionary with kabat and imgt lengths
 def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
