@@ -29,13 +29,36 @@ def rep_char_read(read_result_obj,meta,organism,imgtdb_obj,read_rec):
 	cdr3_length_results=CDR3LengthAnalysisVDMLOBJ(read_result_obj,meta,organism,imgtdb_obj,read_rec)
 	return_obj['cdr3_length_results']=cdr3_length_results
 
+	#perform own annotation
+	read_result_obj=vSegmentRegionVDJAnalyse(read_result_obj,meta,organism,imgtdb_obj,read_rec)
 
 	return return_obj
 	
 
 
-
-
+#using the PYVDJML, add VDJserver specific tags
+def vSegmentRegionVDJAnalyse(read_result_obj,meta,organism,imgtdb_obj,read_rec):
+	topVDJ=getTopVDJItems(read_result_obj,meta)
+	topV=topVDJ['V']
+	if(topV==None):
+		return read_result_obj
+	reg_name='CDR2'
+	reg_interval=vdjml.Interval.first_last_1(5,10)
+	mm=vdjml.Match_metrics(identity=float(1.00))
+	segment_combinations=read_result_obj.segment_combinations()
+	for s in range(len(segment_combinations)):
+		scb=segment_combinations[s]
+		#sc1 = vdjml.Segment_combination(scb)
+		#scb.add_region(name=reg_name,read_range=reg_interval,metric=mm)
+		scb.insert_region(vdjml.Num_system.kabat,vdjml.Gene_region_type.cdr2,reg_interval,mm)
+ #sc1.insert_region(
+#                          vdjml.Num_system.imgt,
+#                          vdjml.Gene_region_type.fr1,
+#                          vdjml.Interval.first_last_1(1,54),
+#                          vdjml.Match_metrics(100, 54)
+#                          )
+	return read_result_obj
+	
 
 
 
@@ -121,8 +144,8 @@ if (__name__=="__main__"):
 
 			#handle cdr3 length/histogram
 			cdr3_res=read_analysis_results['cdr3_length_results']
-			for mode in modes:
-				my_cdr3_map.inc(mode,cdr3_res[mode])
+			#for mode in modes:
+			#	my_cdr3_map.inc(mode,cdr3_res[mode])
 
 			#handle segment counting
 			segments=read_analysis_results['VDJ']
@@ -139,10 +162,10 @@ if (__name__=="__main__"):
 			read_num+=1
 
 		#write the CDR3 hist	
-		my_cdr3_map.writeToFile(cdr3_hist_out_file)
+		#my_cdr3_map.writeToFile(cdr3_hist_out_file)
 
 		#write the segment counts
-		segment_counter.JSONIFYToFile(args.vdj_db[0],organism,segments_json_out)
+		#segment_counter.JSONIFYToFile(args.vdj_db[0],organism,segments_json_out)
 
 	else:
 		#print "error in args!"
