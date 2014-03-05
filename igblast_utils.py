@@ -16,6 +16,7 @@ import glob
 import ntpath
 import sys
 import time
+from utils import repStr
 
 
 
@@ -398,6 +399,42 @@ def printNiceAlignment(q,s):
 
 
 
+
+#given a BTOP string build a dummy alignment, putting N
+#where sequence cannot be known without source data
+def buildDummyQAndSSeqsFromBTop(btop):
+	#query, then subject
+	q_s=["",""]
+	if(len(btop)<=0):
+		return q_s
+	else:
+		while(len(btop)>0):
+			adm=re.search('^(\d+)$',btop)
+			dm=re.search('^(\d+)[^0-9]',btop)
+			firstTwoLetters=re.search('^([a-z\\-])([a-z\\-])',btop,re.IGNORECASE)
+			if adm:
+				#all digital
+				q_s[0]+=repStr("N",int(adm.group(1)))
+				q_s[1]+=repStr("N",int(adm.group(1)))
+				return q_s
+			elif(dm):
+				#just starts with digits
+				q_s[0]+=repStr("N",int(dm.group(1)))
+				q_s[1]+=repStr("N",int(dm.group(1)))
+				num_digits=len(dm.group(1))
+				btop=btop[num_digits:]
+			else:
+				#2 characters!
+				q_s[0]+=firstTwoLetters.group(1)
+				q_s[1]+=firstTwoLetters.group(2)
+				btop=btop[2:]
+		return q_s
+			
+		
+
+
+
+
 #returns array of query, then match/midline, then subject based on btop alignment specification
 def buildAlignmentWholeSeqs(btop,q,s,debug=False,level=0):
 	if(debug):	
@@ -411,6 +448,7 @@ def buildAlignmentWholeSeqs(btop,q,s,debug=False,level=0):
 	dm=re.search('^(\d+)[^0-9]',btop)
 	adm=re.search('^(\d+)$',btop)
 	if adm:
+		#BTOP is 100% digital
 		if(debug):		
 			print repeatString("\t",level)+"matched all digital..."
 		btopv=int(adm.group(1))
@@ -423,6 +461,7 @@ def buildAlignmentWholeSeqs(btop,q,s,debug=False,level=0):
 				print repeatString("\t",level)+aln[x]
 		return aln
 	elif dm:
+		#BTOP only starts with digits...
 		if(debug):
 			print repeatString("\t",level)+"matched start digital..."
 		digitString=dm.group(1)
@@ -443,6 +482,7 @@ def buildAlignmentWholeSeqs(btop,q,s,debug=False,level=0):
 		print "no digital tests passed...doing letter tests...."
 	firstTwoLetters=re.search('^([a-z\\-])([a-z\\-])',btop,re.IGNORECASE)
 	if firstTwoLetters:
+		#BTOP starts with a dash and a letter, a letter and a dash, or two letters
 		if(debug):
 			print "aligns first two letters..."
 		firstLetter=firstTwoLetters.group(1)
@@ -519,6 +559,7 @@ def printVDJBestAssignments(i):
 			captureFlag=True
 		elif(captureFlag):
 			pieces=line.split('\t')
+
 			for p in range(len(pieces)):
 				if ',' in pieces[p]:
 					#the piece is a string of comma-separated values
@@ -538,8 +579,10 @@ def printVDJBestAssignments(i):
 
 def test():
 	pass
+	btop="5-A2"
+	print buildDummyQAndSSeqsFromBTop(btop)
 	#scanOutputToSQLite("/home/mlevin/project/stanford_davis/run3/out4","/home/esalina2/FLORIAN/merged.igblast.db","/home/mlevin/project/stanford_davis/run3/out4/merged.fasta")
-	printVDJBestAssignments("/home/esalina2/FLORIAN/TR/merged.igblast.out")
+	#printVDJBestAssignments("/home/esalina2/FLORIAN/TR/merged.igblast.out")
 	#print "Running test...."
 	#counts_map=
 	#in_hier_dir="/home/data/vdj_server/pipeline/vdj_ann/17_way/"
@@ -573,6 +616,7 @@ def test():
 	#	os.remove(testDBFile)
 	#scanOutputToSQLite("/home/esalina/repserver/igblast_routines/igblast_2.out",testDBFile,"/tmp/fasta/fna")
 	#	q="ATTACA"
+
 	#	s="GATTACA"
 	#btop="-G6"
 	#aln=buildAlignmentWholeSeqs(btop,q,s)
