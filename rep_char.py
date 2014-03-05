@@ -6,7 +6,7 @@ from utils import printMap
 from pprint import pprint
 from imgt_utils import imgt_db
 from cdr3_hist import CDR3LengthAnalysisVDMLOBJ,histoMapClass
-from vdjml_utils import getTopVDJItems,getRegionsObjsFromSegmentCombo,getHitInfo
+from vdjml_utils import getTopVDJItems,getRegionsObjsFromSegmentCombo,getHitInfo,getProductiveFlag
 from Bio import SeqIO
 from segment_utils import IncrementMapWrapper
 from char_utils import getNumberBaseSubsFromBTOP,getNumberIndelsFromBTOP,getIndelMapFromBTOP
@@ -34,8 +34,8 @@ def rep_char_read(read_result_obj,meta,organism,imgtdb_obj,read_rec):
 
 	#perform own annotation
 	#read_result_obj=vSegmentRegionVDJAnalyse(read_result_obj,meta,organism,imgtdb_obj,read_rec)
-	vSegmentRegionVDJAnalyse(read_result_obj,meta,organism,imgtdb_obj,read_rec)
-	#readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec)
+	#vSegmentRegionVDJAnalyse(read_result_obj,meta,organism,imgtdb_obj,read_rec)
+	readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec)
 	return return_obj
 	
 
@@ -75,6 +75,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec):
 	annMap['whole_seq_number_indels']=whole_seq_number_indels
 	annMap['whole_seq_number_insertions']=whole_seq_number_insertions
 	annMap['whole_seq_number_deletions']=whole_seq_number_deletions
+	annMap['productive']=getProductiveFlag(read_result_obj,meta,organism,imgtdb_obj)
 	printMap(annMap)
 	sys.exit(0)
 

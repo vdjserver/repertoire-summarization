@@ -2,6 +2,7 @@
 
 from pprint import pprint
 from utils import printMap
+from segment_utils import getNAProductiveFlagFromVJHitLineData
 
 #given a read object, meta object, and an allele name
 #known to already HIT to the read, find the following info
@@ -54,7 +55,7 @@ def getHitInfo(read_result_obj,meta,alleleName):
 
 
 #return either true or false, no N/A yet
-def getProductiveFlag(read_result_obj,meta):
+def getProductiveFlag(read_result_obj,meta,organism,imgtdb_obj):
 	topVDJ=getTopVDJItems(read_result_obj,meta)
 	productive_flag=False
 	top_V=topVDJ['V']
@@ -62,7 +63,7 @@ def getProductiveFlag(read_result_obj,meta):
 	if(top_V!=None and top_J!=None):
 		vHitInfo=getHitInfo(read_result_obj,meta,top_V)
 		jHitInfo=getHitInfo(read_result_obj,meta,top_J)
-		productive_flag=getNAProductiveFlagFromVJHitLineData(vHitInfo,jHitInfo)
+		productive_flag=getNAProductiveFlagFromVJHitLineData(vHitInfo,jHitInfo,organism,imgtdb_obj)
 		if(productive_flag is None):
 			#there is no "N/A" yet!
 			return False
