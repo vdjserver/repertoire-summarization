@@ -2,12 +2,13 @@
 
 from pprint import pprint
 from utils import printMap
-from segment_utils import getNAProductiveRearrangmentFlagFromVJHitLineData
+from segment_utils import getNAProductiveRearrangmentFlagFromVJHitLineData,getRegionAlignmentFromLargerVAlignment
+from igblast_utils import buildAlignmentWholeSeqs
 
 #given a read object, meta object, and an allele name
 #known to already HIT to the read, find the following info
 #and put it in a dict 'q. start', 'q. end', 's. start', 's. end', & btop
-def getHitInfo(read_result_obj,meta,alleleName):
+def getHitInfo(read_result_obj,meta,alleleName,query_record=None,imgtdb_obj=None,organism=None):
 	#print "Need to extract info for ",alleleName
 	segment_matches=read_result_obj.segment_matches() 
 	ret_map=dict()
@@ -35,16 +36,40 @@ def getHitInfo(read_result_obj,meta,alleleName):
 					#	1       59      90      148
 					query_range=segment_match.range()
 					query_start=query_range.pos_1()
-					quern_end=query_start+query_range.length()
+					query_end=query_start+query_range.length()
 					ret_map['q. start']=query_start
-					ret_map['q. end']=quern_end-1
-					btop=segment_match.btop()
+					ret_map['q. end']=query_end-1
+					btop=str(segment_match.btop())
 					ret_map['btop']=str(btop)
 					ret_map['subject ids']=alleleName
 					ret_map['is_inverted']=gls_match.is_inverted()
 					ret_map['query id']=read_result_obj.id()
 					if(ret_map['is_inverted']):
 						ret_map['query id']="reversed|"+read_result_obj.id()
+					if(query_record!=None):
+						#attempt to use BTOP
+						q_start_line=ret_map['q. start']
+						q_end_line=ret_map['q. end']
+						s_start_line=ret_map['s. start']
+						s_end_line=ret_map['s. end']
+						query_str=str(query_record.seq)
+						query_for_btop=query_str[q_start_line-1:q_end_line]
+						sbjct=imgtdb_obj.getRefDirSetFNASeqGivenOrgAndAllele(ret_map['subject ids'],organism)
+						sbjct_for_btop=sbjct[s_start_line-1:s_end_line]
+						#print "from map :"
+						#printMap(ret_map)
+						#print "from full query=",query_str
+						#print "from full sbjct=",sbjct
+						#print "got btop ready query=",query_for_btop," of len ",len(query_for_btop)
+						#print "got btop ready sbjct=",sbjct_for_btop," of len ",len(sbjct_for_btop)
+						q_m_s=buildAlignmentWholeSeqs(btop,query_for_btop,sbjct_for_btop)
+						#print q_s[0]
+						#print q_s[1]
+						#print q_s[2]
+						#sys.exit(0)
+						ret_map['query seq']=q_m_s[0]
+						ret_map['subject seq']=q_m_s[2]
+					return ret_map
 				else:
 					#print "skipping ",hit_name
 					pass
@@ -73,6 +98,21 @@ def getProductiveRearrangmentFlag(read_result_obj,meta,organism,imgtdb_obj):
 		#note, there is no "N/A" or "inconclusive" ....
 		return productive_flag
 
+#given a V segment alignment extract from it the sub-portion for a given
+#region.  Return a 4-length array with subject and query alignment data  [region_alignment,frame_mask,r_q_start,r_q_end]  (region_alignment has query first, then sub)
+#return None if alignment too short or doesn't cover region
+def getVDJServerRegionAlignmentFromLargerVAlignmentPyObj(read_result_obj,meta,org,mode,region_name,imgtdb_obj,wholeOnly,read_rec):
+	topVDJ=getTopVDJItems(read_result_obj,meta)
+	if('V' in topVDJ):
+		topV=topVDJ['V']
+		if(topV!=None):
+			v_info=getHitInfo(read_result_obj,meta,topV,read_rec,imgtdb_obj,org)
+			raInfo=getRegionAlignmentFromLargerVAlignment(v_info,org,mode,region_name,imgtdb_obj,wholeOnly)
+			return raInfo
+		else:
+			return None
+	else:
+		return None
 
 
 
