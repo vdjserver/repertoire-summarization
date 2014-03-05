@@ -1170,6 +1170,31 @@ def getEmptyRegCharMap():
 	return char_map
 
 
+#can be 'None', True, or False
+def getNAProductiveFlagFromVJHitLineData(firstVMap,firstJMap,organism,imgtdb_obj):
+	###########################################
+	#some code to look at the 'productive rearrangement
+	productive_flag=None
+	if(firstVMap!=None and firstJMap!=None):
+		v_s_fr3_imgt_start=getVRegionStartAndStopGivenRefData(firstVMap['subject ids'],organism,imgtdb_obj,"FR3","imgt")[0]
+		if(v_s_fr3_imgt_start!=(-1)):
+			v_s_end=int(firstVMap['s. end'])
+			v_s_end_frame=getTheFrameForThisReferenceAtThisPosition(firstVMap['subject ids'],organism,imgtdb_obj,v_s_end)
+			j_s_start=int(firstJMap['s. start'])
+			j_s_imgt_cdr3_end=int(getADJCDR3EndFromJAllele(firstJMap['subject ids'],imgtdb_obj,organism,"imgt"))
+			if(j_s_imgt_cdr3_end==(-1)):
+				#can't get CDR3 end
+				return productive_flag
+			j_s_start_frame=(j_s_start-j_s_imgt_cdr3_end)%3
+			num_bp_between_V_and_J=int(firstJMap['q. start'])-int(firstVMap['q. end'])-1
+			if((v_s_end_frame+num_bp_between_V_and_J+j_s_start_frame+1)%3==0):
+				#print "TESTED PRODUCTIVE BY ALIGNMENT"
+				productive_flag=True
+			else:
+				productive_flag=False
+		else:
+			return productive_flag
+	return productive_flag
 
 
 
