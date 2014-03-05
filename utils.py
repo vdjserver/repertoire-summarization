@@ -534,11 +534,20 @@ def read_map_from_file(path):
 	reader.close()
 	return m
 
-def printMap(m):
+def printMap(m,sortKeys=False):
 	i=0
-	for k in m:
-		print "#"+str(i),k,"->",m[k]
-		i+=1
+	if(not(sortKeys)):
+		for k in m:
+			print "#"+str(i+1),k,"->",m[k]
+			i+=1
+	else:
+		keys=m.keys()
+		#print "pre sort ",keys
+		keys.sort()
+		#print "pst sort ",keys
+		for k in keys:
+			print "#"+str(i+1),k,"->",m[k]
+			i+=1
 
 
 def returnTimeStamp():
