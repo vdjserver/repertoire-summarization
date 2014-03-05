@@ -1031,7 +1031,7 @@ def getCDR3RegionSpecificCharacterization(vData,dData,jData,organism,imgtdb_obj,
 	print "v,d,j tots",v_tot,d_tot,j_tot
 	print "v,d,j smes",v_same,d_same,j_same
 	cum_sme=v_same+d_same+j_same
-	print "cum same and tot : ",cum_sme," ",cum_tot
+	print "cumulative same and cumulative tot : ",cum_sme," ",cum_tot
 	cum_pct_id=float(cum_sme)/float(cum_tot)
 	combo_map['pct_id']=cum_pct_id*100.0
 	print "THE COMBO MAP is "

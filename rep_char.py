@@ -27,13 +27,15 @@ def rep_char_read(read_result_obj,meta,organism,imgtdb_obj,read_rec):
 	return_obj['VDJ']=topVDJ
 
 	#retrieve the CDR3 lengths
-	#cdr3_length_results=CDR3LengthAnalysisVDMLOBJ(read_result_obj,meta,organism,imgtdb_obj,read_rec)
-	#return_obj['cdr3_length_results']=cdr3_length_results
+	cdr3_length_results=CDR3LengthAnalysisVDMLOBJ(read_result_obj,meta,organism,imgtdb_obj,read_rec)
+	return_obj['cdr3_length_results']=cdr3_length_results
+
+
 
 	#perform own annotation
 	#read_result_obj=vSegmentRegionVDJAnalyse(read_result_obj,meta,organism,imgtdb_obj,read_rec)
-	#vSegmentRegionVDJAnalyse(read_result_obj,meta,organism,imgtdb_obj,read_rec)
-	readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec)
+	vSegmentRegionVDJAnalyse(read_result_obj,meta,organism,imgtdb_obj,read_rec)
+	#readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec)
 	return return_obj
 	
 
@@ -58,7 +60,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec):
 			#print "to get info...."
 			hit_info=getHitInfo(read_result_obj,meta,topVDJ[seg])
 			btop=hit_info['btop']
-			print "got btop",btop
+			print "got btop ",seg," (",topVDJ[seg],") :",btop
 			whole_seq_number_base_subs+=getNumberBaseSubsFromBTOP(btop)
 			whole_seq_number_indels+=getNumberIndelsFromBTOP(btop)
 			indel_map=getIndelMapFromBTOP(btop)
