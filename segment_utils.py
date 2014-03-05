@@ -1180,6 +1180,8 @@ def getNAProductiveRearrangmentFlagFromVJHitLineData(firstVMap,firstJMap,organis
 		v_s_fr3_imgt_start=getVRegionStartAndStopGivenRefData(firstVMap['subject ids'],organism,imgtdb_obj,"FR3","imgt")[0]
 		if(v_s_fr3_imgt_start!=(-1)):
 			v_s_end=int(firstVMap['s. end'])
+			v_s_start=int(firstVMap['s. start'])
+			v_s_cdr3Start=getAdjustedCDR3StartFromRefDirSetAllele(firstVMap['subject ids'],imgtdb_obj,organism,"imgt")
 			v_s_end_frame=getTheFrameForThisReferenceAtThisPosition(firstVMap['subject ids'],organism,imgtdb_obj,v_s_end)
 			j_s_start=int(firstJMap['s. start'])
 			j_s_imgt_cdr3_end=int(getADJCDR3EndFromJAllele(firstJMap['subject ids'],imgtdb_obj,organism,"imgt"))
@@ -1189,12 +1191,13 @@ def getNAProductiveRearrangmentFlagFromVJHitLineData(firstVMap,firstJMap,organis
 			if(j_s_start>j_s_imgt_cdr3_end):
 				#algignment to J starts after CDR3 end...
 				return productive_flag
-			#j_s_start_frame=(j_s_start-j_s_imgt_cdr3_end)%3
-			j_s_start_frame=(2-(j_s_start-j_s_imgt_cdr3_end))%3
+			j_s_start_frame=(2-(j_s_start-j_s_imgt_cdr3_end))%3  #the 2 i here because the CDR3 end of J is in frame2 cause its the 3rd NA in a codon
 			num_bp_between_V_and_J=int(firstJMap['q. start'])-int(firstVMap['q. end'])-1
 			if(num_bp_between_V_and_J<0):
 				#unhandled case where V/J overlap!!!
-				return productive_flag
+				v_s_end_frame=ofRightmostVNucleotideNotAligningToJGetItsFrameAssumingJunctionSegmentOverlap(vMap,jMap,v_s_end_frame)
+				j_s_start_frame=ofLeftmostJNucleotideNotAligningToJGetItsFrameAssumingJunctionSegmentOverlap(vMap,jMap,v_s_end_frame)
+				num_bp_between_V_and_J=num_bp_between_V_and_J*(-1)
 			#print "num_bp_between_V_and_J",num_bp_between_V_and_J
 			#print "v_s_end_frame=",v_s_end_frame
 			#print "j_s_start_frame",j_s_start_frame
@@ -1207,6 +1210,22 @@ def getNAProductiveRearrangmentFlagFromVJHitLineData(firstVMap,firstJMap,organis
 			#couldn't get fr3, so can't get CDR3 either....
 			return productive_flag
 	return productive_flag
+
+
+def ofRightmostVNucleotideNotAligningToJGetItsFrameAssumingJunctionSegmentOverlap(vMap,jMap,frameAtVSEnd):
+	#assume NO indels in a junction overlap
+	q_v_end=int(vMap['q. end'])
+	q_j_bgn=int(jMap['q. start'])
+	overlap_size=q_v_end-q_j_bgn+1
+	desired_frame=(frameAtVSEnd-overlap_size)%3
+	return desired_frame
+
+
+
+def ofLeftmostJNucleotideNotAligningToJGetItsFrameAssumingJunctionSegmentOverlap(vMap,jMap,frameAtVSEnd):
+	#assume no indels in a junction overlap
+	desired_frame=(frameAtVSEnd+1)%3
+	return desired_frame
 
 
 
