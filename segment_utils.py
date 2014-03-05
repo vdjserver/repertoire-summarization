@@ -756,10 +756,11 @@ def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human",m
 
 
 #given a V segment alignment extract from it the sub-portion for a given
-#region.  Return a 4-length array with subject and query alignment data  [region_alignment,frame_mask,r_q_start,r_q_end]
+#region.  Return a 4-length array with subject and query alignment data  [region_alignment,frame_mask,r_q_start,r_q_end] (region_alignment has query first, then sub)
 #return None if alignment too short or doesn't cover region
 def getRegionAlignmentFromLargerVAlignment(sub_info_map,org,mode,region_name,imgtdb_obj,wholeOnly=False):
-	if(wholeOnly===True):
+	#print "THE SIM is ",sub_info_map
+	if(wholeOnly==True):
 		raise Exception("Error, wholeOnly not yet implemented!!!!!!!!!")
 	#print "\n\n\n\nusing region=",region_name
 	valid_regions=getVRegionsList()
@@ -803,8 +804,8 @@ def getRegionAlignmentFromLargerVAlignment(sub_info_map,org,mode,region_name,img
 					r_q_start=temp_index_qury
 				if(q_aln[temp_index]!=(-1)):
 					r_q_end=temp_index_qury
-				region_alignment[0]+=s_aln[temp_index]
-				region_alignment[1]+=q_aln[temp_index]
+				region_alignment[0]+=q_aln[temp_index]
+				region_alignment[1]+=s_aln[temp_index]
 				if(s_aln[temp_index]!="-"):
 					#if the frame is knowable, use it
 					frame_mask.append(getTheFrameForThisReferenceAtThisPosition(refName,org,imgtdb_obj,temp_index_sbjct))
@@ -1072,7 +1073,7 @@ def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name,frame_mask,mode):
 	num_syn=0
 	num_nsy=0
 	num_bsb=0
-	print "\n\nNice alignment (region=",reg_name,") query top, subject bottom : \n",printNiceAlignment(q_aln,s_aln),"\n"
+	#print "\n\nNice alignment (region=",reg_name,") query top, subject bottom : \n",printNiceAlignment(q_aln,s_aln),"\n"
 	if(len(s_aln)!=len(q_aln)):
 		raise Exception("ERROR, Q_ALN LENGTH NOT EQUAL TO S_ALN LENGTH!?!?!")
 	#do counts independent of codons/translations
@@ -1233,7 +1234,7 @@ def ofLeftmostJNucleotideNotAligningToJGetItsFrameAssumingJunctionSegmentOverlap
 
 #at the indicated position find the frame by using the first imgt delineation start as a "base" or "frame of reference"
 def getTheFrameForThisReferenceAtThisPosition(refName,organism,imgtdb_obj,refPos):
-	regions=getVRegionsList():
+	regions=getVRegionsList()
 	for region in regions:
 		interval=getVRegionStartAndStopGivenRefData(refName,organism,imgtdb_obj,region,"imgt")
 		if(not(interval is None)):
@@ -1247,7 +1248,7 @@ def getTheFrameForThisReferenceAtThisPosition(refName,organism,imgtdb_obj,refPos
 
 def getVRegionsList(includeCDR3=False):
 	regions=["FR1","CDR1","FR2","CDR2","FR3"]
-	if(includeCDR):
+	if(includeCDR3):
 		regions.append("CDR3")
 	return regions
 
