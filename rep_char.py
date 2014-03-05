@@ -2,13 +2,13 @@
 
 import vdjml
 from vdjml_igblast_parse import scanOutputToVDJML,makeParserArgs,makeVDJMLDefaultMetaAndFactoryFromArgs
-from utils import printMap
+from utils import printMap,get_domain_modes
 from pprint import pprint
 from imgt_utils import imgt_db
 from cdr3_hist import CDR3LengthAnalysisVDMLOBJ,histoMapClass
-from vdjml_utils import getTopVDJItems,getRegionsObjsFromSegmentCombo,getHitInfo,getProductiveRearrangmentFlag
+from vdjml_utils import getTopVDJItems,getRegionsObjsFromSegmentCombo,getHitInfo,getProductiveRearrangmentFlag,getVDJServerRegionAlignmentFromLargerVAlignmentPyObj
 from Bio import SeqIO
-from segment_utils import IncrementMapWrapper
+from segment_utils import IncrementMapWrapper,getVRegionsList,getRegionSpecifcCharacterization
 from char_utils import getNumberBaseSubsFromBTOP,getNumberIndelsFromBTOP,getIndelMapFromBTOP
 
 # use a read_result_ojbect return several things:
@@ -60,7 +60,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec):
 			#print "to get info...."
 			hit_info=getHitInfo(read_result_obj,meta,topVDJ[seg])
 			btop=hit_info['btop']
-			print "got btop ",seg," (",topVDJ[seg],") :",btop
+			#print "got btop ",seg," (",topVDJ[seg],") :",btop
 			whole_seq_number_base_subs+=getNumberBaseSubsFromBTOP(btop)
 			whole_seq_number_indels+=getNumberIndelsFromBTOP(btop)
 			indel_map=getIndelMapFromBTOP(btop)
@@ -76,8 +76,37 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec):
 	annMap['whole_seq_number_insertions']=whole_seq_number_insertions
 	annMap['whole_seq_number_deletions']=whole_seq_number_deletions
 	annMap['productive_rearrangement']=getProductiveRearrangmentFlag(read_result_obj,meta,organism,imgtdb_obj)
-	printMap(annMap)
+	#printMap(annMap)
+	#VDJSERVER ANNOTATIONS
+	mode_list=get_domain_modes()
+	for mode in mode_list:
+		for region in getVRegionsList():
+			#print "Now to analyze region ",region," in mode",mode
+			raInfo=getVDJServerRegionAlignmentFromLargerVAlignmentPyObj(read_result_obj,meta,organism,mode,region,imgtdb_obj,False,read_rec)
+			if(raInfo!=None):
+				#print "got no info!"
+				aln=raInfo[0]
+				q_aln=aln[0]
+				s_aln=aln[1]
+				mask=raInfo[1]
+				q_start=raInfo[2]
+				q_end=raInfo[3]
+				reg_ann=getRegionSpecifcCharacterization(s_aln,q_aln,region,mask,mode)
+				#print "got ann "
+				#printMap(reg_ann)
+				key_base="vdj_server_ann_"+mode+"_"
+				for key in reg_ann:
+					annMap[key_base+region+"_"+key]=reg_ann[key]
+			else:
+				#print raInfo
+				pass
+	printMap(annMap,True)
 	sys.exit(0)
+
+
+
+
+
 
 
 
