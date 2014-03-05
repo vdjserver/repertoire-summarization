@@ -1171,7 +1171,8 @@ def getEmptyRegCharMap():
 
 
 #can be 'None', True, or False
-def getNAProductiveFlagFromVJHitLineData(firstVMap,firstJMap,organism,imgtdb_obj):
+#uses frame information from begining of J alignment, end of V alignment 
+def getNAProductiveRearrangmentFlagFromVJHitLineData(firstVMap,firstJMap,organism,imgtdb_obj):
 	###########################################
 	#some code to look at the 'productive rearrangement
 	productive_flag=None
@@ -1185,9 +1186,13 @@ def getNAProductiveFlagFromVJHitLineData(firstVMap,firstJMap,organism,imgtdb_obj
 			if(j_s_imgt_cdr3_end==(-1)):
 				#can't get CDR3 end
 				return productive_flag
-			j_s_start_frame=(j_s_start-j_s_imgt_cdr3_end)%3
+			if(j_s_start>j_s_imgt_cdr3_end):
+				#algignment to J starts after CDR3 end...
+				return productive_flag
+			#j_s_start_frame=(j_s_start-j_s_imgt_cdr3_end)%3
+			j_s_start_frame=(2-(j_s_start-j_s_imgt_cdr3_end))%3
 			num_bp_between_V_and_J=int(firstJMap['q. start'])-int(firstVMap['q. end'])-1
-			if(num_bp_between_V_and_J<=0):
+			if(num_bp_between_V_and_J<0):
 				#unhandled case where V/J overlap!!!
 				return productive_flag
 			#print "num_bp_between_V_and_J",num_bp_between_V_and_J
