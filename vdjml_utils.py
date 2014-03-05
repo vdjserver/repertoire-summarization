@@ -53,6 +53,28 @@ def getHitInfo(read_result_obj,meta,alleleName):
 
 
 
+#return either true or false, no N/A yet
+def getProductiveFlag(read_result_obj,meta):
+	topVDJ=getTopVDJItems(read_result_obj,meta)
+	productive_flag=False
+	top_V=topVDJ['V']
+	top_J=topVDJ['J']
+	if(top_V!=None and top_J!=None):
+		vHitInfo=getHitInfo(read_result_obj,meta,top_V)
+		jHitInfo=getHitInfo(read_result_obj,meta,top_J)
+		productive_flag=getNAProductiveFlagFromVJHitLineData(vHitInfo,jHitInfo)
+		if(productive_flag is None):
+			#there is no "N/A" yet!
+			return False
+		else:
+			return productive_flag
+	else:
+		#note, there is no "N/A" or "inconclusive" ....
+		return productive_flag
+
+
+
+
 
 def getRegionsObjsFromSegmentCombo(segment_combo):
 	print "got a segment combo : ",segment_combo
