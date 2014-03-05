@@ -54,6 +54,17 @@ def getHitInfo(read_result_obj,meta,alleleName):
 
 
 
+def getRegionsObjsFromSegmentCombo(segment_combo):
+	regions=segment_combo.regions
+	print "the type of regions is ",str(type(regions))
+	#regions.new()
+	#pprint(regions)
+	#for region in regions:
+	#	print "region???"
+	#for r in range(len(region_list)):
+	#	print "Looking at region "+str(r+1)
+
+
 
 
 #given a read result object and meta data
