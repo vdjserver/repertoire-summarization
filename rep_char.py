@@ -6,9 +6,10 @@ from utils import printMap
 from pprint import pprint
 from imgt_utils import imgt_db
 from cdr3_hist import CDR3LengthAnalysisVDMLOBJ,histoMapClass
-from vdjml_utils import getTopVDJItems
+from vdjml_utils import getTopVDJItems,getRegionsObjsFromSegmentCombo,getHitInfo
 from Bio import SeqIO
 from segment_utils import IncrementMapWrapper
+from char_utils import getNumberBaseSubsFromBTOP,getNumberIndelsFromBTOP,getIndelMapFromBTOP
 
 # use a read_result_ojbect return several things:
 # 1) the segment counts (a list of 1, 2, or 3 items) , 
@@ -26,38 +27,76 @@ def rep_char_read(read_result_obj,meta,organism,imgtdb_obj,read_rec):
 	return_obj['VDJ']=topVDJ
 
 	#retrieve the CDR3 lengths
-	cdr3_length_results=CDR3LengthAnalysisVDMLOBJ(read_result_obj,meta,organism,imgtdb_obj,read_rec)
-	return_obj['cdr3_length_results']=cdr3_length_results
+	#cdr3_length_results=CDR3LengthAnalysisVDMLOBJ(read_result_obj,meta,organism,imgtdb_obj,read_rec)
+	#return_obj['cdr3_length_results']=cdr3_length_results
 
 	#perform own annotation
-	read_result_obj=vSegmentRegionVDJAnalyse(read_result_obj,meta,organism,imgtdb_obj,read_rec)
-
+	#read_result_obj=vSegmentRegionVDJAnalyse(read_result_obj,meta,organism,imgtdb_obj,read_rec)
+	#vSegmentRegionVDJAnalyse(read_result_obj,meta,organism,imgtdb_obj,read_rec)
+	readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec)
 	return return_obj
 	
+
+
+def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec):
+	print "To annotate a read...."
+	topVDJ=getTopVDJItems(read_result_obj,meta)
+	annMap=dict()
+	for seg in topVDJ:
+		annMap['top_'+seg]=topVDJ[seg]
+	#print "ann map from segs :"
+	#printMap(annMap)
+	#getHitInfo(read_result_obj,meta,alleleName):
+	hit_infos=dict()
+	whole_seq_number_base_subs=0
+	whole_seq_number_indels=0
+	whole_seq_number_insertions=0
+	whole_seq_number_deletions=0
+	for seg in topVDJ:
+		#print "in second loop...."
+		if(topVDJ[seg] is not None):
+			#print "to get info...."
+			hit_info=getHitInfo(read_result_obj,meta,topVDJ[seg])
+			btop=hit_info['btop']
+			print "got btop",btop
+			whole_seq_number_base_subs+=getNumberBaseSubsFromBTOP(btop)
+			whole_seq_number_indels+=getNumberIndelsFromBTOP(btop)
+			indel_map=getIndelMapFromBTOP(btop)
+			whole_seq_number_insertions+=indel_map['insertions']
+			whole_seq_number_deletions+=indel_map['deletions']
+			#print "from ",btop," got ",muts," substitutions"
+			#printMap(hit_info)
+			#printMap(hit_infos[seg])
+		else:
+			print "got a none seg!"
+	annMap['whole_seq_number_base_subs']=whole_seq_number_base_subs
+	annMap['whole_seq_number_indels']=whole_seq_number_indels
+	annMap['whole_seq_number_insertions']=whole_seq_number_insertions
+	annMap['whole_seq_number_deletions']=whole_seq_number_deletions
+	printMap(annMap)
+	sys.exit(0)
+
 
 
 #using the PYVDJML, add VDJserver specific tags
 def vSegmentRegionVDJAnalyse(read_result_obj,meta,organism,imgtdb_obj,read_rec):
 	topVDJ=getTopVDJItems(read_result_obj,meta)
 	topV=topVDJ['V']
-	if(topV==None):
-		return read_result_obj
-	reg_name='CDR2'
-	reg_interval=vdjml.Interval.first_last_1(5,10)
-	mm=vdjml.Match_metrics(identity=float(1.00))
 	segment_combinations=read_result_obj.segment_combinations()
 	for s in range(len(segment_combinations)):
-		scb=segment_combinations[s]
+		segment_combination=segment_combinations[s]
+		print "Looking at combination #",str(s+1)
+		getRegionsObjsFromSegmentCombo(segment_combination)
 		#sc1 = vdjml.Segment_combination(scb)
 		#scb.add_region(name=reg_name,read_range=reg_interval,metric=mm)
-		scb.insert_region(vdjml.Num_system.kabat,vdjml.Gene_region_type.cdr2,reg_interval,mm)
- #sc1.insert_region(
+#		scb.insert_region(vdjml.Num_system.kabat,vdjml.Gene_region_type.cdr2,reg_interval,mm)
+#sc1.insert_region(
 #                          vdjml.Num_system.imgt,
 #                          vdjml.Gene_region_type.fr1,
 #                          vdjml.Interval.first_last_1(1,54),
 #                          vdjml.Match_metrics(100, 54)
 #                          )
-	return read_result_obj
+#	return read_result_obj
 	
 
 
@@ -143,17 +182,18 @@ if (__name__=="__main__"):
 			read_analysis_results=rep_char_read(read_result_obj,meta,organism,imgtdb_obj,query_record)
 
 			#handle cdr3 length/histogram
-			cdr3_res=read_analysis_results['cdr3_length_results']
-			#for mode in modes:
-			#	my_cdr3_map.inc(mode,cdr3_res[mode])
+			if('cdr3_length_results' in read_analysis_results):
+				cdr3_res=read_analysis_results['cdr3_length_results']
+				for mode in modes:
+					my_cdr3_map.inc(mode,cdr3_res[mode])
 
 			#handle segment counting
-			segments=read_analysis_results['VDJ']
-			possible_segments=['V','D','J']
-			for s in segments:
-				actual=segments[s]
-				if(actual is not None):
-					segment_counter.increment(actual)
+			if('VDJ' in read_analysis_results):
+				segments=read_analysis_results['VDJ']
+				for s in segments:
+					actual=segments[s]
+					if(actual is not None):
+						segment_counter.increment(actual)
 
 			#process for writing
 			rrw(read_result_obj)
@@ -162,10 +202,10 @@ if (__name__=="__main__"):
 			read_num+=1
 
 		#write the CDR3 hist	
-		#my_cdr3_map.writeToFile(cdr3_hist_out_file)
+		my_cdr3_map.writeToFile(cdr3_hist_out_file)
 
 		#write the segment counts
-		#segment_counter.JSONIFYToFile(args.vdj_db[0],organism,segments_json_out)
+		segment_counter.JSONIFYToFile(args.vdj_db[0],organism,segments_json_out)
 
 	else:
 		#print "error in args!"
