@@ -756,11 +756,13 @@ def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human",m
 
 
 #given a V segment alignment extract from it the sub-portion for a given
-#region.  Return a 2-length array with subject and query alignment data
+#region.  Return a 4-length array with subject and query alignment data  [region_alignment,frame_mask,r_q_start,r_q_end]
 #return None if alignment too short or doesn't cover region
 def getRegionAlignmentFromLargerVAlignment(sub_info_map,org,mode,region_name,imgtdb_obj,wholeOnly=False):
+	if(wholeOnly===True):
+		raise Exception("Error, wholeOnly not yet implemented!!!!!!!!!")
 	#print "\n\n\n\nusing region=",region_name
-	valid_regions=["FR1","CDR1","FR2","CDR2","FR3"]
+	valid_regions=getVRegionsList()
 	if(not(region_name in valid_regions)):
 		print region_name," is an invalid region!!!!"
 		return None
@@ -1231,7 +1233,7 @@ def ofLeftmostJNucleotideNotAligningToJGetItsFrameAssumingJunctionSegmentOverlap
 
 #at the indicated position find the frame by using the first imgt delineation start as a "base" or "frame of reference"
 def getTheFrameForThisReferenceAtThisPosition(refName,organism,imgtdb_obj,refPos):
-	regions=["FR1","CDR1","FR2","CDR2","FR3"]
+	regions=getVRegionsList():
 	for region in regions:
 		interval=getVRegionStartAndStopGivenRefData(refName,organism,imgtdb_obj,region,"imgt")
 		if(not(interval is None)):
@@ -1241,6 +1243,13 @@ def getTheFrameForThisReferenceAtThisPosition(refName,organism,imgtdb_obj,refPos
 				return (refPos-start)%3
 	raise Exception("ERROR, COULD NOT FIND ANY FRAME POSITION AT ALL FOR ",refName," with organism=",organism)
 
+
+
+def getVRegionsList(includeCDR3=False):
+	regions=["FR1","CDR1","FR2","CDR2","FR3"]
+	if(includeCDR):
+		regions.append("CDR3")
+	return regions
 
 
 
@@ -1254,7 +1263,7 @@ reg_adj_map["Mus_musculus"]["kabat"]=dict()
 reg_adj_map["Mus_musculus"]["imgt"]=dict()
 def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 	global reg_adj_map
-	regions=["FR1","CDR1","FR2","CDR2","FR3","CDR3"]
+	regions=getVRegionsList(True)
 	if(refOrg in reg_adj_map):
 		if(mode in reg_adj_map[refOrg]):
 			if(refName in reg_adj_map[refOrg][mode]):
