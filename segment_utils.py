@@ -1187,12 +1187,19 @@ def getNAProductiveFlagFromVJHitLineData(firstVMap,firstJMap,organism,imgtdb_obj
 				return productive_flag
 			j_s_start_frame=(j_s_start-j_s_imgt_cdr3_end)%3
 			num_bp_between_V_and_J=int(firstJMap['q. start'])-int(firstVMap['q. end'])-1
-			if((v_s_end_frame+num_bp_between_V_and_J+j_s_start_frame+1)%3==0):
+			if(num_bp_between_V_and_J<=0):
+				#unhandled case where V/J overlap!!!
+				return productive_flag
+			#print "num_bp_between_V_and_J",num_bp_between_V_and_J
+			#print "v_s_end_frame=",v_s_end_frame
+			#print "j_s_start_frame",j_s_start_frame
+			if((v_s_end_frame+num_bp_between_V_and_J+j_s_start_frame)%3==1):
 				#print "TESTED PRODUCTIVE BY ALIGNMENT"
 				productive_flag=True
 			else:
 				productive_flag=False
 		else:
+			#couldn't get fr3, so can't get CDR3 either....
 			return productive_flag
 	return productive_flag
 
