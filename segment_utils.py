@@ -1191,7 +1191,7 @@ def getNAProductiveRearrangmentFlagFromVJHitLineData(firstVMap,firstJMap,organis
 			if(j_s_start>j_s_imgt_cdr3_end):
 				#algignment to J starts after CDR3 end...
 				return productive_flag
-			j_s_start_frame=(2-(j_s_start-j_s_imgt_cdr3_end))%3  #the 2 i here because the CDR3 end of J is in frame2 cause its the 3rd NA in a codon
+			j_s_start_frame=(2-(j_s_start-j_s_imgt_cdr3_end))%3  #the 2 (at the beginning) is here because the CDR3 end of J is in frame2 cause its the 3rd NA in a codon
 			num_bp_between_V_and_J=int(firstJMap['q. start'])-int(firstVMap['q. end'])-1
 			if(num_bp_between_V_and_J<0):
 				#unhandled case where V/J overlap!!!
