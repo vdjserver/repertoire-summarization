@@ -2,13 +2,13 @@
 
 import vdjml
 from vdjml_igblast_parse import scanOutputToVDJML,makeParserArgs,makeVDJMLDefaultMetaAndFactoryFromArgs
-from utils import printMap,get_domain_modes,biopythonTranslate,rev_comp_dna
+from utils import printMap,get_domain_modes,biopythonTranslate,rev_comp_dna,makeAllMapValuesVal
 from pprint import pprint
 from imgt_utils import imgt_db
 from cdr3_hist import CDR3LengthAnalysisVDMLOBJ,histoMapClass
 from vdjml_utils import getTopVDJItems,getRegionsObjsFromSegmentCombo,getHitInfo,getProductiveRearrangmentFlag,getVDJServerRegionAlignmentFromLargerVAlignmentPyObj
 from Bio import SeqIO
-from segment_utils import IncrementMapWrapper,getVRegionsList,getRegionSpecifcCharacterization
+from segment_utils import IncrementMapWrapper,getVRegionsList,getRegionSpecifcCharacterization,getEmptyRegCharMap,getAdjustedCDR3StartFromRefDirSetAllele,getTheFrameForThisReferenceAtThisPosition
 from char_utils import getNumberBaseSubsFromBTOP,getNumberIndelsFromBTOP,getIndelMapFromBTOP
 
 
@@ -34,8 +34,6 @@ def rep_char_read(read_result_obj,meta,organism,imgtdb_obj,read_rec):
 	return_obj['cdr3_length_results']=cdr3_length_results
 
 	#perform own annotation
-	#read_result_obj=vSegmentRegionVDJAnalyse(read_result_obj,meta,organism,imgtdb_obj,read_rec)
-	#vSegmentRegionVDJAnalyse(read_result_obj,meta,organism,imgtdb_obj,read_rec)
 	read_ann_map=readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_length_results)
 
 	#printMap(read_ann_map,True)
@@ -56,6 +54,12 @@ def readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,read_ann
 			query_cdr3=qw[f-1:t]
 			read_ann_map[global_key_base+mode+'_cdr3_na']=query_cdr3
 			read_ann_map[global_key_base+mode+'_cdr3_tr']=biopythonTranslate(read_ann_map[global_key_base+mode+'_cdr3_na'])
+			vMap=getHitInfo(read_result_obj,meta,read_ann_map['top_V'],read_rec,imgtdb_obj,organism)
+			dMap=None
+			if(read_ann_map['top_D'] is not None):
+				dMap=getHitInfo(read_result_obj,meta,read_ann_map['top_D'],read_rec,imgtdb_obj,organism)
+			jMap=getHitInfo(read_result_obj,meta,read_ann_map['top_J'],read_rec,imgtdb_obj,organism)
+			cdr3RegCharAnalysis(vMap,dMap,jMap,mode,cdr3_length_results,organism,imgtdb_obj)
 		else:
 			read_ann_map[global_key_base+mode+'_cdr3_na']=""
 			read_ann_map[global_key_base+mode+'_cdr3_tr']=read_ann_map[global_key_base+mode+'_cdr3_na']
@@ -63,12 +67,84 @@ def readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,read_ann
 
 
 
+#each vmap,dmap,jmap are the alignment infos as returned from getHitInfo
+def cdr3RegCharAnalysis(vMap,dMap,jMap,mode,cdr3_anal_map,organism,imgtdb_obj):
+	empty_map=getEmptyRegCharMap()
+	#first do input validation
+	if(vMap==None or jMap==None):
+		empty_map=makeAllMapValuesVal(empty_map,-1)
+		return empty_map
+	if(not(mode in cdr3_anal_map)):
+		empty_map=makeAllMapValuesVal(empty_map,-1)
+		return empty_map
+	elif(cdr3_anal_map[mode]==(-1)):
+		empty_map=makeAllMapValuesVal(empty_map,-1)
+		return empty_map
+	for m in [vMap,dMap,jMap]:
+		if('subject seq'  not in m):
+			empty_map=makeAllMapValuesVal(empty_map,-1)
+			return empty_map
+		elif('query seq' not in m):
+			empty_map=makeAllMapValuesVal(empty_map,-1)
+			return empty_map
+	#accumulate counts for V
+	max_v_anal=(-1)
+	max_d_anal=(-1)
+	q_cdr3_start=cdr3_anal_map[mode+'_from']
+	q_cdr3_end=cdr3_anal_map[mode+'_to']
+	v_s_aln=vMap['subject seq']
+	v_q_aln=vMap['query seq']
+	temp_v_pos=int(vMap['s. start'])
+	temp_v=0
+	temp_v_q_pos=int(vMap['q. start'])
+	VrefName=vMap['subject ids']
+	v_ref_cdr3_start=getAdjustedCDR3StartFromRefDirSetAllele(VrefName,imgtdb_obj,organism,mode)
+	frame_mask=list()
+	qry_cdr3_start_last_frame=(-1)
+	cdr3_q_start_for_return=(-1)
+	cdr3_s_aln=""
+	cdr3_q_aln=""
+	v_tot=0
+	v_same=0
+	while(temp_v<len(v_s_aln)):
+		if(temp_v_pos>=v_ref_cdr3_start):
+			cdr3_s_aln+=v_s_aln[temp_v]
+			cdr3_q_aln+=v_q_aln[temp_v]
+			qry_cdr3_start_last_frame=getTheFrameForThisReferenceAtThisPosition(VrefName,organism,imgtdb_obj,temp_v_pos)
+			if(v_s_aln[temp_v]!="-" and v_q_aln[temp_v]!="-"):
+				v_tot+=1
+				if(v_s_aln[temp_v]==v_q_aln[temp_v]):
+					v_same+=1
+			frame_mask.append(qry_cdr3_start_last_frame)
+		if(v_q_aln[temp_v]!="-" and cdr3_q_start_for_return!=(-1)):
+			cdr3_q_start_for_return=temp_v_q_pos
+		if(v_q_aln[temp_v]!="-"):
+			temp_v_q_pos+=1
+		if(v_s_aln[temp_v]!="-"):
+			lastVPos=temp_v_pos
+			temp_v_pos+=1
+		temp_v+=1
+	#cdr3_v_char_map=getRegionSpecifcCharacterization(cdr3_s_aln,cdr3_q_aln,"CDR3",frame_mask,dMode)
+	print "THE CDR3 ALN IN V is (q top, s bottom)"
+	print cdr3_q_aln
+	print cdr3_s_aln
+	print frame_mask
+	print "stop here"
+	sys.exit(0)
+
+	
+	
+			
+
 def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
 	#print "To annotate a read...."
 	topVDJ=getTopVDJItems(read_result_obj,meta)
 	annMap=dict()
 	for seg in topVDJ:
-		annMap['top_'+seg]=topVDJ[seg]
+		if(topVDJ[seg] is not None):
+			annMap['top_'+seg]=topVDJ[seg]
+		else:
+			annMap['top_'+seg]="None"			
 	#print "ann map from segs :"
 	#printMap(annMap)
 	#getHitInfo(read_result_obj,meta,alleleName):
@@ -130,6 +206,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
 	#printMap(annMap,True)
 	#sys.exit(0)
 	annMap=readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,annMap,cdr3_map)
+	printMap(annMap,True)
 	return annMap
 
 
