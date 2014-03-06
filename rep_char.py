@@ -77,6 +77,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
 	whole_seq_number_indels=0
 	whole_seq_number_insertions=0
 	whole_seq_number_deletions=0
+	noneSeg_flag=False
 	for seg in topVDJ:
 		#print "in second loop...."
 		if(topVDJ[seg] is not None):
@@ -93,6 +94,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
 			#printMap(hit_info)
 			#printMap(hit_infos[seg])
 		else:
+			noneSeg_flag=True
 			print "got a none seg!"
 	annMap['whole_seq_number_base_subs']=whole_seq_number_base_subs
 	annMap['whole_seq_number_indels']=whole_seq_number_indels
@@ -106,7 +108,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
 		for region in getVRegionsList():
 			#print "Now to analyze region ",region," in mode",mode
 			raInfo=getVDJServerRegionAlignmentFromLargerVAlignmentPyObj(read_result_obj,meta,organism,mode,region,imgtdb_obj,False,read_rec)
-			if(raInfo!=None):
+			if(raInfo!=None and not(noneSeg_flag)):
 				#print "got no info!"
 				aln=raInfo[0]
 				q_aln=aln[0]
@@ -122,7 +124,9 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
 					annMap[key_base+region+"_"+key]=reg_ann[key]
 			else:
 				#print raInfo
-				pass
+				for key in reg_ann:
+					annMap[key_base+region+"_"+key]=(-1)
+				#pass
 	#printMap(annMap,True)
 	#sys.exit(0)
 	annMap=readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,annMap,cdr3_map)
