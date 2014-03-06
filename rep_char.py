@@ -46,7 +46,6 @@ def rep_char_read(read_result_obj,meta,organism,imgtdb_obj,read_rec):
 		if(f!=(-1) or t!=(-1) or cdr3_length_results[mode]==(-1) ):
 			qw=str(read_rec.seq)
 			if(cdr3_length_results['qry_rev']):
-				print "RC detection!!!!!"
 				qw=rev_comp_dna(qw)
 			query_cdr3=qw[f-1:t]
 			read_ann_map[global_key_base+mode+'_cdr3_na']=query_cdr3
