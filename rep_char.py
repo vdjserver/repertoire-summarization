@@ -36,9 +36,15 @@ def rep_char_read(read_result_obj,meta,organism,imgtdb_obj,read_rec):
 	#perform own annotation
 	#read_result_obj=vSegmentRegionVDJAnalyse(read_result_obj,meta,organism,imgtdb_obj,read_rec)
 	#vSegmentRegionVDJAnalyse(read_result_obj,meta,organism,imgtdb_obj,read_rec)
-	read_ann_map=readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec)
+	read_ann_map=readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_length_results)
 
-	#add some CDR3 information to the ann_amp
+	#printMap(read_ann_map,True)
+	#sys.exit(0)
+
+	return return_obj
+	
+
+def readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,read_ann_map,cdr3_length_results):
 	global global_key_base
 	for mode in get_domain_modes():
 		f=cdr3_length_results[mode+'_from']
@@ -53,16 +59,12 @@ def rep_char_read(read_result_obj,meta,organism,imgtdb_obj,read_rec):
 		else:
 			read_ann_map[global_key_base+mode+'_cdr3_na']=""
 			read_ann_map[global_key_base+mode+'_cdr3_tr']=read_ann_map[global_key_base+mode+'_cdr3_na']
-			
-
-	printMap(read_ann_map,True)
-	sys.exit(0)
-	return return_obj
-	
+	return read_ann_map
 
 
-def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec):
-	print "To annotate a read...."
+
+def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
+	#print "To annotate a read...."
 	topVDJ=getTopVDJItems(read_result_obj,meta)
 	annMap=dict()
 	for seg in topVDJ:
@@ -97,8 +99,8 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec):
 	annMap['whole_seq_number_insertions']=whole_seq_number_insertions
 	annMap['whole_seq_number_deletions']=whole_seq_number_deletions
 	annMap['productive_rearrangement']=getProductiveRearrangmentFlag(read_result_obj,meta,organism,imgtdb_obj)
-	#printMap(annMap)
-	#VDJSERVER ANNOTATIONS
+
+	#VDJSERVER V REGION ANNOTATIONS
 	mode_list=get_domain_modes()
 	for mode in mode_list:
 		for region in getVRegionsList():
@@ -123,6 +125,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec):
 				pass
 	#printMap(annMap,True)
 	#sys.exit(0)
+	annMap=readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,annMap,cdr3_map)
 	return annMap
 
 
@@ -230,6 +233,8 @@ if (__name__=="__main__"):
 			#prepare for the iteration and give a possible status message...
 			if(read_num>1 and read_num%1000==0):
 				print "Processed read",read_num,"..."
+			elif(read_num==1):
+				print "Processing reads..."
 			query_record=fasta_reader.next()
 			
 			#analyze a read's results
