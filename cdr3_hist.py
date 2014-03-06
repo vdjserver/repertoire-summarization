@@ -127,11 +127,15 @@ def CDR3LengthAnalysisVDMLOBJ(read_result_obj,meta,organism,imgtdb_obj,query_rec
 	vAllele=VDJMap['V']
 	jAllele=VDJMap['J']
 	empty_map=dict()
-	empty_map['kabat']=(-1)
-	empty_map['imgt']=(-1)
+	modes=get_domain_modes()
+	for mode in modes:
+		empty_map[mode]=(-1)
+		empty_map[mode+'_from']=(-1)
+		empty_map[mode+'_to']=(-1)
+		empty_map[mode+'_to']=(-1)
+		empty_map['qry_rev']=False
 	if(vAllele!=None and jAllele!=None):
 		vData=getHitInfo(read_result_obj,meta,vAllele)
-		#print "Vdata IS "
 		vData=addAlignmentsPreCDR3(vData,vAllele,imgtdb_obj,organism,query_record)
 		jData=getHitInfo(read_result_obj,meta,jAllele)
 		jData=addAlignmentsPreCDR3(jData,jAllele,imgtdb_obj,organism,query_record)
@@ -303,11 +307,17 @@ def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
 	currentV=vMap['subject ids']
 	currentJ=jMap['subject ids']
 	cdr3_hist=dict()
+	if(vMap['query id'].find("reversed|")==0):
+		cdr3_hist['qry_rev']=True
+	else:
+		cdr3_hist['qry_rev']=False
 	if(looksLikeAlleleStr(currentV) and looksLikeAlleleStr(currentJ)):
 		#print "WE'RE IN BUSINESS!"
 		domain_modes=get_domain_modes()
 		for dm in domain_modes:
 			cdr3_hist[dm]=(-1)
+			cdr3_hist[dm+'_from']=(-1)
+			cdr3_hist[dm+'_to']=(-1)
 			#print "processing in ",dm
 			if(not currentV in rsmap[dm]):
 				#print currentV,"not in lookup for dm=",dm
@@ -338,8 +348,6 @@ def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
 				qry_cdr3_end=getQueryIndexGivenSubjectIndexAndAlignment(jq_aln,js_aln,jq_f,jq_t,js_f,js_t,ref_cdr3_end)
 				if(qry_cdr3_start!=(-1) and qry_cdr3_end!=(-1)):
 					#query_coding_seq=query_seq_map[currentQueryName]
-					#if(vMap['query id'].find("reversed|"+currentQueryName)==(-1)):
-					#	query_coding_seq=rev_comp_dna(query_coding_seq)
 					#coding_seq=query_coding_seq[(qry_cdr3_start-1):(qry_cdr3_end-1)]
 					cdr3_len=qry_cdr3_end-qry_cdr3_start+1
 					#translation=biopythonTranslate(coding_seq)
@@ -347,6 +355,8 @@ def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
 					#print "The translation ("+dm+") is : ",translation
 					#print "CDR3_LEN ("+dm+") ="+str(cdr3_len)
 					cdr3_hist[dm]=cdr3_len
+					cdr3_hist[dm+'_from']=qry_cdr3_start
+					cdr3_hist[dm+'_to']=qry_cdr3_end
 				else:
 					#print "BADQRYMAP Failure to map to query for mode=",dm," V=",currentV," J=",currentJ," read=",currentQueryName," REFSTART=",ref_cdr3_start,"QRYSTART=",qry_cdr3_start,"REFEND=",ref_cdr3_end,"QRYEND=",qry_cdr3_end
 					pass

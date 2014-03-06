@@ -2,7 +2,7 @@
 
 import vdjml
 from vdjml_igblast_parse import scanOutputToVDJML,makeParserArgs,makeVDJMLDefaultMetaAndFactoryFromArgs
-from utils import printMap,get_domain_modes
+from utils import printMap,get_domain_modes,biopythonTranslate,rev_comp_dna
 from pprint import pprint
 from imgt_utils import imgt_db
 from cdr3_hist import CDR3LengthAnalysisVDMLOBJ,histoMapClass
@@ -10,6 +10,9 @@ from vdjml_utils import getTopVDJItems,getRegionsObjsFromSegmentCombo,getHitInfo
 from Bio import SeqIO
 from segment_utils import IncrementMapWrapper,getVRegionsList,getRegionSpecifcCharacterization
 from char_utils import getNumberBaseSubsFromBTOP,getNumberIndelsFromBTOP,getIndelMapFromBTOP
+
+
+global_key_base="vdj_server_ann_"
 
 # use a read_result_ojbect return several things:
 # 1) the segment counts (a list of 1, 2, or 3 items) , 
@@ -30,12 +33,31 @@ def rep_char_read(read_result_obj,meta,organism,imgtdb_obj,read_rec):
 	cdr3_length_results=CDR3LengthAnalysisVDMLOBJ(read_result_obj,meta,organism,imgtdb_obj,read_rec)
 	return_obj['cdr3_length_results']=cdr3_length_results
 
-
-
 	#perform own annotation
 	#read_result_obj=vSegmentRegionVDJAnalyse(read_result_obj,meta,organism,imgtdb_obj,read_rec)
 	#vSegmentRegionVDJAnalyse(read_result_obj,meta,organism,imgtdb_obj,read_rec)
-	readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec)
+	read_ann_map=readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec)
+
+	#add some CDR3 information to the ann_amp
+	global global_key_base
+	for mode in get_domain_modes():
+		f=cdr3_length_results[mode+'_from']
+		t=cdr3_length_results[mode+'_to']
+		if(f!=(-1) or t!=(-1) or cdr3_length_results[mode]==(-1) ):
+			qw=str(read_rec.seq)
+			if(cdr3_length_results['qry_rev']):
+				print "RC detection!!!!!"
+				qw=rev_comp_dna(qw)
+			query_cdr3=qw[f-1:t]
+			read_ann_map[global_key_base+mode+'_cdr3_na']=query_cdr3
+			read_ann_map[global_key_base+mode+'_cdr3_tr']=biopythonTranslate(read_ann_map[global_key_base+mode+'_cdr3_na'])
+		else:
+			read_ann_map[global_key_base+mode+'_cdr3_na']=""
+			read_ann_map[global_key_base+mode+'_cdr3_tr']=read_ann_map[global_key_base+mode+'_cdr3_na']
+			
+
+	printMap(read_ann_map,True)
+	sys.exit(0)
 	return return_obj
 	
 
@@ -94,14 +116,15 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec):
 				reg_ann=getRegionSpecifcCharacterization(s_aln,q_aln,region,mask,mode)
 				#print "got ann "
 				#printMap(reg_ann)
-				key_base="vdj_server_ann_"+mode+"_"
+				key_base=global_key_base+mode+"_"
 				for key in reg_ann:
 					annMap[key_base+region+"_"+key]=reg_ann[key]
 			else:
 				#print raInfo
 				pass
-	printMap(annMap,True)
-	sys.exit(0)
+	#printMap(annMap,True)
+	#sys.exit(0)
+	return annMap
 
 
 
