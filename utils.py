@@ -11,6 +11,16 @@ import pickle
 
 
 
+
+def makeAllMapValuesVal(m,v):
+	if(m is not None):
+		for k in m:
+			m[k]=v
+	return m
+		
+
+
+
 def rev_dna(dna):
 	reversed_dna=""
 	for ub in range(len(dna)):
