@@ -1066,7 +1066,7 @@ def getCDR3RegionSpecificCharacterization(vData,dData,jData,organism,imgtdb_obj,
 #C) insertions, D) deletions, E) number stop codons
 #F) mutation(sum A-D)
 #NOTE "A" and "B" are 'base substitutions'
-def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name,frame_mask,mode):
+def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name,frame_mask,mode,q_start=None,limit=(-1)):
 	char_map=dict()
 	num_ins=0
 	num_del=0
@@ -1084,40 +1084,57 @@ def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name,frame_mask,mode):
 			num_del+=1
 	#do counts with codon information
 	temp_index=0
-	#print "Now doing codon-based counting..."
+	#using such flags take stats with the limitation of limit
+	if(q_start!=None):
+		q_pos=q_start
+	else:
+		q_pos=float("inf")
+	last_q_pos=q_pos
 	while(temp_index<len(s_aln)):
 		#print "temp_index=",temp_index," and frame mask is ",frame_mask[temp_index]
 		if(
 			temp_index<len(s_aln)-2 and 
 			frame_mask[temp_index]==0 and 
 			frame_mask[temp_index+1]==1 and 
-			frame_mask[temp_index+2]==2
+			frame_mask[temp_index+2]==2 
 			):
 			#print "encountered a codon...."
 			s_codon=s_aln[temp_index:(temp_index+3)]
+			s_codon_w_gaps=s_codon
 			s_codon=re.sub(r'\-','N',s_codon)
 			#print "s codon is ",s_codon
 			q_codon=q_aln[temp_index:(temp_index+3)]
+			q_codon_w_gaps=q_codon
 			q_codon=re.sub(r'\-','N',q_codon)
 			#print "q codon is ",q_codon
 			if(s_codon.find("-")==(-1) and q_codon.find("-")==(-1)):
+				#ANALYSIS FOR CODONS WITH NO GAPS
 				#no gaps, perform analysis
 				s_amino=str(biopythonTranslate(s_codon))
 				#print "subject amino :",s_amino
 				q_amino=str(biopythonTranslate(q_codon))
 				#print "query amino ",q_amino
 				for cp in range(3):
-					if(s_codon[cp]!=q_codon[cp] and s_amino==q_amino):
+					if(s_codon[cp]!=q_codon[cp] and s_amino==q_amino and q_pos+cp>limit):
 						num_syn+=1
 						num_bsb+=1
-					elif(s_codon[cp]!=q_codon[cp] and s_amino!=q_amino):
+						if(q_codon_w_gaps[cp]!="-"):
+							q_pos+=1
+							last_q_pos=q_pos
+					elif(s_codon[cp]!=q_codon[cp] and s_amino!=q_amino and q_pos+cp>limit):
 						num_nsy+=1
 						num_bsb+=1
+						if(q_codon_w_gaps[cp]!="-"):
+							q_pos+=1
+							last_q_pos=q_pos
 			else:
-				#for codons with gaps
+				#ANALYSIS FOR CODONS WITHOUT GAPS
 				for cp in range(3):
-					if(s_codon[cp]!="-" and q_codon[cp]!="-" and s_codon[cp]!=q_codon[cp]):
+					if(s_codon[cp]!="-" and q_codon[cp]!="-" and s_codon[cp]!=q_codon[cp] and q_pos>limit):
 						num_bsb+=1
+					if(q_codon_w_gaps[cp]!="-"):
+						q_pos+=1
+						last_q_pos=q_pos
 			#q_codon_space=getCodonSpace(q_codon)
 			#s_codon_space=getCodonSpace(s_codon)
 			#q_codon_set=getCodonSpaceAsSet(q_codon_space)
@@ -1129,18 +1146,29 @@ def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name,frame_mask,mode):
 		else:
 			#print "encountered a single...."
 			if(s_aln[temp_index]!=q_aln[temp_index] and s_aln[temp_index]!="-" and q_aln[temp_index]!="-"):
-				num_bsb+=1
+				if(q_pos>limit):
+					num_bsb+=1
+				if(q_aln[temp_index]!="-"):
+					q_pos+=1
+					
 			temp_index+=1
 	#have this loop below for pct id
 	num_same=0
 	num_tot=0
 	temp_index=0
+	#using such flags take stats with the limitation of limit
+	if(q_start!=None):
+		q_pos=q_start
+	else:
+		q_pos=float("inf")
 	while(temp_index<len(s_aln)):
 		num_tot+=0
-		if(s_aln[temp_index]==q_aln[temp_index] and s_aln[temp_index]!="-" and q_aln[temp_index]!="-"):
+		if(s_aln[temp_index]==q_aln[temp_index] and s_aln[temp_index]!="-" and q_aln[temp_index]!="-" and q_pos>limit):
 			num_same+=1
-		if(s_aln[temp_index]!="-" and q_aln[temp_index]!="-"):
+		if(s_aln[temp_index]!="-" and q_aln[temp_index]!="-" and q_pos>limit):
 			num_tot+=1
+		if(q_aln[temp_index]!="-"):
+			q_pos+=1
 		temp_index+=1
 	pct_id=0
 	if(num_tot==0):
