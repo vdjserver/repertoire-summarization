@@ -1264,7 +1264,7 @@ reg_adj_map["Mus_musculus"]["kabat"]=dict()
 reg_adj_map["Mus_musculus"]["imgt"]=dict()
 def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 	global reg_adj_map
-	regions=getVRegionsList(True)
+	regions=getVRegionsList()
 	if(refOrg in reg_adj_map):
 		if(mode in reg_adj_map[refOrg]):
 			if(refName in reg_adj_map[refOrg][mode]):
@@ -1277,12 +1277,11 @@ def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 				reg_adj_map[refOrg][mode][refName]=dict()
 		else:
 			#mode not there! a bad mode!
-			print "unknown mode ",mode," (expect kabat or imgt)!"
-			sys.exit(0)
+			raise Exception("unknown mode ",mode," (expected kabat or imgt)!")
+			#sys.exit(0)
 	else:
 		#organism not in there!
-		#print "unknown organism :",refOrf,"!"
-		sys.exit(0)
+		raise Exception("Unknown organism "+refOrg)
 	#first, form a path to a lookup.
 	#this depends on organis and mode
 	#for KABAT its a file
