@@ -885,6 +885,33 @@ def combineCharMaps(map_1,map_2):
 
 
 
+
+
+
+#find CDR3 by subalignment styles and find the characterization
+def  getCDR3RegionSpecificCharacterizationSubAln(vData,dData,jData,organism,imgtdb_obj,dMode):
+	#aln=["",""]
+	if(vData==None or jData==None):
+		return getEmptyRegCharMap()
+	#get ALIGNMENT starting at CDR3 in V QUERY
+	VrefName=vData['subject ids']
+	v_ref_cdr3_start=getAdjustedCDR3StartFromRefDirSetAllele(VrefName,imgtdb_obj,organism,dMode)
+	vRefTo=int(vData['s. end'])
+	vRefFrom=int(vData['s. start'])
+	vQryFrom=int(vData['q. start'])
+	vQryTo=int(vData['q. end'])
+	v_q_aln=vData['query seq']
+	v_s_aln=vData['subject seq']
+	qry_cdr3_start=getQueryIndexGivenSubjectIndexAndAlignment(v_q_aln,v_s_aln,vQryFrom,vQryTo,vRefFrom,vRefTo,v_ref_cdr3_start)
+	v_q_cdr3_aln=getAlnAtAndCond(v_q_aln,v_s_aln,vQryFrom,vQryTo,vRefFrom,vRefTo,qry_cdr3_start,"query","geq")
+	print "The sub aln for CDR3 in V is ",v_q_cdr3_aln
+
+
+
+
+
+
+
 #characterize CDR3
 def getCDR3RegionSpecificCharacterization(vData,dData,jData,organism,imgtdb_obj,dMode):
 	print "###############################ENTER CDR3#################################"
@@ -1608,8 +1635,12 @@ def getQueryIndexGivenSubjectIndexAndAlignment(query_aln,subject_aln,q_start,q_s
 				#return 1-based index
 				#return q_counter
 				if(s_val!="-"):
-					#print "getQueryIndexGivenSubjectIndexAndAlignment to return (qcounter) ",q_counter
 					return q_counter
+					#print "getQueryIndexGivenSubjectIndexAndAlignment to return (qcounter) ",q_counter
+					#if(q_val!="-"):
+					#	return q_counter
+					#else:
+					#	return q_counter+1
 			if(not(q_val=="-")):
 				q_counter+=1
 			if(not(s_val=="-")):
@@ -1665,9 +1696,22 @@ def getHierarchyByOrganism(geneTablesDirectoryOfHTMLFiles,org_name,filterbyFasta
 
 
 
-
-
-
+if (__name__=="__main__"):
+	#getQueryIndexGivenSubjectIndexAndAlignment
+	#getQueryIndexGivenSubjectIndexAndAlignment(query_aln,subject_aln,q_start,q_stop,s_start,s_stop,subject_pos):
+	query_aln="AC-XN-GT"
+	sbjct_aln="-GAT-ACA"
+	query_from=2
+	query_to=7
+	sbjct_f=3
+	sbjct_t=8
+	for i in range(3,8+1):
+		print "\n\n\n"
+		print "Now analyzing (s at top, q at bottom):"
+		print sbjct_f,sbjct_aln,sbjct_t
+		print query_from,query_aln,query_to
+		print "q_from=",query_from," query_to=",query_to,",s_from=",sbjct_f,", s_to=",sbjct_t," At subject position=",i
+		print "The corresponding query position is "+str(getQueryIndexGivenSubjectIndexAndAlignment(query_aln,sbjct_aln,query_from,query_to,sbjct_f,sbjct_t,i))
 
 
 
