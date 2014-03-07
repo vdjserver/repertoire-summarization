@@ -11,6 +11,59 @@ import pickle
 
 
 
+#given an alignment, and a position of a sequence IN the alignment
+#return the porition of the alignment whose bp are <= or >= that position in the alignment
+def getAlnAtAndCond(q_aln,s_aln,q_from,q_to,s_from,s_to,a_pos,st="query",cond="leq"):
+	if(not(st=="query")):
+		st="subject"
+	aln=["",""] #Q, then S
+	if(not(cond=="leq")):
+		cond="geq"
+	else:
+		s_pos=s_from
+		q_pos=q_from
+		temp=0
+		while(temp<len(q_aln)):
+			if(cond=="leq"):
+				if(st=="query"):
+					if(a_pos<=q_pos):
+						aln[0]+=q_aln[temp]
+						aln[1]+=s_aln[temp]
+				else:
+					if(a_pos<=s_pos):
+						aln[0]+=q_aln[temp]
+						aln[1]+=s_aln[temp]
+			else:
+				if(st=="query"):
+					if(a_pos>=q_pos):
+						aln[0]+=q_aln[temp]
+						aln[1]+=s_aln[temp]
+				else:
+					if(a_pos>=s_pos):
+						aln[0]+=q_aln[temp]
+						aln[1]+=s_aln[temp]				
+			if(s_aln[temp]!="-"):
+				s_pos+=1
+			if(q_aln[temp]!="-"):
+				q_pos+=1
+			temp+=1
+		return aln #Q then S
+			
+	
+
+
+
+def makeEmptyArrayOfStringsOfLen(l):
+	empty_str_arr=list()
+	#non-negative numbers only please!
+	l=max(0,l)
+	for i in range(l)
+		empty_str_arr.append("")
+	return empty_str_arr
+
+
+
+
 
 def makeAllMapValuesVal(m,v):
 	if(m is not None):
