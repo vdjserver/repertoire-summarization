@@ -10,7 +10,7 @@ from imgt_utils import get_loci_list,imgt_db
 import glob
 from utils import biopythonTranslate
 from igblast_utils import printNiceAlignment
-from utils import printMap,makeAllMapValuesVal
+from utils import printMap,makeAllMapValuesVal,getAlnAtAndCond
 
 
 def removeTerminatingSemicolonIfItExists(s):
@@ -883,8 +883,27 @@ def combineCharMaps(map_1,map_2):
 		combo_map[k]=map_1[k]+map_2[k]
 	return combo_map
 
-
-
+#return a map with 'q. end ' and 's. end' as keys
+def givenAlnAndStartsFindLasts(q_aln,s_aln,q_from,s_from):
+	temp=0
+	q_pos=q_from
+	s_pos=s_from
+	while(temp<len(q_aln)):
+		if(temp==len(q_aln)-1):
+			res=dict()
+			res['s. end']=s_pos
+			res['q. end']=q_pos
+			return res
+		if(q_aln[temp]!="-"):
+			q_pos+=1
+		if(s_aln[temp]!="-"):
+			s_pos+=1
+		temp+=1
+	res=dict()
+	res['s. end']=s_pos
+	res['q. end']=q_pos
+	return res
+	
 
 
 
@@ -902,10 +921,32 @@ def  getCDR3RegionSpecificCharacterizationSubAln(vData,dData,jData,organism,imgt
 	vQryTo=int(vData['q. end'])
 	v_q_aln=vData['query seq']
 	v_s_aln=vData['subject seq']
+	print "target=",v_ref_cdr3_start," ref=",VrefName," mode=",dMode
+	print "s from/to : ",vRefFrom," and ",vRefTo
+	print "q from/to : ",vQryFrom," and ",vQryTo
 	#qry_cdr3_start=getQueryIndexGivenSubjectIndexAndAlignment(v_q_aln,v_s_aln,vQryFrom,vQryTo,vRefFrom,vRefTo,v_ref_cdr3_start)
 	v_cdr3_aln=getAlnAtAndCond(v_q_aln,v_s_aln,vQryFrom,vQryTo,vRefFrom,vRefTo,v_ref_cdr3_start,"subject","geq")
-	print "The sub aln for CDR3 in V is ",v_cdr3_aln
-	sys.exit(0)
+	q_cdr3_start=getQueryIndexGivenSubjectIndexAndAlignment(v_q_aln,v_s_aln,vQryFrom,vQryTo,vRefFrom,vRefTo,v_ref_cdr3_start)
+	print "The sub aln for CDR3 in V is ",v_cdr3_aln," and the according cdr3 pos is ",q_cdr3_start
+	#find the position number of the last BP in the V CDR3 query
+	#use this position number to extract the portion of the D alignment that is not already covered 
+	#in the V alignment.  This in the case the junction sequence is "double aligned" by both V and D
+	# this is notated with "GA(TTA)CA" in the IGBLAST output
+	q_last_cdr3=givenAlnAndStartsFindLasts(v_cdr3_aln[0],v_cdr3_aln[1],q_cdr3_start,v_ref_cdr3_start)
+	#increment the value by one to get the next bp to avoid overcounting and because the routine to call will use >= not >
+	q_d_cdr3_lim=q_last_cdr3+1
+	#using this 'q_d_cdr3_lim' if D alignment exists, find the sub alignment in D of CDR3
+	if(dData!=None):
+		
+
+	
+
+	
+
+
+
+
+
 
 
 
