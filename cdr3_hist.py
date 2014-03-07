@@ -349,7 +349,7 @@ def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
 				if(qry_cdr3_start!=(-1) and qry_cdr3_end!=(-1)):
 					#query_coding_seq=query_seq_map[currentQueryName]
 					#coding_seq=query_coding_seq[(qry_cdr3_start-1):(qry_cdr3_end-1)]
-					if(qry_cdr3_start<qry_cdr3_end):
+					if(qry_cdr3_start<=qry_cdr3_end):
 						#good
 						cdr3_len=qry_cdr3_end-qry_cdr3_start+1
 						#translation=biopythonTranslate(coding_seq)
