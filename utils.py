@@ -57,7 +57,7 @@ def makeEmptyArrayOfStringsOfLen(l):
 	empty_str_arr=list()
 	#non-negative numbers only please!
 	l=max(0,l)
-	for i in range(l)
+	for i in range(l):
 		empty_str_arr.append("")
 	return empty_str_arr
 
