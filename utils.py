@@ -50,8 +50,37 @@ def getAlnAtAndCond(q_aln,s_aln,q_from,q_to,s_from,s_to,a_pos,st="query",cond="l
 		return aln #Q then S
 			
 	
-
-
+#does a position in a sequence align to a gap???
+def doesPosInSeqAlignToGap(q_aln,s_aln,q_from,q_to,s_from,s_to,a_pos,st="query"):
+	if(st!="query"):
+		st="subject"
+	if(st=="subject" and not(s_from<=a_pos and a_pos<=s_to)):
+		return None
+	elif(st=="query" and not(q_from<=a_pos and a_pos<=q_to)):
+		return None
+	else:
+		s_pos=s_from
+		q_pos=q_from
+		temp=0
+		while(temp<len(q_aln)):
+			s_val=s_aln[temp]
+			q_val=q_aln[temp]
+			if(st=="query" and a_pos==q_pos):
+				if(s_val=="-"):
+					return True
+				else:
+					return False
+			if(st=="subject" and a_pos==s_pos):
+				if(q_val=="-"):
+					return True
+				else:
+					return False
+			if(s_aln[temp]!="-"):
+				s_pos+=1
+			if(q_aln[temp]!="-"):
+				q_pos+=1
+			temp+=1
+		return aln #Q then S		
 
 def makeEmptyArrayOfStringsOfLen(l):
 	empty_str_arr=list()
