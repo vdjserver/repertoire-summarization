@@ -909,6 +909,8 @@ def givenAlnAndStartsFindLasts(q_aln,s_aln,q_from,s_from):
 
 #find CDR3 by subalignment styles and find the characterization
 def  getCDR3RegionSpecificCharacterizationSubAln(vData,dData,jData,organism,imgtdb_obj,dMode,query_rec):
+	#it is assume that CDR3 length evaluates to a non-negative number here!
+	#assume VDATA, DDATA, JDATA are all non-None!
 	#aln=["",""]
 	if(vData==None or jData==None):
 		return getEmptyRegCharMap()
@@ -922,27 +924,91 @@ def  getCDR3RegionSpecificCharacterizationSubAln(vData,dData,jData,organism,imgt
 	v_q_aln=vData['query seq']
 	v_s_aln=vData['subject seq']
 	print "target=",v_ref_cdr3_start," ref=",VrefName," mode=",dMode
-	print "s from/to : ",vRefFrom," and ",vRefTo
-	print "q from/to : ",vQryFrom," and ",vQryTo
+	print "V s from/to : ",vRefFrom," and ",vRefTo
+	print "V q from/to : ",vQryFrom," and ",vQryTo
 	#qry_cdr3_start=getQueryIndexGivenSubjectIndexAndAlignment(v_q_aln,v_s_aln,vQryFrom,vQryTo,vRefFrom,vRefTo,v_ref_cdr3_start)
 	v_cdr3_aln=getAlnAtAndCond(v_q_aln,v_s_aln,vQryFrom,vQryTo,vRefFrom,vRefTo,v_ref_cdr3_start,"subject","geq")
-	q_cdr3_start=getQueryIndexGivenSubjectIndexAndAlignment(v_q_aln,v_s_aln,vQryFrom,vQryTo,vRefFrom,vRefTo,v_ref_cdr3_start)
-	print "The sub aln for CDR3 in V is ",v_cdr3_aln," and the according cdr3 pos is ",q_cdr3_start
+	print "CDR3=",v_cdr3_aln
 	#find the position number of the last BP in the V CDR3 query
 	#use this position number to extract the portion of the D alignment that is not already covered 
 	#in the V alignment.  This in the case the junction sequence is "double aligned" by both V and D
 	# this is notated with "GA(TTA)CA" in the IGBLAST output
-	q_last_cdr3=givenAlnAndStartsFindLasts(v_cdr3_aln[0],v_cdr3_aln[1],q_cdr3_start,v_ref_cdr3_start)
+	q_last_cdr3=vQryTo
 	#increment the value by one to get the next bp to avoid overcounting and because the routine to call will use >= not >
 	q_d_cdr3_lim=q_last_cdr3+1
 	#using this 'q_d_cdr3_lim' if D alignment exists, find the sub alignment in D of CDR3
-	if(dData!=None):
-		
+	numDInAlnRemoved=0 #represents number BP chopped from beginning of D alignment
+	d_adj_cdr3_start=(-1)
+	#get D subalignment
+	d_q_aln=dData['query seq']
+	d_s_aln=dData['subject seq']
+	dQryFrom=int(dData['q. start'])
+	dQryTo=int(dData['q. end'])
+	dRefFrom=int(dData['s. start'])
+	dRefTo=int(dData['s. end'])
+	#printMap(dData)
+	#print "D s from/to : ",dRefFrom," and ",dRefTo
+	#print "D q from/to : ",dQryFrom," and ",dQryTo
+	d_cdr3_aln=getAlnAtAndCond(d_q_aln,d_s_aln,dQryFrom,dQryTo,dRefFrom,dRefTo,q_d_cdr3_lim,"query","geq")
+	if(len(d_cdr3_aln[0])==0):
+		d_q_last_cdr3=q_d_cdr3_lim
+		numDInAlnRemoved=len(d_q_aln)
+		d_adj_cdr3_start=(-1)
+	else:
+		d_q_last_cdr3=dQryTo
+		numDInAlnRemoved=len(d_q_aln)-len(d_cdr3_aln)
+		#get the adjust D cdr3 "resume" (not start)
+		#so that proper frame can be achieved
+		temp=0
+		q_pos=dQryTo
+		temp=len(d_q_aln)-1
+		while(temp>=0):
+			if(temp==numDInAlnRemoved):
+				d_adj_cdr3_start=q_pos
+				temp=0
+			if(d_q_aln[temp]!="-"):
+				q_pos-=1
+			temp-=1
+	#NOW d_adj_cdr3_start represents the position of the first base of the D alignment
+	#that is not also in the V alignment for 
+	print "D CDR3 ALN WITH OVERLAP REMOVED : "
+	print d_cdr3_aln
 
+	#J part
+	if(d_adj_cdr3_start==(-1)):
+		#if all D alignment was removed, use same limit that D used
+		j_cdr3_lim=q_d_cdr3_lim
+	else:
+		#if not all D was removed
+		j_cdr3_lim=d_q_last_cdr3+1
+
+	#get sub J alignment
+	j_q_aln=jData['query seq']
+	j_s_aln=jData['subject seq']
+	jQryFrom=int(jData['q. start'])
+	jQryTo=int(jData['q. end'])
+	jRefFrom=int(jData['s. start'])
+	jRefTo=int(jData['s. end'])
+	j_cdr3_aln=getAlnAtAndCond(j_q_aln,j_s_aln,jQryFrom,jQryTo,jRefFrom,jRefTo,j_cdr3_lim,"query","geq")
 	
 
-	
-
+	#accumulate on base subs, insertions, deletions
+	noSynMap=getEmptyRegCharMap()	
+	segs=['V','D','J']
+	for s in range(len(segs)):
+		to_analyze=None
+		if(s==0):
+			to_analyze=v_cdr3_aln
+		elif(s==1):
+			to_analyze=d_cdr3_aln
+		else:
+			to_analyze=j_cdr3_aln
+		temp_frame_array=list()
+		for i in range(len(to_analyze[0])):
+			temp_frame_array.append(0)
+		temp_char_map=getRegionSpecifcCharacterization(s_aln,q_aln,reg_name,temp_frame_array,mode)
+		for k in temp_char_map:
+			noSynMap[k]+=temp_char_map[k]
 
 
 
@@ -1250,7 +1316,7 @@ def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name,frame_mask,mode,q_star
 	char_map['base_sub']=num_bsb
 	char_map['synonymous_bsb']=num_syn
 	char_map['nonsynonymous_bsb']=num_nsy
-	char_map['mutations']=num_nsy+num_syn+num_bsb+num_del+num_ins
+	char_map['mutations']=num_bsb+num_del+num_ins
 	char_map['pct_id']=pct_id*100.0
 	return char_map
 
