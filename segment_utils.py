@@ -889,7 +889,7 @@ def combineCharMaps(map_1,map_2):
 
 
 #find CDR3 by subalignment styles and find the characterization
-def  getCDR3RegionSpecificCharacterizationSubAln(vData,dData,jData,organism,imgtdb_obj,dMode):
+def  getCDR3RegionSpecificCharacterizationSubAln(vData,dData,jData,organism,imgtdb_obj,dMode,query_rec):
 	#aln=["",""]
 	if(vData==None or jData==None):
 		return getEmptyRegCharMap()
@@ -902,9 +902,10 @@ def  getCDR3RegionSpecificCharacterizationSubAln(vData,dData,jData,organism,imgt
 	vQryTo=int(vData['q. end'])
 	v_q_aln=vData['query seq']
 	v_s_aln=vData['subject seq']
-	qry_cdr3_start=getQueryIndexGivenSubjectIndexAndAlignment(v_q_aln,v_s_aln,vQryFrom,vQryTo,vRefFrom,vRefTo,v_ref_cdr3_start)
-	v_q_cdr3_aln=getAlnAtAndCond(v_q_aln,v_s_aln,vQryFrom,vQryTo,vRefFrom,vRefTo,qry_cdr3_start,"query","geq")
-	print "The sub aln for CDR3 in V is ",v_q_cdr3_aln
+	#qry_cdr3_start=getQueryIndexGivenSubjectIndexAndAlignment(v_q_aln,v_s_aln,vQryFrom,vQryTo,vRefFrom,vRefTo,v_ref_cdr3_start)
+	v_cdr3_aln=getAlnAtAndCond(v_q_aln,v_s_aln,vQryFrom,vQryTo,vRefFrom,vRefTo,v_ref_cdr3_start,"subject","geq")
+	print "The sub aln for CDR3 in V is ",v_cdr3_aln
+	sys.exit(0)
 
 
 
@@ -1581,8 +1582,10 @@ class IncrementMapWrapper():
 
 
 
-
-def getQueryIndexGivenSubjectIndexAndAlignment(query_aln,subject_aln,q_start,q_stop,s_start,s_stop,subject_pos):
+#the lean right means that if the subject pos aligns to a gap, then choose the bp position to the right
+#otherwise if the subject aligns to a gap at the position, lean "left" and choose the previous bp positoin
+#RIGHT is the default!
+def getQueryIndexGivenSubjectIndexAndAlignment(query_aln,subject_aln,q_start,q_stop,s_start,s_stop,subject_pos,lean="right"):
 	#print "in getQueryIndexGivenSubjectIndexAndAlignment"
 	#import hashlib
 	#print "query_aln=",query_aln
@@ -1635,7 +1638,12 @@ def getQueryIndexGivenSubjectIndexAndAlignment(query_aln,subject_aln,q_start,q_s
 				#return 1-based index
 				#return q_counter
 				if(s_val!="-"):
-					return q_counter
+					if(lean=="right"):
+						return q_counter
+					elif(lean!="right" and q_val=="-"):
+						return q_counter-1
+					else:
+						return q_counter
 					#print "getQueryIndexGivenSubjectIndexAndAlignment to return (qcounter) ",q_counter
 					#if(q_val!="-"):
 					#	return q_counter
@@ -1712,6 +1720,7 @@ if (__name__=="__main__"):
 		print query_from,query_aln,query_to
 		print "q_from=",query_from," query_to=",query_to,",s_from=",sbjct_f,", s_to=",sbjct_t," At subject position=",i
 		print "The corresponding query position is "+str(getQueryIndexGivenSubjectIndexAndAlignment(query_aln,sbjct_aln,query_from,query_to,sbjct_f,sbjct_t,i))
+		print "The corresponding (lean_left) query position is "+str(getQueryIndexGivenSubjectIndexAndAlignment(query_aln,sbjct_aln,query_from,query_to,sbjct_f,sbjct_t,i,"left"))
 
 
 
