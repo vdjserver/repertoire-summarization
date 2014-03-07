@@ -349,14 +349,21 @@ def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
 				if(qry_cdr3_start!=(-1) and qry_cdr3_end!=(-1)):
 					#query_coding_seq=query_seq_map[currentQueryName]
 					#coding_seq=query_coding_seq[(qry_cdr3_start-1):(qry_cdr3_end-1)]
-					cdr3_len=qry_cdr3_end-qry_cdr3_start+1
-					#translation=biopythonTranslate(coding_seq)
-					#print "the coding seq ("+dm+") is : ",coding_seq
-					#print "The translation ("+dm+") is : ",translation
-					#print "CDR3_LEN ("+dm+") ="+str(cdr3_len)
-					cdr3_hist[dm]=cdr3_len
-					cdr3_hist[dm+'_from']=qry_cdr3_start
-					cdr3_hist[dm+'_to']=qry_cdr3_end
+					if(qry_cdr3_start<qry_cdr3_end):
+						#good
+						cdr3_len=qry_cdr3_end-qry_cdr3_start+1
+						#translation=biopythonTranslate(coding_seq)
+						#print "the coding seq ("+dm+") is : ",coding_seq
+						#print "The translation ("+dm+") is : ",translation
+						#print "CDR3_LEN ("+dm+") ="+str(cdr3_len)
+						cdr3_hist[dm]=cdr3_len
+						cdr3_hist[dm+'_from']=qry_cdr3_start
+						cdr3_hist[dm+'_to']=qry_cdr3_end
+					else:
+						#messed up alignment presumably due to overlap!
+						cdr3_hist[dm]=(-1)
+						#cdr3_hist[dm+'_from']=(-1)
+						#cdr3_hist[dm+'_to']=(-1)
 				else:
 					#print "BADQRYMAP Failure to map to query for mode=",dm," V=",currentV," J=",currentJ," read=",currentQueryName," REFSTART=",ref_cdr3_start,"QRYSTART=",qry_cdr3_start,"REFEND=",ref_cdr3_end,"QRYEND=",qry_cdr3_end
 					pass
