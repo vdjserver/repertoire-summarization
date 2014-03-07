@@ -8,8 +8,9 @@ from imgt_utils import imgt_db
 from cdr3_hist import CDR3LengthAnalysisVDMLOBJ,histoMapClass
 from vdjml_utils import getTopVDJItems,getRegionsObjsFromSegmentCombo,getHitInfo,getProductiveRearrangmentFlag,getVDJServerRegionAlignmentFromLargerVAlignmentPyObj
 from Bio import SeqIO
-from segment_utils import IncrementMapWrapper,getVRegionsList,getRegionSpecifcCharacterization,getEmptyRegCharMap,getAdjustedCDR3StartFromRefDirSetAllele,getTheFrameForThisReferenceAtThisPosition
+from segment_utils import IncrementMapWrapper,getVRegionsList,getRegionSpecifcCharacterization,getEmptyRegCharMap,getAdjustedCDR3StartFromRefDirSetAllele,getTheFrameForThisReferenceAtThisPosition,getCDR3RegionSpecificCharacterizationSubAln
 from char_utils import getNumberBaseSubsFromBTOP,getNumberIndelsFromBTOP,getIndelMapFromBTOP
+
 
 
 global_key_base="vdj_server_ann_"
@@ -47,7 +48,7 @@ def readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,read_ann
 	for mode in get_domain_modes():
 		f=cdr3_length_results[mode+'_from']
 		t=cdr3_length_results[mode+'_to']
-		if(f!=(-1) or t!=(-1) or cdr3_length_results[mode]==(-1) ):
+		if(f!=(-1) and t!=(-1) and cdr3_length_results[mode]!=(-1) ):
 			qw=str(read_rec.seq)
 			if(cdr3_length_results['qry_rev']):
 				qw=rev_comp_dna(qw)
@@ -59,12 +60,33 @@ def readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,read_ann
 			if(read_ann_map['top_D'] is not None):
 				dMap=getHitInfo(read_result_obj,meta,read_ann_map['top_D'],read_rec,imgtdb_obj,organism)
 			jMap=getHitInfo(read_result_obj,meta,read_ann_map['top_J'],read_rec,imgtdb_obj,organism)
-			cdr3RegCharAnalysis(vMap,dMap,jMap,mode,cdr3_length_results,organism,imgtdb_obj)
+			#cdr3RegCharAnalysis(vMap,dMap,jMap,mode,cdr3_length_results,organism,imgtdb_obj)
+			getCDR3RegionSpecificCharacterizationSubAln(vMap,dMap,jMap,organism,imgtdb_obj,mode,read_rec)
+			sys.exit(0)
 		else:
 			read_ann_map[global_key_base+mode+'_cdr3_na']=""
 			read_ann_map[global_key_base+mode+'_cdr3_tr']=read_ann_map[global_key_base+mode+'_cdr3_na']
 	return read_ann_map
 
+
+
+
+# get CDR3 spec char. but return q_pos of last_analyzed position and also limit to analysis greater than given char
+def getCDR3SpecifcCharacterization(s_aln,q_aln,frame_mask,q_aln_start,limit):
+	empty_map=getEmptyRegCharMap()
+	#the only keys are zero!
+	#print "s",s_aln
+	#print "q",q_aln
+	#print "f",frame_mask
+	#print "x",q_aln_start
+	#print "l",limit
+	q_pos=q_aln_start
+	temp=0
+	#while(temp<len(s_aln)):
+		
+	
+	
+	
 
 
 #each vmap,dmap,jmap are the alignment infos as returned from getHitInfo
@@ -106,6 +128,7 @@ def cdr3RegCharAnalysis(vMap,dMap,jMap,mode,cdr3_anal_map,organism,imgtdb_obj):
 	cdr3_q_aln=""
 	v_tot=0
 	v_same=0
+	#print "to enter while"
 	while(temp_v<len(v_s_aln)):
 		if(temp_v_pos>=v_ref_cdr3_start):
 			cdr3_s_aln+=v_s_aln[temp_v]
@@ -130,6 +153,12 @@ def cdr3RegCharAnalysis(vMap,dMap,jMap,mode,cdr3_anal_map,organism,imgtdb_obj):
 	print cdr3_s_aln
 	print frame_mask
 	print "stop here"
+	print "last q",temp_v_q_pos
+	getCDR3SpecifcCharacterization(cdr3_s_aln,cdr3_q_aln,frame_mask,temp_v_q_pos,(-1))
+	map_map=dict()
+	super_s=makeEmptyArrayOfStringsOfLen(jMap['q. end'])
+	#sys.exit(0)
+
 	sys.exit(0)
 
 	
@@ -184,6 +213,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
 		for region in getVRegionsList():
 			#print "Now to analyze region ",region," in mode",mode
 			raInfo=getVDJServerRegionAlignmentFromLargerVAlignmentPyObj(read_result_obj,meta,organism,mode,region,imgtdb_obj,False,read_rec)
+			key_base=global_key_base+mode+"_"
 			if(raInfo!=None and not(noneSeg_flag)):
 				#print "got no info!"
 				aln=raInfo[0]
@@ -195,11 +225,11 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
 				reg_ann=getRegionSpecifcCharacterization(s_aln,q_aln,region,mask,mode)
 				#print "got ann "
 				#printMap(reg_ann)
-				key_base=global_key_base+mode+"_"
 				for key in reg_ann:
 					annMap[key_base+region+"_"+key]=reg_ann[key]
 			else:
 				#print raInfo
+				reg_ann=getEmptyRegCharMap()
 				for key in reg_ann:
 					annMap[key_base+region+"_"+key]=(-1)
 				#pass
