@@ -61,8 +61,8 @@ def readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,read_ann
 				dMap=getHitInfo(read_result_obj,meta,read_ann_map['top_D'],read_rec,imgtdb_obj,organism)
 			jMap=getHitInfo(read_result_obj,meta,read_ann_map['top_J'],read_rec,imgtdb_obj,organism)
 			#cdr3RegCharAnalysis(vMap,dMap,jMap,mode,cdr3_length_results,organism,imgtdb_obj)
-			getCDR3RegionSpecificCharacterizationSubAln(vMap,dMap,jMap,organism,imgtdb_obj,mode,read_rec)
-			sys.exit(0)
+			#getCDR3RegionSpecificCharacterizationSubAln(vMap,dMap,jMap,organism,imgtdb_obj,mode,read_rec)
+			#sys.exit(0)
 		else:
 			read_ann_map[global_key_base+mode+'_cdr3_na']=""
 			read_ann_map[global_key_base+mode+'_cdr3_tr']=read_ann_map[global_key_base+mode+'_cdr3_na']
@@ -200,7 +200,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
 			#printMap(hit_infos[seg])
 		else:
 			noneSeg_flag=True
-			print "got a none seg!"
+			print "got a none seg (",seg,")!",read_rec.id
 	annMap['whole_seq_number_base_subs']=whole_seq_number_base_subs
 	annMap['whole_seq_number_indels']=whole_seq_number_indels
 	annMap['whole_seq_number_insertions']=whole_seq_number_insertions
@@ -340,7 +340,7 @@ if (__name__=="__main__"):
 		segments_json_out=args.json_out
 		print "to write vdjml to ",args.vdjml_out
 		rrw = vdjml.Result_writer(str(args.vdjml_out[0]), meta)
-		for read_result_obj in scanOutputToVDJML(args.igblast_in[0],fact):
+		for read_result_obj in scanOutputToVDJML(args.igblast_in[0],fact,query_fasta):
 			#prepare for the iteration and give a possible status message...
 			if(read_num>1 and read_num%1000==0):
 				print "Processed read",read_num,"..."
@@ -372,9 +372,13 @@ if (__name__=="__main__"):
 			read_num+=1
 
 		#write the CDR3 hist	
+		if(type(cdr3_hist_out_file)==list):
+			cdr3_hist_out_file=cdr3_hist_out_file[0]
 		my_cdr3_map.writeToFile(cdr3_hist_out_file)
 
 		#write the segment counts
+		if(type(segments_json_out)==list):
+			segments_json_out=segments_json_out[0]
 		segment_counter.JSONIFYToFile(args.vdj_db[0],organism,segments_json_out)
 
 	else:
