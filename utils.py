@@ -11,6 +11,36 @@ import pickle
 
 
 
+
+
+def getRevCompInterval(i,seq_len_in_bp):
+	#form an interval in one strand
+	#find the interval in the reverse complement strand
+	i_s=i[0]
+	i_e=i[1]
+	int_len=abs(i_s-i_e)
+	ne_s=seq_len_in_bp-i_e+1
+	ne_e=ne_s+int_len
+	return [ne_s,ne_e]
+
+
+
+#given a seq record, an interval into it, and an inverted flag (telling wether interval is in the opposite strand or no
+#return the subsequece (inclusive) indicated by the interval
+def extractSubSeq(interval,seq_rec,is_inverted):
+	if(is_inverted):
+		rc_inteval=getRevCompInterval(interval,len(str(seq_rec.seq)))
+		return extractSubSeq(interval,seq_rec,False)
+	else:
+		s=str(seq_rec.seq)
+		s=s[interval[0]-1,interval[1]
+		
+
+
+
+
+
+
 #given an alignment, and a position of a sequence IN the alignment
 #return the porition of the alignment whose bp are <= or >= that position in the alignment
 def getAlnAtAndCond(q_aln,s_aln,q_from,q_to,s_from,s_to,a_pos,st="query",cond="geq"):
