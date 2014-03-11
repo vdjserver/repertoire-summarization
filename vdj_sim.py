@@ -2,14 +2,16 @@
 import argparse
 import random
 from utils import read_fasta_file_into_map
+import numpy
 
 #global variable for V(D)J data!
 vMap=None
 dMap=None
 jMap=None
+bps=["A","C","G","T"]
 
 def rand_jun(min_len,max_len):
-	bps=["A","C","G","T"]
+	global bps	
 	rand_len=random.choice(range(min_len,max_len+1))
 	junc=""
 	for i in range(rand_len):
@@ -50,6 +52,18 @@ def sim_heavy_recomb(vMap,dMap,jMap):
 	#return [vKey,dKey,jKey,vd_junc,dj_junc,heavy_seq]
 	
 
+def dummySHM(seq,mut_param_lambda):
+	num_muts=numpy.random.poisson(mut_param_lambda,1)[0]
+	mut_types=["ins","del","bsb"]
+	shm_seq=list(seq)
+	join_char=""
+	global bps
+	for mut_id in range(num_muts):
+		bp_id=random.choice(range(len(shm_seq)))
+		shm_seq[bp_id]=random.choice(bps)
+	return join_char.join(shm_seq)
+
+
 def vdj_sim(vFasta,dFasta,jFasta,no_light,no_heavy,max_sim=float("inf")):
 	vMap=read_fasta_file_into_map(vFasta)
 	jMap=read_fasta_file_into_map(jFasta)
@@ -67,11 +81,13 @@ def vdj_sim(vFasta,dFasta,jFasta,no_light,no_heavy,max_sim=float("inf")):
 		chain_selection=random.choice(chain_list)
 		#print "The chain selection is ",chain_selection
 		if(chain_selection=="heavy"):
-			heavy_recomb=sim_heavy_recomb(vMap,dMap,jMap)
-			print heavy_recomb
+			recomb=sim_heavy_recomb(vMap,dMap,jMap)
 		else:
-			light_recomb=sim_light_recomb(vMap,jMap)
-			print light_recomb
+			recomb=sim_light_recomb(vMap,jMap)
+		recomb['shm_seq']=dummySHM(recomb['seq'],0.5)
+		#if(recomb['shm_seq']!=recomb['seq']):
+		#	print "mutation detected!"
+		#print recomb
 		num_sim+=1
 	
 
