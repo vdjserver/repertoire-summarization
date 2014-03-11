@@ -388,13 +388,13 @@ def test_nonexistent_touchable_and_del(f):
 
 
 
-def read_fasta_file_into_map(fasta_path,alwaysSeqToUpper=True):
+def read_fasta_file_into_map(fasta_path,alwaysSeqToUpper=True,removeNonIUPAC=True):
 	fasta_data=read_fasta(fasta_path,alwaysSeqToUpper)
 	fasta_map=read_fasta_into_map(fasta_data)
 	return fasta_map
 
 
-def read_fasta_string(fasta_string,alwaysSeqToUpper=True):
+def read_fasta_string(fasta_string,alwaysSeqToUpper=True,removeNonIUPAC=True):
 	lines=fasta_string.split("\n")
 	data=list()
 	for line in lines:
@@ -403,10 +403,15 @@ def read_fasta_string(fasta_string,alwaysSeqToUpper=True):
 			data.append(temp_line[1:])
 			data.append("")
 		else:
+			if(removeNonIUPAC):
+				#SEE http://search.cpan.org/~cjfields/BioPerl-1.6.923/Bio/Tools/IUPAC.pm
+				iupac_re=re.compile('[A-Z\*]',re.IGNORECASE)
+				temp_line=re.sub(iupac_re,'',temp_line)
 			if(alwaysSeqToUpper):
 				data[len(data)-1]+=temp_line.upper()
 			else:
-				data[len(data)-1]+=temp_line	
+				data[len(data)-1]+=temp_line
+				
 	return data
 
 
