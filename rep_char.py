@@ -43,6 +43,8 @@ def rep_char_read(read_result_obj,meta,organism,imgtdb_obj,read_rec):
 	return return_obj
 	
 
+
+#specialized annotation for CDR3 region!
 def readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,read_ann_map,cdr3_length_results):
 	global global_key_base
 	for mode in get_domain_modes():
@@ -88,7 +90,7 @@ def getCDR3SpecifcCharacterization(s_aln,q_aln,frame_mask,q_aln_start,limit):
 	
 	
 
-
+#add to the characterization map CDR3 region characterization
 #each vmap,dmap,jmap are the alignment infos as returned from getHitInfo
 def cdr3RegCharAnalysis(vMap,dMap,jMap,mode,cdr3_anal_map,organism,imgtdb_obj):
 	empty_map=getEmptyRegCharMap()
@@ -164,7 +166,9 @@ def cdr3RegCharAnalysis(vMap,dMap,jMap,mode,cdr3_anal_map,organism,imgtdb_obj):
 	
 	
 			
-
+#given a read object, meta data, organism and database data and the read record and CDR3 data
+#make a characterization map using the database/lookups
+#of regions FR1, CDR1, FR2, CDR2, FR3
 def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
 	#print "To annotate a read...."
 	topVDJ=getTopVDJItems(read_result_obj,meta)
@@ -246,7 +250,8 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
 
 
 
-#using the PYVDJML, add VDJserver specific tags
+#using the PYVDJML, extract information from the IGBLAST-notated
+#regions (FR1, CDR1, etc) and compare them with VDJ-server lookedup values
 def vSegmentRegionVDJAnalyse(read_result_obj,meta,organism,imgtdb_obj,read_rec):
 	topVDJ=getTopVDJItems(read_result_obj,meta)
 	topV=topVDJ['V']
@@ -270,42 +275,7 @@ def vSegmentRegionVDJAnalyse(read_result_obj,meta,organism,imgtdb_obj,read_rec):
 
 
 
-def getTopVDJItems(read_result_obj,meta):
-	#print "I want top hits from a read object!"
-	top_segs=dict()
-	names=dict()
-	segTypes=["V","D","J"]
-	for st in segTypes:
-		names[st]=None
-	segment_combinations=read_result_obj.segment_combinations()
-	for s in range(len(segment_combinations)):
-		#print "LOOKING AT COMBINATION # ",str(int(s+1))," of ",str(len(segment_combinations))," FOR READ ID=",read_result_obj.id()
-		segment_combination=segment_combinations[s]
-		#print "The number of segments in this combination is ",len(segment_combination.segments())
-		#print "The ids of the segments are ",segment_combination.segments()
-		seg_id=0
-		for i in segment_combination.segments():
-			segment_match = read_result_obj[i]
-			#print "got a segment match, id=",i," from combination # ",str(int(s+1))
-			seg_type=segTypes[seg_id]
-			#print "the seg type is ",seg_type
-			for gls_match in segment_match.germline_segments():
-				#print "in inner most loop...."
-				#print "gls_match=",gls_match
-				#print meta[gls_match.gl_segment_].name_
-				if(names[seg_type]==None):
-					#print "USING ",meta[gls_match.gl_segment_].name_
-					names[seg_type]=meta[gls_match.gl_segment_].name_
-				else:
-					#print "SKIPPING ",meta[gls_match.gl_segment_].name_
-					pass
-			seg_id+=1
-		#print "\n\n\n\n\n"
-	#printMap(names)
-	return names
-	
-
-
+#add on the kinds of arguments this program accepts
 def add_rep_char_args_to_parser(parser):
 	parser.add_argument('-json_out',type=str,nargs=1,default="/dev/stdout",help="output file for the JSON segment count IMGT hierarchy")
 	parser.add_argument('-cdr3_hist_out',type=str,nargs=1,default="/dev/stdout",help="output file for the JSON segment count IMGT hierarchy")
