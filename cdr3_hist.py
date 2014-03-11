@@ -24,6 +24,9 @@ def getNumDashInStr(s):
 
 
 #from an alignment mark where CDR3 is with X
+#s_aln, q_aln are the alignment string
+#s_c q_c are the cdr3 starts for subject and query
+# s_s q_s are the subject and query alignment starts
 def annotatedCDR3(s_aln,q_aln,s_c,q_c,s_s,q_s):
 	#get CDR3 starts relative to the alignment starts
 	aln_rel_s=s_c-s_s
