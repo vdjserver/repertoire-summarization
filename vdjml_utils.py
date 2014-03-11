@@ -133,8 +133,9 @@ def getRegionsObjsFromSegmentCombo(segment_combo):
 
 
 
-#given a read result object and meta data
-#get the names of the top V,D, and J alleles
+#using the read object and meta data
+#find the names of the segments in the top
+#VDJ combintion and add these it
 def getTopVDJItems(read_result_obj,meta):
 	#print "I want top hits from a read object!"
 	top_segs=dict()
