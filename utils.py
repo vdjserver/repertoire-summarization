@@ -153,13 +153,44 @@ def rev_dna(dna):
 
 	
 #complement a string (of DNA)
-def comp_dna(dna):
+#allow IUPAC complementing if desired
+def comp_dna(dna,allowIUPAC=False):
+# see http://droog.gs.washington.edu/parc/images/iupac.html
+#IUPAC Code 	Meaning 	Complement
+#A 	A 	T
+#C 	C 	G
+#G 	G 	C
+#T/U 	T 	A
+#M 	A or C 	K
+#R 	A or G 	Y
+#W 	A or T 	W
+#S 	C or G 	S
+#Y 	C or T 	R
+#K 	G or T 	M
+#V 	A or C or G 	B
+#H 	A or C or T 	D
+#D 	A or G or T 	H
+#B 	C or G or T 	V
+#N 	G or A or T or C 	N
 	comped=""
 	comp=dict()
 	comp['A']='T'
 	comp['T']='A'
 	comp['G']='C'
 	comp['C']='G'
+	comp['N']='N'
+	if(allowIUPAC):
+		comp['U']='A'
+		comp['M']='K'
+		comp['R']='Y'
+		comp['W']='W'
+		comp['S']='S'
+		comp['Y']='R'
+		comp['K']='M'
+		comp['V']='B'
+		comp['H']='D'
+		comp['D']='H'
+		comp['B']='V'
 	for b in range(len(dna)):
 		if(dna[b] in comp):
 			comped+=comp[dna[b]]
