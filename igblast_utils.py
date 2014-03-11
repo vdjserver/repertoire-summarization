@@ -19,7 +19,8 @@ import time
 from utils import repStr
 
 
-
+#from an IGBLAST output file (infile)
+#write a REGION lookup table to outfile
 def makeRegionLookupTableFile(infile,outfile):
 	INPUT=open(infile,'r')
 	OUTPUT=open(outfile,'w')
@@ -96,13 +97,13 @@ def makeRegionLookupTableFile(infile,outfile):
 
 
 
-
+#old SQL code...
 def addMetadataTableToSQLITEDatabase(igblast_version,databases,domain_class,query_path):
 	creation_sql="CREATE TABLE IF NOT EXISTS metadata (igblast_version,databases,domain_class,query_path);"
 	insertion_sql="INSERT INTO metadata (igblast_version,databases,domain_class,query_path) VALUES ('"+igblast_version+"','"+databases+"','"+domain_class+"','"+query_path+"');"
 	return creation_sql+"\n"+insertion_sql
 
-
+#old SQL code
 def scanOutputToSQLite(input_file,output_file,fastaPath,debug=False):
 	if(debug):
 		print "debug is true"
@@ -340,13 +341,16 @@ def scanOutputToSQLite(input_file,output_file,fastaPath,debug=False):
 
 
 
-
+#turn an alignment (in the form of an array)
+#into a printabel nice string
 def getNiceAlignment(aln):
 	a=str("")
 	for idx, val in enumerate(aln):
 		a+=val+"\n"
 	return a
 
+
+#repeat a string (s) n times
 def repeatString(s,n):
 	if(n<=0):
 		return ""
@@ -372,7 +376,8 @@ def getWholeChainAlignment(qvseq,vseq,qdseq,dseq,qjseq,jseq,btop_map):
 
 
 
-
+#build an alignment printable string
+#from the query and subject, but include a MIDLINE
 def buildAlignmentWholeSeqsDirect(q,s):
 	aln=["","",""]
 	aln[0]=str(q)
@@ -515,7 +520,7 @@ def buildAlignmentWholeSeqs(btop,q,s,debug=False,level=0):
 
 
 
-
+#old SQL code
 def get_rearrangement_segment_counts_from_db(dbfile):
 	conn=sqlite3.connect(dbfile)
 	c = conn.cursor()
@@ -534,17 +539,12 @@ def get_rearrangement_segment_counts_from_db(dbfile):
 	return counts_map
 
 
-
+#get the path to IGBLAST
 def getIGBlastExecutablePath():
 	return "/usr/local/bin/igblastn"
 
 
-def getDomainClasses():
-	dcs=["imgt","kabat"]
-	return dcs
-
-
-
+#scan an output file and print the alleles of the best V(D)J combination
 def printVDJBestAssignments(i):
 	reader=open(i,'r')
 	currentQuery=None
