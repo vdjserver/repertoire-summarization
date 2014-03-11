@@ -12,7 +12,9 @@ import pickle
 
 
 
-
+#given an interval (in list form [from,to])
+#with 1-based indesing AND given a sequence length in BP
+#return the same interval but on the reverse strand
 def getRevCompInterval(i,seq_len_in_bp):
 	#form an interval in one strand
 	#find the interval in the reverse complement strand
@@ -25,8 +27,9 @@ def getRevCompInterval(i,seq_len_in_bp):
 
 
 
-#given a seq record, an interval into it, and an inverted flag (telling wether interval is in the opposite strand or no
+#given a seq record, an interval into it, and an inverted flag (telling wether interval is in the opposite strand or not)
 #return the subsequece (inclusive) indicated by the interval
+#NOTE that the interval has 1-based indices
 def extractSubSeq(interval,seq,is_inverted):
 	if(is_inverted):
 		rc_inteval=getRevCompInterval(interval,len(seq))
@@ -79,6 +82,7 @@ def getAlnAtAndCond(q_aln,s_aln,q_from,q_to,s_from,s_to,a_pos,st="query",cond="g
 			
 	
 #does a position in a sequence align to a gap???
+#return true or false
 def doesPosInSeqAlignToGap(q_aln,s_aln,q_from,q_to,s_from,s_to,a_pos,st="query"):
 	if(st!="query"):
 		st="subject"
@@ -110,6 +114,12 @@ def doesPosInSeqAlignToGap(q_aln,s_aln,q_from,q_to,s_from,s_to,a_pos,st="query")
 			temp+=1
 		return aln #Q then S		
 
+
+
+
+
+#given a length l, make a list of that
+#length whose entries are empty strings
 def makeEmptyArrayOfStringsOfLen(l):
 	empty_str_arr=list()
 	#non-negative numbers only please!
@@ -121,7 +131,8 @@ def makeEmptyArrayOfStringsOfLen(l):
 
 
 
-
+#given a hash map, set all values
+# to a given value 
 def makeAllMapValuesVal(m,v):
 	if(m is not None):
 		for k in m:
@@ -130,15 +141,18 @@ def makeAllMapValuesVal(m,v):
 		
 
 
-
+#reverse a string (of DNA)
 def rev_dna(dna):
 	reversed_dna=""
 	for ub in range(len(dna)):
 		b=len(dna)-ub-1
 		reversed_dna+=dna[b]
 	return reversed_dna
-		
+	
 
+
+	
+#complement a string (of DNA)
 def comp_dna(dna):
 	comped=""
 	comp=dict()
