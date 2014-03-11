@@ -128,7 +128,12 @@ if (__name__=="__main__"):
 	parser.set_defaults(no_light=False)
 	parser.add_argument('-no_heavy',action='store_true',dest='no_heavy',help="exclude simulation of 'heavy' chains")
 	parser.set_defaults(no_heavy=False)	
+	parser.add_argument('-num_seqs',type=int,default=float("inf"),nargs=1,help="the number of sequences to simulate")
 	args = parser.parse_args()
+	if(args.num_seqs!=float("inf")):
+		max_sim=int(args.num_seqs[0])
+	else:
+		max_sim=float("inf")
 	if(args.no_light and args.no_heavy):
 		print "ERROR! Must allow simulation of at least either light or heavy chains!"
 		parser.print_help()
@@ -141,7 +146,7 @@ if (__name__=="__main__"):
 		if(args.dfasta):
 			dFasta=args.dfasta[0]
 		jFasta=args.jfasta[0]
-		vdj_sim(vFasta,dFasta,jFasta,args.no_light,args.no_heavy,max_sim=float("inf"))
+		vdj_sim(vFasta,dFasta,jFasta,args.no_light,args.no_heavy,max_sim)
 
 
 	
