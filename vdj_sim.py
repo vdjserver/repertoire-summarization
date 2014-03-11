@@ -27,6 +27,7 @@ def sim_light_recomb(vMap,jMap):
 	light_seq=vMap[vKey]+vj_junc+jMap[jKey]
 	return {
 		'vKey':vKey,
+		'dKey':"None",
 		'jKey':jKey,
 		'vj_junc':vj_junc,
 		'seq':light_seq
@@ -54,13 +55,23 @@ def sim_heavy_recomb(vMap,dMap,jMap):
 
 def dummySHM(seq,mut_param_lambda):
 	num_muts=numpy.random.poisson(mut_param_lambda,1)[0]
+	if(num_muts==0):
+		return seq
 	mut_types=["ins","del","bsb"]
 	shm_seq=list(seq)
 	join_char=""
 	global bps
 	for mut_id in range(num_muts):
-		bp_id=random.choice(range(len(shm_seq)))
-		shm_seq[bp_id]=random.choice(bps)
+		bp_id=random.choice(range(len(shm_seq)))+1
+		mut_type=random.choice(mut_types)
+		if(mut_type=="bsb"):
+			shm_seq[bp_id-1]=random.choice(bps)
+		elif(mut_type=="ins"):
+			new_nuc=random.choice(bps)
+			shm_seq.insert(bp_id-1,new_nuc)
+		else:
+			#del #ts_shm=ts[0:1]+ts[2:]
+			shm_seq=shm_seq[0:bp_id-1]+shm_seq[bp_id:]
 	return join_char.join(shm_seq)
 
 
@@ -68,6 +79,8 @@ def vdj_sim(vFasta,dFasta,jFasta,no_light,no_heavy,max_sim=float("inf")):
 	vMap=read_fasta_file_into_map(vFasta)
 	jMap=read_fasta_file_into_map(jFasta)
 	dMap=None
+	sorted_h_keys=['vKey','dKey','jKey','vd_junc','dj_junc']
+	sorted_l_keys=['vKey','jKey','vj_junc']
 	if(no_heavy):
 		chain_list=["light"]
 	elif(no_light):
@@ -80,14 +93,27 @@ def vdj_sim(vFasta,dFasta,jFasta,no_light,no_heavy,max_sim=float("inf")):
 	while(num_sim<max_sim):
 		chain_selection=random.choice(chain_list)
 		#print "The chain selection is ",chain_selection
+		descriptor=">"+str(num_sim+1)
 		if(chain_selection=="heavy"):
 			recomb=sim_heavy_recomb(vMap,dMap,jMap)
+			#>1315|dKey=None|jKey=IGKJ3*01|vKey=IGHV2-70*13|vj_junc=CTCAATATG
+			for sk in sorted_h_keys:
+				descriptor+="|"+sk+"="+recomb[sk]
+			descriptor+="|chain_type=heavy"
 		else:
 			recomb=sim_light_recomb(vMap,jMap)
+			for sk in sorted_l_keys:
+				descriptor+="|"+sk+"="+recomb[sk]
+			descriptor+="|chain_type=light"
 		recomb['shm_seq']=dummySHM(recomb['seq'],0.5)
-		#if(recomb['shm_seq']!=recomb['seq']):
-		#	print "mutation detected!"
-		#print recomb
+
+
+		#sorted_keys=recomb.keys()
+		#sorted_keys.sort()
+		#for sk in sorted_keys:
+		#	if(not(sk.endswith("seq"))):
+		#		descriptor+="|"+sk+"="+recomb[sk]
+		print descriptor+"\n"+recomb['shm_seq']
 		num_sim+=1
 	
 
@@ -115,8 +141,8 @@ if (__name__=="__main__"):
 		if(args.dfasta):
 			dFasta=args.dfasta[0]
 		jFasta=args.jfasta[0]
-		print "vdj are ",vFasta," and ",dFasta," and ",jFasta
 		vdj_sim(vFasta,dFasta,jFasta,args.no_light,args.no_heavy,max_sim=float("inf"))
+
 
 	
 
