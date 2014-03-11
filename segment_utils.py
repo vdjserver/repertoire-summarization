@@ -13,21 +13,21 @@ from igblast_utils import printNiceAlignment
 from utils import printMap,makeAllMapValuesVal,getAlnAtAndCond
 
 
-def removeTerminatingSemicolonIfItExists(s):
-	s=re.sub(r';+$',"",s)
-	return s
-	
 
+
+#pretty print a tree
 def prettyPrintTree(t):
 	pp = pprint.PrettyPrinter()
 	pp.pprint(dicts(t))
 	
 
-
-
-
-
-
+#from a URL of an IMGT gene table generate a dict() of dict() of dict()
+#that indicates the hierarchy
+#have a list of ALLOWABLE names that (if not None) acts as a 'white' list so that items must be in it to be returned in the hierarchy
+#have an existing hierarchy that is added to (if not None)
+#return an array of TWO elements [tree,cloneNamesMap]
+#the tree is the resulting hierarchy
+#the clone names maps allele names to clones (may have information in MOUSE cases)
 def hierarchyTreeFromGenetableURL(url,locus,listOfAllowableNames=None,existingHierarchy=None):
 	f = urllib2.urlopen(url)
 	html=f.read()
@@ -36,17 +36,17 @@ def hierarchyTreeFromGenetableURL(url,locus,listOfAllowableNames=None,existingHi
 	table_div=soup.find(id="genetable")
 	if table_div is None:
 		if(existingHierarchy==None):
-			return tree()
+			return [tree(),clone_names_map]
 		return [existingHierarchy,clone_names_map]
 	gene_table=table_div.find('table')
 	if gene_table is None:
 		if(existingHierarchy==None):
-			return tree()
+			return [tree(),clone_names_map]
 		return [existingHierarchy,clone_names_map]
 	rows = gene_table.findAll('tr')
 	if rows is None:
 		if(existingHierarchy==None):
-			return tree()
+			return [tree(),clone_names_map]
 		return [existingHierarchy,clone_names_map]
 	subgroup=""
 	gene_name=""
@@ -141,7 +141,10 @@ def dicts(t): return {k: dicts(t[k]) for k in t}
 
 
 
-
+#given a base dir for a database
+#and any specified organism and/or locus
+#scan the reference directory set FASTAs
+#and see what entries of them are in the gene tables (or not)
 def analyze_download_dir_forVDJserver(base_dir,countsMap=None,specifiedOrganism=None,specifiedLocus=None):
 	myDB=imgt_db(base_dir)
 	organisms=myDB.getOrganismList()
@@ -243,6 +246,16 @@ def analyze_download_dir_forVDJserver(base_dir,countsMap=None,specifiedOrganism=
 
 
 
+
+
+
+
+#given a gene table hierarchy and a patch file path
+#patch the hierarchy
+#format is add H1 H2,....HN-1,HN
+#format is del H1 H2,....HN-1,HN
+#to add and remove entries
+#NOTE that the hierarchy and path must be at the same level (organism->locus)
 def patchlocusHierarchyData(locusHierarchyData,patchfilepath):
 	patch_file=open(patchfilepath,'r')
 	joinStr="']['"
@@ -269,6 +282,10 @@ def patchlocusHierarchyData(locusHierarchyData,patchfilepath):
 
 
 
+
+
+
+#write an object to a pickle file
 def pickleWrite(pPath,o):
 	output = open(pPath, 'wb')
 	# Pickle dictionary using protocol 0.
@@ -278,6 +295,10 @@ def pickleWrite(pPath,o):
 
 
 
+
+
+
+#read an object from a pickle file
 def pickleRead(pPath):
 	pkl_file = open(pPath, 'rb')
 	data1 = pickle.load(pkl_file)
@@ -285,7 +306,12 @@ def pickleRead(pPath):
 	return data1
 
 
-	
+
+
+
+
+#from a tree get the total number of counts
+#using the counts map	
 def get_total_tree(tree,this_name,counts_map):
 	subtree_sum=0
 	if this_name in counts_map:
@@ -296,6 +322,12 @@ def get_total_tree(tree,this_name,counts_map):
 	return subtree_sum
 
 
+
+
+
+
+#zero pad a string e
+#up to length tot
 def zeropad(e,tot):
 	str_e=str(e)
 	if(len(str_e)>=tot):
@@ -308,7 +340,8 @@ def zeropad(e,tot):
 		return zeroes+str_e
 
 
-
+#zero pad a string (of digits)
+#up to a length
 def zeroPadDigitsTo(s,num=8):
 	if(re.search(r'\d',s)):
 		#proceed here
@@ -338,8 +371,10 @@ def zeroPadDigitsTo(s,num=8):
 
 
 
-
-def jsonify_hierarchy(hier_map,name,counts_map,count_string):
+#JSONIFY from a hierarchy with a counts map
+#the "count_string" is used to make the label for the count in the JSON
+#the "labelString" is used to make the label for the names
+def jsonify_hierarchy(hier_map,name,counts_map,count_string,labelString="label"):
 	#print "\n\n\n\n\n"
 	hier_map_keys=hier_map.keys()
 	original_to_padded=dict()
@@ -357,7 +392,7 @@ def jsonify_hierarchy(hier_map,name,counts_map,count_string):
 	#print "\n\n\n"
 	JSON=""
 	JSON+="{\n"
-	JSON+="\"label\":\""+name+"\",\n"
+	JSON+="\""+labelString+"\":\""+name+"\",\n"
 	actual_value=0
 	actual_value=get_total_tree(hier_map,name,counts_map)
 	#JSON+="\"value\":"+str(actual_value)+",\n"
@@ -385,7 +420,9 @@ def jsonify_hierarchy(hier_map,name,counts_map,count_string):
 	return JSON
 
 
-
+#from a BLAST hit string, attempt to parse out 
+#the name the allele and use that to return
+#the descriptor from the fastalistofdescs
 def getSegmentName(blast_hit,fastaListOfDescs):
 	gnl_re=r'^(gnl\|)?BL_ORD_ID[\|:](\d+)$'
 	if(blast_hit in fastaListOfDescs):
@@ -401,7 +438,7 @@ def getSegmentName(blast_hit,fastaListOfDescs):
 
 
 
-
+#return a list of descriptors from a file
 def getFastaListOfDescs(fasta_file):
 	fr=open(fasta_file,'r')
 	descs=list()
@@ -416,7 +453,9 @@ def getFastaListOfDescs(fasta_file):
 
 
 
-
+#given an IGBLAST output file, scan it and extract the name
+#from the list of fasta files
+#and increment counts based on the extractions
 def get_segment_count_map_from_blast_output(blast_out,fasta_file_list):
 	vlist=getFastaListOfDescs(fasta_file_list[0])
 	dlist=getFastaListOfDescs(fasta_file_list[1])
@@ -461,6 +500,11 @@ def get_segment_count_map_from_blast_output(blast_out,fasta_file_list):
 	return counts_map
 
 
+
+#given the JALLELE name and IMGTDB object (and organism and mode)
+#find the position (1-based) of the CDR3 end in the indicated sequece
+#use the LOOKUP tables in the database 
+#IMGT data use the imgt.dat
 def getADJCDR3EndFromJAllele(jallele,imgtdb_obj,org="human",mode="imgt"):
 	if(mode=="imgt"):
 		jdescriptor=imgtdb_obj.extractDescriptorLine(jallele,org)
@@ -488,7 +532,7 @@ def getADJCDR3EndFromJAllele(jallele,imgtdb_obj,org="human",mode="imgt"):
 			print "FAILED TO MATCH ON INTERVAL REGEX!!!!\n"
 			return None
 	elif(mode=="kabat"):
-		kabat_file="/home/data/DATABASE/01_22_2014/"+org+"/ReferenceDirectorySet/KABAT/Jlookup.tsv"
+		kabat_file=imgtdb_obj.getBaseDir()+"/"+org+"/ReferenceDirectorySet/KABAT/Jlookup.tsv"
 		reader=open(kabat_file,'r')
 		cdr3_end_adj_kabat=(-1)
 		for line in reader:
@@ -503,7 +547,7 @@ def getADJCDR3EndFromJAllele(jallele,imgtdb_obj,org="human",mode="imgt"):
 
 
 
-
+#use the IMGT dat FILE to find the CDR3 end for a JALLELE
 def getCDR3EndFromJData(allele,imgtdb_obj,org="human"):
 	#tmp_file_path="/dev/shm/"+re.sub(r'[^0-9\.a-zA-Z]','',allele)
 	#print "tpath is ",tmp_file_path
@@ -561,7 +605,7 @@ def getCDR3EndFromJData(allele,imgtdb_obj,org="human"):
 	return None
 
 
-
+#swap the start/stop in an interval descriptor 123..456 -> 456..123
 def swapIMGTDescInterval(i):
 	interval_re=re.compile(r'(\d+)(\.+)(\d+)')
 	mr=re.search(interval_re,i)	
@@ -574,7 +618,7 @@ def swapIMGTDescInterval(i):
 		raise Exception("Error, bad interval in IMGT descriptor "+i)
 
 
-
+#return true if VAL is between two numbers
 def isValBetweenTwoNumsInc(n1,n2,val):
 	#print "in testing func"
 	if(int(n1)<=int(n2)):
@@ -589,75 +633,6 @@ def isValBetweenTwoNumsInc(n1,n2,val):
 	return False
 
 
-def adjustCDR3StartToSubseq(cdr3_start,descriptor,imgtdb_obj,organism="human"):
-	print "in adjustCDR3StartToSubseq"
-	print "raw cdr3 start is ",cdr3_start
-	desc_pieces=descriptor.split("|")
-	print "before rev:"
-	print desc_pieces
-	reversedFlag=False
-	if(desc_pieces[14]=="rev-compl"):
-		#desc_pieces[5]=swapIMGTDescInterval(desc_pieces[5])
-		#sep="|"
-		#descriptor=sep.join(desc_pieces)
-		reversedFlag=True
-	desc_range=desc_pieces[5]
-	interval_re=re.compile(r'(\d+)\.+(\d+)')
-	mr=re.search(interval_re,desc_range)
-	print "after rev"
-	print desc_pieces
-	if(mr):
-		start=int(mr.group(1))
-		stop=int(mr.group(2))
-		print "start and stop are ",start," and ",stop
-		if(isValBetweenTwoNumsInc(start,stop,cdr3_start)):
-			if(reversedFlag):			
-				cdr3_adj=cdr3_start-min(start,stop)
-				cdr3_adj=max(start,stop)-cdr3_adj
-				cdr3_adj-=start
-			else:
-				cdr3_adj=start-cdr3_start
-				cdr3_adj*=(-1)
-				cdr3_adj+=1
-			print "rev status : ",str(reversedFlag)
-			print "Adjusted : ",cdr3_adj
-			#sys.exit(0)
-			return cdr3_adj
-		else:
-			#this ref dir seq sequence doesn't cover the CDR3 start! :(
-			return (-1)
-	else:
-		#ref dir set lacks the XX..YY interval markers
-		#print "raw cdr3=",cdr3_start
-		#print "descriptor=",descriptor
-		allele=extractIMGTNameFromKey(descriptor)
-		#print "allele\n"
-		vdata=imgtdb_obj.getIMGTDatGivenAllele(allele,organism)
-		#print "vdata ",vdata
-		biopyrec=imgtdb_obj.extractIMGTDatRecordUsingRefDirSetDescriptor(descriptor,True)
-		mybiopyseq=str(biopyrec.seq)
-		mybiopyseq=mybiopyseq.upper()
-		#print "the biopy seq :",mybiopyseq
-		refdirsetseq=imgtdb_obj.getRefDirSetFNAGivenCompleteDescriptor(descriptor,organism)
-		refdirsetseq=refdirsetseq.upper()
-		#print "The ref dir set seq is ",refdirsetseq
-		refdirsetseq_noperiods=re.sub(r'[^ACTG]','',refdirsetseq)
-		#print "The ref dir set seq (no periods)  is ",refdirsetseq_noperiods
-		found_res=mybiopyseq.find(refdirsetseq_noperiods)
-		if(found_res==(-1)):
-			raise Exception("Error, failed to get interval (start..stop) from "+descriptor," despite using biopython and subseq!")
-		else:
-			desc_start=found_res
-			if(not(desc_start<=cdr3_start and cdr3_start<=desc_end)):
-				#not in range!
-				return (-1)
-			else:
-				#print "cdr3_reg=",cdr3_start
-				cdr3_adj=desc_start-cdr3_start
-				cdr3_adj*=(-1)
-				#print "cdr3_adj=",cdr3_adj
-				return cdr3_adj	
-
 
 
 cdr3_adj_map=dict()
@@ -667,6 +642,10 @@ cdr3_adj_map["human"]["imgt"]=dict()
 cdr3_adj_map["human"]["kabat"]=dict()
 cdr3_adj_map["Mus_musculus"]["kabat"]=dict()
 cdr3_adj_map["Mus_musculus"]["imgt"]=dict()
+#return the CDR3 start using a cache mechanism
+#LOOKUPs are used
+#IMGT-HIGHVQUEST for IMGT
+#KABAT TSV values from IGBLAST for KABAT
 def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human",mode="imgt"):
 	#use this map as a caching mechanism!
 	global cdr3_adj_map
@@ -1337,7 +1316,12 @@ def getEmptyRegCharMap():
 
 
 #can be 'None', True, or False
-#uses frame information from begining of J alignment, end of V alignment 
+#uses frame information from begining of J alignment, end of V alignment to determine
+#if the arrangment is "productive".  It's productive if the first J nuc
+#is in consistent frame with the last V nuc
+#If no CDR3 is found then NONE is returned
+#otherwise, get the frames where V/J end/begin aligning (using the CDR3 start and ends)
+#and verify that the frames are consistent (ie if no BP in between the frames are 0->1, if 1, then 0->2, if 2, then 0->0, if 3 0->1, and so on
 def getNAProductiveRearrangmentFlagFromVJHitLineData(firstVMap,firstJMap,organism,imgtdb_obj):
 	###########################################
 	#some code to look at the 'productive rearrangement
@@ -1357,7 +1341,8 @@ def getNAProductiveRearrangmentFlagFromVJHitLineData(firstVMap,firstJMap,organis
 			if(j_s_start>j_s_imgt_cdr3_end):
 				#algignment to J starts after CDR3 end...
 				return productive_flag
-			j_s_start_frame=(2-(j_s_start-j_s_imgt_cdr3_end))%3  #the 2 (at the beginning) is here because the CDR3 end of J is in frame2 cause its the 3rd NA in a codon
+			j_s_start_frame=(2-(j_s_start-j_s_imgt_cdr3_end))%3  
+			#the 2 (at the beginning) is here because the CDR3 end of J is in frame2 cause its the 3rd NA in a codon
 			num_bp_between_V_and_J=int(firstJMap['q. start'])-int(firstVMap['q. end'])-1
 			if(num_bp_between_V_and_J<0):
 				#unhandled case where V/J overlap!!!
@@ -1378,6 +1363,7 @@ def getNAProductiveRearrangmentFlagFromVJHitLineData(firstVMap,firstJMap,organis
 	return productive_flag
 
 
+#of the rightmost V nucleotide in the query not also aligned to J get its frame!
 def ofRightmostVNucleotideNotAligningToJGetItsFrameAssumingJunctionSegmentOverlap(vMap,jMap,frameAtVSEnd):
 	#assume NO indels in a junction overlap
 	q_v_end=int(vMap['q. end'])
@@ -1387,7 +1373,7 @@ def ofRightmostVNucleotideNotAligningToJGetItsFrameAssumingJunctionSegmentOverla
 	return desired_frame
 
 
-
+#use the frame at the end of V to get the frame when J alignment begins
 def ofLeftmostJNucleotideNotAligningToJGetItsFrameAssumingJunctionSegmentOverlap(vMap,jMap,frameAtVSEnd):
 	#assume no indels in a junction overlap
 	desired_frame=(frameAtVSEnd+1)%3
@@ -1534,69 +1520,6 @@ def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 		return reg_adj_map[refOrg]["imgt"][refName][region]
 
 
-def getCDR3StartFromVData(vdata,allele,imgtdb_obj,organism):
-	pyobj=imgtdb_obj.getIMGTDatGivenAllele(allele,True,organism)
-	descriptor=imgtdb_obj.extractDescriptorLine(allele,organism)
-	desc_pieces=descriptor.split("|")
-	revCompFlag=False
-	if(desc_pieces[14]=="rev-compl"):
-		revCompFlag=True
-	#find the v region with the allele name
-	#and get the range in the v region.
-	#find the CDR3 inside the v region.  Return it
-	record=pyobj
-	vregion_start=None
-	vregion_stop=None
-	#first find the region start, stop with the matching allele
-	for feature_list in record.features:
-		#print "got feature list : ",feature_list
-		ftype=feature_list.type
-		qualifiers=feature_list.qualifiers
-		if(ftype=="V-REGION"):
-			if("IMGT_allele" in qualifiers):
-				allele_val=str(qualifiers["IMGT_allele"][0])
-				#print "comparison allele : ",allele
-				#print "allele_val is ",allele_val
-				if(allele_val==allele):
-					#print "\n\n*****MATCH!*****\n\n"
-					vregion_start=int(re.sub(r'[^0-9]','',str(feature_list.location.start)))
-					#print "fetched is ",vregion_start
-					vregion_stop=int(re.sub(r'[^0-9]','',str(feature_list.location.end)))
-					#sys.exit(0)
-				else:
-					pass
-					#print "NO MATCH!"
-					#sys.exit(0)
-	
-	if(vregion_start==None or vregion_stop==None):
-		#print "found an invalid region....!"
-		return (-1)
-	else:
-		#print "found a region start and stop, so look for cdr3 in it...."
-		for feature_list in record.features:
-			#print "got a feature list"
-			#print feature_list
-			ftype=feature_list.type
-			if(re.search(r'CDR3',ftype,re.IGNORECASE)):
-				print "found a CDR3!"
-				cdr3_start=int(re.sub(r'[^0-9]','',str(feature_list.location.start)))
-				cdr3_stop=int(re.sub(r'[^0-9]','',str(feature_list.location.end)))
-				qualifiers=feature_list.qualifiers
-				#print feature_list
-				#print qualifiers
-				if("complement" in qualifiers):
-					revCompFlag=True
-				else:
-					revCompFlag=False
-				if(vregion_start<=cdr3_start and cdr3_start<=vregion_stop):
-					#print "returning ",cdr3_start
-					#return cdr3_start
-					#sys.exit(0)
-					if(not(revCompFlag)):
-						return cdr3_start
-					else:
-						return cdr3_stop
-	return (-1)
 
 #class for count map
 class IncrementMapWrapper():
@@ -1764,7 +1687,7 @@ def getQueryIndexGivenSubjectIndexAndAlignment(query_aln,subject_aln,q_start,q_s
 			#print "\n\n"
 
 
-
+#return true if a string ends with *XY with X and Y digits
 def looksLikeAlleleStr(a):
 	are=re.compile(r'\*\d+$')
 	res=re.search(are,a)
@@ -1775,7 +1698,7 @@ def looksLikeAlleleStr(a):
 
 
 
-
+#rooted at an organism get the hierarchy from the gene tables
 def getHierarchyByOrganism(geneTablesDirectoryOfHTMLFiles,org_name,filterbyFastaAlleles=False):
 	loci=get_loci_list()
 	hierarchy=tree()
