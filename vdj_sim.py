@@ -10,6 +10,7 @@ dMap=None
 jMap=None
 bps=["A","C","G","T"]
 
+#make a random junction string
 def rand_jun(min_len,max_len):
 	global bps	
 	rand_len=random.choice(range(min_len,max_len+1))
@@ -19,7 +20,8 @@ def rand_jun(min_len,max_len):
 	return junc
 
 
-
+#pick V and J and recombine with a junction
+#note, can currently allow IGHV to combine with IGKJ
 def sim_light_recomb(vMap,jMap):
 	vKey=random.choice(vMap.keys())
 	jKey=random.choice(jMap.keys())
@@ -34,7 +36,8 @@ def sim_light_recomb(vMap,jMap):
 		}
 	#return [vKey,jKey,vj_junc,light_seq]
 	
-
+#pick V,D, and J and recombine with junctions
+#note, can currently allow IGHV to combine with IGKJ
 def sim_heavy_recomb(vMap,dMap,jMap):
 	vKey=random.choice(vMap.keys())
 	dKey=random.choice(dMap.keys())
@@ -53,6 +56,10 @@ def sim_heavy_recomb(vMap,dMap,jMap):
 	#return [vKey,dKey,jKey,vd_junc,dj_junc,heavy_seq]
 	
 
+
+
+#dummy SHM
+#TODO : region-aware SHM
 def dummySHM(seq,mut_param_lambda):
 	num_muts=numpy.random.poisson(mut_param_lambda,1)[0]
 	if(num_muts==0):
@@ -75,6 +82,11 @@ def dummySHM(seq,mut_param_lambda):
 	return join_char.join(shm_seq)
 
 
+
+
+
+#using the input fastas and flags (and max sim)
+#writer simulated VDJs to STDOUT
 def vdj_sim(vFasta,dFasta,jFasta,no_light,no_heavy,max_sim=float("inf")):
 	vMap=read_fasta_file_into_map(vFasta)
 	jMap=read_fasta_file_into_map(jFasta)
@@ -92,11 +104,9 @@ def vdj_sim(vFasta,dFasta,jFasta,no_light,no_heavy,max_sim=float("inf")):
 	num_sim=0
 	while(num_sim<max_sim):
 		chain_selection=random.choice(chain_list)
-		#print "The chain selection is ",chain_selection
 		descriptor=">"+str(num_sim+1)
 		if(chain_selection=="heavy"):
 			recomb=sim_heavy_recomb(vMap,dMap,jMap)
-			#>1315|dKey=None|jKey=IGKJ3*01|vKey=IGHV2-70*13|vj_junc=CTCAATATG
 			for sk in sorted_h_keys:
 				descriptor+="|"+sk+"="+recomb[sk]
 			descriptor+="|chain_type=heavy"
@@ -106,21 +116,15 @@ def vdj_sim(vFasta,dFasta,jFasta,no_light,no_heavy,max_sim=float("inf")):
 				descriptor+="|"+sk+"="+recomb[sk]
 			descriptor+="|chain_type=light"
 		recomb['shm_seq']=dummySHM(recomb['seq'],0.5)
-
-
-		#sorted_keys=recomb.keys()
-		#sorted_keys.sort()
-		#for sk in sorted_keys:
-		#	if(not(sk.endswith("seq"))):
-		#		descriptor+="|"+sk+"="+recomb[sk]
 		print descriptor+"\n"+recomb['shm_seq']
 		num_sim+=1
 	
 
 
-
+#get VDJ fasta, heavy/light flags and simulate
+#with 'dumb' SHM (includes insertions, deletions, and base substitutions)
 if (__name__=="__main__"):
-	parser = argparse.ArgumentParser(description='Given V,D,J fastA files, simulate V(D)J recombination with somatic hypermutation')
+	parser = argparse.ArgumentParser(description='Given V,D,J fastA files, simulate V(D)J recombination with somatic hypermutation.  Note SHM includes insertions, deletions, and base substitutions is not "region"-aware (e.g. of CDR1, CDR2, etc).  Simulated sequences are written to STDOUT')
 	parser.add_argument('vfasta',type=str,nargs=1,help="path to the V fasta file")
 	parser.add_argument('jfasta',type=str,nargs=1,help="path to the J fasta file")
 	parser.add_argument('-dfasta',type=str,nargs=1,help="path to the D fasta file for heavy chains")
