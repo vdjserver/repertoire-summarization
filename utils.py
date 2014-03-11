@@ -198,15 +198,18 @@ def comp_dna(dna,allowIUPAC=False):
 			comped+=dna[b]
 	return comped
 			
-
-def rev_comp_dna(dna):
-	return comp_dna(rev_dna(dna))
-
-
+#reverse complement DNA
+def rev_comp_dna(dna,allowIUPAC=False):
+	return comp_dna(rev_dna(dna),allowIUPAC)
 
 
 
 
+
+#translate a sequence with BIOPYTHON
+#using IUPAC standards
+#NOTE that sequences are truncated so
+#that the length is %3=0
 def biopythonTranslate(dna):
 	from Bio.Seq import Seq
 	from Bio.Alphabet import IUPAC
@@ -240,7 +243,9 @@ def biopythonTranslate(dna):
 
 
 
-
+#using a map and key 
+#increment the value
+#init at 1 if no such key is in the map
 def counter_map_inc(counter_map,key):
 	if key in counter_map:
 		counter_map[key]+=1
@@ -249,6 +254,8 @@ def counter_map_inc(counter_map,key):
 	return counter_map
 
 
+
+#scan to see if a string contains an apostrophe
 def doesStringContainAnApostrophe(s):
 	if(re.search("'",s)):
 		return True
@@ -256,7 +263,8 @@ def doesStringContainAnApostrophe(s):
 		return False
 
 
-
+#return TRUE if the first argument (a)
+# is a substring of the second (b)
 def a_subseq_of_b(a,b):
 	try:
 		a_index=b.index(a)
@@ -265,15 +273,24 @@ def a_subseq_of_b(a,b):
 		return False
 
 
+
+
+#return true if the two sequences in an alignment are equal
+#allow exclusion of head/tail indels as an option (defaults to False)
 def isAlignmentFreeOfBothMutationsAndIndels(alignment,TryRemovalOfHeadAndTailDash=False):
 	if(alignment[0]==alignment[1]):
+		#query and subject are the same, return true
 		return True
 	else:
 		if(TryRemovalOfHeadAndTailDash and (removeHeadAndTailMultiDash(alignment[0])==removeHeadAndTailMultiDash(alignment[1]))):
+			#see if they're equal if head/tail indels are removed
 			return True
+		#nope!
 		return False
 
 
+
+#read multiple fasta files into a single map
 def readMultipleMapFilesIntoSingleMapWithGlob(g):
 	map_files=glob.glob(g)
 	total_map=dict()
@@ -284,7 +301,9 @@ def readMultipleMapFilesIntoSingleMapWithGlob(g):
 	return total_map
 
 
-
+#given a subset list 'subset'
+#write data from the source (input)
+# that is in the subset to the output path
 def fastaSubset(inputFastaPath,subset,outputFastaPath):
 	#print "**************************************"
 	#print "FASTA SUBSET CALLED"
@@ -311,6 +330,9 @@ def fastaSubset(inputFastaPath,subset,outputFastaPath):
 	subset_writer.close()
 
 
+#using NW alignment data
+#map unmapped items to a list
+#(this is for comparing IGBLAST and IMGT data)
 def nw_map_from_fastas(q_fasta_path,s_fasta_path,logPath,clone_names,alleleList,mappedPath,unmappedPath,resEq=True):
 	q_map=read_fasta_file_into_map(q_fasta_path)
 	db_map=read_fasta_file_into_map(s_fasta_path)
@@ -327,7 +349,8 @@ def nw_map_from_fastas(q_fasta_path,s_fasta_path,logPath,clone_names,alleleList,
 	write_list_to_file(unmapped_list,unmappedPath)
 	
 
-	
+#from the map/alignment data and clone list
+#find the alignments
 def find_best_nw_from_maps_KeepPerfects(q_map,db_map,logPath,clone_names_map,alleleList,resEq=True):
 	score_map_name=dict()
 	score_map_val=dict()
@@ -403,6 +426,11 @@ def find_best_nw_from_maps_KeepPerfects(q_map,db_map,logPath,clone_names_map,all
 	return good_map
 
 
+
+
+#act as a wrapper getting a value
+#from a map with 0 as the default value
+#if the key is not in the map
 def counter_map_get(counter_map,key):
 	if key in counter_map:
 		return counter_map[key]
@@ -411,7 +439,8 @@ def counter_map_get(counter_map,key):
 
 
 
-
+#wrapper to touch a file
+#see http://stackoverflow.com/questions/1158076/implement-touch-using-python
 def touch(fname, times=None):
 	try:
 		with file(fname, 'a'):
@@ -420,6 +449,8 @@ def touch(fname, times=None):
 		print "Error in touching file",fname
 
 
+#given a file path attempt to find out if it does NOT exist
+#would be touchable and would be deletable
 def test_nonexistent_touchable_and_del(f):
 	if(os.path.exists(f)):
 		return False
@@ -432,13 +463,15 @@ def test_nonexistent_touchable_and_del(f):
 	return True
 
 
-
+#read a fasta file into a map (descriptors as keys, sequences as values)
 def read_fasta_file_into_map(fasta_path,alwaysSeqToUpper=True,removeNonIUPAC=True):
 	fasta_data=read_fasta(fasta_path,alwaysSeqToUpper)
 	fasta_map=read_fasta_into_map(fasta_data)
 	return fasta_map
 
-
+#read a fasta string (from a fasta file) into an array of data
+#elements 0,2,... become descriptors
+#elements 1,3,... become sequences
 def read_fasta_string(fasta_string,alwaysSeqToUpper=True,removeNonIUPAC=True):
 	lines=fasta_string.split("\n")
 	data=list()
@@ -463,7 +496,9 @@ def read_fasta_string(fasta_string,alwaysSeqToUpper=True,removeNonIUPAC=True):
 
 
 
-
+#read a single fasta file into an array of data
+#elements 0,2,... become descriptors
+#elements 1,3,... become sequences
 def read_fasta(fasta_path,alwaysSeqToUpper=True):
 	data=list()
 	temp_seq=""
@@ -491,7 +526,7 @@ def repStr(s,n):
 
 
 
-
+#return a nicely-formatted date and time string
 def formatNiceDateTimeStamp():
 	#	>>> datetime.now().strftime("%A, %d. %B %Y %I:%M%p")
 	#	'Thursday, 09. January 2014 03:49PM'
@@ -508,7 +543,7 @@ def formatNiceDateTimeStamp():
 
 
 
-
+#remove any "-" (0 or more) from the head and tail of a string
 def removeHeadAndTailMultiDash(s):
 	s=re.sub(r'\-+$',"",s)
 	s=re.sub(r'^\-+',"",s)
@@ -525,7 +560,8 @@ def get_domain_modes():
 
 
 
-
+#remove any ; found at the end of a string
+#remove 1 or more of them .... as many are as found
 def removeTerminatingSemicolonIfItExists(s):
 	s=re.sub(r';+$',"",s)
 	return s
@@ -533,7 +569,7 @@ def removeTerminatingSemicolonIfItExists(s):
 
 
 
-
+#wrapper to call makeblastdb to format a blast DB
 def format_blast_db(fastaPath):
 	format_db_cmd="/usr/local/bin/makeblastdb -dbtype nucl -in "+fastaPath
 	print "The format cmd is ",format_db_cmd
@@ -544,7 +580,7 @@ def format_blast_db(fastaPath):
 	return format_db_cmd
 
 
-
+#call NCBI blast
 def blast_db(query_path,db_arg,blast_output_path,xmlMode=True):
 	blast_cmd="/usr/local/bin/blastn -query "+query_path#+" -word_size 4"
 	if(xmlMode):
@@ -558,7 +594,9 @@ def blast_db(query_path,db_arg,blast_output_path,xmlMode=True):
 	return blast_cmd
 
 
-
+#read a fasta file into a map
+#with descriptors as keys
+#and squences as values
 def read_fasta_into_map(fasta_data):
 	i=0
 	fasta_map=dict()
@@ -569,7 +607,10 @@ def read_fasta_into_map(fasta_data):
 	return fasta_map
 
 
-
+#given a 'plain' dict() (python primitive)
+#convert it to a default dict
+# see http://docs.python.org/2/library/collections.html#collections.defaultdict
+# see http://stackoverflow.com/questions/5900578/how-collections-defaultdict-work
 def convertToDefaultStringDict(m,s):
 	dd=defaultdict(s)
 	for k in m:
@@ -578,7 +619,8 @@ def convertToDefaultStringDict(m,s):
 
 
 
-
+#given a directory hierarchy, unGZ files under it
+#(NOTE not functional)...
 def uncompressFilesUnderDir(d):
 	uncompRE=re.compile(r'\.(Z|gz)$')
 	for root, dirs, files in os.walk(d, topdown=False):
@@ -600,7 +642,10 @@ def uncompressFilesUnderDir(d):
 
 
 
-
+#given two maps of keys and values
+#return a third that is their union
+#if a key is shared mb takes precedence
+#and its value overwrites whatever ma may have
 def merge_maps(ma,mb):
 	mc=dict()
 	for a in ma:
@@ -611,7 +656,7 @@ def merge_maps(ma,mb):
 
 
 
-
+#write a list to a file with line numbers (0-based)
 def write_list_to_file(m,path,doSort=True):
 	writer=open(path,'w')
 	if(doSort):
@@ -624,7 +669,7 @@ def write_list_to_file(m,path,doSort=True):
 	writer.close()
 
 
-
+#wrapper to exectute a BASH script
 def execute_bash_script(scriptPath,outPath="/dev/stdout",errPath="/dev/stderr"):
 	cmd="/bin/bash "+scriptPath.strip()
 	#print "popen called with cmd=/bin/bash "+scriptPath+" stdout=",outPath," stderr=",errPath," and shell=/bin/bash"
@@ -642,7 +687,7 @@ def execute_bash_script(scriptPath,outPath="/dev/stdout",errPath="/dev/stderr"):
 
 
 
-
+#wrapper to write a bash script
 def write_temp_bash_script(cmd_string,scriptFilePath=None):
 	if(scriptFilePath==None):
 		scriptFilePath="/tmp/vdj_server_rand_"+binascii.hexlify(os.urandom(16))+".sh"
@@ -655,7 +700,7 @@ def write_temp_bash_script(cmd_string,scriptFilePath=None):
 	return scriptFilePath	
 	
 
-
+#get the number of lines in a file
 def getNumberLinesInFile(p):
 	reader=open(p,'r')
 	lines=0
@@ -663,13 +708,15 @@ def getNumberLinesInFile(p):
 		lines+=1
 	return lines
 
-
+#alias for getNumberLinesInFile 
+#looking at the file as a list
 def getLengthOfListInFile(p):
 	mylist=read_list_from_file(p)
 	return len(mylist)
 
 
-
+#write a map to a file (optionally using a sorted list of keys)
+# and prefix line/key numbers to the output
 def write_map_to_file(m,path,doSort=True):
 	writer=open(path,'w')
 	if(doSort):
@@ -682,7 +729,7 @@ def write_map_to_file(m,path,doSort=True):
 	writer.close()
 
 
-
+#read a list of lines from a file into a list
 def read_list_from_file(path):
 	reader=open(path,'r')
 	file_list=list()
@@ -692,7 +739,9 @@ def read_list_from_file(path):
 	reader.close()	
 	return file_list
 
-
+#read a map from a file
+#formatted as tab-separated values
+#ignore lines that aren't 2-columns (key and value)
 def read_map_from_file(path):
 	reader=open(path,'r')
 	m=dict()
@@ -704,6 +753,10 @@ def read_map_from_file(path):
 	reader.close()
 	return m
 
+
+
+#print a map to the screen (stdout)
+#optionally sorting the keys before doing so
 def printMap(m,sortKeys=False):
 	i=0
 	if(not(sortKeys)):
@@ -719,21 +772,25 @@ def printMap(m,sortKeys=False):
 			print "#"+str(i+1),k,"->",m[k]
 			i+=1
 
-
+#get the time from the DATE command
 def returnTimeStamp():
 	date_cmd="date"
 	date_cmd_args="+%m_%d_%Y_%H_%M_%S.%N"
 	date_result=subprocess.check_output([date_cmd,date_cmd_args])
 
 
-
+#print a LIST to STDOUT
+#using indices
 def printList(l):
 	for i in range(len(l)):
 		print i,":",l[i]
 
 
 
-
+#given two lists and two titles
+#print a "side-by-side" style "diff -sy"-like
+#output showing what's in one list but not the
+#other!
 def extendedSortedSetDiff(a,b,a_title,b_title):
 	#coveredInA=list()
 	blank=""
@@ -749,7 +806,8 @@ def extendedSortedSetDiff(a,b,a_title,b_title):
 			print blank,"\t>\t",b_i
 
 
-
+#given two lists and two titles
+#print  messages show differences
 def briefSetDiff(a,b,a_title,b_title):
 	if(len(a)==len(b) and set(a)==set(b)):
 		print "Two sets are the same!"
@@ -762,6 +820,7 @@ def briefSetDiff(a,b,a_title,b_title):
 				print "item",b_i," is in ",b_title,"but not in",a_title				
 
 
+#read a file into a string
 def readFileIntoString(path):
 	f=open(path,'r')
 	data=f.read()
@@ -769,13 +828,14 @@ def readFileIntoString(path):
 	return data
 
 
-
+#read a URL using urllib2
 def readAURL(url):
 	f = urllib2.urlopen(url)
 	html=f.read()
 	return html
 
-
+#assuming a directory exists write a string to a file whose path is in
+#that directory
 def writeStringToFilePathAssumingDirectoryExists(string,file_path):
 	outfile=open(file_path,'w')
 	outfile.write(string)
@@ -783,13 +843,18 @@ def writeStringToFilePathAssumingDirectoryExists(string,file_path):
 
 
 
-
+#download a URL and write it to a local file assuming the 
+#directory where the file will be written to exists
 def downloadURLToLocalFileAssumingDirectoryExists(url,local):
 	url_content=readAURL(url)
 	writeStringToFilePathAssumingDirectoryExists(url_content,local)
 
 
-
+#uncompress a .Z file using the uncompress program
+#uncompress in place or write to the file
+#without the .Z extension
+#if no .Z extension, then return
+#if the output already exists, then return
 def uncompressZFile(path,uncompressInPlace=False):
 	if(uncompressInPlace):
 		cmd="uncompress "+path
