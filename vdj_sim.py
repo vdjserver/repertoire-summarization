@@ -23,7 +23,13 @@ def sim_light_recomb(vMap,jMap):
 	jKey=random.choice(jMap.keys())
 	vj_junc=rand_jun(0,10)
 	light_seq=vMap[vKey]+vj_junc+jMap[jKey]
-	return [vKey,jKey,vj_junc,light_seq]
+	return {
+		'vKey':vKey,
+		'jKey':jKey,
+		'vj_junc':vj_junc,
+		'seq':light_seq
+		}
+	#return [vKey,jKey,vj_junc,light_seq]
 	
 
 def sim_heavy_recomb(vMap,dMap,jMap):
@@ -59,10 +65,13 @@ def vdj_sim(vFasta,dFasta,jFasta,no_light,no_heavy,max_sim=float("inf")):
 	num_sim=0
 	while(num_sim<max_sim):
 		chain_selection=random.choice(chain_list)
-		print "The chain selection is ",chain_selection
+		#print "The chain selection is ",chain_selection
 		if(chain_selection=="heavy"):
 			heavy_recomb=sim_heavy_recomb(vMap,dMap,jMap)
 			print heavy_recomb
+		else:
+			light_recomb=sim_light_recomb(vMap,jMap)
+			print light_recomb
 		num_sim+=1
 	
 
