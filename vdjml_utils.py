@@ -6,8 +6,8 @@ from segment_utils import getNAProductiveRearrangmentFlagFromVJHitLineData,getRe
 from igblast_utils import buildAlignmentWholeSeqs
 
 #given a read object, meta object, and an allele name
-#known to already HIT to the read, find the following info
-#and put it in a dict 'q. start', 'q. end', 's. start', 's. end', & btop
+#known to ALREADY HIT to the read, find the following info
+#and put it in a dict 'q. start', 'q. end', 's. start', 's. end', 'query id', 'subject ids', & btop
 def getHitInfo(read_result_obj,meta,alleleName,query_record=None,imgtdb_obj=None,organism=None):
 	#print "Need to extract info for ",alleleName
 	segment_matches=read_result_obj.segment_matches() 
@@ -116,7 +116,7 @@ def getVDJServerRegionAlignmentFromLargerVAlignmentPyObj(read_result_obj,meta,or
 
 
 
-
+#from a segment combination, extract the region
 def getRegionsObjsFromSegmentCombo(segment_combo):
 	print "got a segment combo : ",segment_combo
 	print "regions is ",segment_combo.regions
