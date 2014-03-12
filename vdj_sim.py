@@ -2,7 +2,9 @@
 import argparse
 import random
 from utils import read_fasta_file_into_map
+from imgt_utils import get_loci_list
 import numpy
+
 
 #global variable for V(D)J data!
 vMap=None
@@ -132,7 +134,7 @@ def compatibleForRecombination(c1,c2):
 
 #using the input fastas and flags (and max sim)
 #writer simulated VDJs to STDOUT
-def vdj_sim(vFasta,dFasta,jFasta,no_light,no_heavy,max_sim=float("inf")):
+def vdj_sim(vFasta,dFasta,jFasta,selected_loci,max_sim=float("inf")):
 	vMap=read_fasta_file_into_map(vFasta)
 	vMom=partitionIntoClassMaps(vMap)
 	print "VMOM : ",vMom
@@ -169,6 +171,19 @@ def vdj_sim(vFasta,dFasta,jFasta,no_light,no_heavy,max_sim=float("inf")):
 	
 
 
+#get default classes from IMGT loci
+def getDefaultClasses():
+	loci=get_loci_list()
+	classes=list()
+	for locus in loci:
+		class_name=locus[0:3]
+		if(not(class_name in classes)):
+			classes.append(class_name)
+	return classes
+
+
+
+
 #get VDJ fasta, heavy/light flags and simulate
 #with 'dumb' SHM (includes insertions, deletions, and base substitutions)
 if (__name__=="__main__"):
@@ -176,29 +191,30 @@ if (__name__=="__main__"):
 	parser.add_argument('vfasta',type=str,nargs=1,help="path to the V fasta file")
 	parser.add_argument('jfasta',type=str,nargs=1,help="path to the J fasta file")
 	parser.add_argument('-dfasta',type=str,nargs=1,help="path to the D fasta file for heavy chains")
-	parser.add_argument('-no_light',action='store_true',dest='no_light',help="exclude simulation of 'light' chains")
-	parser.set_defaults(no_light=False)
-	parser.add_argument('-no_heavy',action='store_true',dest='no_heavy',help="exclude simulation of 'heavy' chains")
-	parser.set_defaults(no_heavy=False)	
+	parser.add_argument('-loci',type=str,nargs=1,help="comma-separated list of allowed loci (default all these \"IGH,IGK,IGV,TRA,TRB,TRD,TRG\")")
 	parser.add_argument('-num_seqs',type=int,default=float("inf"),nargs=1,help="the number of sequences to simulate")
 	args = parser.parse_args()
+	if(not(args.loci is None)):
+		selected_loci=args.loci
+		selected_loci=selected_loci[0]
+		selected_loci=selected_loci.split(',')
+		allowed_loci=getDefaultClasses()
+		for s in selected_loci:
+			if(not(s in allowed_loci)):
+				print "ERROR, selected loci ",s," not in list of allowed loci : ",allowed_loci
+				raise Exception("Error, must select allowed loci only!")
+	else:
+		selected_loci=getDefaultClasses()
 	if(args.num_seqs!=float("inf")):
 		max_sim=int(args.num_seqs[0])
 	else:
 		max_sim=float("inf")
-	if(args.no_light and args.no_heavy):
-		print "ERROR! Must allow simulation of at least either light or heavy chains!"
-		parser.print_help()
-	elif(not(args.no_heavy) and not(args.dfasta)):
-		print "ERROR! Must supply D fasta if not excluding heavy chain simulation!"
-		parser.print_help
-	else:
-		vFasta=args.vfasta[0]
-		dFasta=None
-		if(args.dfasta):
-			dFasta=args.dfasta[0]
-		jFasta=args.jfasta[0]
-		vdj_sim(vFasta,dFasta,jFasta,args.no_light,args.no_heavy,max_sim)
+	vFasta=args.vfasta[0]
+	dFasta=None
+	if(args.dfasta):
+		dFasta=args.dfasta[0]
+	jFasta=args.jfasta[0]
+	vdj_sim(vFasta,dFasta,jFasta,selected_loci,max_sim)
 
 
 	
