@@ -1687,16 +1687,6 @@ def getQueryIndexGivenSubjectIndexAndAlignment(query_aln,subject_aln,q_start,q_s
 			#print "\n\n"
 
 
-#return true if a string ends with *XY with X and Y digits
-def looksLikeAlleleStr(a):
-	are=re.compile(r'\*\d+$')
-	res=re.search(are,a)
-	if(res):
-		return True
-	else:
-		return False
-
-
 
 #rooted at an organism get the hierarchy from the gene tables
 def getHierarchyByOrganism(geneTablesDirectoryOfHTMLFiles,org_name,filterbyFastaAlleles=False):
