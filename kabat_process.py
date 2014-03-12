@@ -21,6 +21,11 @@ def isIntegral(s):
 	else:
 		return False
 
+
+
+
+
+
 def writeKabatJCDR3End(k,o):
 	reader=open(k,'r')
 	blast_records = NCBIXML.parse(reader)
