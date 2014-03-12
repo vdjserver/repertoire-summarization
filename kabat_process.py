@@ -5,6 +5,14 @@ import os
 from utils import printMap
 from Bio.Blast import NCBIXML
 
+
+#ROUTINES FOR MAKING LOOKUP TABLES OF KABAT MODE
+
+
+
+
+
+
 def isIntegral(s):
 	ire=re.compile(r'^\s*(\d+)\s*$')
 	sr=re.search(ire,s)
