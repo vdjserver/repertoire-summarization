@@ -192,7 +192,7 @@ def vdj_sim(vFasta,dFasta,jFasta,selected_loci_classes,max_sim=float("inf")):
 			recomb=sim_heavy_recomb(vPool,dPool,jPool)
 			for sk in sorted_h_keys:
 				descriptor+="|"+sk+"="+recomb[sk]
-				descriptor+="|chain_type=heavy"
+			descriptor+="|chain_type=heavy"
 		else:
 			#light recombination
 			recomb=sim_light_recomb(vPool,jPool)
@@ -283,7 +283,7 @@ if (__name__=="__main__"):
 				import sys
 				sys.exit(1)
 	else:
-		selected_loci=getDefaultClasses()
+		selected_loci_classes=getDefaultClasses()
 	if(args.num_seqs!=float("inf")):
 		max_sim=int(args.num_seqs[0])
 	else:
