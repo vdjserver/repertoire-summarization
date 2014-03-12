@@ -2,7 +2,7 @@
 import argparse
 import random
 from utils import read_fasta_file_into_map
-from imgt_utils import get_loci_list
+from imgt_utils import get_loci_list,get_heavy_loci
 import numpy
 
 
@@ -87,8 +87,8 @@ def dummySHM(seq,mut_param_lambda):
 
 
 #from a full name extract the class
-def getClassName(n):
-	class_name=n[0:4]
+def getLocusClassName(n):
+	class_name=n[0:3]
 	return class_name
 
 
@@ -100,18 +100,21 @@ def getClassName(n):
 def partitionIntoClassMaps(mainMap):
 	#first gather the class names
 	classList=list()
+	allowed_classes=getDefaultClasses()
 	for k in mainMap:
-		class_name=getClassName(k)
+		class_name=getLocusClassName(k)
 		#print "From ",k," extracted ",class_name
 		if(not(class_name in classList)):
-			classList.append(class_name)	
+			classList.append(class_name)
+		if(not(class_name in allowed_classes)):
+			raise Exception("Error, found sequence named ",k," with unknown class!")
 	#initialize a map of maps based on class names
 	mom=dict()
 	for c in classList:
 		mom[c]=dict()
 	#now map into that map-of-maps the items from k
 	for k in mainMap:
-		this_class_name=getClassName(k)
+		this_class_name=getLocusClassName(k)
 		mom[this_class_name][k]=mainMap[k]
 		#mom[c][k]="\n"
 	return mom
@@ -137,38 +140,37 @@ def compatibleForRecombination(c1,c2):
 def vdj_sim(vFasta,dFasta,jFasta,selected_loci,max_sim=float("inf")):
 	vMap=read_fasta_file_into_map(vFasta)
 	vMom=partitionIntoClassMaps(vMap)
-	print "VMOM : ",vMom
-	sys.exit(0)
 	jMap=read_fasta_file_into_map(jFasta)
+	jMom=partitionIntoClassMaps(jMap)
 	dMap=None
 	sorted_h_keys=['vKey','dKey','jKey','vd_junc','dj_junc']
 	sorted_l_keys=['vKey','jKey','vj_junc']
-	if(no_heavy):
-		chain_list=["light"]
-	elif(no_light):
-		chain_list=["heavy"]
-	else:
-		chain_list=["ligth","heavy"]
-	if("heavy" in chain_list):
+	if(not(dFasta is None)):
 		dMap=read_fasta_file_into_map(dFasta)
+		dMom==partitionIntoClassMaps(dMap)
 	num_sim=0
 	while(num_sim<max_sim):
-		chain_selection=random.choice(chain_list)
-		descriptor=">"+str(num_sim+1)
-		if(chain_selection=="heavy"):
-			recomb=sim_heavy_recomb(vMap,dMap,jMap)
-			for sk in sorted_h_keys:
-				descriptor+="|"+sk+"="+recomb[sk]
-			descriptor+="|chain_type=heavy"
-		else:
-			recomb=sim_light_recomb(vMap,jMap)
-			for sk in sorted_l_keys:
-				descriptor+="|"+sk+"="+recomb[sk]
-			descriptor+="|chain_type=light"
-		recomb['shm_seq']=dummySHM(recomb['seq'],0.5)
-		print descriptor+"\n"+recomb['shm_seq']
+		print (num_sim+1)
+		#chain_selection=random.choice(chain_list)
+		#descriptor=">"+str(num_sim+1)
+		#if(chain_selection=="heavy"):
+		#	recomb=sim_heavy_recomb(vMap,dMap,jMap)
+		#	for sk in sorted_h_keys:
+		#		descriptor+="|"+sk+"="+recomb[sk]
+		#	descriptor+="|chain_type=heavy"
+		#else:
+		#	recomb=sim_light_recomb(vMap,jMap)
+		#	for sk in sorted_l_keys:
+		#		descriptor+="|"+sk+"="+recomb[sk]
+		#	descriptor+="|chain_type=light"
+		#recomb['shm_seq']=dummySHM(recomb['seq'],0.5)
+		#print descriptor+"\n"+recomb['shm_seq']
 		num_sim+=1
 	
+
+
+def getClass(s):
+	return s[0:3]
 
 
 #get default classes from IMGT loci
@@ -176,11 +178,23 @@ def getDefaultClasses():
 	loci=get_loci_list()
 	classes=list()
 	for locus in loci:
-		class_name=locus[0:3]
+		class_name=getClass(locus)
 		if(not(class_name in classes)):
 			classes.append(class_name)
 	return classes
 
+
+#extract from a list the items identified as "heavy"
+def returnHeavyItems(l):
+	hi=list()
+	heavy_loci=get_heavy_loci()
+	heavy_classes=list()
+	for hl in heavy_loci:
+		heavy_classes.append(getClass(hl))
+	for i in l:
+		if(i in heavy_classes):
+			hi.append(i)
+	return hi
 
 
 
@@ -202,13 +216,21 @@ if (__name__=="__main__"):
 		for s in selected_loci:
 			if(not(s in allowed_loci)):
 				print "ERROR, selected loci ",s," not in list of allowed loci : ",allowed_loci
-				raise Exception("Error, must select allowed loci only!")
+				import sys
+				sys.exit(1)
 	else:
 		selected_loci=getDefaultClasses()
 	if(args.num_seqs!=float("inf")):
 		max_sim=int(args.num_seqs[0])
 	else:
 		max_sim=float("inf")
+	heavyItems=returnHeavyItems(selected_loci)
+	if(len(heavyItems)>0):
+		#ensure the dfasta is set
+		if(args.dfasta is None):
+			print "The following selected loci are heavy ("+str(heavyItems)+") but no DFASTA has been specified ! Heavy loci require D fasta! Abort !"
+			import sys
+			sys.exit(1)
 	vFasta=args.vfasta[0]
 	dFasta=None
 	if(args.dfasta):
