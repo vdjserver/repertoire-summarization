@@ -11,7 +11,7 @@ def getNumberIndelsFromBTOP(btop):
 	return orig_btop_len-btop_len_no_gap
 
 
-#find the number of mutations (does NOT include indels) from a BTOP
+#find the number of base substitutions (does NOT include indels) from a BTOP
 def getNumberBaseSubsFromBTOP(btop):
 	#remove all digits
 	btop_orig=str(btop)
