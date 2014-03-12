@@ -10,6 +10,8 @@ import re
 from igblast_utils import *
 from utils import *
 
+#SOME ROUTINES USED IN IMGT/IGBLAST mapping
+
 
 def isIMGTNameInAllKeyList(imgt_n,s_map):
 	imgt_list=list()
