@@ -137,20 +137,51 @@ def compatibleForRecombination(c1,c2):
 
 #using the input fastas and flags (and max sim)
 #writer simulated VDJs to STDOUT
-def vdj_sim(vFasta,dFasta,jFasta,selected_loci,max_sim=float("inf")):
+def vdj_sim(vFasta,dFasta,jFasta,selected_loci_classes,max_sim=float("inf")):
 	vMap=read_fasta_file_into_map(vFasta)
 	vMom=partitionIntoClassMaps(vMap)
+	num_miss_V=0
+	for v_class in vMom.keys():
+		if(not(v_class in selected_loci_classes)):
+			num_miss_V+=1
+	if(num_miss_V==len(vMom.keys())):
+		print "ERROR, loci classes from selected loci classes is ",selected_loci_classes," but classes read from V FASTA are ",vMom.keys(),". No data found for selected classes ! Abort!"
+		import sys
+		sys.exit(0)
 	jMap=read_fasta_file_into_map(jFasta)
 	jMom=partitionIntoClassMaps(jMap)
+	num_miss_J=0
+	for j_class in jMom.keys():
+		if(not(j_class in selected_loci_classes)):
+			num_miss_J+=1
+	if(num_miss_J==len(jMom.keys())):
+		print "ERROR, loci classes from selected loci classes is ",selected_loci_classes," but classes read from J FASTA are ",jMom.keys(),". No data found for selected classes ! Abort!"
+		import sys
+		sys.exit(0)
 	dMap=None
 	sorted_h_keys=['vKey','dKey','jKey','vd_junc','dj_junc']
 	sorted_l_keys=['vKey','jKey','vj_junc']
 	if(not(dFasta is None)):
 		dMap=read_fasta_file_into_map(dFasta)
-		dMom==partitionIntoClassMaps(dMap)
+		dMom=partitionIntoClassMaps(dMap)
+		num_miss_D=0
+		for d_class in dMom.keys():
+			if(not(d_class in selected_loci_classes)):
+				num_miss_d+=1
+		if(num_miss_D==len(dMom.keys())):
+			print "ERROR, loci classes from selected loci classes is ",selected_loci_classes," but classes read from D FASTA are ",dMom.keys(),". No data found for selected classes ! Abort!"
+			import sys
+			sys.exit(0)			
 	num_sim=0
 	while(num_sim<max_sim):
 		print (num_sim+1)
+		#make a random class choice from the list of selected classes
+		selected_random_class=random.choice(selected_loci_classes)
+		print "Selected random class ",selected_random_class
+		if(selected_random_class in vMom):
+			print "got v data!"
+		else:
+			print "no v data!"
 		#chain_selection=random.choice(chain_list)
 		#descriptor=">"+str(num_sim+1)
 		#if(chain_selection=="heavy"):
@@ -184,8 +215,18 @@ def getDefaultClasses():
 	return classes
 
 
+#determine if a locus selection is heavy
+def locusIsHeavy(l):
+	heavy_loci=get_heavy_loci()
+	if(l in heavy_loci):
+		return True
+	else:
+		return False
+
+
+
 #extract from a list the items identified as "heavy"
-def returnHeavyItems(l):
+def returnHeavyClassItems(l):
 	hi=list()
 	heavy_loci=get_heavy_loci()
 	heavy_classes=list()
@@ -205,17 +246,17 @@ if (__name__=="__main__"):
 	parser.add_argument('vfasta',type=str,nargs=1,help="path to the V fasta file")
 	parser.add_argument('jfasta',type=str,nargs=1,help="path to the J fasta file")
 	parser.add_argument('-dfasta',type=str,nargs=1,help="path to the D fasta file for heavy chains")
-	parser.add_argument('-loci',type=str,nargs=1,help="comma-separated list of allowed loci (default all these \"IGH,IGK,IGV,TRA,TRB,TRD,TRG\")")
+	parser.add_argument('-loci',type=str,nargs=1,help="comma-separated list of allowed loci classes (default these 7 : \"IGH,IGK,IGV,TRA,TRB,TRD,TRG\")")
 	parser.add_argument('-num_seqs',type=int,default=float("inf"),nargs=1,help="the number of sequences to simulate")
 	args = parser.parse_args()
 	if(not(args.loci is None)):
-		selected_loci=args.loci
-		selected_loci=selected_loci[0]
-		selected_loci=selected_loci.split(',')
-		allowed_loci=getDefaultClasses()
-		for s in selected_loci:
-			if(not(s in allowed_loci)):
-				print "ERROR, selected loci ",s," not in list of allowed loci : ",allowed_loci
+		selected_loci_classes=args.loci
+		selected_loci_classes=selected_loci_classes[0]
+		selected_loci_classes=selected_loci_classes.split(',')
+		allowed_loci_classes=getDefaultClasses()
+		for s in selected_loci_classes:
+			if(not(s in allowed_loci_classes)):
+				print "ERROR, selected loci ",s," not in list of allowed loci : ",allowed_loci_classes
 				import sys
 				sys.exit(1)
 	else:
@@ -224,11 +265,11 @@ if (__name__=="__main__"):
 		max_sim=int(args.num_seqs[0])
 	else:
 		max_sim=float("inf")
-	heavyItems=returnHeavyItems(selected_loci)
-	if(len(heavyItems)>0):
+	heavyClassItems=returnHeavyClassItems(selected_loci_classes)
+	if(len(heavyClassItems)>0):
 		#ensure the dfasta is set
 		if(args.dfasta is None):
-			print "The following selected loci are heavy ("+str(heavyItems)+") but no DFASTA has been specified ! Heavy loci require D fasta! Abort !"
+			print "The following selected loci are heavy ("+str(heavyClassItems)+") but no DFASTA has been specified ! Heavy loci require D fasta! Abort !"
 			import sys
 			sys.exit(1)
 	vFasta=args.vfasta[0]
@@ -236,7 +277,7 @@ if (__name__=="__main__"):
 	if(args.dfasta):
 		dFasta=args.dfasta[0]
 	jFasta=args.jfasta[0]
-	vdj_sim(vFasta,dFasta,jFasta,selected_loci,max_sim)
+	vdj_sim(vFasta,dFasta,jFasta,selected_loci_classes,max_sim)
 
 
 	
