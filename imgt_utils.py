@@ -592,6 +592,26 @@ def get_loci_list():
 	loci=["IGHV","IGHD","IGHJ","IGKV","IGKJ","IGLV","IGLJ","TRAV","TRAJ","TRBV","TRBD","TRBJ","TRDV","TRDD","TRDJ","TRGV","TRGJ"]
 	return loci
 
+#of the 17 loci, return the ones defined as "heavy"
+def get_heavy_loci():
+	defined_as_heavy=["IGHD","IGHJ","IGHV","TRBD","TRBJ","TRBV","TRDD","TRDJ","TRDV"]
+	return defined_as_heavy
+
+#get loci that are light (not heavy)
+def get_light_loci():
+	all_loci=get_loci_list()
+	heavy_loci=get_heavy_loci()
+	light_loci=list()
+	for locus in all_loci:
+		if(locus in heavy_loci):
+			pass
+		else:
+			light_loci.append(locus)
+	return light_loci
+
+
+
+
 #is the given loci one of the 17???
 def isLegitimateLoci(locus):
 	loci_list=get_loci_list()
