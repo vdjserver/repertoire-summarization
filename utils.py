@@ -850,6 +850,22 @@ def downloadURLToLocalFileAssumingDirectoryExists(url,local):
 	writeStringToFilePathAssumingDirectoryExists(url_content,local)
 
 
+
+
+
+#return true if a string ends with *XY with X and Y digits
+def looksLikeAlleleStr(a):
+	are=re.compile(r'\*\d+$')
+	res=re.search(are,a)
+	if(res):
+		return True
+	else:
+		return False
+
+
+
+
+
 #uncompress a .Z file using the uncompress program
 #uncompress in place or write to the file
 #without the .Z extension

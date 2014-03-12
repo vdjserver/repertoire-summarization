@@ -17,7 +17,7 @@ from Bio.Blast import NCBIXML
 import sys, traceback
 import pickle
 import ntpath
-from segment_utils import looksLikeAlleleStr
+from utils import looksLikeAlleleStr
 from Bio import SeqIO
 
 
@@ -985,7 +985,7 @@ def getIMGTNameListFromFastaMap(fm):
 #if at least one FAILS return false
 def areAllItemsInListIMGTAlleles(l):
 	for i in l:
-		if(not(looksLikeAlleleStr(i)):
+		if(not(looksLikeAlleleStr(i))):
 			return False
 	return True
 
