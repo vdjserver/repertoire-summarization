@@ -265,7 +265,7 @@ def returnHeavyClassItems(l):
 #get VDJ fasta, heavy/light flags and simulate
 #with 'dumb' SHM (includes insertions, deletions, and base substitutions)
 if (__name__=="__main__"):
-	parser = argparse.ArgumentParser(description='Given V,D,J fastA files, simulate V(D)J recombination with somatic hypermutation.  Note SHM includes insertions, deletions, and base substitutions is not "region"-aware (e.g. of CDR1, CDR2, etc).  Simulated sequences are written to STDOUT')
+	parser = argparse.ArgumentParser(description='Given V,D,J fastA files, simulate V(D)J recombination with somatic hypermutation.  Note SHM includes insertions, deletions, and base substitutions is not "region"-aware (e.g. of CDR1, CDR2, etc).  Since SHM is not "region"-aware there is *no* bias for the positions of any of the mutations (base substitions, insertions, deletions). Simulated sequences are written to STDOUT')
 	parser.add_argument('vfasta',type=str,nargs=1,help="path to the V fasta file")
 	parser.add_argument('jfasta',type=str,nargs=1,help="path to the J fasta file")
 	parser.add_argument('-dfasta',type=str,nargs=1,help="path to the D fasta file for heavy chains")
