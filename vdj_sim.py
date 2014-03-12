@@ -84,11 +84,59 @@ def dummySHM(seq,mut_param_lambda):
 
 
 
+#from a full name extract the class
+def getClassName(n):
+	class_name=n[0:4]
+	return class_name
+
+
+#given a single map (not partitioned)
+#partition into submaps
+#for light/heavy loci respectively
+#return a list of named maps
+#Classificiation is based on name string comparison/extraction of the first 4 characters
+def partitionIntoClassMaps(mainMap):
+	#first gather the class names
+	classList=list()
+	for k in mainMap:
+		class_name=getClassName(k)
+		#print "From ",k," extracted ",class_name
+		if(not(class_name in classList)):
+			classList.append(class_name)	
+	#initialize a map of maps based on class names
+	mom=dict()
+	for c in classList:
+		mom[c]=dict()
+	#now map into that map-of-maps the items from k
+	for k in mainMap:
+		this_class_name=getClassName(k)
+		mom[this_class_name][k]=mainMap[k]
+		#mom[c][k]="\n"
+	return mom
+
+
+
+#ae two classes recombination-compatible?
+#if the first 3 characters are the same, then yes!
+#otherwise no!
+def compatibleForRecombination(c1,c2):
+	a=c1[0:3]
+	b=c2[0:3]
+	if(a==b):
+		return True
+	else:
+		return False
+
+
+
 
 #using the input fastas and flags (and max sim)
 #writer simulated VDJs to STDOUT
 def vdj_sim(vFasta,dFasta,jFasta,no_light,no_heavy,max_sim=float("inf")):
 	vMap=read_fasta_file_into_map(vFasta)
+	vMom=partitionIntoClassMaps(vMap)
+	print "VMOM : ",vMom
+	sys.exit(0)
 	jMap=read_fasta_file_into_map(jFasta)
 	dMap=None
 	sorted_h_keys=['vKey','dKey','jKey','vd_junc','dj_junc']
