@@ -161,13 +161,13 @@ def vdj_sim(vFasta,dFasta,jFasta,selected_loci_classes,max_sim=float("inf")):
 	dMap=None
 	sorted_h_keys=['vKey','dKey','jKey','vd_junc','dj_junc']
 	sorted_l_keys=['vKey','jKey','vj_junc']
-	if(not(dFasta is None)):
+	if(not(dFasta is None) and isAtLeastOneSelectedLocusClassHeavy(selected_loci_classes)):
 		dMap=read_fasta_file_into_map(dFasta)
 		dMom=partitionIntoClassMaps(dMap)
 		num_miss_D=0
 		for d_class in dMom.keys():
 			if(not(d_class in selected_loci_classes)):
-				num_miss_d+=1
+				num_miss_D+=1
 		if(num_miss_D==len(dMom.keys())):
 			print "ERROR, loci classes from selected loci classes is ",selected_loci_classes," but classes read from D FASTA are ",dMom.keys(),". No data found for selected classes ! Abort!"
 			import sys
@@ -177,42 +177,65 @@ def vdj_sim(vFasta,dFasta,jFasta,selected_loci_classes,max_sim=float("inf")):
 		print (num_sim+1)
 		#make a random class choice from the list of selected classes
 		selected_random_class=random.choice(selected_loci_classes)
-		print "Selected random class ",selected_random_class
-		if(selected_random_class in vMom):
-			print "got v data!"
+		vPool=vMom[selected_random_class]
+		jPool=jMom[selected_random_class]
+		dPool=None
+		if(locusClassIsHeavy(selected_random_class)):
+			dPool=dMom[selected_random_class]
+		#print "SELECTED RANDOM CLASS IS ",selected_random_class
+		#print "V POOL ",vPool
+		#print "D POOL ",dPool
+		#print "J POOL ",jPool
+		descriptor=">"+str(num_sim+1)
+		if(dPool is not None):
+			#heavy recombination
+			recomb=sim_heavy_recomb(vPool,dPool,jPool)
+			for sk in sorted_h_keys:
+				descriptor+="|"+sk+"="+recomb[sk]
+				descriptor+="|chain_type=heavy"
 		else:
-			print "no v data!"
-		#chain_selection=random.choice(chain_list)
-		#descriptor=">"+str(num_sim+1)
-		#if(chain_selection=="heavy"):
-		#	recomb=sim_heavy_recomb(vMap,dMap,jMap)
-		#	for sk in sorted_h_keys:
-		#		descriptor+="|"+sk+"="+recomb[sk]
-		#	descriptor+="|chain_type=heavy"
-		#else:
-		#	recomb=sim_light_recomb(vMap,jMap)
-		#	for sk in sorted_l_keys:
-		#		descriptor+="|"+sk+"="+recomb[sk]
-		#	descriptor+="|chain_type=light"
-		#recomb['shm_seq']=dummySHM(recomb['seq'],0.5)
-		#print descriptor+"\n"+recomb['shm_seq']
+			#light recombination
+			recomb=sim_light_recomb(vPool,jPool)
+			for sk in sorted_l_keys:
+				descriptor+="|"+sk+"="+recomb[sk]
+			descriptor+="|chain_type=light"
+		recomb['shm_seq']=dummySHM(recomb['seq'],0.5)
+		print descriptor+"\n"+recomb['shm_seq']
 		num_sim+=1
 	
 
-
-def getClass(s):
+#given a locus, get the class
+def getLocusClass(s):
 	return s[0:3]
 
+
+
+def isAtLeastOneSelectedLocusClassHeavy(slc):
+	for s in slc:
+		if(locusClassIsHeavy(s)):
+			return True
+	return False
 
 #get default classes from IMGT loci
 def getDefaultClasses():
 	loci=get_loci_list()
 	classes=list()
 	for locus in loci:
-		class_name=getClass(locus)
+		class_name=getLocusClass(locus)
 		if(not(class_name in classes)):
 			classes.append(class_name)
 	return classes
+
+
+#determine if a locus class is heavy
+def locusClassIsHeavy(lc):
+	heavy_loci=get_heavy_loci()
+	for heavy_locus in heavy_loci:
+		heavy_locus_class=getLocusClass(heavy_locus)
+		if(heavy_locus_class==lc):
+			return True
+	return False
+
 
 
 #determine if a locus selection is heavy
@@ -231,7 +254,7 @@ def returnHeavyClassItems(l):
 	heavy_loci=get_heavy_loci()
 	heavy_classes=list()
 	for hl in heavy_loci:
-		heavy_classes.append(getClass(hl))
+		heavy_classes.append(getLocusClass(hl))
 	for i in l:
 		if(i in heavy_classes):
 			hi.append(i)
