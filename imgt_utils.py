@@ -1280,7 +1280,9 @@ def testIdx(dat,idx):
 
 
 
-
+#the IMGT class
+#object container for data and methods
+#for database FNA and GENETABLE files
 class imgt_db:
 	####################
 	#data members
