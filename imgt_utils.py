@@ -17,10 +17,11 @@ from Bio.Blast import NCBIXML
 import sys, traceback
 import pickle
 import ntpath
+from segment_utils import looksLikeAlleleStr
 from Bio import SeqIO
 
 
-
+#find the number of leaves
 def countNumTerminalEntriesInHierarchy(h):
 	num_kids=0
 	for k in h:
@@ -31,7 +32,9 @@ def countNumTerminalEntriesInHierarchy(h):
 	return num_kids
 
 
-
+#find out if two allels are the same except for the allele * part
+#ie A*01 and A*02 ARE equivalent
+#ie A*01 and B*01 ARE NOT equivalent!
 def areTwoAllellesAlleleEquivalent(a1,a2):
 	#print "in comp, a1=",a1,"a2="
 	a1=re.sub(r'\*\d+$',"",a1)
@@ -43,7 +46,9 @@ def areTwoAllellesAlleleEquivalent(a1,a2):
 	
 
 
-
+#used in mapping IGBLAST data with
+#IMGT data
+#remove???
 def get_key_from_blast_title(title):
 	space_index=title.find(' ')
 	space_index+=1
@@ -52,7 +57,7 @@ def get_key_from_blast_title(title):
 	return str(key)
 
 
-
+#from an IMGT descriptor, extract the IMGT name (eg IGHV4-1*01)
 def extractIMGTNameFromKey(k):
 	pieces=k.split("|")
 	#print "the pieces are :",pieces
@@ -61,19 +66,27 @@ def extractIMGTNameFromKey(k):
 
 
 
-
+#from a string (presumably of DNA characters)
+#remove Ns at the beginning and end
 def removeHeadTailN(s):
 	s=re.sub(r'^N+','',s)
 	s=re.sub(r'N+$','',s)
 	return s
 
 
-
+#given an organism name,
+#make it "directoryable"
+#by removing chars such as /\-)( and
+#replace them with '_'
 def directoryFyOrgName(n):
 	d=re.sub(r'[\ \/\-\(\);:]','_',n)
 	return d
 
 
+
+#used in mapping IGBLAST data with
+#IMGT data
+#remove???
 def partitionIMGTFastaInDirByFile(f):
 	fasta_map=read_fasta_file_into_map(f)
 	for desc in fasta_map:
@@ -92,7 +105,9 @@ def partitionIMGTFastaInDirByFile(f):
 
 		
 	
-
+#used in mapping IGBLAST data with
+#IMGT data
+#remove???
 def filterIMGTMapByBasicCaseInsensitiveStartsWith(unfiltered_map,filter_str):
 	filtered_map=dict()
 	for key in unfiltered_map:
@@ -109,7 +124,8 @@ def filterIMGTMapByBasicCaseInsensitiveStartsWith(unfiltered_map,filter_str):
 
 
 
-
+#iterative, 'filter-based' process comparing two datasets
+#igblast and imgt
 def igblast_blast_map_multistep(nonExistentMapDir,query,refDirSetFNAList,allPPath,clone_map,alleleList,organism_filter):
 	#query is path to query data
 	#ref dir set fna list is a list of fasta of ref dir FNA files
@@ -241,7 +257,7 @@ def igblast_blast_map_multistep(nonExistentMapDir,query,refDirSetFNAList,allPPat
 
 
 
-
+#give  SINGLE fastas (query and subject) perform mapping/comparison
 def igblast_map_FA(queryFastaPath,subjectFastaPath,mappedPath,unMappedPath,clone_map,alleleList):
 	q_seq_map=read_fasta_file_into_map(queryFastaPath)
 	s_seq_map=read_fasta_file_into_map(subjectFastaPath)
@@ -371,7 +387,7 @@ def igblast_map_FA(queryFastaPath,subjectFastaPath,mappedPath,unMappedPath,clone
 
 
 
-
+#based on GLOBs perform a comparison IGBLAST/IMGT
 def igblast_map(igblastFNAGlob,refDirFNAGlob,nonExistentMapDir,clone_map,alleleList):
 	#get IGBLAST FNA files using the glob
 	igblast_fna=glob.glob(igblastFNAGlob)
@@ -544,16 +560,8 @@ def igblast_map(igblastFNAGlob,refDirFNAGlob,nonExistentMapDir,clone_map,alleleL
 
 
 
-def getSubListOfAlleliclyCompatibleAlleles(givenAllele,alleleList):
-	sublist=list()
-	for allele in alleleList:
-		#print "IN PASSING A1=",allele,"AND A2=",givenAllele
-		if(areTwoAllellesAlleleEquivalent(allele,givenAllele)):
-			sublist.append(allele)
-	return sublist
 
-
-
+#given a MYSQLLITE DB, make a JSON from the counts
 def get_count_JSON_ofVDJ(dbfilepath,db_base_dir,organism_name):
 	print "Now getting counts from ",dbfilepath,"..."
 	counts_map=get_rearrangement_segment_counts_from_db(dbfilepath)
@@ -574,21 +582,28 @@ def get_count_JSON_ofVDJ(dbfilepath,db_base_dir,organism_name):
 	JSON=jsonify_hierarchy(filled_hierarchy[organism_name],organism_name,counts_map)
 	return JSON
 
-
+#get the IMGT URL base
+#used in the downloading process
 def getIMGTURLBase():
 	return "http://www.imgt.org/"
 
-
+#get the list of LOCI
 def get_loci_list():
 	loci=["IGHV","IGHD","IGHJ","IGKV","IGKJ","IGLV","IGLJ","TRAV","TRAJ","TRBV","TRBD","TRBJ","TRDV","TRDD","TRDJ","TRGV","TRGJ"]
 	return loci
 
+#is the given loci one of the 17???
 def isLegitimateLoci(locus):
 	loci_list=get_loci_list()
 	locus=locus.upper()
 	return (locus in loci_list)
 
-
+#given a species and locus
+#form a URL to download the FNA data
+#that is the REFERENCE DIRECTORY SET!
+#note only "allowed" species and loci are used
+#in the formation of URLs
+#unallowed triggers an exception
 def formRefDirURL(species,locus):
 	base=getIMGTURLBase()
 	allowed=dict()
@@ -621,6 +636,12 @@ def formRefDirURL(species,locus):
 		exceptionStatus+="\nSpecies ("+species+") legitimacy : "+str((species in allowed))
 		raise Exception(exceptionStatus)
 
+
+
+
+#given HTML data, count the number
+#of appearances of "&gt;", which,
+#when decoded, is ">" which is the fasta descriptor signal
 def countNumApparentFastaRecsInStr(s):
 	if(s is None):
 		return (-1)
@@ -631,6 +652,12 @@ def countNumApparentFastaRecsInStr(s):
 			n+=1
 	return n
 
+
+
+
+#from <pre>...</pre> HTML tag
+#extract the fasta data within it
+#and return it as a string
 def filterOutFastaStringFromFastaPre(p):
 	dnaRE=re.compile(r'[actg\.]')
 	lines=p.split("\n")
@@ -647,7 +674,10 @@ def filterOutFastaStringFromFastaPre(p):
 
 
 
-
+#given a locus and species download the corresponding
+#reference directory set data from IMGT and return
+#it as a string
+#use BEAUTIFUL SOUP for parsing
 def downloadRefDirFasta(locus,species,URLOverRide=None):
 	if(URLOverRide is None):
 		url=formRefDirURL(species,locus)
@@ -688,7 +718,9 @@ def downloadRefDirFasta(locus,species,URLOverRide=None):
 
 
 
-
+#given a species and a locus
+#form a URL for subsequent download 
+#from IMGT
 def formGeneTableURLs(species,locus):
 	#http://www.imgt.org/IMGTrepertoire/index.php?section=LocusGenes&repertoire=genetable&species=human&group=IGHV
 	allowed=dict()
@@ -710,6 +742,11 @@ def formGeneTableURLs(species,locus):
 
 
 
+
+
+
+
+#example tree usage
 def basic_tree_test():
 	mytree=tree()
 	mytree['TCRA']
@@ -741,10 +778,9 @@ def path_leaf(path):
 
 
 
-
+#find .dat hierarchies in in_dir
+#create corresponding .json file in out_dir (which is not the same as in dir) with counts
 def hierarchy_jsonify_batch(in_hier_dir,out_hier_dir,count_map):
-	#find .dat hierarchies in in_dir
-	#create corresponding .json file in out_dir (which is not the same as in dir) with counts
 	if not os.path.exists(out_hier_dir):
 		os.makedirs(out_hier_dir)
 	else:
@@ -770,7 +806,8 @@ def hierarchy_jsonify_batch(in_hier_dir,out_hier_dir,count_map):
 
 
 
-
+#given a hierarchy file (of tab-separated values of parent/child)
+#return a tree with the indicated hierarchy
 def getHierarchyTreeFromFile(hier_file):
 	#get the hierarchy
 	#hier_file="/home/data/vdj_server/pipeline/vdj_ann/hierarchy.txt";
@@ -799,7 +836,9 @@ def getHierarchyTreeFromFile(hier_file):
 
 
 
-
+#given a list, return it back
+#but with each element having been
+#applied with "strip"
 def trimList(l):
 	for idx, val in enumerate(l):
 		#print idx, val
@@ -812,7 +851,9 @@ def trimList(l):
 
 
 
-
+#from a hierarchy file (tab-separated)
+#find the root by searching for a parent
+#who is its own child
 def getRootFromFile(hfile):
 	f = open(hfile, 'r')
 	root=""
@@ -836,27 +877,13 @@ def getRootFromFile(hfile):
 
 
 
-def doesThisHierarchyFileNeedToBeUsed(hfile,counts_map):
-	f = open(hier_file, 'r')
-	for line in f:
-		line=line.strip()
-		pieces=line.split('\t')
-		if pieces[0] in counts_map:
-			return True
-	f.close()
-	return False
-	
 
-
-
-
-
-
-
-
-
-
-
+#from a tab-separated values file
+#get a mapping 
+#first colum is child
+#second column is parent
+#children allowed 0 or 1 parents, no more
+#multiple parents triggers shutdown
 def get_pmap(hier_file):
 	mapping=dict()
 	f = open(hier_file, 'r')
@@ -876,12 +903,8 @@ def get_pmap(hier_file):
 
 
 
-
-
-
-
-
-
+#Given a map (parent/child) and a name
+#get the lineage
 def hier_look(pmap,name,max_iter):
 	#here pmap is a map keys are children, values are parents
 	#name is a child whose lineage to root is desired
@@ -907,13 +930,9 @@ def hier_look(pmap,name,max_iter):
 
 
 
-
-
-
-
-
-
-
+#given a hierarchy (parent/child) file
+# initialize a map of counts whose keys
+#are the children and whose counts are initialized to zero
 def init_hierarchy_count_map(hierarchy_file):
 	INPUT=open(hierarchy_file,'r')
 	count_map=dict()
@@ -929,27 +948,26 @@ def init_hierarchy_count_map(hierarchy_file):
 
 
 
-
-
-
-
-
-
-
-
+#given a tree object, recursively explore it and
+#aggregate a list of all the alleles (ABC*01)
+#and return that list
 def get_list_of_alleles_appearing_in_tree(t):
 	listOfAlleles=list()
 	for k in t:
 		name=str(k)
-		alleleRegex=re.compile(r'\*\d+$')
-		#print "Testing ",k," for allele patter...."
-		if(alleleRegex.search(k)):
+		if(looksLikeAlleleStr(name)):
 			listOfAlleles.append(k)
 		recList=get_list_of_alleles_appearing_in_tree(t[k])
 		listOfAlleles=listOfAlleles+recList
 	return listOfAlleles
 
 
+
+
+
+
+#given a list of IMGT descriptors
+#return the list back, but just the IMGT allele names
 def getIMGTNameListFromFastaMap(fm):
 	imgtList=list()
 	for k in fm:
@@ -960,15 +978,25 @@ def getIMGTNameListFromFastaMap(fm):
 
 
 
+
+
+
+#determine if all strings in a list are allelic
+#if at least one FAILS return false
 def areAllItemsInListIMGTAlleles(l):
 	for i in l:
-		alleleRegex=re.compile(r'\*\d+$')
-		if(not (alleleRegex.search(i))):
+		if(not(looksLikeAlleleStr(i)):
 			return False
 	return True
 
 
 
+
+
+
+
+#for all strings in a list, force them to be "allelic"
+#(if they're not already allelic) by adding *01 at the end
 def allelifyList(l):
 	#print "NOW ALLEFYING A LIST, THE INPUT LIST IS :"
 	#printList(l)
@@ -978,7 +1006,7 @@ def allelifyList(l):
 		#print "GOOD LIST IS CURRENTLY:"
 		#printList(goodlist)
 		alleleRegex=re.compile(r'\*\d+$')
-		if(not (alleleRegex.search(i))):
+		if(not (looksLikeAlleleStr(i))):
 			#print "NEED TO ALLELIFY IT!"
 			goodlist.append(i+"*01")
 		else:
@@ -992,7 +1020,9 @@ def allelifyList(l):
 
 
 
-
+#from a tree object, return a map of parent/child relationships
+#keys are kids
+#values are their parents
 def getPMapFromTree(t,emap,currentParent):
 	print "getPMapFromTree called with currentParent="+currentParent
 	for k in t:
@@ -1006,7 +1036,10 @@ def getPMapFromTree(t,emap,currentParent):
 
 
 
-
+#using a directory, with organism directories under it
+#iterate through .map files
+#and pick up clone names
+#the map files must match the glob *clone_names.map
 def get_clone_names_by_org_map_from_base_dir(bd):
 	print "now in ",bd
 	clone_names_by_org=dict()
@@ -1031,29 +1064,8 @@ def get_clone_names_by_org_map_from_base_dir(bd):
 
 
 
-def dynamic_ig_blast_map(base_dir,organism,key,defaultUnmapped="unallocated",):
-	map_glob=base_dir+"/*.map"
-	igblast_imgt_map=readMultipleMapFilesIntoSingleMapWithGlob(map_glob)
-	override_file=base_dir+"/map.override"
-	if(os.path.exists(override_file)):
-		orr=open(override_file,'r')
-		for lines in orr:
-			temp=lines.strip()
-			pieces=temp.split('\t')
-			if(len(pieces)==3):
-				if(pieces[0].strip()=="add"):
-					igblast_imgt_map[pieces[1]]=pieces[2]
-			elif(len(pieces)==2):
-				if(pieces[0].strip()=="del"):
-					if(pieces[1] in igblast_imgt_map):
-						del igblast_imgt_map[pieces[1]]
-	if key in igblast_imgt_map:
-		return igblast_imgt_map[key]
-	else:
-		return defaultUnmapped
 
-
-
+#used in IGBLAST/IMGT mapping
 def getPartitionGlobFromIMGTFastaPathAndOrganism(f,org):
 	if(org=="Mus_musculus"):
 		return f+"_partition/Mus*/*.fna"
@@ -1066,7 +1078,7 @@ def getPartitionGlobFromIMGTFastaPathAndOrganism(f,org):
 		sys.exit(0)
 
 
-
+#used in IGBLAST/IMGT mapping
 def igblast_imgt_mapping(base_dir,org_to_glob_db_map,imgtfastaPath,hierachyByOrg):
 	clone_names_by_org=get_clone_names_by_org_map_from_base_dir(base_dir)
 	organism_list=getOrganismList()
@@ -1187,7 +1199,7 @@ def makeIGBLASTVRegionDatabase(outputdir,listOfVDatabases,auxBase):
 		dw.close()
 
 
-
+#map IGBLAST and IMGT data
 def batchMultistepSegmentsAndOrganisms(base_dir):
 	allPPath="/tmp/imgt_down/www.imgt.org/download/GENE-DB/IMGTGENEDB-ReferenceSequences.fasta-nt-WithoutGaps-F+ORF+allP"
 	hier_data=loadPickleDataAndMakeIfNotAvailable(base_dir)
@@ -1246,7 +1258,7 @@ def loadPickleDataAndMakeIfNotAvailable(base_dir):
 	
 		
 
-
+#verify if a dat file is usable with its index
 def testIdx(dat,idx):
 	idx_read=open(idx,'r')
 	m=5
@@ -1260,6 +1272,13 @@ def testIdx(dat,idx):
 		end=int(pieces[2])
 		data=fetchRecFromDat(dat,start,end)
 		print "For accession='"+str(acc)+"', got data='"+str(data)+"' ! :)\n\n"
+
+
+
+
+
+
+
 
 
 class imgt_db:
