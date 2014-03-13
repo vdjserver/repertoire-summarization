@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-
+import random
 from utils import makeEmptyArrayOfDigitsOfLen
 
 #class for two-seq alignment methods/tools/data
@@ -239,6 +239,21 @@ class alignment:
 
 
 
+	def getSubAlnInc(self,sub_start,sub_end,s):
+		if(sub_start>sub_end):
+			temp=sub_start
+			sub_start=sub_end
+			sub_end=temp
+		if(s=="query"):
+			if(sub_start>self.q_end or sub_end<self.q_start):
+				return alignment("","",0,0,0,0)
+		if(s=="subject"):
+			if(sub_start>self.s_end or sub_end<self.s_start):
+				return alignment("","",0,0,0,0)			
+		firstAln=self.getAlnAtAndCond(sub_end,s,cond="leq")
+		secondAln=firstAln.getAlnAtAndCond(sub_start,s,cond="geq")
+		return secondAln
+
 
 	#given an alignment, and a position of a sequence IN the alignment
 	#return the porition of the alignment whose bp are <= or >= that position in the alignment
@@ -249,7 +264,7 @@ class alignment:
 			a_pos=self.q_start
 		if(st=="query" and a_pos>self.q_end and cond=="leq"):
 			a_pos=self.q_end
-		if(st=="subject" and a_pos<self.s_start and cond=="qeq"):
+		if(st=="subject" and a_pos<self.s_start and cond=="geq"):
 			a_pos=self.s_start
 		if(st=="subject" and a_pos>self.s_end and cond=="leq"):
 			a_pos=self.s_end
@@ -357,27 +372,37 @@ class alignment:
 		t_s_from=19
 		t_s_to=29
 		test_aln=alignment(t_q_aln,t_s_aln,t_q_from,t_q_to,t_s_from,t_s_to)
-		for c in range(t_q_from-2,t_q_to+2):
-			print "\n"
-			print "c query=",c
-			abovec=test_aln.getAlnAtAndCond(c,"query","geq")
-			belowc=test_aln.getAlnAtAndCond(c,"query","leq")
+		testGOL=False
+		if(testGOL):
+			for c in range(t_q_from-2,t_q_to+2):
+				print "\n"
+				print "c query=",c
+				abovec=test_aln.getAlnAtAndCond(c,"query","geq")
+				belowc=test_aln.getAlnAtAndCond(c,"query","leq")
+				print "ORIGINAL\n"+test_aln.getNiceString()
+				print "MODA >=",c
+				print abovec.getNiceString()
+				print "MODB <=",c
+				print belowc.getNiceString()
+			for c in range(t_s_from-2,t_s_to+2):
+				print "\n"
+				print "c subject=",c
+				abovec=test_aln.getAlnAtAndCond(c,"subject","geq")
+				belowc=test_aln.getAlnAtAndCond(c,"subject","leq")
+				print "ORIGINAL\n"+test_aln.getNiceString()
+				print "MODA >=",c
+				print abovec.getNiceString()
+				print "MODB <=",c
+				print belowc.getNiceString()
+		for s in range(100):
+			start=int(random.random()*50)
+			end=start+int(random.random()*10)
+			print "\n\n\n"
 			print "ORIGINAL\n"+test_aln.getNiceString()
-			print "MODA >=",c
-			print abovec.getNiceString()
-			print "MODB <=",c
-			print belowc.getNiceString()
-		for c in range(t_s_from-2,t_s_to+2):
-			print "\n"
-			print "c subject=",c
-			abovec=test_aln.getAlnAtAndCond(c,"subject","geq")
-			belowc=test_aln.getAlnAtAndCond(c,"subject","leq")
-			print "ORIGINAL\n"+test_aln.getNiceString()
-			print "MODA >=",c
-			print abovec.getNiceString()
-			print "MODB <=",c
-			print belowc.getNiceString()
-		
+			print "Try start=",start," end=",end
+			sub_aln=test_aln.getSubAlnInc(start,end,"query")
+			print sub_aln.getNiceString()
+
 
 
 
