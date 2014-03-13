@@ -28,11 +28,14 @@ class alignment:
 
 
 
-	#set frame mask so that ZERO starts with first base
+	#set frame mask so that ZERO starts with subject first base
 	def setSFM(self):
 		nfm=list()
 		current=0
 		temp=0
+		if(len(self.s_aln)<=0):
+			self.s_mask=nfm
+			return
 		if(self.s_aln[temp]=="-"):
 			current=(-1)
 		while(temp<len(self.s_aln)):
@@ -202,11 +205,11 @@ class alignment:
 						if(s_codon[cp]!=q_codon[cp] and s_amino==q_amino):
 							#SYNONYMOUS mutation
 							num_syn+=1
-							num_bsb+=1
+							#num_bsb+=1
 						elif(s_codon[cp]!=q_codon[cp] and s_amino!=q_amino):
 							#NONSYNONYMOUS MUTATION
 							num_nsy+=1
-							num_bsb+=1
+							#num_bsb+=1
 				else:
 					#ANALYSIS FOR CODONS WITHOUT GAPS
 					for cp in range(3):
@@ -223,7 +226,8 @@ class alignment:
 			else:
 				#print "encountered a single...."
 				if(self.s_aln[temp_index]!=self.q_aln[temp_index] and self.s_aln[temp_index]!="-" and self.q_aln[temp_index]!="-"):
-					num_bsb+=1
+					#num_bsb+=1
+					pass
 				temp_index+=1
 
 		#fill in the map
@@ -372,7 +376,8 @@ class alignment:
 		t_s_from=19
 		t_s_to=29
 		test_aln=alignment(t_q_aln,t_s_aln,t_q_from,t_q_to,t_s_from,t_s_to)
-		testGOL=False
+		test_aln.setSFM()
+		testGOL=True
 		if(testGOL):
 			for c in range(t_q_from-2,t_q_to+2):
 				print "\n"
@@ -382,8 +387,10 @@ class alignment:
 				print "ORIGINAL\n"+test_aln.getNiceString()
 				print "MODA >=",c
 				print abovec.getNiceString()
+				print abovec.characterize()
 				print "MODB <=",c
 				print belowc.getNiceString()
+				print belowc.characterize()
 			for c in range(t_s_from-2,t_s_to+2):
 				print "\n"
 				print "c subject=",c
@@ -392,15 +399,19 @@ class alignment:
 				print "ORIGINAL\n"+test_aln.getNiceString()
 				print "MODA >=",c
 				print abovec.getNiceString()
+				print abovec.characterize()
 				print "MODB <=",c
 				print belowc.getNiceString()
+				print belowc.characterize()
 		for s in range(100):
 			start=int(random.random()*50)
 			end=start+int(random.random()*10)
+			#start=27;end=29
 			print "\n\n\n"
 			print "ORIGINAL\n"+test_aln.getNiceString()
 			print "Try start=",start," end=",end
 			sub_aln=test_aln.getSubAlnInc(start,end,"query")
+			sub_aln.setSFM()
 			print sub_aln.getNiceString()
 
 
