@@ -37,7 +37,7 @@ class alignment:
 			self.s_mask=nfm
 			return
 		if(self.s_aln[temp]=="-"):
-			current=-=1
+			current-=1
 			current=current%3
 		while(temp<len(self.s_aln)):
 			if(self.s_aln[temp]!="-"):
@@ -153,14 +153,19 @@ class alignment:
 				return b
 
 	#for each bp, get a mapping to position within the sequence
-	def getPosList(self,s="query"):
+	def getPosList(self,s="subject"):
 		temp=0
-		if(s=="query):
-			seq=self.a_aln
+		pl=list()
+		if((self.s_aln is None) or (self.q_aln is None)):
+			return pl
+		if(len(self.s_aln)<=0 or len(self.q_aln)<=0):
+			return pl
+		if(s=="query"):
+			seq=self.q_aln
 			s_pos=self.q_start
 		else:
 			seq=self.s_aln
-			s_pos=s_aln
+			s_pos=self.s_start
 		if(seq[temp]=="-"):
 			s_pos-=1
 		pl=list()
@@ -409,9 +414,11 @@ class alignment:
 				print "MODA >=",c
 				print abovec.getNiceString()
 				print abovec.characterize()
+				print abovec.getPosList()
 				print "MODB <=",c
 				print belowc.getNiceString()
 				print belowc.characterize()
+				print belowc.getPosList()
 			for c in range(t_s_from-2,t_s_to+2):
 				print "\n"
 				print "c subject=",c
@@ -421,9 +428,11 @@ class alignment:
 				print "MODA >=",c
 				print abovec.getNiceString()
 				print abovec.characterize()
+				print abovec.getPosList()
 				print "MODB <=",c
 				print belowc.getNiceString()
 				print belowc.characterize()
+				print belowc.getPosList()
 		for s in range(100):
 			start=int(random.random()*50)
 			end=start+int(random.random()*10)
