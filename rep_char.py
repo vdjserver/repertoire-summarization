@@ -309,7 +309,7 @@ if (__name__=="__main__"):
 		read_num=1
 		segments_json_out=args.json_out
 		print "to write vdjml to ",args.vdjml_out
-		rrw = vdjml.Result_writer(str(args.vdjml_out[0]), meta)
+		#rrw = vdjml.Result_writer(str(args.vdjml_out[0]), meta)
 		for read_result_obj in scanOutputToVDJML(args.igblast_in[0],fact,query_fasta):
 			#prepare for the iteration and give a possible status message...
 			if(read_num>1 and read_num%1000==0):
@@ -336,20 +336,22 @@ if (__name__=="__main__"):
 						segment_counter.increment(actual)
 
 			#process for writing
-			rrw(read_result_obj)
+			#rrw(read_result_obj)
 
 			#increment the read number
 			read_num+=1
 
-		#write the CDR3 hist	
+		#write the CDR3 hist when non-dev-null
 		if(type(cdr3_hist_out_file)==list):
 			cdr3_hist_out_file=cdr3_hist_out_file[0]
-		my_cdr3_map.writeToFile(cdr3_hist_out_file)
+		if(not(cdr3_hist_out_file=="/dev/null")):
+			my_cdr3_map.writeToFile(cdr3_hist_out_file)
 
-		#write the segment counts
+		#write the segment counts when non-dev-null
 		if(type(segments_json_out)==list):
 			segments_json_out=segments_json_out[0]
-		segment_counter.JSONIFYToFile(args.vdj_db[0],organism,segments_json_out)
+		if(not(segments_json_out=="/dev/null")):
+			segment_counter.JSONIFYToFile(args.vdj_db[0],organism,segments_json_out)
 
 	else:
 		#print "error in args!"
