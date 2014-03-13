@@ -10,7 +10,7 @@ from imgt_utils import get_loci_list,imgt_db
 import glob
 from utils import biopythonTranslate
 from igblast_utils import printNiceAlignment
-from utils import printMap,makeAllMapValuesVal,getAlnAtAndCond
+from utils import printMap,makeAllMapValuesVal,getAlnAtAndCond,removeTerminatingSemicolonIfItExists
 
 
 
