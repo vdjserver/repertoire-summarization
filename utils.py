@@ -27,20 +27,6 @@ def getRevCompInterval(i,seq_len_in_bp):
 
 
 
-#given a seq record, an interval into it, and an inverted flag (telling wether interval is in the opposite strand or not)
-#return the subsequece (inclusive) indicated by the interval
-#NOTE that the interval has 1-based indices
-def extractSubSeq(interval,seq,is_inverted):
-	if(is_inverted):
-		rc_inteval=getRevCompInterval(interval,len(seq))
-		return extractSubSeq(interval,rev_comp_dna(seq),False)
-	else:
-		s=seq[interval[0]-1:interval[1]]
-		return s
-
-
-
-
 
 
 #given an alignment, and a position of a sequence IN the alignment
