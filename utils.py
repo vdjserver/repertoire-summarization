@@ -129,7 +129,15 @@ def makeEmptyArrayOfStringsOfLen(l):
 	return empty_str_arr
 
 
-
+#given a length l, make a list of digits of
+#length whose entries are the given digit or 0 if not given
+def makeEmptyArrayOfDigitsOfLen(l,d=0):
+	empty_dig_arr=list()
+	#non-negative numbers only please!
+	l=max(0,l)
+	for i in range(l):
+		empty_dig_arr.append(d)
+	return empty_dig_arr
 
 #given a hash map, set all values
 # to a given value 
