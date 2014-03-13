@@ -28,16 +28,17 @@ class alignment:
 
 
 
-	#set frame mask so that ZERO starts with subject first base
-	def setSFM(self):
+	#set frame mask so that the first subject base has the given value
+	def setSFM(self,firstFrame=0):
 		nfm=list()
-		current=0
+		current=firstFrame
 		temp=0
 		if(len(self.s_aln)<=0):
 			self.s_mask=nfm
 			return
 		if(self.s_aln[temp]=="-"):
-			current=(-1)
+			current=-=1
+			current=current%3
 		while(temp<len(self.s_aln)):
 			if(self.s_aln[temp]!="-"):
 				current+=1
@@ -151,7 +152,27 @@ class alignment:
 			else:
 				return b
 
+	#for each bp, get a mapping to position within the sequence
+	def getPosList(self,s="query"):
+		temp=0
+		if(s=="query):
+			seq=self.a_aln
+			s_pos=self.q_start
+		else:
+			seq=self.s_aln
+			s_pos=s_aln
+		if(seq[temp]=="-"):
+			s_pos-=1
+		pl=list()
+		while(temp<len(seq)):
+			pl.append(s_pos)
+			if(seq[temp]!="-"):
+				s_pos+=1	
+			temp+=1
+		return pl
 
+
+	#ins, del, bsb, syn/non-sym
 	def characterize(self):
 		char_map=dict()
 		num_ins=0
