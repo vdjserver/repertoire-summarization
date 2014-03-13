@@ -153,7 +153,7 @@ class alignment:
 				return b
 
 	#for each bp, get a mapping to position within the sequence
-	def getPosList(self,s="subject"):
+	def getPosList(self,s="subject",leanLeft=True):
 		temp=0
 		pl=list()
 		if((self.s_aln is None) or (self.q_aln is None)):
@@ -166,7 +166,7 @@ class alignment:
 		else:
 			seq=self.s_aln
 			s_pos=self.s_start
-		if(seq[temp]=="-"):
+		if(seq[temp]=="-" and leanLeft):
 			s_pos-=1
 		pl=list()
 		while(temp<len(seq)):
