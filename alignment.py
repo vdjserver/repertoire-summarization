@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 
-
+from utils import makeEmptyArrayOfDigitsOfLen
 
 #class for two-seq alignment methods/tools/data
 class alignment:
@@ -134,7 +134,7 @@ class alignment:
 
 
 
-	def characterize(self,s_frame_mask,q_start):
+	def characterize(self):
 		char_map=dict()
 		num_ins=0
 		num_del=0
@@ -144,15 +144,19 @@ class alignment:
 
 		#do counts that are independent of codons/translations
 		for i in range(len(self.s_aln)):
-			if(s_aln[i]=="-"):
+			if(self.s_aln[i]=="-"):
 				num_ins+=1
 			elif(self.q_aln[i]=="-"):
 				num_del+=1
 			elif(self.q_aln[i]!=self.s_aln[i]):
 				num_bsb+=1
 
-		
-		frame_mask=s_frame_mask
+		#if there is a frame, load it
+		#otherwise, load a dummy frame
+		if(not(self.s_frame_mask is None)):
+			frame_mask=self.s_frame_mask
+		else:
+			frame_mask=makeEmptyArrayOfDigitsOfLen(len(self.s_aln))
 
 		#do frame-dependent calculations
 		temp_index=0
@@ -184,24 +188,15 @@ class alignment:
 							#SYNONYMOUS mutation
 							num_syn+=1
 							num_bsb+=1
-							if(q_codon_w_gaps[cp]!="-"):
-								q_pos+=1
-								last_q_pos=q_pos
 						elif(s_codon[cp]!=q_codon[cp] and s_amino!=q_amino):
 							#NONSYNONYMOUS MUTATION
 							num_nsy+=1
 							num_bsb+=1
-							if(q_codon_w_gaps[cp]!="-"):
-								q_pos+=1
-								last_q_pos=q_pos
 				else:
 					#ANALYSIS FOR CODONS WITHOUT GAPS
 					for cp in range(3):
 						if(s_codon[cp]!="-" and q_codon[cp]!="-" and s_codon[cp]!=q_codon[cp]):
 							num_bsb+=1
-						if(q_codon_w_gaps[cp]!="-"):
-							q_pos+=1
-							last_q_pos=q_pos
 				#q_codon_space=getCodonSpace(q_codon)
 				#s_codon_space=getCodonSpace(s_codon)
 				#q_codon_set=getCodonSpaceAsSet(q_codon_space)
@@ -214,8 +209,6 @@ class alignment:
 				#print "encountered a single...."
 				if(self.s_aln[temp_index]!=self.q_aln[temp_index] and self.s_aln[temp_index]!="-" and self.q_aln[temp_index]!="-"):
 					num_bsb+=1
-					if(q_aln[temp_index]!="-"):
-						q_pos+=1
 				temp_index+=1
 
 		#fill in the map
@@ -225,7 +218,7 @@ class alignment:
 		char_map['synonymous_bsb']=num_syn
 		char_map['nonsynonymous_bsb']=num_nsy
 		char_map['mutations']=num_bsb+num_del+num_ins
-		char_map['pct_id']=pct_id*100.0
+		#char_map['pct_id']=pct_id*100.0
 		return char_map
 
 
@@ -240,13 +233,14 @@ class alignment:
 		aln=["",""] #Q, then S
 		if(not(cond=="leq")):
 			cond="geq"
-		s_pos=self.s_start
-		q_pos=self.q_start
 		temp=0
 		min_s_pos=float("inf")
 		max_s_pos=float("-inf")
 		min_q_pos=float("inf")
-		max_q_pos=float("-inf")		
+		max_q_pos=float("-inf")	
+		used_flag=False	
+		s_pos=self.s_start
+		q_pos=self.q_start
 		while(temp<len(self.q_aln)):
 			used_flag=False
 			if(cond=="leq"):
@@ -281,16 +275,21 @@ class alignment:
 				if(q_pos<=min_q_pos):
 					min_q_pos=q_pos
 			if(self.s_aln[temp]!="-"):
+				#print "examing ",self.s_aln[temp]," incrementing ",s_pos," to ",str(s_pos+1)
 				s_pos+=1
 			if(self.q_aln[temp]!="-"):
 				q_pos+=1
 			temp+=1
-		if(temp==len(self.q_aln)):
-			temp-=1
-		if(self.s_aln[temp]=="-"):
-			max_s_pos-=1
-		if(self.q_aln[temp]=="-"):
-			max_q_pos-=1
+		if(used_flag):
+			if(s_pos<=min_s_pos):
+				min_s_pos=s_pos
+			if(s_pos>=max_s_pos):
+				max_s_pos=s_pos
+			if(q_pos>=max_q_pos):
+				max_q_pos=q_pos
+			if(q_pos<=min_q_pos):
+				min_q_pos=q_pos
+
 		sub_aln=alignment(aln[0],aln[1],min_q_pos,max_q_pos,min_s_pos,max_s_pos)
 		#return aln #Q then S
 		return sub_aln
@@ -339,8 +338,9 @@ if (__name__=="__main__"):
 	test_aln.setSFM()
 	ps=test_aln.getNiceString()
 	print ps
-	above15=test_aln.getAlnAtAndCond(15)
+	above15=test_aln.getAlnAtAndCond(14,"query","leq")
 	print above15.getNiceString()
+	print above15.characterize()
 
 
 
