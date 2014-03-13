@@ -133,6 +133,21 @@ class alignment:
 		return alignment(aln[0],aln[1])
 
 
+	@staticmethod
+	def isAnInf(a):
+		if(a==float("inf") or a==float("-inf")):
+			return True
+
+	@staticmethod
+	def getNonInf(a,b):
+		if(alignment.isAnInf(a) and alignment.isAnInf(b)):
+			raise Exception("Can't get noninf from a=",a,"b=",b)
+		else:
+			if(not(alignment.isAnInf(a))):
+				return a
+			else:
+				return b
+
 
 	def characterize(self):
 		char_map=dict()
@@ -228,12 +243,26 @@ class alignment:
 	#given an alignment, and a position of a sequence IN the alignment
 	#return the porition of the alignment whose bp are <= or >= that position in the alignment
 	def getAlnAtAndCond(self,a_pos,st="query",cond="geq"):
+		
+		#for request that would return the entire alignment reset the inputs
+		if(st=="query" and a_pos<self.q_start and cond=="geq"):
+			a_pos=self.q_start
+		if(st=="query" and a_pos>self.q_end and cond=="leq"):
+			a_pos=self.q_end
+		if(st=="subject" and a_pos<self.s_start and cond=="qeq"):
+			a_pos=self.s_start
+		if(st=="subject" and a_pos>self.s_end and cond=="leq"):
+			a_pos=self.s_end
+
+
 		if(not(st=="query")):
 			st="subject"
 		aln=["",""] #Q, then S
 		if(not(cond=="leq")):
 			cond="geq"
 		temp=0
+
+
 		min_s_pos=float("inf")
 		max_s_pos=float("-inf")
 		min_q_pos=float("inf")
@@ -241,6 +270,8 @@ class alignment:
 		used_flag=False	
 		s_pos=self.s_start
 		q_pos=self.q_start
+		s_char=""
+		q_char=""
 		while(temp<len(self.q_aln)):
 			used_flag=False
 			if(cond=="leq"):
@@ -266,13 +297,13 @@ class alignment:
 						aln[1]+=self.s_aln[temp]				
 						used_flag=True
 			if(used_flag):
-				if(s_pos<=min_s_pos):
-					min_s_pos=s_pos
-				if(s_pos>=max_s_pos):
+				if(max_s_pos<=s_pos and self.s_aln[temp]!="-"   ):
 					max_s_pos=s_pos
-				if(q_pos>=max_q_pos):
+				if(min_s_pos>=s_pos and self.s_aln[temp]!="-"  ):
+					min_s_pos=s_pos
+				if(max_q_pos<=q_pos and  self.q_aln[temp]!="-"):
 					max_q_pos=q_pos
-				if(q_pos<=min_q_pos):
+				if(min_q_pos>=q_pos and self.q_aln[temp]!="-"):
 					min_q_pos=q_pos
 			if(self.s_aln[temp]!="-"):
 				#print "examing ",self.s_aln[temp]," incrementing ",s_pos," to ",str(s_pos+1)
@@ -280,20 +311,73 @@ class alignment:
 			if(self.q_aln[temp]!="-"):
 				q_pos+=1
 			temp+=1
-		if(used_flag):
-			if(s_pos<=min_s_pos):
-				min_s_pos=s_pos
-			if(s_pos>=max_s_pos):
-				max_s_pos=s_pos
-			if(q_pos>=max_q_pos):
-				max_q_pos=q_pos
-			if(q_pos<=min_q_pos):
-				min_q_pos=q_pos
+
+		if(cond=="geq"):
+			#print "GREATER BRANCH"
+			#print "set qmax from ",max_q_pos," to ",self.s_end
+			max_q_pos=self.q_end
+			max_s_pos=self.s_end
+			if(st=="query"):
+				min_q_pos=a_pos
+			else:
+				min_s_pos=a_pos
+		else:
+			min_q_pos=self.q_start
+			min_s_pos=self.s_start
+			if(st=="query"):
+				max_q_pos=a_pos
+			else:
+				max_s_pos=a_pos
+
+		if(self.isAnInf(max_q_pos)):
+			max_q_pos=self.getNonInf(max_q_pos,min_q_pos)
+		if(self.isAnInf(min_q_pos)):
+			min_q_pos=self.getNonInf(max_q_pos,min_q_pos)
+		if(self.isAnInf(max_s_pos)):
+			max_s_pos=self.getNonInf(max_s_pos,min_s_pos)
+		if(self.isAnInf(min_s_pos)):
+			min_s_pos=self.getNonInf(max_s_pos,min_s_pos)
+			
+
+		if(min_s_pos>max_s_pos or min_q_pos>max_q_pos):
+			return alignment("","",0,0,0,0)			
+
 
 		sub_aln=alignment(aln[0],aln[1],min_q_pos,max_q_pos,min_s_pos,max_s_pos)
 		#return aln #Q then S
 		return sub_aln
 
+	@staticmethod
+	def test():
+		print "TEST!"
+		t_q_aln="GATT-CATA-TACA"
+		t_s_aln="-AT-ACCATATTA-"
+		t_q_from=10
+		t_q_to=21
+		t_s_from=19
+		t_s_to=29
+		test_aln=alignment(t_q_aln,t_s_aln,t_q_from,t_q_to,t_s_from,t_s_to)
+		for c in range(t_q_from-2,t_q_to+2):
+			print "\n"
+			print "c query=",c
+			abovec=test_aln.getAlnAtAndCond(c,"query","geq")
+			belowc=test_aln.getAlnAtAndCond(c,"query","leq")
+			print "ORIGINAL\n"+test_aln.getNiceString()
+			print "MODA >=",c
+			print abovec.getNiceString()
+			print "MODB <=",c
+			print belowc.getNiceString()
+		for c in range(t_s_from-2,t_s_to+2):
+			print "\n"
+			print "c subject=",c
+			abovec=test_aln.getAlnAtAndCond(c,"subject","geq")
+			belowc=test_aln.getAlnAtAndCond(c,"subject","leq")
+			print "ORIGINAL\n"+test_aln.getNiceString()
+			print "MODA >=",c
+			print abovec.getNiceString()
+			print "MODB <=",c
+			print belowc.getNiceString()
+		
 
 
 
@@ -323,24 +407,8 @@ class alignment:
 		return s_final
 
 
-
-
-#test the alignment class
 if (__name__=="__main__"):
-	print "TEST!"
-	t_q_aln="GATT-CATA-TACA"
-	t_s_aln="-AT-ACCATATTA-"
-	t_q_from=10
-	t_q_to=21
-	t_s_from=19
-	t_s_to=29
-	test_aln=alignment(t_q_aln,t_s_aln,t_q_from,t_q_to,t_s_from,t_s_to)
-	test_aln.setSFM()
-	ps=test_aln.getNiceString()
-	print ps
-	above15=test_aln.getAlnAtAndCond(14,"query","leq")
-	print above15.getNiceString()
-	print above15.characterize()
+	alignment.test()
 
 
 
