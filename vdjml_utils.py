@@ -117,14 +117,21 @@ def getVDJServerRegionAlignmentFromLargerVAlignmentPyObj(read_result_obj,meta,or
 
 
 #from a segment combination, extract the region
-def getRegionsObjsFromSegmentCombo(segment_combo):
+def getRegionsObjsFromSegmentCombo(segment_combo,meta,ann_map):
 	print "got a segment combo : ",segment_combo
 	print "regions is ",segment_combo.regions
 	print "now calling....",
 	regions=segment_combo.regions()
 	print "the type of regions is ",str(type(regions))
 	for region in regions:
-		print "region???"
+		#print "region???",region
+		print "range : ",region.range_
+		#print region.range_.pos_0()
+		rgn_start=region.range_.pos_1() 
+		rgn_end=rgn_start+region.range_.length()-1
+		print "start/end : ",rgn_start," and ",rgn_end
+		ann_map_key='vdj_server_ann_'
+		
 
 
 
@@ -145,7 +152,7 @@ def getTopVDJItems(read_result_obj,meta):
 		#print "LOOKING AT COMBINATION # ",str(int(s+1))," of ",str(len(segment_combinations))," FOR READ ID=",read_result_obj.id()
 		segment_combination=segment_combinations[s]
 		#print "about to enter into region extraction...."
-		#getRegionsObjsFromSegmentCombo(segment_combination)
+		#getRegionsObjsFromSegmentCombo(segment_combination,meta)
 		#print "The number of segments in this combination is ",len(segment_combination.segments())
 		#print "The ids of the segments are ",segment_combination.segments()
 		seg_id=0
