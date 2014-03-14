@@ -267,7 +267,6 @@ class alignment:
 					#num_bsb+=1
 					pass
 				temp_index+=1
-
 		#fill in the map
 		char_map['insertions']=num_ins
 		char_map['deletions']=num_del
@@ -280,16 +279,19 @@ class alignment:
 		else:
 			char_map['bsb_freq']=num_bsb/(getNumberBpInAlnStr(q_aln))
 		if(len(s_aln)>0 and len(q_aln)>0):
-			comp_pct_id=num_bsb
 			mlen=min(getNumberBpInAlnStr(q_aln),getNumberBpInAlnStr(s_aln))
 			if(mlen!=0):
-				comp_pct_id=(mlen-comp_pct_id)/mlen
+				comp_pct_id=(mlen-num_bsb)/mlen
 				char_map['pct_id']=comp_pct_id
 			else:
 				char_map['pct_id']=0
 		else:
-			char_map['pct_id']=comp_pct_id
-		char_map['ns_rto']=0
+			char_map['pct_id']=0
+		if(num_syn!=0):
+			ns_ratio=float(num_nsy)/float(num_nsy)
+		else:
+			ns_ratio=0
+		char_map['ns_rto']=ns_ratio
 		return char_map
 
 
