@@ -709,6 +709,15 @@ def getLengthOfListInFile(p):
 	return len(mylist)
 
 
+#return the number of base pairs (throwing out "-")
+def getNumberBpInAlnStr(a_str):
+	if(a_str.find("-")==(-1)):
+		return len(a_str)
+	else:
+		a_str=re.sub(r'\-','',a_str)
+		return len(a_str)
+
+
 #write a map to a file (optionally using a sorted list of keys)
 # and prefix line/key numbers to the output
 def write_map_to_file(m,path,doSort=True):
