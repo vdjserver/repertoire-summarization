@@ -2,7 +2,7 @@
 
 import vdjml
 from vdjml_igblast_parse import scanOutputToVDJML,makeParserArgs,makeVDJMLDefaultMetaAndFactoryFromArgs
-from utils import printMap,get_domain_modes,biopythonTranslate,rev_comp_dna,makeAllMapValuesVal
+from utils import printMap,get_domain_modes,biopythonTranslate,rev_comp_dna,makeAllMapValuesVal,getNumberBpInAlnStr
 from pprint import pprint
 from imgt_utils import imgt_db
 from cdr3_hist import CDR3LengthAnalysisVDMLOBJ,histoMapClass
@@ -181,18 +181,19 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
 	#print "ann map from segs :"
 	#printMap(annMap)
 	#getHitInfo(read_result_obj,meta,alleleName):
-	hit_infos=dict()
 	whole_seq_number_base_subs=0
 	whole_seq_number_indels=0
 	whole_seq_number_insertions=0
 	whole_seq_number_deletions=0
+	whole_seq_number_bps=0
 	noneSeg_flag=False
 	for seg in topVDJ:
 		#print "in second loop...."
 		if(topVDJ[seg] is not None):
 			#print "to get info...."
-			hit_info=getHitInfo(read_result_obj,meta,topVDJ[seg])
+			hit_info=getHitInfo(read_result_obj,meta,topVDJ[seg],read_rec,imgtdb_obj,organism)
 			btop=hit_info['btop']
+			whole_seq_number_bps+=getNumberBpInAlnStr(hit_info['query seq'])
 			#print "got btop ",seg," (",topVDJ[seg],") :",btop
 			whole_seq_number_base_subs+=getNumberBaseSubsFromBTOP(btop)
 			whole_seq_number_indels+=getNumberIndelsFromBTOP(btop)
@@ -201,10 +202,13 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
 			whole_seq_number_deletions+=indel_map['deletions']
 			#print "from ",btop," got ",muts," substitutions"
 			#printMap(hit_info)
-			#printMap(hit_infos[seg])
 		else:
 			noneSeg_flag=True
 			print "got a none seg (",seg,")!",read_rec.id
+	if(whole_seq_number_bps!=0):
+		annMap['whole_seq_bsb_freq']=whole_seq_number_base_subs/whole_seq_number_bps
+	else:
+		annMap['whole_seq_bsb_freq']=0
 	annMap['whole_seq_number_base_subs']=whole_seq_number_base_subs
 	annMap['whole_seq_number_indels']=whole_seq_number_indels
 	annMap['whole_seq_number_insertions']=whole_seq_number_insertions
@@ -226,9 +230,15 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
 				mask=raInfo[1]
 				q_start=raInfo[2]
 				q_end=raInfo[3]
+				#print "calling RSC for read=",read_rec.id
 				reg_ann=getRegionSpecifcCharacterization(s_aln,q_aln,region,mask,mode)
 				#print "got ann "
 				#printMap(reg_ann)
+				annMap[key_base+region+'_qry_aln']=q_aln
+				annMap[key_base+region+'_qry_srt']=q_start
+				annMap[key_base+region+'_qry_end']=q_end
+				annMap[key_base+region+'_ref_aln']=s_aln
+				annMap[key_base+region+'_frm_msk']=mask
 				for key in reg_ann:
 					annMap[key_base+region+"_"+key]=reg_ann[key]
 			else:
@@ -240,6 +250,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
 	#printMap(annMap,True)
 	#sys.exit(0)
 	annMap=readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,annMap,cdr3_map)
+	annMap['read_name']=read_rec.id
 	printMap(annMap,True)
 	return annMap
 
