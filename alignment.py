@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 import random
-from utils import makeEmptyArrayOfDigitsOfLen
+from utils import makeEmptyArrayOfDigitsOfLen,biopythonTranslate
+import re
 
 #class for two-seq alignment methods/tools/data
 class alignment:
@@ -33,7 +34,9 @@ class alignment:
 		nfm=list()
 		current=firstFrame
 		temp=0
+		#print "setsfm called..."
 		if(len(self.s_aln)<=0):
+			print "setsfm early return..."
 			self.s_mask=nfm
 			return
 		if(self.s_aln[temp]=="-"):
@@ -45,6 +48,7 @@ class alignment:
 			nfm.append(current%3)
 			temp+=1
 		self.s_frame_mask=nfm
+		#print "just set self.s_frame_mask to ",self.s_frame_mask
 
 
 	#supply S frame_mask
@@ -197,9 +201,12 @@ class alignment:
 
 		#if there is a frame, load it
 		#otherwise, load a dummy frame
-		if(not(self.s_frame_mask is None)):
+		#print "self.s_frame_mask",self.s_frame_mask
+		if(not(self.s_frame_mask==None)):
+			#print "loading own mask cause it's non-none"
 			frame_mask=self.s_frame_mask
 		else:
+			#print "loading empty mask cause own mask is none"
 			frame_mask=makeEmptyArrayOfDigitsOfLen(len(self.s_aln))
 
 		#do frame-dependent calculations
@@ -214,19 +221,21 @@ class alignment:
 				#print "encountered a codon...."
 				s_codon=self.s_aln[temp_index:(temp_index+3)]
 				s_codon_w_gaps=s_codon
-				s_codon=re.sub(r'\-','N',s_codon)
+				#s_codon=re.sub(r'\-','N',s_codon)
 				#print "s codon is ",s_codon
-				q_codon=q_aln[temp_index:(temp_index+3)]
+				q_codon=self.q_aln[temp_index:(temp_index+3)]
 				q_codon_w_gaps=q_codon
-				q_codon=re.sub(r'\-','N',q_codon)
+				#q_codon=re.sub(r'\-','N',q_codon)
 				#print "q codon is ",q_codon
 				if(s_codon.find("-")==(-1) and q_codon.find("-")==(-1)):
 					#ANALYSIS FOR CODONS WITH NO GAPS
 					#no gaps, perform analysis
+					print "Detected on gaps in codons"
 					s_amino=str(biopythonTranslate(s_codon))
-					#print "subject amino :",s_amino
+					print "subject amino :",s_amino," and codon ",s_codon
 					q_amino=str(biopythonTranslate(q_codon))
-					#print "query amino ",q_amino
+					print "query amino ",q_amino," and codon ",q_codon
+					print "PRE SN counts : ",num_syn," and ",num_nsy
 					for cp in range(3):
 						if(s_codon[cp]!=q_codon[cp] and s_amino==q_amino):
 							#SYNONYMOUS mutation
@@ -236,11 +245,14 @@ class alignment:
 							#NONSYNONYMOUS MUTATION
 							num_nsy+=1
 							#num_bsb+=1
+					print "POST SN counts : ",num_syn," and ",num_nsy
 				else:
 					#ANALYSIS FOR CODONS WITHOUT GAPS
 					for cp in range(3):
 						if(s_codon[cp]!="-" and q_codon[cp]!="-" and s_codon[cp]!=q_codon[cp]):
-							num_bsb+=1
+							#num_bsb+=1
+							#already accounted for at beginning
+							pass
 				#q_codon_space=getCodonSpace(q_codon)
 				#s_codon_space=getCodonSpace(s_codon)
 				#q_codon_set=getCodonSpaceAsSet(q_codon_space)
@@ -411,6 +423,7 @@ class alignment:
 				abovec=test_aln.getAlnAtAndCond(c,"query","geq")
 				belowc=test_aln.getAlnAtAndCond(c,"query","leq")
 				print "ORIGINAL\n"+test_aln.getNiceString()
+				print test_aln.characterize()
 				print "MODA >=",c
 				print abovec.getNiceString()
 				print abovec.characterize()
