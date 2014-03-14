@@ -10,6 +10,7 @@ from vdjml_utils import getTopVDJItems,getRegionsObjsFromSegmentCombo,getHitInfo
 from Bio import SeqIO
 from segment_utils import IncrementMapWrapper,getVRegionsList,getRegionSpecifcCharacterization,getEmptyRegCharMap,getAdjustedCDR3StartFromRefDirSetAllele,getTheFrameForThisReferenceAtThisPosition,getCDR3RegionSpecificCharacterizationSubAln
 from char_utils import getNumberBaseSubsFromBTOP,getNumberIndelsFromBTOP,getIndelMapFromBTOP
+from alignment import alignment
 
 
 
@@ -42,6 +43,9 @@ def rep_char_read(read_result_obj,meta,organism,imgtdb_obj,read_rec):
 
 	return return_obj
 	
+
+
+
 
 
 #specialized annotation for CDR3 region!
@@ -163,6 +167,29 @@ def cdr3RegCharAnalysis(vMap,dMap,jMap,mode,cdr3_anal_map,organism,imgtdb_obj):
 
 	sys.exit(0)
 
+
+
+def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism):
+	if(not(vInfo==None)):
+		#at least work with V
+		v_cdr3_start=getAdjustedCDR3StartFromRefDirSetAllele(vInfo['subject ids'],imgtdb_obj,organism,"imgt")
+		if(v_cdr3_start==(-1)):
+			v_cdr3_start=vInfo['s. end']+1
+		#just work on V
+		#print "EFFECTIVE CDR3 start is ",v_cdr3_start
+		vAlnObj=alignment(vInfo['query seq'],vInfo['subject seq'],vInfo['q. start'],vInfo['q. end'],vInfo['s. start'],vInfo['s. end'])
+		#print "Total aln \n",vAlnObj.getNiceString()
+		preCDR3Aln=vAlnObj.getAlnAtAndCond(v_cdr3_start-1,"subject","leq")
+		#print "PRECDR3 aln\n",preCDR3Aln.getNiceString()
+		preCDR3Aln.setSFM(getTheFrameForThisReferenceAtThisPosition(vInfo['subject ids'],organism,imgtdb_obj,preCDR3Aln.s_start))
+		if(jInfo==None):
+			return preCDR3Aln.characterize()
+			pass
+		else:
+			#work on V and J
+			pass
+
+
 	
 	
 			
@@ -187,11 +214,18 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
 	whole_seq_number_deletions=0
 	whole_seq_number_bps=0
 	noneSeg_flag=False
+	vInfo=None
+	jInfo=None
 	for seg in topVDJ:
-		#print "in second loop...."
+		print "in second loop...."
+		print "seg=",seg
 		if(topVDJ[seg] is not None):
 			#print "to get info...."
 			hit_info=getHitInfo(read_result_obj,meta,topVDJ[seg],read_rec,imgtdb_obj,organism)
+			if(seg=="V" and not(hit_info==None)):
+				vInfo=hit_info
+			elif(seg=="J" and not(hit_info==None)):
+				jInfo=hit_info
 			btop=hit_info['btop']
 			whole_seq_number_bps+=getNumberBpInAlnStr(hit_info['query seq'])
 			#print "got btop ",seg," (",topVDJ[seg],") :",btop
@@ -209,11 +243,13 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
 		annMap['whole_seq_bsb_freq']=whole_seq_number_base_subs/whole_seq_number_bps
 	else:
 		annMap['whole_seq_bsb_freq']=0
-	annMap['whole_seq_number_base_subs']=whole_seq_number_base_subs
-	annMap['whole_seq_number_indels']=whole_seq_number_indels
-	annMap['whole_seq_number_insertions']=whole_seq_number_insertions
-	annMap['whole_seq_number_deletions']=whole_seq_number_deletions
+	#annMap['whole_seq_number_base_subs']=whole_seq_number_base_subs
+	#annMap['whole_seq_number_indels']=whole_seq_number_indels
+	#annMap['whole_seq_number_insertions']=whole_seq_number_insertions
+	#annMap['whole_seq_number_deletions']=whole_seq_number_deletions
 	annMap['productive_rearrangement']=getProductiveRearrangmentFlag(read_result_obj,meta,organism,imgtdb_obj)
+	returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism)
+
 
 	#VDJSERVER V REGION ANNOTATIONS
 	mode_list=get_domain_modes()
@@ -249,10 +285,54 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
 				#pass
 	#printMap(annMap,True)
 	#sys.exit(0)
-	annMap=readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,annMap,cdr3_map)
+	#annMap=readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,annMap,cdr3_map)
 	annMap['read_name']=read_rec.id
+	#analyze_combinations(read_result_obj,meta,organism,imgtdb_obj,read_rec,annMap)
 	printMap(annMap,True)
 	return annMap
+
+
+
+
+
+def analyze_combinations(read_result_obj,meta,organism,imgtdb_obj,read_rec,read_ann_map):
+	segment_combinations=read_result_obj.segment_combinations()
+	for s in range(len(segment_combinations)):
+		#print "LOOKING AT COMBINATION # ",str(int(s+1))," of ",str(len(segment_combinations))," FOR READ ID=",read_result_obj.id()
+		segment_combination=segment_combinations[s]
+		analyzeRegionObjsFromSegmentCombo(segment_combination,meta,organism,imgtdb_obj,read_rec,read_ann_map)
+
+
+
+
+def analyzeRegionObjsFromSegmentCombo(segment_combo,meta,organism,imgtdb_obj,read_rec,read_ann_map):
+	print "got a segment combo : ",segment_combo
+	print "regions is ",segment_combo.regions
+	print "now calling....",
+	regions=segment_combo.regions()
+	print "the type of regions is ",str(type(regions))
+	for region in regions:
+		#print "region???",region
+		print "range : ",region.range_
+		#print region.range_.pos_0()
+		rgn_start=region.range_.pos_1() 
+		rgn_end=rgn_start+region.range_.length()-1
+		print "start/end : ",rgn_start," and ",rgn_end
+		rgn_ns=region.num_system_
+		#print "rgn_ns",rgn_ns
+		#if(rgn_ns=="1"):
+		#	rgn_ns="imgt"
+		#else:
+		#	rgn_ns="kabat"
+		#print "rgn_ns",rgn_ns
+		rgn_ns="imgt"
+		#rgn_nm=region.
+		#ann_map_key='vdj_server_ann_'
+		#ann_map_key='vdj_server_ann_imgt_FR3_qry_srt
+
+
+		
+
 
 
 
@@ -283,7 +363,7 @@ def vSegmentRegionVDJAnalyse(read_result_obj,meta,organism,imgtdb_obj,read_rec):
 #	return read_result_obj
 	
 
-
+60  and  64
 
 
 #add on the kinds of arguments this program accepts
