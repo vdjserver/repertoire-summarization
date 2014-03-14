@@ -10,7 +10,7 @@ from imgt_utils import get_loci_list,imgt_db
 import glob
 from utils import biopythonTranslate
 from igblast_utils import printNiceAlignment
-from utils import printMap,makeAllMapValuesVal,getAlnAtAndCond,removeTerminatingSemicolonIfItExists
+from utils import printMap,makeAllMapValuesVal,getAlnAtAndCond,removeTerminatingSemicolonIfItExists,getNumberBpInAlnStr
 
 
 
@@ -1255,10 +1255,10 @@ def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name,frame_mask,mode,q_star
 	num_syn=0
 	num_nsy=0
 	num_bsb=0
-	#print "\n\nNice alignment (region=",reg_name,") query top, subject bottom : \n",printNiceAlignment(q_aln,s_aln),"\n"
+	#print "\n\nNice alignment (region=",reg_name," ,mode=",mode,") query top, subject bottom : \n",printNiceAlignment(q_aln,s_aln),"\n"
 	if(len(s_aln)!=len(q_aln)):
 		raise Exception("ERROR, Q_ALN LENGTH NOT EQUAL TO S_ALN LENGTH!?!?!")
-	#do counts independent of codons/translations
+	#do indel counts independent of codons/translations
 	for i in range(len(s_aln)):
 		if(s_aln[i]=="-"):
 			num_ins+=1
@@ -1283,11 +1283,11 @@ def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name,frame_mask,mode,q_star
 			#print "encountered a codon...."
 			s_codon=s_aln[temp_index:(temp_index+3)]
 			s_codon_w_gaps=s_codon
-			s_codon=re.sub(r'\-','N',s_codon)
+			#s_codon=re.sub(r'\-','N',s_codon)
 			#print "s codon is ",s_codon
 			q_codon=q_aln[temp_index:(temp_index+3)]
 			q_codon_w_gaps=q_codon
-			q_codon=re.sub(r'\-','N',q_codon)
+			#q_codon=re.sub(r'\-','N',q_codon)
 			#print "q codon is ",q_codon
 			if(s_codon.find("-")==(-1) and q_codon.find("-")==(-1)):
 				#ANALYSIS FOR CODONS WITH NO GAPS
@@ -1296,6 +1296,8 @@ def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name,frame_mask,mode,q_star
 				#print "subject amino :",s_amino
 				q_amino=str(biopythonTranslate(q_codon))
 				#print "query amino ",q_amino
+				#if(q_amino!=s_amino):
+				#	print "AMINOS NOT EQUAL - NS MUT!"
 				for cp in range(3):
 					if(s_codon[cp]!=q_codon[cp] and s_amino==q_amino and q_pos+cp>limit):
 						num_syn+=1
@@ -1311,6 +1313,7 @@ def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name,frame_mask,mode,q_star
 							last_q_pos=q_pos
 			else:
 				#ANALYSIS FOR CODONS WITHOUT GAPS
+				#print "analyzing with gap..."
 				for cp in range(3):
 					if(s_codon[cp]!="-" and q_codon[cp]!="-" and s_codon[cp]!=q_codon[cp] and q_pos>limit):
 						num_bsb+=1
@@ -1363,8 +1366,17 @@ def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name,frame_mask,mode,q_star
 	char_map['base_sub']=num_bsb
 	char_map['synonymous_bsb']=num_syn
 	char_map['nonsynonymous_bsb']=num_nsy
+	if(num_syn!=0):
+		char_map['ns_rto']=num_syn/num_syn
+	else:
+		#leave it at zero
+		char_map['ns_rto']=0
 	char_map['mutations']=num_bsb+num_del+num_ins
 	char_map['pct_id']=pct_id*100.0
+	if(len(q_aln)==0):
+		char_map['bsb_freq']=0
+	else:
+		char_map['bsb_freq']=num_bsb/(getNumberBpInAlnStr(q_aln))
 	return char_map
 
 
@@ -1380,6 +1392,8 @@ def getEmptyRegCharMap():
 	char_map['nonsynonymous_bsb']=0
 	char_map['mutations']=0
 	char_map['pct_id']=0
+	char_map['bsb_freq']=0
+	char_map['ns_rto']=0
 	return char_map
 
 
