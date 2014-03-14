@@ -123,12 +123,9 @@ def getRegionsObjsFromSegmentCombo(segment_combo):
 	print "now calling....",
 	regions=segment_combo.regions()
 	print "the type of regions is ",str(type(regions))
-	#regions.new()
-	#pprint(regions)
 	for region in regions:
 		print "region???"
-	#for r in range(len(region_list)):
-	#	print "Looking at region "+str(r+1)
+
 
 
 
@@ -147,6 +144,8 @@ def getTopVDJItems(read_result_obj,meta):
 	for s in range(len(segment_combinations)):
 		#print "LOOKING AT COMBINATION # ",str(int(s+1))," of ",str(len(segment_combinations))," FOR READ ID=",read_result_obj.id()
 		segment_combination=segment_combinations[s]
+		#print "about to enter into region extraction...."
+		#getRegionsObjsFromSegmentCombo(segment_combination)
 		#print "The number of segments in this combination is ",len(segment_combination.segments())
 		#print "The ids of the segments are ",segment_combination.segments()
 		seg_id=0
