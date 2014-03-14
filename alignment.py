@@ -275,7 +275,21 @@ class alignment:
 		char_map['synonymous_bsb']=num_syn
 		char_map['nonsynonymous_bsb']=num_nsy
 		char_map['mutations']=num_bsb+num_del+num_ins
-		#char_map['pct_id']=pct_id*100.0
+		if(len(q_aln)==0):
+			char_map['bsb_freq']=0
+		else:
+			char_map['bsb_freq']=num_bsb/(getNumberBpInAlnStr(q_aln))
+		if(len(s_aln)>0 and len(q_aln)>0):
+			comp_pct_id=num_bsb
+			mlen=min(getNumberBpInAlnStr(q_aln),getNumberBpInAlnStr(s_aln))
+			if(mlen!=0):
+				comp_pct_id=(mlen-comp_pct_id)/mlen
+				char_map['pct_id']=comp_pct_id
+			else:
+				char_map['pct_id']=0
+		else:
+			char_map['pct_id']=comp_pct_id
+		char_map['ns_rto']=0
 		return char_map
 
 
@@ -300,7 +314,12 @@ class alignment:
 	#given an alignment, and a position of a sequence IN the alignment
 	#return the porition of the alignment whose bp are <= or >= that position in the alignment
 	def getAlnAtAndCond(self,a_pos,st="query",cond="geq"):
-		
+
+		if(not(st=="query")):
+			st="subject"
+		aln=["",""] #Q, then S
+		if(not(cond=="leq")):
+			cond="geq"		
 		#for request that would return the entire alignment reset the inputs
 		if(st=="query" and a_pos<self.q_start and cond=="geq"):
 			a_pos=self.q_start
@@ -312,11 +331,6 @@ class alignment:
 			a_pos=self.s_end
 
 
-		if(not(st=="query")):
-			st="subject"
-		aln=["",""] #Q, then S
-		if(not(cond=="leq")):
-			cond="geq"
 		temp=0
 
 
