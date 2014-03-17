@@ -1386,7 +1386,10 @@ def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name,frame_mask,mode,q_star
 	if(len(q_aln)==0):
 		char_map['bsb_freq']=0
 	else:
-		char_map['bsb_freq']=num_bsb/(getNumberBpInAlnStr(q_aln))
+		if(not(getNumberBpInAlnStr(q_aln)==0)):
+			char_map['bsb_freq']=num_bsb/(getNumberBpInAlnStr(q_aln))
+		else:
+			char_map['bsb_freq']=0
 	return char_map
 
 
