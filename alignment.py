@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import random
-from utils import makeEmptyArrayOfDigitsOfLen,biopythonTranslate
+from utils import makeEmptyArrayOfDigitsOfLen,biopythonTranslate,getNumberBpInAlnStr
 import re
 
 #class for two-seq alignment methods/tools/data
@@ -274,12 +274,12 @@ class alignment:
 		char_map['synonymous_bsb']=num_syn
 		char_map['nonsynonymous_bsb']=num_nsy
 		char_map['mutations']=num_bsb+num_del+num_ins
-		if(len(q_aln)==0):
+		if(len(self.q_aln)==0):
 			char_map['bsb_freq']=0
 		else:
-			char_map['bsb_freq']=num_bsb/(getNumberBpInAlnStr(q_aln))
-		if(len(s_aln)>0 and len(q_aln)>0):
-			mlen=min(getNumberBpInAlnStr(q_aln),getNumberBpInAlnStr(s_aln))
+			char_map['bsb_freq']=num_bsb/(getNumberBpInAlnStr(self.q_aln))
+		if(len(self.s_aln)>0 and len(self.q_aln)>0):
+			mlen=min(getNumberBpInAlnStr(self.q_aln),getNumberBpInAlnStr(self.s_aln))
 			if(mlen!=0):
 				comp_pct_id=(mlen-num_bsb)/mlen
 				char_map['pct_id']=comp_pct_id
