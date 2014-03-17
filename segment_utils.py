@@ -11,6 +11,7 @@ import glob
 from utils import biopythonTranslate
 from igblast_utils import printNiceAlignment
 from utils import printMap,makeAllMapValuesVal,getAlnAtAndCond,removeTerminatingSemicolonIfItExists,getNumberBpInAlnStr
+from alignment import alignment
 
 
 
@@ -754,52 +755,61 @@ def getRegionAlignmentFromLargerVAlignment(sub_info_map,org,mode,region_name,img
 		print "Can't get region info, start and stop of ref region is neg 1...."
 		return None
 	else:
-		reg_start=int(ref_region_interval[0])
-		if(reg_start==(-1)):
-			reg_start=int(sub_info_map['s. start'])
-		reg_end=int(ref_region_interval[1])
-		if(reg_end==(-1)):
-			reg_end=int(sub_info_map['s. end'])
-		s_start=int(sub_info_map['s. start'])
-		s_end=int(sub_info_map['s. end'])
-		q_start=int(sub_info_map['q. start'])
-		q_end=int(sub_info_map['q. end'])
+		region_frame_start=(ref_region_interval[0]-ref_region_transcript_start)%3
+		aln_obj=alignment(sub_info_map['query seq'],sub_info_map['subject seq'],sub_info_map['q. start'],sub_info_map['q. end'],sub_info_map['s. start'],sub_info_map['s. end'])
+		region_aln=aln_obj.getSubAlnInc(ref_region_interval[0],ref_region_interval[1],"subject")
+		region_aln.setSFM(region_frame_start)
+		region_alignment=list()
+		region_alignment.append(region_aln.q_aln)
+		region_alignment.append(region_aln.s_aln)
+		return [region_alignment,region_aln.s_frame_mask,region_aln.q_start,region_aln.q_end]
+		#aln_obj.setSFM(region_frame_start)		
+		#reg_start=int(ref_region_interval[0])
+		#if(reg_start==(-1)):
+		#	reg_start=int(sub_info_map['s. start'])
+		#reg_end=int(ref_region_interval[1])
+		#if(reg_end==(-1)):
+		#	reg_end=int(sub_info_map['s. end'])
+		#s_start=int(sub_info_map['s. start'])
+		#s_end=int(sub_info_map['s. end'])
+		#q_start=int(sub_info_map['q. start'])
+		#q_end=int(sub_info_map['q. end'])
 		#print "s_start=",s_start," and s_end=",s_end
-		s_aln=sub_info_map['subject seq']
-		q_aln=sub_info_map['query seq']
-		region_alignment=["",""]
-		temp_index=0
-		temp_index_sbjct=s_start
-		temp_index_qury=q_start
-		frame_mask=list()
-		r_q_start=(-1)
-		r_q_end=(-1)
-		refName=sub_info_map['subject ids']
-		while(temp_index<len(s_aln)):
-			if(reg_start<=temp_index_sbjct and temp_index_sbjct<=reg_end):
-				#in region
-				#subject at 0, query at 1
-				if(r_q_start==(-1) and q_aln[temp_index]!="-"):
-					r_q_start=temp_index_qury
-				if(q_aln[temp_index]!=(-1)):
-					r_q_end=temp_index_qury
-				region_alignment[0]+=q_aln[temp_index]
-				region_alignment[1]+=s_aln[temp_index]
-				if(s_aln[temp_index]!="-"):
-					#if the frame is knowable, use it
-					frame_mask.append(getTheFrameForThisReferenceAtThisPosition(refName,org,imgtdb_obj,temp_index_sbjct))
-				else:
-					#if the frame is not knowable, put 1 everywhere for the frame to trigger plain sub cts
-					frame_mask.append(1)					
-			else:
-				#not in region
-				pass
-			if(s_aln[temp_index]!="-"):
-				temp_index_sbjct+=1
-			if(q_aln[temp_index]!="-"):
-				temp_index_qury+=1
-			temp_index+=1
-		return [region_alignment,frame_mask,r_q_start,r_q_end]
+		#s_aln=sub_info_map['subject seq']
+		#q_aln=sub_info_map['query seq']
+		#region_alignment=["",""]
+		#temp_index=0
+		#temp_index_sbjct=s_start
+		#temp_index_qury=q_start
+		#frame_mask=list()
+		#r_q_start=(-1)
+		#r_q_end=(-1)
+		#refName=sub_info_map['subject ids']
+		#while(temp_index<len(s_aln)):
+		#	if(reg_start<=temp_index_sbjct and temp_index_sbjct<=reg_end):
+		#		#in region
+		#		#subject at 0, query at 1
+		#		if(r_q_start==(-1) and q_aln[temp_index]!="-"):
+		#			r_q_start=temp_index_qury
+		#		if(q_aln[temp_index]!=(-1)):
+		#			r_q_end=temp_index_qury
+		#		region_alignment[0]+=q_aln[temp_index]
+		#		region_alignment[1]+=s_aln[temp_index]
+		#		if(s_aln[temp_index]!="-"):
+		#			#if the frame is knowable, use it
+		#			frame_mask.append(getTheFrameForThisReferenceAtThisPosition(refName,org,imgtdb_obj,temp_index_sbjct))
+		#		else:
+		#			#if the frame is not knowable, put 1 everywhere for the frame to trigger plain sub cts
+		#			frame_mask.append(1)					
+		#	else:
+		#		#not in region
+		#		pass
+		#	if(s_aln[temp_index]!="-"):
+		#		temp_index_sbjct+=1
+		#	if(q_aln[temp_index]!="-"):
+		#		temp_index_qury+=1
+		#	temp_index+=1
+		#return [region_alignment,frame_mask,r_q_start,r_q_end]
 
 
 #given a V segment alignment extract from it the sub-portion for a given
@@ -1821,8 +1831,8 @@ if (__name__=="__main__"):
 		print sbjct_f,sbjct_aln,sbjct_t
 		print query_from,query_aln,query_to
 		print "q_from=",query_from," query_to=",query_to,",s_from=",sbjct_f,", s_to=",sbjct_t," At subject position=",i
-		print "The corresponding query position is "+str(getQueryIndexGivenSubjectIndexAndAlignment(query_aln,sbjct_aln,query_from,query_to,sbjct_f,sbjct_t,i))
-		print "The corresponding (lean_left) query position is "+str(getQueryIndexGivenSubjectIndexAndAlignment(query_aln,sbjct_aln,query_from,query_to,sbjct_f,sbjct_t,i,"left"))
+		#print "The corresponding query position is "+str(getQueryIndexGivenSubjectIndexAndAlignment(query_aln,sbjct_aln,query_from,query_to,sbjct_f,sbjct_t,i))
+		#print "The corresponding (lean_left) query position is "+str(getQueryIndexGivenSubjectIndexAndAlignment(query_aln,sbjct_aln,query_from,query_to,sbjct_f,sbjct_t,i,"left"))
 
 
 
