@@ -288,7 +288,7 @@ class alignment:
 		else:
 			char_map['pct_id']=0
 		if(num_syn!=0):
-			ns_ratio=float(num_nsy)/float(num_nsy)
+			ns_ratio=float(num_nsy)/float(num_syn)
 		else:
 			ns_ratio=0
 		char_map['ns_rto']=ns_ratio
