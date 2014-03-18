@@ -18,6 +18,13 @@ import re
 
 global_key_base="vdj_server_ann_"
 
+def detectUU(m):
+	for k in m:
+		if(k.find("__")!=(-1)):
+			print "found __"
+			sys.exit(0)
+
+
 # use a read_result_ojbect return several things:
 # 1) the segment counts (a list of 1, 2, or 3 items) , 
 # 2) the cdr3_lengths (kabat and imgt) ( a dict() with two keys)
@@ -39,7 +46,8 @@ def rep_char_read(read_result_obj,meta,organism,imgtdb_obj,read_rec):
 
 	#perform own annotation
 	read_ann_map=readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_length_results)
-
+	return_obj['ann_map']=read_ann_map
+	detectUU(read_ann_map)
 	#printMap(read_ann_map,True)
 	#sys.exit(0)
 
@@ -158,7 +166,6 @@ def cdr3RegCharAnalysis(vMap,dMap,jMap,mode,cdr3_anal_map,organism,imgtdb_obj):
 	#cdr3_v_char_map=getRegionSpecifcCharacterization(cdr3_s_aln,cdr3_q_aln,"CDR3",frame_mask,dMode)
 	print "THE CDR3 ALN IN V is (q top, s bottom)"
 	print cdr3_q_aln
-	print cdr3_s_aln
 	print frame_mask
 	print "stop here"
 	print "last q",temp_v_q_pos
@@ -168,6 +175,7 @@ def cdr3RegCharAnalysis(vMap,dMap,jMap,mode,cdr3_anal_map,organism,imgtdb_obj):
 	#sys.exit(0)
 
 	sys.exit(0)
+
 
 
 
@@ -281,17 +289,10 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
 			annMap['top_'+seg]=topVDJ[seg]
 		else:
 			annMap['top_'+seg]="None"			
-	#print "ann map from segs :"
-	#printMap(annMap)
-	#getHitInfo(read_result_obj,meta,alleleName):
-	whole_seq_number_base_subs=0
-	whole_seq_number_indels=0
-	whole_seq_number_insertions=0
-	whole_seq_number_deletions=0
-	whole_seq_number_bps=0
-	noneSeg_flag=False
+
 	vInfo=None
 	jInfo=None
+	noneSeg_flag=False
 	for seg in topVDJ:
 		print "in second loop...."
 		print "seg=",seg
@@ -302,36 +303,18 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
 				vInfo=hit_info
 			elif(seg=="J" and not(hit_info==None)):
 				jInfo=hit_info
-			#btop=hit_info['btop']
-			#whole_seq_number_bps+=getNumberBpInAlnStr(hit_info['query seq'])
-			#print "got btop ",seg," (",topVDJ[seg],") :",btop
-			#whole_seq_number_base_subs+=getNumberBaseSubsFromBTOP(btop)
-			#whole_seq_number_indels+=getNumberIndelsFromBTOP(btop)
-			#indel_map=getIndelMapFromBTOP(btop)
-			#$whole_seq_number_insertions+=indel_map['insertions']
-			#whole_seq_number_deletions+=indel_map['deletions']
-			#print "from ",btop," got ",muts," substitutions"
-			#printMap(hit_info)
 		else:
 			if(seg=='V'):
 				noneSeg_flag=True
-			#print "got a none seg (",seg,")!",read_rec.id
-	#if(whole_seq_number_bps!=0):
-	#	annMap['whole_seq_bsb_freq']=whole_seq_number_base_subs/whole_seq_number_bps
-	#else:
-	#	annMap['whole_seq_bsb_freq']=0
-	#annMap['whole_seq_number_base_subs']=whole_seq_number_base_subs
-	#annMap['whole_seq_number_indels']=whole_seq_number_indels
-	#annMap['whole_seq_number_insertions']=whole_seq_number_insertions
-	#annMap['whole_seq_number_deletions']=whole_seq_number_deletions
-
-
 
 	#whole seq characterization
 	whole_char_map=returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism)
 	for w in whole_char_map:
-		annMap[global_key_base+'_whole_seq_'+w]=whole_char_map[w]
+		new_key=global_key_base+'whole_seq_'+w
+		annMap[new_key]=whole_char_map[w]
 
+
+	detectUU(annMap)
 
 	#productive rearrangement 
 	annMap['productive_rearrangement']=getProductiveRearrangmentFlag(read_result_obj,meta,organism,imgtdb_obj)
@@ -368,9 +351,9 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
 				for key in reg_ann:
 					annMap[key_base+region+"_"+key]=(-1)
 				#pass
-	#printMap(annMap,True)
+	detectUU(annMap)
 	#sys.exit(0)
-	#annMap=readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,annMap,cdr3_map)
+	annMap=readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,annMap,cdr3_map)
 	annMap['read_name']=read_rec.id
 	#analyze_combinations(read_result_obj,meta,organism,imgtdb_obj,read_rec,annMap)
 	printMap(annMap,True)
@@ -391,6 +374,7 @@ def analyze_combinations(read_result_obj,meta,organism,imgtdb_obj,read_rec,read_
 
 
 def analyzeRegionObjsFromSegmentCombo(segment_combo,meta,organism,imgtdb_obj,read_rec,read_ann_map):
+	global global_key_base
 	print "got a segment combo : ",segment_combo
 	print "regions is ",segment_combo.regions
 	print "now calling....",
@@ -412,7 +396,7 @@ def analyzeRegionObjsFromSegmentCombo(segment_combo,meta,organism,imgtdb_obj,rea
 		#print "rgn_ns",rgn_ns
 		rgn_nm=meta[region.region_]
 		rgn_nm=re.sub(r'W','',rgn_nm)
-		lookup_key_base="vdj_server_ann_"+rgn_ns+"_"+rgn_nm+"_"
+		lookup_key_base=global_key_base+rgn_ns+"_"+rgn_nm+"_"
 		lookup_qry_start=lookup_key_base+"qry_srt"
 		lookup_qry_end=lookup_key_base+"qry_end"
 		#print "using lookups ",lookup_qry_start," and ",lookup_qry_end
@@ -457,17 +441,17 @@ def vSegmentRegionVDJAnalyse(read_result_obj,meta,organism,imgtdb_obj,read_rec):
 		getRegionsObjsFromSegmentCombo(segment_combination)
 		#sc1 = vdjml.Segment_combination(scb)
 		#scb.add_region(name=reg_name,read_range=reg_interval,metric=mm)
-#		scb.insert_region(vdjml.Num_system.kabat,vdjml.Gene_region_type.cdr2,reg_interval,mm)
-#sc1.insert_region(
-#                          vdjml.Num_system.imgt,
-#                          vdjml.Gene_region_type.fr1,
-#                          vdjml.Interval.first_last_1(1,54),
-#                          vdjml.Match_metrics(100, 54)
-#                          )
-#	return read_result_obj
-	
+		#		scb.insert_region(vdjml.Num_system.kabat,vdjml.Gene_region_type.cdr2,reg_interval,mm)
+		#sc1.insert_region(
+		#                          vdjml.Num_system.imgt,
+		#                          vdjml.Gene_region_type.fr1,
+		#                          vdjml.Interval.first_last_1(1,54),
+		#                          vdjml.Match_metrics(100, 54)
+		#                          )
+		#	return read_result_obj
 
-60  and  64
+
+
 
 
 #add on the kinds of arguments this program accepts
@@ -481,6 +465,187 @@ def add_rep_char_args_to_parser(parser):
 	return parser
 
 
+
+
+def appendAnnToFileWithMap(fPath,m,desiredKeys=None,defaultValue="None"):
+	keys=[
+		"top_V",
+		"top_D",
+		"top_J",
+		"vdj_server_ann_imgt_cdr3_na",
+		"vdj_server_ann_imgt_cdr3_tr",
+		"vdj_server_ann_kabat_cdr3_na",
+		"vdj_server_ann_kabat_cdr3_tr",
+		"vdj_server_ann_imgt_CDR1_base_sub",
+		"vdj_server_ann_imgt_CDR1_bsb_freq",
+		"vdj_server_ann_imgt_CDR1_deletions",
+		"vdj_server_ann_imgt_CDR1_frm_msk",
+		"vdj_server_ann_imgt_CDR1_insertions",
+		"vdj_server_ann_imgt_CDR1_mutations",
+		"vdj_server_ann_imgt_CDR1_nonsynonymous_bsb",
+		"vdj_server_ann_imgt_CDR1_ns_rto",
+		"vdj_server_ann_imgt_CDR1_pct_id",
+		"vdj_server_ann_imgt_CDR1_qry_aln",
+		"vdj_server_ann_imgt_CDR1_qry_end",
+		"vdj_server_ann_imgt_CDR1_qry_srt",
+		"vdj_server_ann_imgt_CDR1_ref_aln",
+		"vdj_server_ann_imgt_CDR1_synonymous_bsb",
+		"vdj_server_ann_imgt_CDR2_base_sub",
+		"vdj_server_ann_imgt_CDR2_bsb_freq",
+		"vdj_server_ann_imgt_CDR2_deletions",
+		"vdj_server_ann_imgt_CDR2_frm_msk",
+		"vdj_server_ann_imgt_CDR2_insertions",
+		"vdj_server_ann_imgt_CDR2_mutations",
+		"vdj_server_ann_imgt_CDR2_nonsynonymous_bsb",
+		"vdj_server_ann_imgt_CDR2_ns_rto",
+		"vdj_server_ann_imgt_CDR2_pct_id",
+		"vdj_server_ann_imgt_CDR2_qry_aln",
+		"vdj_server_ann_imgt_CDR2_qry_end",
+		"vdj_server_ann_imgt_CDR2_qry_srt",
+		"vdj_server_ann_imgt_CDR2_ref_aln",
+		"vdj_server_ann_imgt_CDR2_synonymous_bsb",
+		"vdj_server_ann_imgt_FR1_base_sub",
+		"vdj_server_ann_imgt_FR1_bsb_freq",
+		"vdj_server_ann_imgt_FR1_deletions",
+		"vdj_server_ann_imgt_FR1_frm_msk",
+		"vdj_server_ann_imgt_FR1_insertions",
+		"vdj_server_ann_imgt_FR1_mutations",
+		"vdj_server_ann_imgt_FR1_nonsynonymous_bsb",
+		"vdj_server_ann_imgt_FR1_ns_rto",
+		"vdj_server_ann_imgt_FR1_pct_id",
+		"vdj_server_ann_imgt_FR1_qry_aln",
+		"vdj_server_ann_imgt_FR1_qry_end",
+		"vdj_server_ann_imgt_FR1_qry_srt",
+		"vdj_server_ann_imgt_FR1_ref_aln",
+		"vdj_server_ann_imgt_FR1_synonymous_bsb",
+		"vdj_server_ann_imgt_FR2_base_sub",
+		"vdj_server_ann_imgt_FR2_bsb_freq",
+		"vdj_server_ann_imgt_FR2_deletions",
+		"vdj_server_ann_imgt_FR2_frm_msk",
+		"vdj_server_ann_imgt_FR2_insertions",
+		"vdj_server_ann_imgt_FR2_mutations",
+		"vdj_server_ann_imgt_FR2_nonsynonymous_bsb",
+		"vdj_server_ann_imgt_FR2_ns_rto",
+		"vdj_server_ann_imgt_FR2_pct_id",
+		"vdj_server_ann_imgt_FR2_qry_aln",
+		"vdj_server_ann_imgt_FR2_qry_end",
+		"vdj_server_ann_imgt_FR2_qry_srt",
+		"vdj_server_ann_imgt_FR2_ref_aln",
+		"vdj_server_ann_imgt_FR2_synonymous_bsb",
+		"vdj_server_ann_imgt_FR3_base_sub",
+		"vdj_server_ann_imgt_FR3_bsb_freq",
+		"vdj_server_ann_imgt_FR3_deletions",
+		"vdj_server_ann_imgt_FR3_frm_msk",
+		"vdj_server_ann_imgt_FR3_insertions",
+		"vdj_server_ann_imgt_FR3_mutations",
+		"vdj_server_ann_imgt_FR3_nonsynonymous_bsb",
+		"vdj_server_ann_imgt_FR3_ns_rto",
+		"vdj_server_ann_imgt_FR3_pct_id",
+		"vdj_server_ann_imgt_FR3_qry_aln",
+		"vdj_server_ann_imgt_FR3_qry_end",
+		"vdj_server_ann_imgt_FR3_qry_srt",
+		"vdj_server_ann_imgt_FR3_ref_aln",
+		"vdj_server_ann_imgt_FR3_synonymous_bsb",
+		"vdj_server_ann_kabat_CDR1_base_sub",
+		"vdj_server_ann_kabat_CDR1_bsb_freq",
+		"vdj_server_ann_kabat_CDR1_deletions",
+		"vdj_server_ann_kabat_CDR1_frm_msk",
+		"vdj_server_ann_kabat_CDR1_insertions",
+		"vdj_server_ann_kabat_CDR1_mutations",
+		"vdj_server_ann_kabat_CDR1_nonsynonymous_bsb",
+		"vdj_server_ann_kabat_CDR1_ns_rto",
+		"vdj_server_ann_kabat_CDR1_pct_id",
+		"vdj_server_ann_kabat_CDR1_qry_aln",
+		"vdj_server_ann_kabat_CDR1_qry_end",
+		"vdj_server_ann_kabat_CDR1_qry_srt",
+		"vdj_server_ann_kabat_CDR1_ref_aln",
+		"vdj_server_ann_kabat_CDR1_synonymous_bsb",
+		"vdj_server_ann_kabat_CDR2_base_sub",
+		"vdj_server_ann_kabat_CDR2_bsb_freq",
+		"vdj_server_ann_kabat_CDR2_deletions",
+		"vdj_server_ann_kabat_CDR2_frm_msk",
+		"vdj_server_ann_kabat_CDR2_insertions",
+		"vdj_server_ann_kabat_CDR2_mutations",
+		"vdj_server_ann_kabat_CDR2_nonsynonymous_bsb",
+		"vdj_server_ann_kabat_CDR2_ns_rto",
+		"vdj_server_ann_kabat_CDR2_pct_id",
+		"vdj_server_ann_kabat_CDR2_qry_aln",
+		"vdj_server_ann_kabat_CDR2_qry_end",
+		"vdj_server_ann_kabat_CDR2_qry_srt",
+		"vdj_server_ann_kabat_CDR2_ref_aln",
+		"vdj_server_ann_kabat_CDR2_synonymous_bsb",
+		"vdj_server_ann_kabat_FR1_base_sub",
+		"vdj_server_ann_kabat_FR1_bsb_freq",
+		"vdj_server_ann_kabat_FR1_deletions",
+		"vdj_server_ann_kabat_FR1_frm_msk",
+		"vdj_server_ann_kabat_FR1_insertions",
+		"vdj_server_ann_kabat_FR1_mutations",
+		"vdj_server_ann_kabat_FR1_nonsynonymous_bsb",
+		"vdj_server_ann_kabat_FR1_ns_rto",
+		"vdj_server_ann_kabat_FR1_pct_id",
+		"vdj_server_ann_kabat_FR1_qry_aln",
+		"vdj_server_ann_kabat_FR1_qry_end",
+		"vdj_server_ann_kabat_FR1_qry_srt",
+		"vdj_server_ann_kabat_FR1_ref_aln",
+		"vdj_server_ann_kabat_FR1_synonymous_bsb",
+		"vdj_server_ann_kabat_FR2_base_sub",
+		"vdj_server_ann_kabat_FR2_bsb_freq",
+		"vdj_server_ann_kabat_FR2_deletions",
+		"vdj_server_ann_kabat_FR2_frm_msk",
+		"vdj_server_ann_kabat_FR2_insertions",
+		"vdj_server_ann_kabat_FR2_mutations",
+		"vdj_server_ann_kabat_FR2_nonsynonymous_bsb",
+		"vdj_server_ann_kabat_FR2_ns_rto",
+		"vdj_server_ann_kabat_FR2_pct_id",
+		"vdj_server_ann_kabat_FR2_qry_aln",
+		"vdj_server_ann_kabat_FR2_qry_end",
+		"vdj_server_ann_kabat_FR2_qry_srt",
+		"vdj_server_ann_kabat_FR2_ref_aln",
+		"vdj_server_ann_kabat_FR2_synonymous_bsb",
+		"vdj_server_ann_kabat_FR3_base_sub",
+		"vdj_server_ann_kabat_FR3_bsb_freq",
+		"vdj_server_ann_kabat_FR3_deletions",
+		"vdj_server_ann_kabat_FR3_frm_msk",
+		"vdj_server_ann_kabat_FR3_insertions",
+		"vdj_server_ann_kabat_FR3_mutations",
+		"vdj_server_ann_kabat_FR3_nonsynonymous_bsb",
+		"vdj_server_ann_kabat_FR3_ns_rto",
+		"vdj_server_ann_kabat_FR3_pct_id",
+		"vdj_server_ann_kabat_FR3_qry_aln",
+		"vdj_server_ann_kabat_FR3_qry_end",
+		"vdj_server_ann_kabat_FR3_qry_srt",
+		"vdj_server_ann_kabat_FR3_ref_aln",
+		"vdj_server_ann_kabat_FR3_synonymous_bsb",
+		"vdj_server_ann_whole_seq_base_sub",
+		"vdj_server_ann_whole_seq_bsb_freq",
+		"vdj_server_ann_whole_seq_deletions",
+		"vdj_server_ann_whole_seq_insertions",
+		"vdj_server_ann_whole_seq_mutations",
+		"vdj_server_ann_whole_seq_nonsynonymous_bsb",
+		"vdj_server_ann_whole_seq_ns_rto",
+		"vdj_server_ann_whole_seq_pct_id",
+		"vdj_server_ann_whole_seq_synonymous_bsb"
+	]
+	fHandle=open(fPath,'a')
+	for k in range(len(keys)):
+		if(k<len(keys)-1):
+			fHandle.write(keys[k]+"\t")
+		else:
+			fHandle.write(keys[k])
+	fHandle.write("\n")
+	for k in range(len(keys)):
+		if(k<len(keys)-1):
+			sep="\t"
+		else:
+			sep=""
+		if(keys[k] in m):
+			fHandle.write(str(m[keys[k]])+sep)
+		else:
+			fHandle.write(defaultValue+sep)
+	fHandle.write("\n")
+	fHandle.close()
+		
+		
 
 
 if (__name__=="__main__"):
@@ -505,6 +670,7 @@ if (__name__=="__main__"):
 		segments_json_out=args.json_out
 		print "to write vdjml to ",args.vdjml_out
 		rrw = vdjml.Vdjml_writer(str(args.vdjml_out[0]), meta)
+		rep_char_out=args.char_out[0]
 		for read_result_obj in scanOutputToVDJML(args.igblast_in[0],fact,query_fasta):
 			#prepare for the iteration and give a possible status message...
 			if(read_num>1 and read_num%1000==0):
@@ -532,6 +698,9 @@ if (__name__=="__main__"):
 
 			#process for writing
 			rrw(read_result_obj)
+
+			#write rep-char
+			appendAnnToFileWithMap(rep_char_out,read_analysis_results['ann_map'])
 
 			#increment the read number
 			read_num+=1
