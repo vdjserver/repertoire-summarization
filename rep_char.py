@@ -2,15 +2,17 @@
 
 import vdjml
 from vdjml_igblast_parse import scanOutputToVDJML,makeParserArgs,makeVDJMLDefaultMetaAndFactoryFromArgs
-from utils import printMap,get_domain_modes,biopythonTranslate,rev_comp_dna,makeAllMapValuesVal,getNumberBpInAlnStr
+from utils import printMap,get_domain_modes,biopythonTranslate,makeAllMapValuesVal,getNumberBpInAlnStr
 from pprint import pprint
 from imgt_utils import imgt_db
 from cdr3_hist import CDR3LengthAnalysisVDMLOBJ,histoMapClass
 from vdjml_utils import getTopVDJItems,getRegionsObjsFromSegmentCombo,getHitInfo,getProductiveRearrangmentFlag,getVDJServerRegionAlignmentFromLargerVAlignmentPyObj
 from Bio import SeqIO
-from segment_utils import IncrementMapWrapper,getVRegionsList,getRegionSpecifcCharacterization,getEmptyRegCharMap,getAdjustedCDR3StartFromRefDirSetAllele,getTheFrameForThisReferenceAtThisPosition,getCDR3RegionSpecificCharacterizationSubAln
+from segment_utils import IncrementMapWrapper,getVRegionsList,getRegionSpecifcCharacterization,getEmptyRegCharMap,getAdjustedCDR3StartFromRefDirSetAllele,getTheFrameForThisReferenceAtThisPosition,getCDR3RegionSpecificCharacterizationSubAln,getVRegionStartAndStopGivenRefData
 from char_utils import getNumberBaseSubsFromBTOP,getNumberIndelsFromBTOP,getIndelMapFromBTOP
 from alignment import alignment
+from vdjml_igblast_parse import rev_comp_dna
+import re
 
 
 
@@ -287,7 +289,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
 	#sys.exit(0)
 	#annMap=readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,annMap,cdr3_map)
 	annMap['read_name']=read_rec.id
-	#analyze_combinations(read_result_obj,meta,organism,imgtdb_obj,read_rec,annMap)
+	analyze_combinations(read_result_obj,meta,organism,imgtdb_obj,read_rec,annMap)
 	printMap(annMap,True)
 	return annMap
 
@@ -298,7 +300,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
 def analyze_combinations(read_result_obj,meta,organism,imgtdb_obj,read_rec,read_ann_map):
 	segment_combinations=read_result_obj.segment_combinations()
 	for s in range(len(segment_combinations)):
-		#print "LOOKING AT COMBINATION # ",str(int(s+1))," of ",str(len(segment_combinations))," FOR READ ID=",read_result_obj.id()
+		print "LOOKING AT COMBINATION # ",str(int(s+1))," of ",str(len(segment_combinations))," FOR READ ID=",read_result_obj.id()
 		segment_combination=segment_combinations[s]
 		analyzeRegionObjsFromSegmentCombo(segment_combination,meta,organism,imgtdb_obj,read_rec,read_ann_map)
 
@@ -313,22 +315,41 @@ def analyzeRegionObjsFromSegmentCombo(segment_combo,meta,organism,imgtdb_obj,rea
 	print "the type of regions is ",str(type(regions))
 	for region in regions:
 		#print "region???",region
-		print "range : ",region.range_
+		#print "range : ",region.range_
 		#print region.range_.pos_0()
 		rgn_start=region.range_.pos_1() 
 		rgn_end=rgn_start+region.range_.length()-1
-		print "start/end : ",rgn_start," and ",rgn_end
-		rgn_ns=region.num_system_
+		#print "start/end : ",rgn_start," and ",rgn_end
+		rgn_ns=int(str(region.num_system_))
 		#print "rgn_ns",rgn_ns
-		#if(rgn_ns=="1"):
-		#	rgn_ns="imgt"
-		#else:
-		#	rgn_ns="kabat"
+		if(rgn_ns==1):
+			rgn_ns="imgt"
+		else:
+			rgn_ns="kabat"
 		#print "rgn_ns",rgn_ns
-		rgn_ns="imgt"
-		#rgn_nm=region.
-		#ann_map_key='vdj_server_ann_'
-		#ann_map_key='vdj_server_ann_imgt_FR3_qry_srt
+		rgn_nm=meta[region.region_]
+		rgn_nm=re.sub(r'W','',rgn_nm)
+		lookup_key_base="vdj_server_ann_"+rgn_ns+"_"+rgn_nm+"_"
+		lookup_qry_start=lookup_key_base+"qry_srt"
+		lookup_qry_end=lookup_key_base+"qry_end"
+		#print "using lookups ",lookup_qry_start," and ",lookup_qry_end
+		if((lookup_qry_start in read_ann_map) and (lookup_qry_end in read_ann_map)):
+			#print "found lookup!"
+			igblast_start=int(rgn_start)
+			igblast_end=int(rgn_end)
+			vdj_start=read_ann_map[lookup_qry_start]
+			vdj_end=read_ann_map[lookup_qry_end]
+			strt_match=(vdj_start==igblast_start)
+			end_match=(vdj_end==igblast_end)
+			#print "start and end matches : ",strt_match," and ",end_match
+			if(strt_match and end_match):
+				print "total match!"
+			else:
+				print "at least one mismatch! igblast start/end : ",igblast_start," and ",igblast_end," vdj start/end     : ",vdj_start," and ",vdj_end," : query=",read_ann_map['read_name']," seg=",read_ann_map['top_V']," rgn=",rgn_nm," rrv : ",getVRegionStartAndStopGivenRefData(read_ann_map['top_V'],organism,imgtdb_obj,rgn_nm,rgn_ns)
+		else:
+			print "no lookup found for ",lookup_qry_start," and ",lookup_qry_end
+			pass
+
 
 
 		
@@ -400,7 +421,7 @@ if (__name__=="__main__"):
 		read_num=1
 		segments_json_out=args.json_out
 		print "to write vdjml to ",args.vdjml_out
-		#rrw = vdjml.Result_writer(str(args.vdjml_out[0]), meta)
+		rrw = vdjml.Vdjml_writer(str(args.vdjml_out[0]), meta)
 		for read_result_obj in scanOutputToVDJML(args.igblast_in[0],fact,query_fasta):
 			#prepare for the iteration and give a possible status message...
 			if(read_num>1 and read_num%1000==0):
@@ -427,7 +448,7 @@ if (__name__=="__main__"):
 						segment_counter.increment(actual)
 
 			#process for writing
-			#rrw(read_result_obj)
+			rrw(read_result_obj)
 
 			#increment the read number
 			read_num+=1
