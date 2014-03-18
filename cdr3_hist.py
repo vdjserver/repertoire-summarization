@@ -6,10 +6,11 @@ import glob
 from os.path import basename
 from segment_utils import getFastaListOfDescs,getQueryIndexGivenSubjectIndexAndAlignment,getAdjustedCDR3StartFromRefDirSetAllele,getADJCDR3EndFromJAllele,getEmptyRegCharMap
 from imgt_utils import imgt_db
-from utils import read_fasta_file_into_map,biopythonTranslate,rev_comp_dna,printMap,get_domain_modes,repStr,looksLikeAlleleStr
+from utils import read_fasta_file_into_map,biopythonTranslate,printMap,get_domain_modes,repStr,looksLikeAlleleStr
 from igblast_utils import printNiceAlignment,buildAlignmentWholeSeqs,buildAlignmentWholeSeqsDirect
 import vdjml
 from vdjml_utils import getTopVDJItems,getHitInfo
+from vdjml_igblast_parse import rev_comp_dna
 import argparse
 
 
