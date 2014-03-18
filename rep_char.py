@@ -2,13 +2,13 @@
 
 import vdjml
 from vdjml_igblast_parse import scanOutputToVDJML,makeParserArgs,makeVDJMLDefaultMetaAndFactoryFromArgs
-from utils import printMap,get_domain_modes,biopythonTranslate,makeAllMapValuesVal,getNumberBpInAlnStr
+from utils import printMap,get_domain_modes,biopythonTranslate,makeAllMapValuesVal,getNumberBpInAlnStr,repStr
 from pprint import pprint
 from imgt_utils import imgt_db
 from cdr3_hist import CDR3LengthAnalysisVDMLOBJ,histoMapClass
 from vdjml_utils import getTopVDJItems,getRegionsObjsFromSegmentCombo,getHitInfo,getProductiveRearrangmentFlag,getVDJServerRegionAlignmentFromLargerVAlignmentPyObj
 from Bio import SeqIO
-from segment_utils import IncrementMapWrapper,getVRegionsList,getRegionSpecifcCharacterization,getEmptyRegCharMap,getAdjustedCDR3StartFromRefDirSetAllele,getTheFrameForThisReferenceAtThisPosition,getCDR3RegionSpecificCharacterizationSubAln,getVRegionStartAndStopGivenRefData
+from segment_utils import IncrementMapWrapper,getVRegionsList,getRegionSpecifcCharacterization,getEmptyRegCharMap,getAdjustedCDR3StartFromRefDirSetAllele,getTheFrameForThisReferenceAtThisPosition,getCDR3RegionSpecificCharacterizationSubAln,getVRegionStartAndStopGivenRefData,getADJCDR3EndFromJAllele
 from char_utils import getNumberBaseSubsFromBTOP,getNumberIndelsFromBTOP,getIndelMapFromBTOP
 from alignment import alignment
 from vdjml_igblast_parse import rev_comp_dna
@@ -176,23 +176,96 @@ def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism):
 		#at least work with V
 		v_cdr3_start=getAdjustedCDR3StartFromRefDirSetAllele(vInfo['subject ids'],imgtdb_obj,organism,"imgt")
 		if(v_cdr3_start==(-1)):
+			#if CDR3 start is not found, just use the entire thing!
 			v_cdr3_start=vInfo['s. end']+1
-		#just work on V
-		#print "EFFECTIVE CDR3 start is ",v_cdr3_start
 		vAlnObj=alignment(vInfo['query seq'],vInfo['subject seq'],vInfo['q. start'],vInfo['q. end'],vInfo['s. start'],vInfo['s. end'])
-		#print "Total aln \n",vAlnObj.getNiceString()
 		preCDR3Aln=vAlnObj.getAlnAtAndCond(v_cdr3_start-1,"subject","leq")
-		#print "PRECDR3 aln\n",preCDR3Aln.getNiceString()
 		preCDR3Aln.setSFM(getTheFrameForThisReferenceAtThisPosition(vInfo['subject ids'],organism,imgtdb_obj,preCDR3Aln.s_start))
 		if(jInfo==None):
+			#if no info is found, return the map from just V
 			return preCDR3Aln.characterize()
-			pass
 		else:
 			#work on V and J
-			pass
+			jAlnObj=alignment(jInfo['query seq'],jInfo['subject seq'],jInfo['q. start'],jInfo['q. end'],jInfo['s. start'],jInfo['s. end'])
+			J_cdr3_end=getADJCDR3EndFromJAllele(jInfo['subject ids'],imgtdb_obj,organism,"imgt")
+			#print "jAlnObj"
+			#print jAlnObj.getNiceString()
+			if(J_cdr3_end==(-1)):
+				#postCDR3AlnStart=jInfo['s. start']
+				#print "JCDR3 end detected to be (-1) so setting new cdr3 post start as ",postCDR3AlnStart
+				return preCDR3Aln.characterize()
+			elif(jAlnObj.q_end<=preCDR3Aln.q_start or jAlnObj.q_end<=preCDR3Aln.q_end):
+				return preCDR3Aln.characterize()
+			else:
+				postCDR3AlnStart=J_cdr3_end+1
+				#print "Normal course for post cdr3 start.  it is set as ",postCDR3AlnStart
+			if(postCDR3AlnStart>jAlnObj.s_end):
+				#CDR3 start is after the s_aln end which means J aligns only in CDR3, ....so just return V map
+				return preCDR3Aln.characterize()
+			postCDR3AlnObj=jAlnObj.getAlnAtAndCond(postCDR3AlnStart,"subject","geq")
+			#print "Initial postCDR3AlnObj is "
+			#print postCDR3AlnObj.getNiceString()
+			if(postCDR3AlnObj.q_start<=preCDR3Aln.q_end):
+				#this is in case V and J overlap in the CDR3 area alignment
+				new_q_start=preCDR3Aln.q_end+1
+				#print "It is deteced that this is in case V and J overlap in the CDR3 area alignment"
+				#print "new q_start is ",new_q_start
+				postCDR3AlnObj=jAlnObj.getAlnAtAndCond(new_q_start,"query","geq")
+			if(postCDR3AlnObj.s_start==postCDR3AlnStart):
+				#great, set the FRAME mask to start with zero cause the alignment starts where it ideally should start
+				#print "postCDR3AlnObj.s_start=",postCDR3AlnObj.s_start,", and postCDR3AlnStart=", postCDR3AlnStart," so normal case for SFM"
+				postCDR3AlnObj.setSFM(0)
+			elif(postCDR3AlnStart<postCDR3AlnObj.s_start):
+				#if the alignment starts later, set the proper frame mask start
+				print "postCDR3AlnStart=",postCDR3AlnStart," and postCDR3AlnObj.s_start=",postCDR3AlnObj.s_start," so settginf SFM as ",str(int(int(postCDR3AlnObj.s_start-postCDR3AlnStart)%3))
+				postCDR3AlnObj.setSFM((postCDR3AlnObj.s_start-postCDR3AlnStart)%3)
+			else:
+				#postCDR3AlnStart>=postCDR3AlnObj.s_start ?????
+				print "postCDR3AlnStart=",postCDR3AlnStart
+				print "postCDR3AlnObj.s_start",postCDR3AlnObj.s_start
+				print "vINFO",vInfo
+				print "jINFO",jInfo
+				print "J_cdr3_end=",J_cdr3_end
+				print "VALNOBJ"
+				print vAlnObj.getNiceString()
+				print "postCDR3"
+				print postCDR3AlnObj.getNiceString()
+				raise Exception('postCDR3AlnStart>postCDR3AlnObj.s_start ?????  Error in alignment class???')
+				#ALIGNMENT. Q_FROM=45 Q_TO=51 S_FROM=19 S_TO=25
+				#QURY:GCAGGAG
+				#MDLN:X||X|XX
+				#SBCT:ACATGGA
 
-
-	
+				
+			numN=postCDR3AlnObj.q_start-preCDR3Aln.q_end-1
+			NSub=repStr("N",numN)
+			NQry=repStr("N",numN)
+			vCharMap=preCDR3Aln.characterize()
+			jCharMap=postCDR3AlnObj.characterize()
+			#to get/compute the 'whole' map, add up the "non-special" values
+			#otherwise, compute them specially
+			toSkip=['bsb_freq','pct_id','ns_rto']
+			totCharMap=dict()
+			for k in vCharMap:
+				if(not(k in toSkip)):
+					totCharMap[k]=vCharMap[k]+jCharMap[k]
+			#handle pct id and bsb_freq specially
+			totQ=getNumberBpInAlnStr(postCDR3AlnObj.q_aln)+getNumberBpInAlnStr(preCDR3Aln.q_aln)
+			totBS=totCharMap['base_sub']
+			if(totQ!=0):
+				totCharMap['pct_id']=float((float(totQ)-float(totBS))/float(totQ))
+				totCharMap['bsb_freq']=float(totCharMap['base_sub'])/float(totQ)
+			else:
+				totCharMap['pct_id']=0.0
+				totCharMap['bsb_freq']=0
+			#handle ns_ratio
+			if(totCharMap['synonymous_bsb']!=0):
+				totCharMap['ns_rto']=float(totCharMap['nonsynonymous_bsb'])/float(totCharMap['synonymous_bsb'])
+			else:
+				totCharMap['ns_rto']=0
+			return totCharMap
+	emptyMap=getEmptyRegCharMap()
+	return emptyMap
 	
 			
 #given a read object, meta data, organism and database data and the read record and CDR3 data
@@ -200,6 +273,7 @@ def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism):
 #of regions FR1, CDR1, FR2, CDR2, FR3
 def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
 	#print "To annotate a read...."
+	global global_key_base
 	topVDJ=getTopVDJItems(read_result_obj,meta)
 	annMap=dict()
 	for seg in topVDJ:
@@ -228,30 +302,39 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
 				vInfo=hit_info
 			elif(seg=="J" and not(hit_info==None)):
 				jInfo=hit_info
-			btop=hit_info['btop']
-			whole_seq_number_bps+=getNumberBpInAlnStr(hit_info['query seq'])
+			#btop=hit_info['btop']
+			#whole_seq_number_bps+=getNumberBpInAlnStr(hit_info['query seq'])
 			#print "got btop ",seg," (",topVDJ[seg],") :",btop
-			whole_seq_number_base_subs+=getNumberBaseSubsFromBTOP(btop)
-			whole_seq_number_indels+=getNumberIndelsFromBTOP(btop)
-			indel_map=getIndelMapFromBTOP(btop)
-			whole_seq_number_insertions+=indel_map['insertions']
-			whole_seq_number_deletions+=indel_map['deletions']
+			#whole_seq_number_base_subs+=getNumberBaseSubsFromBTOP(btop)
+			#whole_seq_number_indels+=getNumberIndelsFromBTOP(btop)
+			#indel_map=getIndelMapFromBTOP(btop)
+			#$whole_seq_number_insertions+=indel_map['insertions']
+			#whole_seq_number_deletions+=indel_map['deletions']
 			#print "from ",btop," got ",muts," substitutions"
 			#printMap(hit_info)
 		else:
-			noneSeg_flag=True
-			print "got a none seg (",seg,")!",read_rec.id
-	if(whole_seq_number_bps!=0):
-		annMap['whole_seq_bsb_freq']=whole_seq_number_base_subs/whole_seq_number_bps
-	else:
-		annMap['whole_seq_bsb_freq']=0
+			if(seg=='V'):
+				noneSeg_flag=True
+			#print "got a none seg (",seg,")!",read_rec.id
+	#if(whole_seq_number_bps!=0):
+	#	annMap['whole_seq_bsb_freq']=whole_seq_number_base_subs/whole_seq_number_bps
+	#else:
+	#	annMap['whole_seq_bsb_freq']=0
 	#annMap['whole_seq_number_base_subs']=whole_seq_number_base_subs
 	#annMap['whole_seq_number_indels']=whole_seq_number_indels
 	#annMap['whole_seq_number_insertions']=whole_seq_number_insertions
 	#annMap['whole_seq_number_deletions']=whole_seq_number_deletions
-	annMap['productive_rearrangement']=getProductiveRearrangmentFlag(read_result_obj,meta,organism,imgtdb_obj)
-	returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism)
 
+
+
+	#whole seq characterization
+	whole_char_map=returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism)
+	for w in whole_char_map:
+		annMap[global_key_base+'_whole_seq_'+w]=whole_char_map[w]
+
+
+	#productive rearrangement 
+	annMap['productive_rearrangement']=getProductiveRearrangmentFlag(read_result_obj,meta,organism,imgtdb_obj)
 
 	#VDJSERVER V REGION ANNOTATIONS
 	mode_list=get_domain_modes()
@@ -289,7 +372,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
 	#sys.exit(0)
 	#annMap=readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,annMap,cdr3_map)
 	annMap['read_name']=read_rec.id
-	analyze_combinations(read_result_obj,meta,organism,imgtdb_obj,read_rec,annMap)
+	#analyze_combinations(read_result_obj,meta,organism,imgtdb_obj,read_rec,annMap)
 	printMap(annMap,True)
 	return annMap
 
