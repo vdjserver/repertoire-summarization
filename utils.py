@@ -12,20 +12,6 @@ import pickle
 
 
 
-#given an interval (in list form [from,to])
-#with 1-based indesing AND given a sequence length in BP
-#return the same interval but on the reverse strand
-def getRevCompInterval(i,seq_len_in_bp):
-	#form an interval in one strand
-	#find the interval in the reverse complement strand
-	i_s=i[0]
-	i_e=i[1]
-	int_len=abs(i_s-i_e)
-	ne_s=seq_len_in_bp-i_e+1
-	ne_e=ne_s+int_len
-	return [ne_s,ne_e]
-
-
 
 
 
@@ -133,71 +119,6 @@ def makeAllMapValuesVal(m,v):
 			m[k]=v
 	return m
 		
-
-
-#reverse a string (of DNA)
-def rev_dna(dna):
-	reversed_dna=""
-	for ub in range(len(dna)):
-		b=len(dna)-ub-1
-		reversed_dna+=dna[b]
-	return reversed_dna
-	
-
-
-	
-#complement a string (of DNA)
-#allow IUPAC complementing if desired
-def comp_dna(dna,allowIUPAC=False):
-# see http://droog.gs.washington.edu/parc/images/iupac.html
-#IUPAC Code 	Meaning 	Complement
-#A 	A 	T
-#C 	C 	G
-#G 	G 	C
-#T/U 	T 	A
-#M 	A or C 	K
-#R 	A or G 	Y
-#W 	A or T 	W
-#S 	C or G 	S
-#Y 	C or T 	R
-#K 	G or T 	M
-#V 	A or C or G 	B
-#H 	A or C or T 	D
-#D 	A or G or T 	H
-#B 	C or G or T 	V
-#N 	G or A or T or C 	N
-	comped=""
-	comp=dict()
-	comp['A']='T'
-	comp['T']='A'
-	comp['G']='C'
-	comp['C']='G'
-	comp['N']='N'
-	if(allowIUPAC):
-		comp['U']='A'
-		comp['M']='K'
-		comp['R']='Y'
-		comp['W']='W'
-		comp['S']='S'
-		comp['Y']='R'
-		comp['K']='M'
-		comp['V']='B'
-		comp['H']='D'
-		comp['D']='H'
-		comp['B']='V'
-	for b in range(len(dna)):
-		if(dna[b] in comp):
-			comped+=comp[dna[b]]
-		else:
-			comped+=dna[b]
-	return comped
-			
-#reverse complement DNA
-def rev_comp_dna(dna,allowIUPAC=False):
-	return comp_dna(rev_dna(dna),allowIUPAC)
-
-
-
 
 
 #translate a sequence with BIOPYTHON
