@@ -43,9 +43,9 @@ class alignment:
 			current-=1
 			current=current%3
 		while(temp<len(self.s_aln)):
-			if(self.s_aln[temp]!="-"):
-				current+=1
 			nfm.append(current%3)
+			if(self.s_aln[temp]!="-"):
+				current+=1			
 			temp+=1
 		self.s_frame_mask=nfm
 		#print "just set self.s_frame_mask to ",self.s_frame_mask
@@ -230,7 +230,7 @@ class alignment:
 				if(s_codon.find("-")==(-1) and q_codon.find("-")==(-1)):
 					#ANALYSIS FOR CODONS WITH NO GAPS
 					#no gaps, perform analysis
-					print "Detected on gaps in codons"
+					print "Detected no gaps in codons"
 					s_amino=str(biopythonTranslate(s_codon))
 					print "subject amino :",s_amino," and codon ",s_codon
 					q_amino=str(biopythonTranslate(q_codon))
@@ -277,7 +277,7 @@ class alignment:
 		if(len(self.q_aln)==0):
 			char_map['bsb_freq']=0
 		else:
-			char_map['bsb_freq']=num_bsb/(getNumberBpInAlnStr(self.q_aln))
+			char_map['bsb_freq']=float(num_bsb)/float(getNumberBpInAlnStr(self.q_aln))
 		if(len(self.s_aln)>0 and len(self.q_aln)>0):
 			mlen=min(getNumberBpInAlnStr(self.q_aln),getNumberBpInAlnStr(self.s_aln))
 			if(mlen!=0):
@@ -295,8 +295,11 @@ class alignment:
 		return char_map
 
 
+	
 
 
+
+	#extract a subalignment given start/stop IS INCLUSIVE! [A,B] (not (A,B)!)
 	def getSubAlnInc(self,sub_start,sub_end,s):
 		if(sub_start>sub_end):
 			temp=sub_start
