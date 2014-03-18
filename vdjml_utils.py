@@ -98,6 +98,9 @@ def getProductiveRearrangmentFlag(read_result_obj,meta,organism,imgtdb_obj):
 		#note, there is no "N/A" or "inconclusive" ....
 		return productive_flag
 
+
+
+
 #given a V segment alignment extract from it the sub-portion for a given
 #region.  Return a 4-length array with subject and query alignment data  [region_alignment,frame_mask,r_q_start,r_q_end]  (region_alignment has query first, then sub)
 #return None if alignment too short or doesn't cover region
