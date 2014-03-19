@@ -188,7 +188,8 @@ class alignment:
 		num_del=0
 		num_syn=0
 		num_nsy=0
-		num_bsb=0		
+		num_bsb=0
+		stp_cdn=False	
 
 		#do counts that are independent of codons/translations
 		for i in range(len(self.s_aln)):
@@ -227,6 +228,10 @@ class alignment:
 				q_codon_w_gaps=q_codon
 				#q_codon=re.sub(r'\-','N',q_codon)
 				#print "q codon is ",q_codon
+				if(q_codon.find("-")==(-1)):
+					q_amino=str(biopythonTranslate(q_codon))
+					if(q_amino=="*"):
+						stp_cdn=True
 				if(s_codon.find("-")==(-1) and q_codon.find("-")==(-1)):
 					#ANALYSIS FOR CODONS WITH NO GAPS
 					#no gaps, perform analysis
@@ -292,6 +297,7 @@ class alignment:
 		else:
 			ns_ratio=0
 		char_map['ns_rto']=ns_ratio
+		char_map['stp_cdn']=stp_cdn
 		return char_map
 
 

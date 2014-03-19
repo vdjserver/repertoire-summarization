@@ -324,27 +324,20 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
 	for mode in mode_list:
 		for region in getVRegionsList():
 			#print "Now to analyze region ",region," in mode",mode
-			raInfo=getVDJServerRegionAlignmentFromLargerVAlignmentPyObj(read_result_obj,meta,organism,mode,region,imgtdb_obj,False,read_rec)
+			#raInfo=getVDJServerRegionAlignmentFromLargerVAlignmentPyObj(read_result_obj,meta,organism,mode,region,imgtdb_obj,False,read_rec)
+			regionAlignment=getVDJServerRegionAlignmentFromLargerVAlignmentPyObj(read_result_obj,meta,organism,mode,region,imgtdb_obj,False,read_rec)
 			key_base=global_key_base+mode+"_"
-			if(raInfo!=None and not(noneSeg_flag)):
-				#print "got no info!"
-				aln=raInfo[0]
-				q_aln=aln[0]
-				s_aln=aln[1]
-				mask=raInfo[1]
-				q_start=raInfo[2]
-				q_end=raInfo[3]
-				#print "calling RSC for read=",read_rec.id
-				reg_ann=getRegionSpecifcCharacterization(s_aln,q_aln,region,mask,mode)
+			if(regionAlignment!=None and not(noneSeg_flag)):
+				reg_ann=regionAlignment.characterize()
 				#print "got ann "
 				#printMap(reg_ann)
-				annMap[key_base+region+'_qry_aln']=q_aln
-				annMap[key_base+region+'_qry_srt']=q_start
-				annMap[key_base+region+'_qry_end']=q_end
-				annMap[key_base+region+'_ref_aln']=s_aln
-				annMap[key_base+region+'_frm_msk']=mask
 				for key in reg_ann:
 					annMap[key_base+region+"_"+key]=reg_ann[key]
+				annMap[key_base+region+'_qry_aln']=regionAlignment.q_aln
+				annMap[key_base+region+'_qry_srt']=regionAlignment.q_start
+				annMap[key_base+region+'_qry_end']=regionAlignment.q_end
+				annMap[key_base+region+'_ref_aln']=regionAlignment.s_aln
+				annMap[key_base+region+'_frm_msk']=regionAlignment.s_frame_mask
 			else:
 				#print raInfo
 				reg_ann=getEmptyRegCharMap()

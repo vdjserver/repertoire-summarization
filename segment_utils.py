@@ -751,18 +751,19 @@ def getRegionAlignmentFromLargerVAlignment(sub_info_map,org,mode,region_name,img
 	ref_region_interval=getVRegionStartAndStopGivenRefData(sub_name,org,imgtdb_obj,region_name,mode)
 	ref_region_transcript_start=getVRegionStartAndStopGivenRefData(sub_name,org,imgtdb_obj,region_name,"imgt")[0]
 	#print "For reference=",sub_name," for org=",org," region=",region_name," got (mode=",mode,")region=",ref_region_interval
-	if(ref_region_interval[0]==(-1) and ref_region_interval[1]==(-1)):
-		print "Can't get region info, start and stop of ref region is neg 1...."
+	if(ref_region_interval[0]==(-1) or ref_region_interval[1]==(-1)):
+		print "Can't get region info, start or stop of ref region is neg 1...."
 		return None
 	else:
 		region_frame_start=(ref_region_interval[0]-ref_region_transcript_start)%3
 		aln_obj=alignment(sub_info_map['query seq'],sub_info_map['subject seq'],sub_info_map['q. start'],sub_info_map['q. end'],sub_info_map['s. start'],sub_info_map['s. end'])
 		region_aln=aln_obj.getSubAlnInc(ref_region_interval[0],ref_region_interval[1],"subject")
 		region_aln.setSFM(region_frame_start)
-		region_alignment=list()
-		region_alignment.append(region_aln.q_aln)
-		region_alignment.append(region_aln.s_aln)
-		return [region_alignment,region_aln.s_frame_mask,region_aln.q_start,region_aln.q_end]
+		return region_aln
+		#region_alignment=list()
+		#region_alignment.append(region_aln.q_aln)
+		#region_alignment.append(region_aln.s_aln)
+		#return [region_alignment,region_aln.s_frame_mask,region_aln.q_start,region_aln.q_end,region_aln.s_start,region_aln.s_end]
 		#aln_obj.setSFM(region_frame_start)		
 		#reg_start=int(ref_region_interval[0])
 		#if(reg_start==(-1)):
@@ -1407,6 +1408,7 @@ def getEmptyRegCharMap():
 	char_map['pct_id']=0
 	char_map['bsb_freq']=0
 	char_map['ns_rto']=0
+	char_map['stp_cdn']=False
 	return char_map
 
 
