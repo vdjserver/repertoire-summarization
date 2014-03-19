@@ -18,11 +18,6 @@ import re
 
 global_key_base="vdj_server_ann_"
 
-def detectUU(m):
-	for k in m:
-		if(k.find("__")!=(-1)):
-			print "found __"
-			sys.exit(0)
 
 
 # use a read_result_ojbect return several things:
@@ -47,7 +42,7 @@ def rep_char_read(read_result_obj,meta,organism,imgtdb_obj,read_rec):
 	#perform own annotation
 	read_ann_map=readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_length_results)
 	return_obj['ann_map']=read_ann_map
-	detectUU(read_ann_map)
+
 	#printMap(read_ann_map,True)
 	#sys.exit(0)
 
@@ -314,8 +309,6 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
 		annMap[new_key]=whole_char_map[w]
 
 
-	detectUU(annMap)
-
 	#productive rearrangement 
 	annMap['productive_rearrangement']=getProductiveRearrangmentFlag(read_result_obj,meta,organism,imgtdb_obj)
 
@@ -344,7 +337,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
 				for key in reg_ann:
 					annMap[key_base+region+"_"+key]=(-1)
 				#pass
-	detectUU(annMap)
+
 	#sys.exit(0)
 	annMap=readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,annMap,cdr3_map)
 	annMap['read_name']=read_rec.id
@@ -460,8 +453,10 @@ def add_rep_char_args_to_parser(parser):
 
 
 
-def appendAnnToFileWithMap(fPath,m,desiredKeys=None,defaultValue="None"):
+def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None"):
 	keys=[
+		"read_id#",
+		"read_name",
 		"top_V",
 		"top_D",
 		"top_J",
@@ -478,6 +473,7 @@ def appendAnnToFileWithMap(fPath,m,desiredKeys=None,defaultValue="None"):
 		"vdj_server_ann_imgt_CDR1_nonsynonymous_bsb",
 		"vdj_server_ann_imgt_CDR1_ns_rto",
 		"vdj_server_ann_imgt_CDR1_pct_id",
+		"vdj_server_ann_imgt_CDR1_stp_cdn",
 		"vdj_server_ann_imgt_CDR1_qry_aln",
 		"vdj_server_ann_imgt_CDR1_qry_end",
 		"vdj_server_ann_imgt_CDR1_qry_srt",
@@ -492,6 +488,7 @@ def appendAnnToFileWithMap(fPath,m,desiredKeys=None,defaultValue="None"):
 		"vdj_server_ann_imgt_CDR2_nonsynonymous_bsb",
 		"vdj_server_ann_imgt_CDR2_ns_rto",
 		"vdj_server_ann_imgt_CDR2_pct_id",
+		"vdj_server_ann_imgt_CDR2_stp_cdn",
 		"vdj_server_ann_imgt_CDR2_qry_aln",
 		"vdj_server_ann_imgt_CDR2_qry_end",
 		"vdj_server_ann_imgt_CDR2_qry_srt",
@@ -506,6 +503,7 @@ def appendAnnToFileWithMap(fPath,m,desiredKeys=None,defaultValue="None"):
 		"vdj_server_ann_imgt_FR1_nonsynonymous_bsb",
 		"vdj_server_ann_imgt_FR1_ns_rto",
 		"vdj_server_ann_imgt_FR1_pct_id",
+		"vdj_server_ann_imgt_FR1_stp_cdn",
 		"vdj_server_ann_imgt_FR1_qry_aln",
 		"vdj_server_ann_imgt_FR1_qry_end",
 		"vdj_server_ann_imgt_FR1_qry_srt",
@@ -520,6 +518,7 @@ def appendAnnToFileWithMap(fPath,m,desiredKeys=None,defaultValue="None"):
 		"vdj_server_ann_imgt_FR2_nonsynonymous_bsb",
 		"vdj_server_ann_imgt_FR2_ns_rto",
 		"vdj_server_ann_imgt_FR2_pct_id",
+		"vdj_server_ann_imgt_FR2_stp_cdn",
 		"vdj_server_ann_imgt_FR2_qry_aln",
 		"vdj_server_ann_imgt_FR2_qry_end",
 		"vdj_server_ann_imgt_FR2_qry_srt",
@@ -534,6 +533,7 @@ def appendAnnToFileWithMap(fPath,m,desiredKeys=None,defaultValue="None"):
 		"vdj_server_ann_imgt_FR3_nonsynonymous_bsb",
 		"vdj_server_ann_imgt_FR3_ns_rto",
 		"vdj_server_ann_imgt_FR3_pct_id",
+		"vdj_server_ann_imgt_FR3_stp_cdn",
 		"vdj_server_ann_imgt_FR3_qry_aln",
 		"vdj_server_ann_imgt_FR3_qry_end",
 		"vdj_server_ann_imgt_FR3_qry_srt",
@@ -548,6 +548,7 @@ def appendAnnToFileWithMap(fPath,m,desiredKeys=None,defaultValue="None"):
 		"vdj_server_ann_kabat_CDR1_nonsynonymous_bsb",
 		"vdj_server_ann_kabat_CDR1_ns_rto",
 		"vdj_server_ann_kabat_CDR1_pct_id",
+		"vdj_server_ann_kabat_CDR1_stp_cdn",
 		"vdj_server_ann_kabat_CDR1_qry_aln",
 		"vdj_server_ann_kabat_CDR1_qry_end",
 		"vdj_server_ann_kabat_CDR1_qry_srt",
@@ -562,6 +563,7 @@ def appendAnnToFileWithMap(fPath,m,desiredKeys=None,defaultValue="None"):
 		"vdj_server_ann_kabat_CDR2_nonsynonymous_bsb",
 		"vdj_server_ann_kabat_CDR2_ns_rto",
 		"vdj_server_ann_kabat_CDR2_pct_id",
+		"vdj_server_ann_kabat_CDR2_stp_cdn",
 		"vdj_server_ann_kabat_CDR2_qry_aln",
 		"vdj_server_ann_kabat_CDR2_qry_end",
 		"vdj_server_ann_kabat_CDR2_qry_srt",
@@ -576,6 +578,7 @@ def appendAnnToFileWithMap(fPath,m,desiredKeys=None,defaultValue="None"):
 		"vdj_server_ann_kabat_FR1_nonsynonymous_bsb",
 		"vdj_server_ann_kabat_FR1_ns_rto",
 		"vdj_server_ann_kabat_FR1_pct_id",
+		"vdj_server_ann_kabat_FR1_stp_cdn",
 		"vdj_server_ann_kabat_FR1_qry_aln",
 		"vdj_server_ann_kabat_FR1_qry_end",
 		"vdj_server_ann_kabat_FR1_qry_srt",
@@ -590,6 +593,7 @@ def appendAnnToFileWithMap(fPath,m,desiredKeys=None,defaultValue="None"):
 		"vdj_server_ann_kabat_FR2_nonsynonymous_bsb",
 		"vdj_server_ann_kabat_FR2_ns_rto",
 		"vdj_server_ann_kabat_FR2_pct_id",
+		"vdj_server_ann_kabat_FR2_stp_cdn",
 		"vdj_server_ann_kabat_FR2_qry_aln",
 		"vdj_server_ann_kabat_FR2_qry_end",
 		"vdj_server_ann_kabat_FR2_qry_srt",
@@ -604,6 +608,7 @@ def appendAnnToFileWithMap(fPath,m,desiredKeys=None,defaultValue="None"):
 		"vdj_server_ann_kabat_FR3_nonsynonymous_bsb",
 		"vdj_server_ann_kabat_FR3_ns_rto",
 		"vdj_server_ann_kabat_FR3_pct_id",
+		"vdj_server_ann_kabat_FR3_stp_cdn",
 		"vdj_server_ann_kabat_FR3_qry_aln",
 		"vdj_server_ann_kabat_FR3_qry_end",
 		"vdj_server_ann_kabat_FR3_qry_srt",
@@ -617,15 +622,18 @@ def appendAnnToFileWithMap(fPath,m,desiredKeys=None,defaultValue="None"):
 		"vdj_server_ann_whole_seq_nonsynonymous_bsb",
 		"vdj_server_ann_whole_seq_ns_rto",
 		"vdj_server_ann_whole_seq_pct_id",
+		"vdj_server_ann_whole_seq_stp_cdn",
 		"vdj_server_ann_whole_seq_synonymous_bsb"
 	]
-	fHandle=open(fPath,'a')
-	for k in range(len(keys)):
-		if(k<len(keys)-1):
-			fHandle.write(keys[k]+"\t")
-		else:
-			fHandle.write(keys[k])
-	fHandle.write("\n")
+	m['read_id#']=rid
+	#fHandle=open(fPath,'a')
+	if(rid==1):
+		for k in range(len(keys)):
+			if(k<len(keys)-1):
+				fHandle.write(keys[k]+"\t")
+			else:
+				fHandle.write(keys[k])
+		fHandle.write("\n")
 	for k in range(len(keys)):
 		if(k<len(keys)-1):
 			sep="\t"
@@ -636,7 +644,7 @@ def appendAnnToFileWithMap(fPath,m,desiredKeys=None,defaultValue="None"):
 		else:
 			fHandle.write(defaultValue+sep)
 	fHandle.write("\n")
-	fHandle.close()
+
 		
 		
 
@@ -664,6 +672,7 @@ if (__name__=="__main__"):
 		print "to write vdjml to ",args.vdjml_out
 		rrw = vdjml.Vdjml_writer(str(args.vdjml_out[0]), meta)
 		rep_char_out=args.char_out[0]
+		fHandle=open(rep_char_out,'w')
 		for read_result_obj in scanOutputToVDJML(args.igblast_in[0],fact,query_fasta):
 			#prepare for the iteration and give a possible status message...
 			if(read_num>1 and read_num%1000==0):
@@ -693,10 +702,13 @@ if (__name__=="__main__"):
 			rrw(read_result_obj)
 
 			#write rep-char
-			appendAnnToFileWithMap(rep_char_out,read_analysis_results['ann_map'])
+			appendAnnToFileWithMap(fHandle,read_analysis_results['ann_map'],read_num)
 
 			#increment the read number
 			read_num+=1
+
+		#close rep_char out
+		fHandle.close()
 
 		#write the CDR3 hist when non-dev-null
 		if(type(cdr3_hist_out_file)==list):
