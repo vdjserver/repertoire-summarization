@@ -1,9 +1,73 @@
 #!/usr/bin/env python
 
 from pprint import pprint
-from utils import printMap
+from utils import printMap,repStr
 from segment_utils import getNAProductiveRearrangmentFlagFromVJHitLineData,getRegionAlignmentFromLargerVAlignment
+from vdjml_igblast_parse import extractJunctionRegionSeq
 from igblast_utils import buildAlignmentWholeSeqs
+from alignment import alignment
+
+def getAlignmentString(read_result_obj,meta,query_record=None,imgtdb_obj=None,organism=None):
+	topVDJ=getTopVDJItems(read_result_obj,meta)
+	topVAllele=topVDJ['V']
+	if(topVAllele is not None):
+		vMap=getHitInfo(read_result_obj,meta,topVDJ['V'],query_record,imgtdb_obj,organism)
+		junction_names=['vd_junction','dj_junction','vj_junction']
+		junction_regions=dict()
+		junction_seqs=dict()
+		junction_alns=dict()
+		all_dict=dict()
+		all_dict['V']=topVDJ['V']
+		for j in range(len(junction_names)):
+			junction_regions[junction_names[j]]=getJunctionRegionByname(read_result_obj,meta,junction_names[j])
+			if(not(junction_regions[junction_names[j]]==None)):
+				junction_seqs[junction_names[j]]=extractJunctionRegionSeq(junction_regions[junction_names[j]],query_record)
+				junction_alns[junction_names[j]]=makeJuncAlignmentObjFromJuncRegion(junction_regions[junction_names[j]],junction_seqs[junction_names[j]])
+			else:
+				junction_seqs[junction_names[j]]=None
+				junction_alns[junction_names[j]]=None
+			all_dict[junction_names[j]]=junction_seqs[junction_names[j]]
+		all_dict['D']=topVDJ['D']
+		all_dict['J']=topVDJ['J']
+		print "ALL_DICT",all_dict
+	else:
+		return ""
+
+
+
+#given a junction pyObject and the sequence return an alignment object
+def makeJuncAlignmentObjFromJuncRegion(jregObj,jseq):
+	rgn_start=jregObj.range_.pos_1() 
+	rgn_end=rgn_start+jregObj.range_.length()-1
+	q_aln=jseq
+	s_aln=repStr("-",rgn_end-rgn_start+1)
+	q_start=rgn_start
+	q_end=rgn_end
+	s_start=q_start
+	s_end=q_end
+	return alignment(q_aln,s_aln,q_start,q_end,s_start,s_end)
+
+
+#given a read object and junction name extract the junction region from the identified combination ID
+def getJunctionRegionByname(read_result_obj,meta,junc_name,combID=0):
+	#print "Trying to get junction region by name ",junc_name
+	segment_combinations=read_result_obj.segment_combinations()
+	if(len(segment_combinations)==0):
+		return None
+		#print "no combo so returning none...."
+	else:
+		if(combID>=len(segment_combinations)):
+			return None
+		segment_combo=segment_combinations[combID]
+		regions=segment_combo.regions()
+		for region in regions:
+			rgn_nm=meta[region.region_]
+			if(rgn_nm==junc_name):
+				return region
+		return None
+
+	
+
 
 #given a read object, meta object, and an allele name
 #known to ALREADY HIT to the read, find the following info
@@ -163,11 +227,16 @@ def getTopVDJItems(read_result_obj,meta):
 			segment_match = read_result_obj[i]
 			#print "got a segment match, id=",i," from combination # ",str(int(s+1))
 			seg_type=segTypes[seg_id]
+			#seg_type=segment_match.vdj
+			#seg_type=segment_match.vdj_
 			#print "the seg type is ",seg_type
 			for gls_match in segment_match.germline_segments():
+				#seg_type=gls_match.segment_type_
 				#print "in inner most loop...."
 				#print "gls_match=",gls_match
 				#print meta[gls_match.gl_segment_].name_
+				type_from_meta=meta[gls_match.gl_segment_].gst_
+				print "META_TYPE",
 				if(names[seg_type]==None):
 					#print "USING ",meta[gls_match.gl_segment_].name_
 					names[seg_type]=meta[gls_match.gl_segment_].name_
