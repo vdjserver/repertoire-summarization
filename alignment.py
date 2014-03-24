@@ -281,8 +281,10 @@ class alignment:
 		char_map['mutations']=num_bsb+num_del+num_ins
 		if(len(self.q_aln)==0):
 			char_map['bsb_freq']=0
-		else:
+		elif(getNumberBpInAlnStr(self.q_aln)!=0):
 			char_map['bsb_freq']=float(num_bsb)/float(getNumberBpInAlnStr(self.q_aln))
+		else:
+			char_map['bsb_freq']=float(0.0)
 		if(len(self.s_aln)>0 and len(self.q_aln)>0):
 			mlen=min(getNumberBpInAlnStr(self.q_aln),getNumberBpInAlnStr(self.s_aln))
 			if(mlen!=0):
