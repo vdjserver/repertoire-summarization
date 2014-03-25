@@ -267,7 +267,37 @@ class histoMapClass:
 
 	#write as STREAM JSON
 	def JSONIFYStreamAsString(self):
-		return ""
+		self.modes.sort()
+		mode_stream_list=list()
+		for mode in self.modes:
+			#print "Now JSONIFying for MODE=",mode
+			values_list=list()
+			min_val=self.gminVal()
+			max_val=self.gmaxVal()
+			#print "min and max are ",min_val,max_val
+			round_num=0
+			if((type(min_val)!=int) or (type(max_val)!=int)):
+				min_val=(-1)
+				max_val=(-1)
+				print "Warning, could not determine min/max values for CDR3 lengths!  Output may not be defined!"			
+			x_y_vals_array=list()
+			for v in range(min(min_val,max_val),max(min_val,max_val)+1):
+				x_y_str=""
+				x_y_str+="\"x\": "+str(v)
+				x_y_str+=","
+				actual_val=0
+				if(v in self.count_map[mode]):
+					actual_val=self.count_map[mode][v]
+				x_y_str+="\"y\": "+str(actual_val)
+				x_y_vals_array.append(x_y_str)
+			obj_sep="}\n,\n{"
+			x_y_vals_array_str=obj_sep.join(x_y_vals_array)
+			stream_str="{\n\"key\":\""+str(mode)+"\",\n"
+			stream_str+="\"values\": [ \n{"+x_y_vals_array_str+"}\n]\n}"
+			mode_stream_list.append(stream_str)
+		stream_sep=","
+		JSON="["+stream_sep.join(mode_stream_list)+"]"
+		return JSON
 #The sample data is 
 #[
 # {
@@ -421,7 +451,8 @@ if (__name__=="__main__"):
 			temp_hist.read_from_file(infile)
 			main_hist.merge(temp_hist)
 		if(args.j):
-			print "GOT LAYER!"
+			#print "GOT LAYER!"
+			print main_hist.JSONIFYStreamAsString()
 		else:
 			main_hist.writeToFile("/dev/stdout")
 	else:
