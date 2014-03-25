@@ -599,7 +599,8 @@ def getCDR3EndFromJData(allele,imgtdb_obj,org="human"):
 					if(reg_start<=c_end and c_end<=reg_end):
 						#this is it!
 						#os.remove(tmp_file_path)
-						return c_end
+						#subtract 3 becuase we want to ignore the TRP or PHE residue and look at the residue immediately preceding
+						return c_end-3
 	else:
 		print "failed to get a start!"
 	#os.remove(tmp_file_path)
