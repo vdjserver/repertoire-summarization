@@ -194,25 +194,25 @@ def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism):
 			#print "jAlnObj"
 			#print jAlnObj.getNiceString()
 			if(J_cdr3_end==(-1)):
-				#postCDR3AlnStart=jInfo['s. start']
-				#print "JCDR3 end detected to be (-1) so setting new cdr3 post start as ",postCDR3AlnStart
+				#could not detect CDR3 end! so just return V map data
 				return preCDR3Aln.characterize()
 			elif(jAlnObj.q_end<=preCDR3Aln.q_start or jAlnObj.q_end<=preCDR3Aln.q_end):
+				#j alignment within V so just return V ; avoid double countings
 				return preCDR3Aln.characterize()
 			else:
 				postCDR3AlnStart=J_cdr3_end+1
-				#print "Normal course for post cdr3 start.  it is set as ",postCDR3AlnStart
+				#okay, got J alignment post-CDR3 position
 			if(postCDR3AlnStart>jAlnObj.s_end):
 				#CDR3 start is after the s_aln end which means J aligns only in CDR3, ....so just return V map
 				return preCDR3Aln.characterize()
+			#extract the subalignment at CDR3 end
 			postCDR3AlnObj=jAlnObj.getAlnAtAndCond(postCDR3AlnStart,"subject","geq")
-			#print "Initial postCDR3AlnObj is "
-			#print postCDR3AlnObj.getNiceString()
 			if(postCDR3AlnObj.q_start<=preCDR3Aln.q_end):
 				#this is in case V and J overlap in the CDR3 area alignment
 				new_q_start=preCDR3Aln.q_end+1
 				#print "It is deteced that this is in case V and J overlap in the CDR3 area alignment"
 				#print "new q_start is ",new_q_start
+				#adjust the J sub-alignment to start after the V ends
 				postCDR3AlnObj=jAlnObj.getAlnAtAndCond(new_q_start,"query","geq")
 			if(postCDR3AlnObj.s_start==postCDR3AlnStart):
 				#great, set the FRAME mask to start with zero cause the alignment starts where it ideally should start
@@ -220,7 +220,7 @@ def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism):
 				postCDR3AlnObj.setSFM(0)
 			elif(postCDR3AlnStart<postCDR3AlnObj.s_start):
 				#if the alignment starts later, set the proper frame mask start
-				print "postCDR3AlnStart=",postCDR3AlnStart," and postCDR3AlnObj.s_start=",postCDR3AlnObj.s_start," so settginf SFM as ",str(int(int(postCDR3AlnObj.s_start-postCDR3AlnStart)%3))
+				print "postCDR3AlnStart=",postCDR3AlnStart," and postCDR3AlnObj.s_start=",postCDR3AlnObj.s_start," so setting SFM as ",str(int(int(postCDR3AlnObj.s_start-postCDR3AlnStart)%3))
 				postCDR3AlnObj.setSFM((postCDR3AlnObj.s_start-postCDR3AlnStart)%3)
 			else:
 				#postCDR3AlnStart>=postCDR3AlnObj.s_start ?????
@@ -252,6 +252,8 @@ def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism):
 			for k in vCharMap:
 				if(not(k in toSkip)):
 					totCharMap[k]=vCharMap[k]+jCharMap[k]
+			if(vCharMap['stp_cdn'] or jCharMap['stp_cdn']):
+				totCharMap['stp_cdn']=True
 			#handle pct id and bsb_freq specially
 			totQ=getNumberBpInAlnStr(postCDR3AlnObj.q_aln)+getNumberBpInAlnStr(preCDR3Aln.q_aln)
 			totBS=totCharMap['base_sub']
