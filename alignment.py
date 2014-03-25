@@ -19,8 +19,8 @@ class alignment:
 
 	#constructor
 	def __init__(self,Cq_aln,Cs_aln,Cq_start=None,Cq_end=None,Cs_start=None,Cs_end=None,Cs_frame_mask=None):
-		self.s_aln=Cs_aln
-		self.q_aln=Cq_aln
+		self.s_aln=Cs_aln.upper()
+		self.q_aln=Cq_aln.upper()
 		self.s_start=Cs_start
 		self.s_end=Cs_end
 		self.q_start=Cq_start
