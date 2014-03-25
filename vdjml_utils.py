@@ -106,7 +106,7 @@ def getHitInfo(read_result_obj,meta,alleleName,query_record=None,imgtdb_obj=None
 					btop=str(segment_match.btop())
 					ret_map['btop']=str(btop)
 					ret_map['subject ids']=alleleName
-					ret_map['is_inverted']=gls_match.is_inverted()
+					ret_map['is_inverted']=gls_match.inverted()
 					ret_map['query id']=read_result_obj.id()
 					if(ret_map['is_inverted']):
 						ret_map['query id']="reversed|"+read_result_obj.id()
@@ -235,8 +235,8 @@ def getTopVDJItems(read_result_obj,meta):
 				#print "in inner most loop...."
 				#print "gls_match=",gls_match
 				#print meta[gls_match.gl_segment_].name_
-				type_from_meta=meta[gls_match.gl_segment_].gst_
-				print "META_TYPE",
+				#type_from_meta=meta[gls_match.gl_segment_].gst_
+				#print "META_TYPE",
 				if(names[seg_type]==None):
 					#print "USING ",meta[gls_match.gl_segment_].name_
 					names[seg_type]=meta[gls_match.gl_segment_].name_
@@ -245,6 +245,7 @@ def getTopVDJItems(read_result_obj,meta):
 					pass
 			seg_id+=1
 		#print "\n\n\n\n\n"
+	#print "Returning from TOP : "
 	#printMap(names)
 	return names
 	
