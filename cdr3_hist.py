@@ -183,26 +183,26 @@ class histoMapClass:
 		line_num=1
 		try:
 			reader=open(infile,'r')
-			modes=list()
+			self.modes=list()
 			for line in reader:
 				line=line.strip()
 				line_pieces=line.split('\t')
 				#print "got line=",line," and line_pieces=",line_pieces
 				if(line_num==1 and len(line_pieces)>=2):
 					for m in range(1,len(line_pieces)):
-						modes.append(line_pieces[m].strip())
+						self.modes.append(line_pieces[m].strip())
 				elif(line_num==1 and len(line_pieces)<2):
 					raise Exception('Error, invalid header in histogram file '+str(infile))
-				elif(len(line_pieces)==len(modes)+1):
+				elif(len(line_pieces)==len(self.modes)+1):
 					#got data!
 					for lp in line_pieces:
 						if(not(self.appearsAsInt(lp))):
 							raise Exception("Error, data ",lp," on line # ",line_num," appears as non-integral!  Integer values are expected!")
 					val=line_pieces[0]
-					for m in range(0,len(modes)):
-						#print "for val=",val," and mode=",modes[m]," need to inc count ",line_pieces[m+1]
+					for m in range(0,len(self.modes)):
+						#print "for val=",val," and mode=",self.modes[m]," need to inc count ",line_pieces[m+1]
 						for i in range(int(line_pieces[m+1])):
-							mode=modes[m]
+							mode=self.modes[m]
 							#print "calling inc with mode=",mode," val=",val
 							self.inc(mode,val)
 				else:
@@ -264,6 +264,29 @@ class histoMapClass:
 			for val in self.count_map[mode]:
 				print val,"\t",self.count_map[mode][val]
 
+
+	#write as STREAM JSON
+	def JSONIFYStreamAsString(self):
+		return ""
+#The sample data is 
+#[
+# {
+#  "key": "KABAT",
+#  "values": [
+#   {
+#    "x": 0,
+#    "y": 0.14202716750712038
+#   },
+#   {
+#    "x": 1,
+#    "y": 0.17686738381528422
+#   },
+#   {
+#    "x": 2,
+#    "y": 0.2520439938176909
+#   },
+
+
 	#write a basic histogram to a file!
 	def writeToFile(self,ofile):
 		writer=open(ofile,'w')
@@ -275,6 +298,7 @@ class histoMapClass:
 			min_val=(-1)
 			max_val=(-1)
 			print "Warning, could not determine min/max values for CDR3 lengths!  Output may not be defined!"
+		self.modes.sort()
 		for v in range(min(min_val,max_val),max(min_val,max_val)+1):
 			if(round_num==0):
 				writer.write("CDR3_LENGTH")
@@ -384,6 +408,7 @@ def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
 if (__name__=="__main__"):
 	parser=argparse.ArgumentParser(description='Merge multiple CDR3 length histograms into a single histogram.  Write the merged result to stdout')
 	parser.add_argument('cdr3_hist_in',type=str,nargs='+',help="path(s) to CDR3 histograms to merge.  At least one is requried!")
+	parser.add_argument('-j', action='store_true',help="Write the output as a 'stream-layer' formatted JSON string")
 	args=parser.parse_args()
 	if(args):
 		#print "in args"
@@ -395,7 +420,10 @@ if (__name__=="__main__"):
 			temp_hist=histoMapClass(get_domain_modes())
 			temp_hist.read_from_file(infile)
 			main_hist.merge(temp_hist)
-		main_hist.writeToFile("/dev/stdout")
+		if(args.j):
+			print "GOT LAYER!"
+		else:
+			main_hist.writeToFile("/dev/stdout")
 	else:
 		parser.print_help()
 
