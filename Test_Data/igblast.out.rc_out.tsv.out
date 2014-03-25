@@ -1,0 +1,4940 @@
+to write vdjml to  ['igblast.out.rc.vdjml']
+Processing reads...
+in second loop....
+seg= J
+in second loop....
+seg= D
+in second loop....
+seg= V
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : V  and codon  GTG
+query amino  V  and codon  GTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTA
+query amino  L  and codon  CTA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGC
+query amino  G  and codon  GGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : A  and codon  GCA
+query amino  A  and codon  GCA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGA
+query amino  G  and codon  GGA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  TTG
+query amino  L  and codon  TTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : P  and codon  CCT
+query amino  P  and codon  CCT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCG
+query amino  S  and codon  TCG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : E  and codon  GAG
+query amino  E  and codon  GAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTC
+query amino  L  and codon  CTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : C  and codon  TGC
+query amino  C  and codon  TGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : A  and codon  GCT
+query amino  A  and codon  GCT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : V  and codon  GTC
+query amino  V  and codon  GTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Y  and codon  TAT
+query amino  Y  and codon  TAT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGT
+query amino  G  and codon  GGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGG
+query amino  G  and codon  GGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : F  and codon  TTC
+query amino  F  and codon  TTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGT
+query amino  S  and codon  AGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGT
+query amino  G  and codon  GGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Y  and codon  TAC
+query amino  Y  and codon  TAC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Y  and codon  TAC
+query amino  Y  and codon  TAC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGC
+query amino  S  and codon  AGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : I  and codon  ATC
+query amino  I  and codon  ATC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : R  and codon  CGC
+query amino  R  and codon  CGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : P  and codon  CCC
+query amino  P  and codon  CCC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : P  and codon  CCA
+query amino  P  and codon  CCA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGG
+query amino  G  and codon  GGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  Q  and codon  CAA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : G  and codon  GGG
+query amino  G  and codon  GGG
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  A  and codon  GCT
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  5
+Detected no gaps in codons
+subject amino : E  and codon  GAG
+query amino  E  and codon  GAG
+PRE SN counts :  0  and  5
+POST SN counts :  0  and  5
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  0  and  5
+POST SN counts :  0  and  5
+Detected no gaps in codons
+subject amino : I  and codon  ATT
+query amino  I  and codon  ATT
+PRE SN counts :  0  and  5
+POST SN counts :  0  and  5
+Detected no gaps in codons
+subject amino : G  and codon  GGG
+query amino  G  and codon  GGG
+PRE SN counts :  0  and  5
+POST SN counts :  0  and  5
+Detected no gaps in codons
+subject amino : E  and codon  GAA
+query amino  E  and codon  GAA
+PRE SN counts :  0  and  5
+POST SN counts :  0  and  5
+Detected no gaps in codons
+subject amino : I  and codon  ATC
+query amino  I  and codon  ATC
+PRE SN counts :  0  and  5
+POST SN counts :  0  and  5
+Detected no gaps in codons
+subject amino : N  and codon  AAT
+query amino  N  and codon  AAT
+PRE SN counts :  0  and  5
+POST SN counts :  0  and  5
+Detected no gaps in codons
+subject amino : H  and codon  CAT
+query amino  H  and codon  CAT
+PRE SN counts :  0  and  5
+POST SN counts :  0  and  5
+Detected no gaps in codons
+subject amino : S  and codon  AGT
+query amino  S  and codon  AGT
+PRE SN counts :  0  and  5
+POST SN counts :  0  and  5
+Detected no gaps in codons
+subject amino : G  and codon  GGA
+query amino  G  and codon  GGA
+PRE SN counts :  0  and  5
+POST SN counts :  0  and  5
+Detected no gaps in codons
+subject amino : S  and codon  AGC
+query amino  S  and codon  AGC
+PRE SN counts :  0  and  5
+POST SN counts :  0  and  5
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  5
+POST SN counts :  0  and  5
+Detected no gaps in codons
+subject amino : N  and codon  AAC
+query amino  N  and codon  AAC
+PRE SN counts :  0  and  5
+POST SN counts :  0  and  5
+Detected no gaps in codons
+subject amino : Y  and codon  TAC
+query amino  Y  and codon  TAC
+PRE SN counts :  0  and  5
+POST SN counts :  0  and  5
+Detected no gaps in codons
+subject amino : N  and codon  AAC
+query amino  N  and codon  AAC
+PRE SN counts :  0  and  5
+POST SN counts :  0  and  5
+Detected no gaps in codons
+subject amino : P  and codon  CCG
+query amino  P  and codon  CCG
+PRE SN counts :  0  and  5
+POST SN counts :  0  and  5
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  5
+POST SN counts :  0  and  5
+Detected no gaps in codons
+subject amino : L  and codon  CTC
+query amino  L  and codon  CTC
+PRE SN counts :  0  and  5
+POST SN counts :  0  and  5
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  0  and  5
+POST SN counts :  0  and  5
+Detected no gaps in codons
+subject amino : S  and codon  AGT
+query amino  S  and codon  AGT
+PRE SN counts :  0  and  5
+POST SN counts :  0  and  5
+Detected no gaps in codons
+subject amino : R  and codon  CGA
+query amino  R  and codon  CGA
+PRE SN counts :  0  and  5
+POST SN counts :  0  and  5
+Detected no gaps in codons
+subject amino : V  and codon  GTC
+query amino  V  and codon  GTC
+PRE SN counts :  0  and  5
+POST SN counts :  0  and  5
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  5
+POST SN counts :  0  and  5
+Detected no gaps in codons
+subject amino : I  and codon  ATA
+query amino  I  and codon  ATA
+PRE SN counts :  0  and  5
+POST SN counts :  0  and  5
+Detected no gaps in codons
+subject amino : S  and codon  TCA
+query amino  S  and codon  TCA
+PRE SN counts :  0  and  5
+POST SN counts :  0  and  5
+Detected no gaps in codons
+subject amino : V  and codon  GTA
+query amino  V  and codon  GTA
+PRE SN counts :  0  and  5
+POST SN counts :  0  and  5
+Detected no gaps in codons
+subject amino : D  and codon  GAC
+query amino  G  and codon  GGC
+PRE SN counts :  0  and  5
+POST SN counts :  0  and  6
+Detected no gaps in codons
+subject amino : T  and codon  ACG
+query amino  T  and codon  ACG
+PRE SN counts :  0  and  6
+POST SN counts :  0  and  6
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  6
+POST SN counts :  0  and  6
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  0  and  6
+POST SN counts :  0  and  6
+Detected no gaps in codons
+subject amino : N  and codon  AAC
+query amino  N  and codon  AAC
+PRE SN counts :  0  and  6
+POST SN counts :  0  and  6
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  6
+POST SN counts :  0  and  6
+Detected no gaps in codons
+subject amino : F  and codon  TTC
+query amino  F  and codon  TTC
+PRE SN counts :  0  and  6
+POST SN counts :  0  and  6
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  6
+POST SN counts :  0  and  6
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  0  and  6
+POST SN counts :  0  and  6
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  0  and  6
+POST SN counts :  0  and  6
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  0  and  6
+POST SN counts :  0  and  6
+Detected no gaps in codons
+subject amino : S  and codon  AGC
+query amino  S  and codon  AGC
+PRE SN counts :  0  and  6
+POST SN counts :  0  and  6
+Detected no gaps in codons
+subject amino : S  and codon  TCT
+query amino  S  and codon  TCT
+PRE SN counts :  0  and  6
+POST SN counts :  0  and  6
+Detected no gaps in codons
+subject amino : V  and codon  GTG
+query amino  V  and codon  GTG
+PRE SN counts :  0  and  6
+POST SN counts :  0  and  6
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  6
+POST SN counts :  0  and  6
+Detected no gaps in codons
+subject amino : A  and codon  GCC
+query amino  A  and codon  GCC
+PRE SN counts :  0  and  6
+POST SN counts :  0  and  6
+Detected no gaps in codons
+subject amino : A  and codon  GCG
+query amino  A  and codon  GCG
+PRE SN counts :  0  and  6
+POST SN counts :  0  and  6
+Detected no gaps in codons
+subject amino : D  and codon  GAC
+query amino  D  and codon  GAC
+PRE SN counts :  0  and  6
+POST SN counts :  0  and  6
+Detected no gaps in codons
+subject amino : T  and codon  ACG
+query amino  T  and codon  ACG
+PRE SN counts :  0  and  6
+POST SN counts :  0  and  6
+Detected no gaps in codons
+subject amino : A  and codon  GCT
+query amino  A  and codon  GCT
+PRE SN counts :  0  and  6
+POST SN counts :  0  and  6
+Detected no gaps in codons
+subject amino : V  and codon  GTG
+query amino  V  and codon  GTG
+PRE SN counts :  0  and  6
+POST SN counts :  0  and  6
+Detected no gaps in codons
+subject amino : Y  and codon  TAT
+query amino  Y  and codon  TAT
+PRE SN counts :  0  and  6
+POST SN counts :  0  and  6
+Detected no gaps in codons
+subject amino : Y  and codon  TAC
+query amino  Y  and codon  TAC
+PRE SN counts :  0  and  6
+POST SN counts :  0  and  6
+Detected no gaps in codons
+subject amino : C  and codon  TGT
+query amino  C  and codon  TGT
+PRE SN counts :  0  and  6
+POST SN counts :  0  and  6
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGC
+query amino  G  and codon  GGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGA
+query amino  G  and codon  GGA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : V  and codon  GTC
+query amino  V  and codon  GTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : V  and codon  GTC
+query amino  V  and codon  GTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCA
+query amino  S  and codon  TCA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : V  and codon  GTG
+query amino  V  and codon  GTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTA
+query amino  L  and codon  CTA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGC
+query amino  G  and codon  GGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : A  and codon  GCA
+query amino  A  and codon  GCA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGA
+query amino  G  and codon  GGA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  TTG
+query amino  L  and codon  TTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : P  and codon  CCT
+query amino  P  and codon  CCT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCG
+query amino  S  and codon  TCG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : E  and codon  GAG
+query amino  E  and codon  GAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTC
+query amino  L  and codon  CTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : C  and codon  TGC
+query amino  C  and codon  TGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : A  and codon  GCT
+query amino  A  and codon  GCT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : V  and codon  GTC
+query amino  V  and codon  GTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Y  and codon  TAT
+query amino  Y  and codon  TAT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGT
+query amino  G  and codon  GGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGG
+query amino  G  and codon  GGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : F  and codon  TTC
+query amino  F  and codon  TTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGT
+query amino  S  and codon  AGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGT
+query amino  G  and codon  GGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Y  and codon  TAC
+query amino  Y  and codon  TAC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Y  and codon  TAC
+query amino  Y  and codon  TAC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGC
+query amino  S  and codon  AGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : I  and codon  ATC
+query amino  I  and codon  ATC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : R  and codon  CGC
+query amino  R  and codon  CGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : P  and codon  CCC
+query amino  P  and codon  CCC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : P  and codon  CCA
+query amino  P  and codon  CCA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGG
+query amino  G  and codon  GGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  Q  and codon  CAA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : G  and codon  GGG
+query amino  G  and codon  GGG
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  A  and codon  GCT
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  5
+Detected no gaps in codons
+subject amino : E  and codon  GAG
+query amino  E  and codon  GAG
+PRE SN counts :  0  and  5
+POST SN counts :  0  and  5
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  0  and  5
+POST SN counts :  0  and  5
+Detected no gaps in codons
+subject amino : I  and codon  ATT
+query amino  I  and codon  ATT
+PRE SN counts :  0  and  5
+POST SN counts :  0  and  5
+Detected no gaps in codons
+subject amino : G  and codon  GGG
+query amino  G  and codon  GGG
+PRE SN counts :  0  and  5
+POST SN counts :  0  and  5
+Detected no gaps in codons
+subject amino : E  and codon  GAA
+query amino  E  and codon  GAA
+PRE SN counts :  0  and  5
+POST SN counts :  0  and  5
+Detected no gaps in codons
+subject amino : I  and codon  ATC
+query amino  I  and codon  ATC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : N  and codon  AAT
+query amino  N  and codon  AAT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : H  and codon  CAT
+query amino  H  and codon  CAT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGT
+query amino  S  and codon  AGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGA
+query amino  G  and codon  GGA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGC
+query amino  S  and codon  AGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : N  and codon  AAC
+query amino  N  and codon  AAC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Y  and codon  TAC
+query amino  Y  and codon  TAC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : N  and codon  AAC
+query amino  N  and codon  AAC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : P  and codon  CCG
+query amino  P  and codon  CCG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTC
+query amino  L  and codon  CTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGT
+query amino  S  and codon  AGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : R  and codon  CGA
+query amino  R  and codon  CGA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : V  and codon  GTC
+query amino  V  and codon  GTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : I  and codon  ATA
+query amino  I  and codon  ATA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCA
+query amino  S  and codon  TCA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : V  and codon  GTA
+query amino  V  and codon  GTA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : D  and codon  GAC
+query amino  G  and codon  GGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : T  and codon  ACG
+query amino  T  and codon  ACG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : N  and codon  AAC
+query amino  N  and codon  AAC
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : F  and codon  TTC
+query amino  F  and codon  TTC
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : S  and codon  AGC
+query amino  S  and codon  AGC
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : S  and codon  TCT
+query amino  S  and codon  TCT
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : V  and codon  GTG
+query amino  V  and codon  GTG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : A  and codon  GCC
+query amino  A  and codon  GCC
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : A  and codon  GCG
+query amino  A  and codon  GCG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : D  and codon  GAC
+query amino  D  and codon  GAC
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : T  and codon  ACG
+query amino  T  and codon  ACG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : A  and codon  GCT
+query amino  A  and codon  GCT
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : V  and codon  GTG
+query amino  V  and codon  GTG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : Y  and codon  TAT
+query amino  Y  and codon  TAT
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : Y  and codon  TAC
+query amino  Y  and codon  TAC
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : C  and codon  TGT
+query amino  C  and codon  TGT
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : V  and codon  GTG
+query amino  V  and codon  GTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTA
+query amino  L  and codon  CTA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGC
+query amino  G  and codon  GGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : A  and codon  GCA
+query amino  A  and codon  GCA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGA
+query amino  G  and codon  GGA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  TTG
+query amino  L  and codon  TTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : P  and codon  CCT
+query amino  P  and codon  CCT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCG
+query amino  S  and codon  TCG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : E  and codon  GAG
+query amino  E  and codon  GAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTC
+query amino  L  and codon  CTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : C  and codon  TGC
+query amino  C  and codon  TGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : A  and codon  GCT
+query amino  A  and codon  GCT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : V  and codon  GTC
+query amino  V  and codon  GTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Y  and codon  TAT
+query amino  Y  and codon  TAT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGT
+query amino  G  and codon  GGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGG
+query amino  G  and codon  GGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : F  and codon  TTC
+query amino  F  and codon  TTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGT
+query amino  S  and codon  AGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGT
+query amino  G  and codon  GGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Y  and codon  TAC
+query amino  Y  and codon  TAC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Y  and codon  TAC
+query amino  Y  and codon  TAC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGC
+query amino  S  and codon  AGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : I  and codon  ATC
+query amino  I  and codon  ATC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : R  and codon  CGC
+query amino  R  and codon  CGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : P  and codon  CCC
+query amino  P  and codon  CCC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : P  and codon  CCA
+query amino  P  and codon  CCA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGG
+query amino  G  and codon  GGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  Q  and codon  CAA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : G  and codon  GGG
+query amino  G  and codon  GGG
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  A  and codon  GCT
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  5
+Detected no gaps in codons
+subject amino : E  and codon  GAG
+query amino  E  and codon  GAG
+PRE SN counts :  0  and  5
+POST SN counts :  0  and  5
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  0  and  5
+POST SN counts :  0  and  5
+Detected no gaps in codons
+subject amino : I  and codon  ATT
+query amino  I  and codon  ATT
+PRE SN counts :  0  and  5
+POST SN counts :  0  and  5
+Detected no gaps in codons
+subject amino : G  and codon  GGG
+query amino  G  and codon  GGG
+PRE SN counts :  0  and  5
+POST SN counts :  0  and  5
+Detected no gaps in codons
+subject amino : E  and codon  GAA
+query amino  E  and codon  GAA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : I  and codon  ATC
+query amino  I  and codon  ATC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : N  and codon  AAT
+query amino  N  and codon  AAT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : H  and codon  CAT
+query amino  H  and codon  CAT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGT
+query amino  S  and codon  AGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGA
+query amino  G  and codon  GGA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGC
+query amino  S  and codon  AGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : N  and codon  AAC
+query amino  N  and codon  AAC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Y  and codon  TAC
+query amino  Y  and codon  TAC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : N  and codon  AAC
+query amino  N  and codon  AAC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : P  and codon  CCG
+query amino  P  and codon  CCG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTC
+query amino  L  and codon  CTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGT
+query amino  S  and codon  AGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : R  and codon  CGA
+query amino  R  and codon  CGA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : V  and codon  GTC
+query amino  V  and codon  GTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : I  and codon  ATA
+query amino  I  and codon  ATA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCA
+query amino  S  and codon  TCA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : V  and codon  GTA
+query amino  V  and codon  GTA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : D  and codon  GAC
+query amino  G  and codon  GGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : T  and codon  ACG
+query amino  T  and codon  ACG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : N  and codon  AAC
+query amino  N  and codon  AAC
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : F  and codon  TTC
+query amino  F  and codon  TTC
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : S  and codon  AGC
+query amino  S  and codon  AGC
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : S  and codon  TCT
+query amino  S  and codon  TCT
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : V  and codon  GTG
+query amino  V  and codon  GTG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : A  and codon  GCC
+query amino  A  and codon  GCC
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : A  and codon  GCG
+query amino  A  and codon  GCG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : D  and codon  GAC
+query amino  D  and codon  GAC
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : T  and codon  ACG
+query amino  T  and codon  ACG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : A  and codon  GCT
+query amino  A  and codon  GCT
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : V  and codon  GTG
+query amino  V  and codon  GTG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : Y  and codon  TAT
+query amino  Y  and codon  TAT
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : Y  and codon  TAC
+query amino  Y  and codon  TAC
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : C  and codon  TGT
+query amino  C  and codon  TGT
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : A  and codon  GCG
+query amino  A  and codon  GCG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : R  and codon  AGA
+query amino  R  and codon  AGA
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+ALL_DICT {'vd_junction': 'cagtaccggc', 'vj_junction': None, 'D': 'IGHD3-3*01', 'J': 'IGHJ4*02', 'dj_junction': 'tac', 'V': 'IGHV4-34*01'}
+#1 productive_rearrangement -> False
+#2 read_name -> AY671579.1
+#3 top_D -> IGHD3-3*01
+#4 top_J -> IGHJ4*02
+#5 top_V -> IGHV4-34*01
+#6 vdj_server_ann_imgt_CDR1_base_sub -> 0
+#7 vdj_server_ann_imgt_CDR1_bsb_freq -> 0.0
+#8 vdj_server_ann_imgt_CDR1_deletions -> 0
+#9 vdj_server_ann_imgt_CDR1_frm_msk -> [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2]
+#10 vdj_server_ann_imgt_CDR1_insertions -> 0
+#11 vdj_server_ann_imgt_CDR1_mutations -> 0
+#12 vdj_server_ann_imgt_CDR1_nonsynonymous_bsb -> 0
+#13 vdj_server_ann_imgt_CDR1_ns_rto -> 0
+#14 vdj_server_ann_imgt_CDR1_pct_id -> 1
+#15 vdj_server_ann_imgt_CDR1_qry_aln -> GGTGGGTCCTTCAGTGGTTACTAC
+#16 vdj_server_ann_imgt_CDR1_qry_end -> 101
+#17 vdj_server_ann_imgt_CDR1_qry_srt -> 78
+#18 vdj_server_ann_imgt_CDR1_ref_aln -> GGTGGGTCCTTCAGTGGTTACTAC
+#19 vdj_server_ann_imgt_CDR1_stp_cdn -> False
+#20 vdj_server_ann_imgt_CDR1_synonymous_bsb -> 0
+#21 vdj_server_ann_imgt_CDR2_base_sub -> 0
+#22 vdj_server_ann_imgt_CDR2_bsb_freq -> 0.0
+#23 vdj_server_ann_imgt_CDR2_deletions -> 0
+#24 vdj_server_ann_imgt_CDR2_frm_msk -> [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2]
+#25 vdj_server_ann_imgt_CDR2_insertions -> 0
+#26 vdj_server_ann_imgt_CDR2_mutations -> 0
+#27 vdj_server_ann_imgt_CDR2_nonsynonymous_bsb -> 0
+#28 vdj_server_ann_imgt_CDR2_ns_rto -> 0
+#29 vdj_server_ann_imgt_CDR2_pct_id -> 1
+#30 vdj_server_ann_imgt_CDR2_qry_aln -> ATCAATCATAGTGGAAGCACC
+#31 vdj_server_ann_imgt_CDR2_qry_end -> 173
+#32 vdj_server_ann_imgt_CDR2_qry_srt -> 153
+#33 vdj_server_ann_imgt_CDR2_ref_aln -> ATCAATCATAGTGGAAGCACC
+#34 vdj_server_ann_imgt_CDR2_stp_cdn -> False
+#35 vdj_server_ann_imgt_CDR2_synonymous_bsb -> 0
+#36 vdj_server_ann_imgt_FR1_base_sub -> 0
+#37 vdj_server_ann_imgt_FR1_bsb_freq -> 0.0
+#38 vdj_server_ann_imgt_FR1_deletions -> 0
+#39 vdj_server_ann_imgt_FR1_frm_msk -> [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2]
+#40 vdj_server_ann_imgt_FR1_insertions -> 0
+#41 vdj_server_ann_imgt_FR1_mutations -> 0
+#42 vdj_server_ann_imgt_FR1_nonsynonymous_bsb -> 0
+#43 vdj_server_ann_imgt_FR1_ns_rto -> 0
+#44 vdj_server_ann_imgt_FR1_pct_id -> 1
+#45 vdj_server_ann_imgt_FR1_qry_aln -> CAGGTGCAGCTACAGCAGTGGGGCGCAGGACTGTTGAAGCCTTCGGAGACCCTGTCCCTCACCTGCGCTGTCTAT
+#46 vdj_server_ann_imgt_FR1_qry_end -> 77
+#47 vdj_server_ann_imgt_FR1_qry_srt -> 3
+#48 vdj_server_ann_imgt_FR1_ref_aln -> CAGGTGCAGCTACAGCAGTGGGGCGCAGGACTGTTGAAGCCTTCGGAGACCCTGTCCCTCACCTGCGCTGTCTAT
+#49 vdj_server_ann_imgt_FR1_stp_cdn -> False
+#50 vdj_server_ann_imgt_FR1_synonymous_bsb -> 0
+#51 vdj_server_ann_imgt_FR2_base_sub -> 5
+#52 vdj_server_ann_imgt_FR2_bsb_freq -> 0.0980392156863
+#53 vdj_server_ann_imgt_FR2_deletions -> 0
+#54 vdj_server_ann_imgt_FR2_frm_msk -> [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2]
+#55 vdj_server_ann_imgt_FR2_insertions -> 0
+#56 vdj_server_ann_imgt_FR2_mutations -> 5
+#57 vdj_server_ann_imgt_FR2_nonsynonymous_bsb -> 5
+#58 vdj_server_ann_imgt_FR2_ns_rto -> 0
+#59 vdj_server_ann_imgt_FR2_pct_id -> 0
+#60 vdj_server_ann_imgt_FR2_qry_aln -> TGGAGCTGGATCCGCCAGCCCCCAGGGCAAGGGGCTGAGTGGATTGGGGAA
+#61 vdj_server_ann_imgt_FR2_qry_end -> 152
+#62 vdj_server_ann_imgt_FR2_qry_srt -> 102
+#63 vdj_server_ann_imgt_FR2_ref_aln -> TGGAGCTGGATCCGCCAGCCCCCAGGGAAGGGGCTGGAGTGGATTGGGGAA
+#64 vdj_server_ann_imgt_FR2_stp_cdn -> False
+#65 vdj_server_ann_imgt_FR2_synonymous_bsb -> 0
+#66 vdj_server_ann_imgt_FR3_base_sub -> 1
+#67 vdj_server_ann_imgt_FR3_bsb_freq -> 0.00877192982456
+#68 vdj_server_ann_imgt_FR3_deletions -> 0
+#69 vdj_server_ann_imgt_FR3_frm_msk -> [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2]
+#70 vdj_server_ann_imgt_FR3_insertions -> 0
+#71 vdj_server_ann_imgt_FR3_mutations -> 1
+#72 vdj_server_ann_imgt_FR3_nonsynonymous_bsb -> 1
+#73 vdj_server_ann_imgt_FR3_ns_rto -> 0
+#74 vdj_server_ann_imgt_FR3_pct_id -> 0
+#75 vdj_server_ann_imgt_FR3_qry_aln -> AACTACAACCCGTCCCTCAAGAGTCGAGTCACCATATCAGTAGGCACGTCCAAGAACCAGTTCTCCCTGAAGCTGAGCTCTGTGACCGCCGCGGACACGGCTGTGTATTACTGT
+#76 vdj_server_ann_imgt_FR3_qry_end -> 287
+#77 vdj_server_ann_imgt_FR3_qry_srt -> 174
+#78 vdj_server_ann_imgt_FR3_ref_aln -> AACTACAACCCGTCCCTCAAGAGTCGAGTCACCATATCAGTAGACACGTCCAAGAACCAGTTCTCCCTGAAGCTGAGCTCTGTGACCGCCGCGGACACGGCTGTGTATTACTGT
+#79 vdj_server_ann_imgt_FR3_stp_cdn -> False
+#80 vdj_server_ann_imgt_FR3_synonymous_bsb -> 0
+#81 vdj_server_ann_imgt_cdr3_na -> gcgagaggcagtaccggccgatttttggagtggttattatactttgactac
+#82 vdj_server_ann_imgt_cdr3_tr -> ARGSTGRFLEWLLYFDY
+#83 vdj_server_ann_kabat_CDR1_base_sub -> 0
+#84 vdj_server_ann_kabat_CDR1_bsb_freq -> 0.0
+#85 vdj_server_ann_kabat_CDR1_deletions -> 0
+#86 vdj_server_ann_kabat_CDR1_frm_msk -> [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2]
+#87 vdj_server_ann_kabat_CDR1_insertions -> 0
+#88 vdj_server_ann_kabat_CDR1_mutations -> 0
+#89 vdj_server_ann_kabat_CDR1_nonsynonymous_bsb -> 0
+#90 vdj_server_ann_kabat_CDR1_ns_rto -> 0
+#91 vdj_server_ann_kabat_CDR1_pct_id -> 1
+#92 vdj_server_ann_kabat_CDR1_qry_aln -> GGTTACTACTGGAGC
+#93 vdj_server_ann_kabat_CDR1_qry_end -> 107
+#94 vdj_server_ann_kabat_CDR1_qry_srt -> 93
+#95 vdj_server_ann_kabat_CDR1_ref_aln -> GGTTACTACTGGAGC
+#96 vdj_server_ann_kabat_CDR1_stp_cdn -> False
+#97 vdj_server_ann_kabat_CDR1_synonymous_bsb -> 0
+#98 vdj_server_ann_kabat_CDR2_base_sub -> 0
+#99 vdj_server_ann_kabat_CDR2_bsb_freq -> 0.0
+#100 vdj_server_ann_kabat_CDR2_deletions -> 0
+#101 vdj_server_ann_kabat_CDR2_frm_msk -> [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2]
+#102 vdj_server_ann_kabat_CDR2_insertions -> 0
+#103 vdj_server_ann_kabat_CDR2_mutations -> 0
+#104 vdj_server_ann_kabat_CDR2_nonsynonymous_bsb -> 0
+#105 vdj_server_ann_kabat_CDR2_ns_rto -> 0
+#106 vdj_server_ann_kabat_CDR2_pct_id -> 1
+#107 vdj_server_ann_kabat_CDR2_qry_aln -> GAAATCAATCATAGTGGAAGCACCAACTACAACCCGTCCCTCAAGAGT
+#108 vdj_server_ann_kabat_CDR2_qry_end -> 197
+#109 vdj_server_ann_kabat_CDR2_qry_srt -> 150
+#110 vdj_server_ann_kabat_CDR2_ref_aln -> GAAATCAATCATAGTGGAAGCACCAACTACAACCCGTCCCTCAAGAGT
+#111 vdj_server_ann_kabat_CDR2_stp_cdn -> False
+#112 vdj_server_ann_kabat_CDR2_synonymous_bsb -> 0
+#113 vdj_server_ann_kabat_FR1_base_sub -> 0
+#114 vdj_server_ann_kabat_FR1_bsb_freq -> 0.0
+#115 vdj_server_ann_kabat_FR1_deletions -> 0
+#116 vdj_server_ann_kabat_FR1_frm_msk -> [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2]
+#117 vdj_server_ann_kabat_FR1_insertions -> 0
+#118 vdj_server_ann_kabat_FR1_mutations -> 0
+#119 vdj_server_ann_kabat_FR1_nonsynonymous_bsb -> 0
+#120 vdj_server_ann_kabat_FR1_ns_rto -> 0
+#121 vdj_server_ann_kabat_FR1_pct_id -> 1
+#122 vdj_server_ann_kabat_FR1_qry_aln -> CAGGTGCAGCTACAGCAGTGGGGCGCAGGACTGTTGAAGCCTTCGGAGACCCTGTCCCTCACCTGCGCTGTCTATGGTGGGTCCTTCAGT
+#123 vdj_server_ann_kabat_FR1_qry_end -> 92
+#124 vdj_server_ann_kabat_FR1_qry_srt -> 3
+#125 vdj_server_ann_kabat_FR1_ref_aln -> CAGGTGCAGCTACAGCAGTGGGGCGCAGGACTGTTGAAGCCTTCGGAGACCCTGTCCCTCACCTGCGCTGTCTATGGTGGGTCCTTCAGT
+#126 vdj_server_ann_kabat_FR1_stp_cdn -> False
+#127 vdj_server_ann_kabat_FR1_synonymous_bsb -> 0
+#128 vdj_server_ann_kabat_FR2_base_sub -> 5
+#129 vdj_server_ann_kabat_FR2_bsb_freq -> 0.119047619048
+#130 vdj_server_ann_kabat_FR2_deletions -> 0
+#131 vdj_server_ann_kabat_FR2_frm_msk -> [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2]
+#132 vdj_server_ann_kabat_FR2_insertions -> 0
+#133 vdj_server_ann_kabat_FR2_mutations -> 5
+#134 vdj_server_ann_kabat_FR2_nonsynonymous_bsb -> 5
+#135 vdj_server_ann_kabat_FR2_ns_rto -> 0
+#136 vdj_server_ann_kabat_FR2_pct_id -> 0
+#137 vdj_server_ann_kabat_FR2_qry_aln -> TGGATCCGCCAGCCCCCAGGGCAAGGGGCTGAGTGGATTGGG
+#138 vdj_server_ann_kabat_FR2_qry_end -> 149
+#139 vdj_server_ann_kabat_FR2_qry_srt -> 108
+#140 vdj_server_ann_kabat_FR2_ref_aln -> TGGATCCGCCAGCCCCCAGGGAAGGGGCTGGAGTGGATTGGG
+#141 vdj_server_ann_kabat_FR2_stp_cdn -> False
+#142 vdj_server_ann_kabat_FR2_synonymous_bsb -> 0
+#143 vdj_server_ann_kabat_FR3_base_sub -> 1
+#144 vdj_server_ann_kabat_FR3_bsb_freq -> 0.0104166666667
+#145 vdj_server_ann_kabat_FR3_deletions -> 0
+#146 vdj_server_ann_kabat_FR3_frm_msk -> [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2]
+#147 vdj_server_ann_kabat_FR3_insertions -> 0
+#148 vdj_server_ann_kabat_FR3_mutations -> 1
+#149 vdj_server_ann_kabat_FR3_nonsynonymous_bsb -> 1
+#150 vdj_server_ann_kabat_FR3_ns_rto -> 0
+#151 vdj_server_ann_kabat_FR3_pct_id -> 0
+#152 vdj_server_ann_kabat_FR3_qry_aln -> CGAGTCACCATATCAGTAGGCACGTCCAAGAACCAGTTCTCCCTGAAGCTGAGCTCTGTGACCGCCGCGGACACGGCTGTGTATTACTGTGCGAGA
+#153 vdj_server_ann_kabat_FR3_qry_end -> 293
+#154 vdj_server_ann_kabat_FR3_qry_srt -> 198
+#155 vdj_server_ann_kabat_FR3_ref_aln -> CGAGTCACCATATCAGTAGACACGTCCAAGAACCAGTTCTCCCTGAAGCTGAGCTCTGTGACCGCCGCGGACACGGCTGTGTATTACTGTGCGAGA
+#156 vdj_server_ann_kabat_FR3_stp_cdn -> False
+#157 vdj_server_ann_kabat_FR3_synonymous_bsb -> 0
+#158 vdj_server_ann_kabat_cdr3_na -> ggcagtaccggccgatttttggagtggttattatactttgactac
+#159 vdj_server_ann_kabat_cdr3_tr -> GSTGRFLEWLLYFDY
+#160 vdj_server_ann_whole_seq_base_sub -> 6
+#161 vdj_server_ann_whole_seq_bsb_freq -> 0.0188087774295
+#162 vdj_server_ann_whole_seq_deletions -> 0
+#163 vdj_server_ann_whole_seq_insertions -> 0
+#164 vdj_server_ann_whole_seq_mutations -> 6
+#165 vdj_server_ann_whole_seq_nonsynonymous_bsb -> 6
+#166 vdj_server_ann_whole_seq_ns_rto -> 0
+#167 vdj_server_ann_whole_seq_pct_id -> 0.981191222571
+#168 vdj_server_ann_whole_seq_stp_cdn -> 0
+#169 vdj_server_ann_whole_seq_synonymous_bsb -> 0
+in second loop....
+seg= J
+in second loop....
+seg= D
+in second loop....
+seg= V
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : V  and codon  GTG
+query amino  V  and codon  GTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTA
+query amino  L  and codon  CTA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGC
+query amino  G  and codon  GGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : A  and codon  GCA
+query amino  A  and codon  GCA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGA
+query amino  G  and codon  GGA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  TTG
+query amino  L  and codon  TTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : P  and codon  CCT
+query amino  P  and codon  CCT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCG
+query amino  S  and codon  TCG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : E  and codon  GAG
+query amino  E  and codon  GAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTC
+query amino  L  and codon  CTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : C  and codon  TGC
+query amino  C  and codon  TGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : A  and codon  GCT
+query amino  A  and codon  GCT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : V  and codon  GTC
+query amino  V  and codon  GTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Y  and codon  TAT
+query amino  Y  and codon  TAT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGT
+query amino  G  and codon  GGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGG
+query amino  G  and codon  GGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : F  and codon  TTC
+query amino  F  and codon  TTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGT
+query amino  S  and codon  AGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGT
+query amino  G  and codon  GGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Y  and codon  TAC
+query amino  Y  and codon  TAC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Y  and codon  TAC
+query amino  Y  and codon  TAC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGC
+query amino  S  and codon  AGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : I  and codon  ATC
+query amino  I  and codon  ATC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : R  and codon  CGC
+query amino  R  and codon  CGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : P  and codon  CCA
+query amino  P  and codon  CCT
+PRE SN counts :  0  and  0
+POST SN counts :  1  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGG
+query amino  G  and codon  GGC
+PRE SN counts :  1  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGG
+query amino  G  and codon  GGG
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : E  and codon  GAG
+query amino  E  and codon  GAG
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : I  and codon  ATT
+query amino  I  and codon  ATT
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGG
+query amino  G  and codon  GGG
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : E  and codon  GAA
+query amino  E  and codon  GAA
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : I  and codon  ATC
+query amino  I  and codon  ATC
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : N  and codon  AAT
+query amino  N  and codon  AAT
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : H  and codon  CAT
+query amino  H  and codon  CAT
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGT
+query amino  S  and codon  AGT
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGA
+query amino  G  and codon  GGA
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGC
+query amino  S  and codon  AGC
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : N  and codon  AAC
+query amino  N  and codon  AAC
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : Y  and codon  TAC
+query amino  Y  and codon  TAC
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : N  and codon  AAC
+query amino  N  and codon  AAC
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : P  and codon  CCG
+query amino  P  and codon  CCG
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTC
+query amino  L  and codon  CTC
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGT
+query amino  S  and codon  AGT
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : R  and codon  CGA
+query amino  R  and codon  CGA
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : V  and codon  GTC
+query amino  V  and codon  GTC
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : I  and codon  ATA
+query amino  I  and codon  ATA
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCA
+query amino  S  and codon  TCA
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : V  and codon  GTA
+query amino  V  and codon  GTA
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : D  and codon  GAC
+query amino  G  and codon  GGC
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  1
+Detected no gaps in codons
+subject amino : T  and codon  ACG
+query amino  T  and codon  ACG
+PRE SN counts :  2  and  1
+POST SN counts :  2  and  1
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  2  and  1
+POST SN counts :  2  and  1
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  2  and  1
+POST SN counts :  2  and  1
+Detected no gaps in codons
+subject amino : N  and codon  AAC
+query amino  N  and codon  AAC
+PRE SN counts :  2  and  1
+POST SN counts :  2  and  1
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  2  and  1
+POST SN counts :  2  and  1
+Detected no gaps in codons
+subject amino : F  and codon  TTC
+query amino  F  and codon  TTC
+PRE SN counts :  2  and  1
+POST SN counts :  2  and  1
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  2  and  1
+POST SN counts :  2  and  1
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  2  and  1
+POST SN counts :  2  and  1
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  2  and  1
+POST SN counts :  2  and  1
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  2  and  1
+POST SN counts :  2  and  1
+Detected no gaps in codons
+subject amino : S  and codon  AGC
+query amino  S  and codon  AGC
+PRE SN counts :  2  and  1
+POST SN counts :  2  and  1
+Detected no gaps in codons
+subject amino : S  and codon  TCT
+query amino  S  and codon  TCT
+PRE SN counts :  2  and  1
+POST SN counts :  2  and  1
+Detected no gaps in codons
+subject amino : V  and codon  GTG
+query amino  V  and codon  GTG
+PRE SN counts :  2  and  1
+POST SN counts :  2  and  1
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  2  and  1
+POST SN counts :  2  and  1
+Detected no gaps in codons
+subject amino : A  and codon  GCC
+query amino  A  and codon  GCC
+PRE SN counts :  2  and  1
+POST SN counts :  2  and  1
+Detected no gaps in codons
+subject amino : A  and codon  GCG
+query amino  A  and codon  GCG
+PRE SN counts :  2  and  1
+POST SN counts :  2  and  1
+Detected no gaps in codons
+subject amino : D  and codon  GAC
+query amino  D  and codon  GAC
+PRE SN counts :  2  and  1
+POST SN counts :  2  and  1
+Detected no gaps in codons
+subject amino : T  and codon  ACG
+query amino  T  and codon  ACG
+PRE SN counts :  2  and  1
+POST SN counts :  2  and  1
+Detected no gaps in codons
+subject amino : A  and codon  GCT
+query amino  A  and codon  GCT
+PRE SN counts :  2  and  1
+POST SN counts :  2  and  1
+Detected no gaps in codons
+subject amino : V  and codon  GTG
+query amino  V  and codon  GTG
+PRE SN counts :  2  and  1
+POST SN counts :  2  and  1
+Detected no gaps in codons
+subject amino : Y  and codon  TAT
+query amino  Y  and codon  TAT
+PRE SN counts :  2  and  1
+POST SN counts :  2  and  1
+Detected no gaps in codons
+subject amino : Y  and codon  TAC
+query amino  Y  and codon  TAC
+PRE SN counts :  2  and  1
+POST SN counts :  2  and  1
+Detected no gaps in codons
+subject amino : C  and codon  TGT
+query amino  C  and codon  TGT
+PRE SN counts :  2  and  1
+POST SN counts :  2  and  1
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGC
+query amino  G  and codon  GGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGA
+query amino  G  and codon  GGA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : V  and codon  GTC
+query amino  V  and codon  GTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : V  and codon  GTC
+query amino  V  and codon  GTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCA
+query amino  S  and codon  TCA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : V  and codon  GTG
+query amino  V  and codon  GTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTA
+query amino  L  and codon  CTA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGC
+query amino  G  and codon  GGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : A  and codon  GCA
+query amino  A  and codon  GCA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGA
+query amino  G  and codon  GGA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  TTG
+query amino  L  and codon  TTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : P  and codon  CCT
+query amino  P  and codon  CCT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCG
+query amino  S  and codon  TCG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : E  and codon  GAG
+query amino  E  and codon  GAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTC
+query amino  L  and codon  CTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : C  and codon  TGC
+query amino  C  and codon  TGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : A  and codon  GCT
+query amino  A  and codon  GCT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : V  and codon  GTC
+query amino  V  and codon  GTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Y  and codon  TAT
+query amino  Y  and codon  TAT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGT
+query amino  G  and codon  GGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGG
+query amino  G  and codon  GGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : F  and codon  TTC
+query amino  F  and codon  TTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGT
+query amino  S  and codon  AGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGT
+query amino  G  and codon  GGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Y  and codon  TAC
+query amino  Y  and codon  TAC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Y  and codon  TAC
+query amino  Y  and codon  TAC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGC
+query amino  S  and codon  AGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : I  and codon  ATC
+query amino  I  and codon  ATC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : R  and codon  CGC
+query amino  R  and codon  CGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : P  and codon  CCA
+query amino  P  and codon  CCT
+PRE SN counts :  0  and  0
+POST SN counts :  1  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGG
+query amino  G  and codon  GGC
+PRE SN counts :  1  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGG
+query amino  G  and codon  GGG
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : E  and codon  GAG
+query amino  E  and codon  GAG
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : I  and codon  ATT
+query amino  I  and codon  ATT
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGG
+query amino  G  and codon  GGG
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : E  and codon  GAA
+query amino  E  and codon  GAA
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : I  and codon  ATC
+query amino  I  and codon  ATC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : N  and codon  AAT
+query amino  N  and codon  AAT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : H  and codon  CAT
+query amino  H  and codon  CAT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGT
+query amino  S  and codon  AGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGA
+query amino  G  and codon  GGA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGC
+query amino  S  and codon  AGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : N  and codon  AAC
+query amino  N  and codon  AAC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Y  and codon  TAC
+query amino  Y  and codon  TAC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : N  and codon  AAC
+query amino  N  and codon  AAC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : P  and codon  CCG
+query amino  P  and codon  CCG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTC
+query amino  L  and codon  CTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGT
+query amino  S  and codon  AGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : R  and codon  CGA
+query amino  R  and codon  CGA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : V  and codon  GTC
+query amino  V  and codon  GTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : I  and codon  ATA
+query amino  I  and codon  ATA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCA
+query amino  S  and codon  TCA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : V  and codon  GTA
+query amino  V  and codon  GTA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : D  and codon  GAC
+query amino  G  and codon  GGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : T  and codon  ACG
+query amino  T  and codon  ACG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : N  and codon  AAC
+query amino  N  and codon  AAC
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : F  and codon  TTC
+query amino  F  and codon  TTC
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : S  and codon  AGC
+query amino  S  and codon  AGC
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : S  and codon  TCT
+query amino  S  and codon  TCT
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : V  and codon  GTG
+query amino  V  and codon  GTG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : A  and codon  GCC
+query amino  A  and codon  GCC
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : A  and codon  GCG
+query amino  A  and codon  GCG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : D  and codon  GAC
+query amino  D  and codon  GAC
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : T  and codon  ACG
+query amino  T  and codon  ACG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : A  and codon  GCT
+query amino  A  and codon  GCT
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : V  and codon  GTG
+query amino  V  and codon  GTG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : Y  and codon  TAT
+query amino  Y  and codon  TAT
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : Y  and codon  TAC
+query amino  Y  and codon  TAC
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : C  and codon  TGT
+query amino  C  and codon  TGT
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : V  and codon  GTG
+query amino  V  and codon  GTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTA
+query amino  L  and codon  CTA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGC
+query amino  G  and codon  GGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : A  and codon  GCA
+query amino  A  and codon  GCA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGA
+query amino  G  and codon  GGA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  TTG
+query amino  L  and codon  TTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : P  and codon  CCT
+query amino  P  and codon  CCT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCG
+query amino  S  and codon  TCG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : E  and codon  GAG
+query amino  E  and codon  GAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTC
+query amino  L  and codon  CTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : C  and codon  TGC
+query amino  C  and codon  TGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : A  and codon  GCT
+query amino  A  and codon  GCT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : V  and codon  GTC
+query amino  V  and codon  GTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Y  and codon  TAT
+query amino  Y  and codon  TAT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGT
+query amino  G  and codon  GGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGG
+query amino  G  and codon  GGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : F  and codon  TTC
+query amino  F  and codon  TTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGT
+query amino  S  and codon  AGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGT
+query amino  G  and codon  GGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Y  and codon  TAC
+query amino  Y  and codon  TAC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Y  and codon  TAC
+query amino  Y  and codon  TAC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGC
+query amino  S  and codon  AGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : I  and codon  ATC
+query amino  I  and codon  ATC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : R  and codon  CGC
+query amino  R  and codon  CGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : P  and codon  CCA
+query amino  P  and codon  CCT
+PRE SN counts :  0  and  0
+POST SN counts :  1  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGG
+query amino  G  and codon  GGC
+PRE SN counts :  1  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGG
+query amino  G  and codon  GGG
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : E  and codon  GAG
+query amino  E  and codon  GAG
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : I  and codon  ATT
+query amino  I  and codon  ATT
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGG
+query amino  G  and codon  GGG
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : E  and codon  GAA
+query amino  E  and codon  GAA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : I  and codon  ATC
+query amino  I  and codon  ATC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : N  and codon  AAT
+query amino  N  and codon  AAT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : H  and codon  CAT
+query amino  H  and codon  CAT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGT
+query amino  S  and codon  AGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGA
+query amino  G  and codon  GGA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGC
+query amino  S  and codon  AGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : N  and codon  AAC
+query amino  N  and codon  AAC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Y  and codon  TAC
+query amino  Y  and codon  TAC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : N  and codon  AAC
+query amino  N  and codon  AAC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : P  and codon  CCG
+query amino  P  and codon  CCG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTC
+query amino  L  and codon  CTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGT
+query amino  S  and codon  AGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : R  and codon  CGA
+query amino  R  and codon  CGA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : V  and codon  GTC
+query amino  V  and codon  GTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : I  and codon  ATA
+query amino  I  and codon  ATA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCA
+query amino  S  and codon  TCA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : V  and codon  GTA
+query amino  V  and codon  GTA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : D  and codon  GAC
+query amino  G  and codon  GGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : T  and codon  ACG
+query amino  T  and codon  ACG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : N  and codon  AAC
+query amino  N  and codon  AAC
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : F  and codon  TTC
+query amino  F  and codon  TTC
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : S  and codon  AGC
+query amino  S  and codon  AGC
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : S  and codon  TCT
+query amino  S  and codon  TCT
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : V  and codon  GTG
+query amino  V  and codon  GTG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : A  and codon  GCC
+query amino  A  and codon  GCC
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : A  and codon  GCG
+query amino  A  and codon  GCG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : D  and codon  GAC
+query amino  D  and codon  GAC
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : T  and codon  ACG
+query amino  T  and codon  ACG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : A  and codon  GCT
+query amino  A  and codon  GCT
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : V  and codon  GTG
+query amino  V  and codon  GTG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : Y  and codon  TAT
+query amino  Y  and codon  TAT
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : Y  and codon  TAC
+query amino  Y  and codon  TAC
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : C  and codon  TGT
+query amino  C  and codon  TGT
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : A  and codon  GCG
+query amino  A  and codon  GCG
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : R  and codon  AGA
+query amino  R  and codon  AGA
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+ALL_DICT {'vd_junction': 'cagtaccggc', 'vj_junction': None, 'D': 'IGHD3-3*01', 'J': 'IGHJ4*02', 'dj_junction': 'tac', 'V': 'IGHV4-34*01'}
+#1 productive_rearrangement -> False
+#2 read_name -> FR2
+#3 top_D -> IGHD3-3*01
+#4 top_J -> IGHJ4*02
+#5 top_V -> IGHV4-34*01
+#6 vdj_server_ann_imgt_CDR1_base_sub -> 0
+#7 vdj_server_ann_imgt_CDR1_bsb_freq -> 0.0
+#8 vdj_server_ann_imgt_CDR1_deletions -> 0
+#9 vdj_server_ann_imgt_CDR1_frm_msk -> [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2]
+#10 vdj_server_ann_imgt_CDR1_insertions -> 0
+#11 vdj_server_ann_imgt_CDR1_mutations -> 0
+#12 vdj_server_ann_imgt_CDR1_nonsynonymous_bsb -> 0
+#13 vdj_server_ann_imgt_CDR1_ns_rto -> 0
+#14 vdj_server_ann_imgt_CDR1_pct_id -> 1
+#15 vdj_server_ann_imgt_CDR1_qry_aln -> GGTGGGTCCTTCAGTGGTTACTAC
+#16 vdj_server_ann_imgt_CDR1_qry_end -> 101
+#17 vdj_server_ann_imgt_CDR1_qry_srt -> 78
+#18 vdj_server_ann_imgt_CDR1_ref_aln -> GGTGGGTCCTTCAGTGGTTACTAC
+#19 vdj_server_ann_imgt_CDR1_stp_cdn -> False
+#20 vdj_server_ann_imgt_CDR1_synonymous_bsb -> 0
+#21 vdj_server_ann_imgt_CDR2_base_sub -> 0
+#22 vdj_server_ann_imgt_CDR2_bsb_freq -> 0.0
+#23 vdj_server_ann_imgt_CDR2_deletions -> 0
+#24 vdj_server_ann_imgt_CDR2_frm_msk -> [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2]
+#25 vdj_server_ann_imgt_CDR2_insertions -> 0
+#26 vdj_server_ann_imgt_CDR2_mutations -> 0
+#27 vdj_server_ann_imgt_CDR2_nonsynonymous_bsb -> 0
+#28 vdj_server_ann_imgt_CDR2_ns_rto -> 0
+#29 vdj_server_ann_imgt_CDR2_pct_id -> 1
+#30 vdj_server_ann_imgt_CDR2_qry_aln -> ATCAATCATAGTGGAAGCACC
+#31 vdj_server_ann_imgt_CDR2_qry_end -> 173
+#32 vdj_server_ann_imgt_CDR2_qry_srt -> 153
+#33 vdj_server_ann_imgt_CDR2_ref_aln -> ATCAATCATAGTGGAAGCACC
+#34 vdj_server_ann_imgt_CDR2_stp_cdn -> False
+#35 vdj_server_ann_imgt_CDR2_synonymous_bsb -> 0
+#36 vdj_server_ann_imgt_FR1_base_sub -> 0
+#37 vdj_server_ann_imgt_FR1_bsb_freq -> 0.0
+#38 vdj_server_ann_imgt_FR1_deletions -> 0
+#39 vdj_server_ann_imgt_FR1_frm_msk -> [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2]
+#40 vdj_server_ann_imgt_FR1_insertions -> 0
+#41 vdj_server_ann_imgt_FR1_mutations -> 0
+#42 vdj_server_ann_imgt_FR1_nonsynonymous_bsb -> 0
+#43 vdj_server_ann_imgt_FR1_ns_rto -> 0
+#44 vdj_server_ann_imgt_FR1_pct_id -> 1
+#45 vdj_server_ann_imgt_FR1_qry_aln -> CAGGTGCAGCTACAGCAGTGGGGCGCAGGACTGTTGAAGCCTTCGGAGACCCTGTCCCTCACCTGCGCTGTCTAT
+#46 vdj_server_ann_imgt_FR1_qry_end -> 77
+#47 vdj_server_ann_imgt_FR1_qry_srt -> 3
+#48 vdj_server_ann_imgt_FR1_ref_aln -> CAGGTGCAGCTACAGCAGTGGGGCGCAGGACTGTTGAAGCCTTCGGAGACCCTGTCCCTCACCTGCGCTGTCTAT
+#49 vdj_server_ann_imgt_FR1_stp_cdn -> False
+#50 vdj_server_ann_imgt_FR1_synonymous_bsb -> 0
+#51 vdj_server_ann_imgt_FR2_base_sub -> 2
+#52 vdj_server_ann_imgt_FR2_bsb_freq -> 0.0392156862745
+#53 vdj_server_ann_imgt_FR2_deletions -> 1
+#54 vdj_server_ann_imgt_FR2_frm_msk -> [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2]
+#55 vdj_server_ann_imgt_FR2_insertions -> 1
+#56 vdj_server_ann_imgt_FR2_mutations -> 4
+#57 vdj_server_ann_imgt_FR2_nonsynonymous_bsb -> 0
+#58 vdj_server_ann_imgt_FR2_ns_rto -> 0.0
+#59 vdj_server_ann_imgt_FR2_pct_id -> 0
+#60 vdj_server_ann_imgt_FR2_qry_aln -> TGGAGCTGGATCCGCCAGCCACCCTGGCAAGGGGCT-GAGTGGATTGGGGAA
+#61 vdj_server_ann_imgt_FR2_qry_end -> 152
+#62 vdj_server_ann_imgt_FR2_qry_srt -> 102
+#63 vdj_server_ann_imgt_FR2_ref_aln -> TGGAGCTGGATCCGCCAGCC-CCCAGGGAAGGGGCTGGAGTGGATTGGGGAA
+#64 vdj_server_ann_imgt_FR2_stp_cdn -> False
+#65 vdj_server_ann_imgt_FR2_synonymous_bsb -> 2
+#66 vdj_server_ann_imgt_FR3_base_sub -> 1
+#67 vdj_server_ann_imgt_FR3_bsb_freq -> 0.00877192982456
+#68 vdj_server_ann_imgt_FR3_deletions -> 0
+#69 vdj_server_ann_imgt_FR3_frm_msk -> [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2]
+#70 vdj_server_ann_imgt_FR3_insertions -> 0
+#71 vdj_server_ann_imgt_FR3_mutations -> 1
+#72 vdj_server_ann_imgt_FR3_nonsynonymous_bsb -> 1
+#73 vdj_server_ann_imgt_FR3_ns_rto -> 0
+#74 vdj_server_ann_imgt_FR3_pct_id -> 0
+#75 vdj_server_ann_imgt_FR3_qry_aln -> AACTACAACCCGTCCCTCAAGAGTCGAGTCACCATATCAGTAGGCACGTCCAAGAACCAGTTCTCCCTGAAGCTGAGCTCTGTGACCGCCGCGGACACGGCTGTGTATTACTGT
+#76 vdj_server_ann_imgt_FR3_qry_end -> 287
+#77 vdj_server_ann_imgt_FR3_qry_srt -> 174
+#78 vdj_server_ann_imgt_FR3_ref_aln -> AACTACAACCCGTCCCTCAAGAGTCGAGTCACCATATCAGTAGACACGTCCAAGAACCAGTTCTCCCTGAAGCTGAGCTCTGTGACCGCCGCGGACACGGCTGTGTATTACTGT
+#79 vdj_server_ann_imgt_FR3_stp_cdn -> False
+#80 vdj_server_ann_imgt_FR3_synonymous_bsb -> 0
+#81 vdj_server_ann_imgt_cdr3_na -> gcgagaggcagtaccggccgatttttggagtggttattatactttgactac
+#82 vdj_server_ann_imgt_cdr3_tr -> ARGSTGRFLEWLLYFDY
+#83 vdj_server_ann_kabat_CDR1_base_sub -> 0
+#84 vdj_server_ann_kabat_CDR1_bsb_freq -> 0.0
+#85 vdj_server_ann_kabat_CDR1_deletions -> 0
+#86 vdj_server_ann_kabat_CDR1_frm_msk -> [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2]
+#87 vdj_server_ann_kabat_CDR1_insertions -> 0
+#88 vdj_server_ann_kabat_CDR1_mutations -> 0
+#89 vdj_server_ann_kabat_CDR1_nonsynonymous_bsb -> 0
+#90 vdj_server_ann_kabat_CDR1_ns_rto -> 0
+#91 vdj_server_ann_kabat_CDR1_pct_id -> 1
+#92 vdj_server_ann_kabat_CDR1_qry_aln -> GGTTACTACTGGAGC
+#93 vdj_server_ann_kabat_CDR1_qry_end -> 107
+#94 vdj_server_ann_kabat_CDR1_qry_srt -> 93
+#95 vdj_server_ann_kabat_CDR1_ref_aln -> GGTTACTACTGGAGC
+#96 vdj_server_ann_kabat_CDR1_stp_cdn -> False
+#97 vdj_server_ann_kabat_CDR1_synonymous_bsb -> 0
+#98 vdj_server_ann_kabat_CDR2_base_sub -> 0
+#99 vdj_server_ann_kabat_CDR2_bsb_freq -> 0.0
+#100 vdj_server_ann_kabat_CDR2_deletions -> 0
+#101 vdj_server_ann_kabat_CDR2_frm_msk -> [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2]
+#102 vdj_server_ann_kabat_CDR2_insertions -> 0
+#103 vdj_server_ann_kabat_CDR2_mutations -> 0
+#104 vdj_server_ann_kabat_CDR2_nonsynonymous_bsb -> 0
+#105 vdj_server_ann_kabat_CDR2_ns_rto -> 0
+#106 vdj_server_ann_kabat_CDR2_pct_id -> 1
+#107 vdj_server_ann_kabat_CDR2_qry_aln -> GAAATCAATCATAGTGGAAGCACCAACTACAACCCGTCCCTCAAGAGT
+#108 vdj_server_ann_kabat_CDR2_qry_end -> 197
+#109 vdj_server_ann_kabat_CDR2_qry_srt -> 150
+#110 vdj_server_ann_kabat_CDR2_ref_aln -> GAAATCAATCATAGTGGAAGCACCAACTACAACCCGTCCCTCAAGAGT
+#111 vdj_server_ann_kabat_CDR2_stp_cdn -> False
+#112 vdj_server_ann_kabat_CDR2_synonymous_bsb -> 0
+#113 vdj_server_ann_kabat_FR1_base_sub -> 0
+#114 vdj_server_ann_kabat_FR1_bsb_freq -> 0.0
+#115 vdj_server_ann_kabat_FR1_deletions -> 0
+#116 vdj_server_ann_kabat_FR1_frm_msk -> [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2]
+#117 vdj_server_ann_kabat_FR1_insertions -> 0
+#118 vdj_server_ann_kabat_FR1_mutations -> 0
+#119 vdj_server_ann_kabat_FR1_nonsynonymous_bsb -> 0
+#120 vdj_server_ann_kabat_FR1_ns_rto -> 0
+#121 vdj_server_ann_kabat_FR1_pct_id -> 1
+#122 vdj_server_ann_kabat_FR1_qry_aln -> CAGGTGCAGCTACAGCAGTGGGGCGCAGGACTGTTGAAGCCTTCGGAGACCCTGTCCCTCACCTGCGCTGTCTATGGTGGGTCCTTCAGT
+#123 vdj_server_ann_kabat_FR1_qry_end -> 92
+#124 vdj_server_ann_kabat_FR1_qry_srt -> 3
+#125 vdj_server_ann_kabat_FR1_ref_aln -> CAGGTGCAGCTACAGCAGTGGGGCGCAGGACTGTTGAAGCCTTCGGAGACCCTGTCCCTCACCTGCGCTGTCTATGGTGGGTCCTTCAGT
+#126 vdj_server_ann_kabat_FR1_stp_cdn -> False
+#127 vdj_server_ann_kabat_FR1_synonymous_bsb -> 0
+#128 vdj_server_ann_kabat_FR2_base_sub -> 2
+#129 vdj_server_ann_kabat_FR2_bsb_freq -> 0.047619047619
+#130 vdj_server_ann_kabat_FR2_deletions -> 1
+#131 vdj_server_ann_kabat_FR2_frm_msk -> [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2]
+#132 vdj_server_ann_kabat_FR2_insertions -> 1
+#133 vdj_server_ann_kabat_FR2_mutations -> 4
+#134 vdj_server_ann_kabat_FR2_nonsynonymous_bsb -> 0
+#135 vdj_server_ann_kabat_FR2_ns_rto -> 0.0
+#136 vdj_server_ann_kabat_FR2_pct_id -> 0
+#137 vdj_server_ann_kabat_FR2_qry_aln -> TGGATCCGCCAGCCACCCTGGCAAGGGGCT-GAGTGGATTGGG
+#138 vdj_server_ann_kabat_FR2_qry_end -> 149
+#139 vdj_server_ann_kabat_FR2_qry_srt -> 108
+#140 vdj_server_ann_kabat_FR2_ref_aln -> TGGATCCGCCAGCC-CCCAGGGAAGGGGCTGGAGTGGATTGGG
+#141 vdj_server_ann_kabat_FR2_stp_cdn -> False
+#142 vdj_server_ann_kabat_FR2_synonymous_bsb -> 2
+#143 vdj_server_ann_kabat_FR3_base_sub -> 1
+#144 vdj_server_ann_kabat_FR3_bsb_freq -> 0.0104166666667
+#145 vdj_server_ann_kabat_FR3_deletions -> 0
+#146 vdj_server_ann_kabat_FR3_frm_msk -> [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2]
+#147 vdj_server_ann_kabat_FR3_insertions -> 0
+#148 vdj_server_ann_kabat_FR3_mutations -> 1
+#149 vdj_server_ann_kabat_FR3_nonsynonymous_bsb -> 1
+#150 vdj_server_ann_kabat_FR3_ns_rto -> 0
+#151 vdj_server_ann_kabat_FR3_pct_id -> 0
+#152 vdj_server_ann_kabat_FR3_qry_aln -> CGAGTCACCATATCAGTAGGCACGTCCAAGAACCAGTTCTCCCTGAAGCTGAGCTCTGTGACCGCCGCGGACACGGCTGTGTATTACTGTGCGAGA
+#153 vdj_server_ann_kabat_FR3_qry_end -> 293
+#154 vdj_server_ann_kabat_FR3_qry_srt -> 198
+#155 vdj_server_ann_kabat_FR3_ref_aln -> CGAGTCACCATATCAGTAGACACGTCCAAGAACCAGTTCTCCCTGAAGCTGAGCTCTGTGACCGCCGCGGACACGGCTGTGTATTACTGTGCGAGA
+#156 vdj_server_ann_kabat_FR3_stp_cdn -> False
+#157 vdj_server_ann_kabat_FR3_synonymous_bsb -> 0
+#158 vdj_server_ann_kabat_cdr3_na -> ggcagtaccggccgatttttggagtggttattatactttgactac
+#159 vdj_server_ann_kabat_cdr3_tr -> GSTGRFLEWLLYFDY
+#160 vdj_server_ann_whole_seq_base_sub -> 3
+#161 vdj_server_ann_whole_seq_bsb_freq -> 0.00940438871473
+#162 vdj_server_ann_whole_seq_deletions -> 1
+#163 vdj_server_ann_whole_seq_insertions -> 1
+#164 vdj_server_ann_whole_seq_mutations -> 5
+#165 vdj_server_ann_whole_seq_nonsynonymous_bsb -> 1
+#166 vdj_server_ann_whole_seq_ns_rto -> 0.5
+#167 vdj_server_ann_whole_seq_pct_id -> 0.990595611285
+#168 vdj_server_ann_whole_seq_stp_cdn -> 0
+#169 vdj_server_ann_whole_seq_synonymous_bsb -> 2
+in second loop....
+seg= J
+in second loop....
+seg= D
+in second loop....
+seg= V
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : V  and codon  GTG
+query amino  V  and codon  GTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTA
+query amino  L  and codon  CTA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGC
+query amino  G  and codon  GGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : A  and codon  GCA
+query amino  A  and codon  GCA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGA
+query amino  G  and codon  GGA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  TTG
+query amino  L  and codon  TTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : P  and codon  CCT
+query amino  P  and codon  CCT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCG
+query amino  S  and codon  TCG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : E  and codon  GAG
+query amino  E  and codon  GAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTC
+query amino  L  and codon  CTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : C  and codon  TGC
+query amino  C  and codon  TGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : A  and codon  GCT
+query amino  A  and codon  GCT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : V  and codon  GTC
+query amino  V  and codon  GTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Y  and codon  TAT
+query amino  Y  and codon  TAT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGT
+query amino  G  and codon  GGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGG
+query amino  G  and codon  GGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : F  and codon  TTC
+query amino  F  and codon  TTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGT
+query amino  S  and codon  AGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGT
+query amino  G  and codon  GGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Y  and codon  TAC
+query amino  Y  and codon  TAC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Y  and codon  TAC
+query amino  Y  and codon  TAC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGC
+query amino  S  and codon  AGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : I  and codon  ATC
+query amino  I  and codon  ATC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : R  and codon  CGC
+query amino  R  and codon  CGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : P  and codon  CCA
+query amino  P  and codon  CCT
+PRE SN counts :  0  and  0
+POST SN counts :  1  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGG
+query amino  G  and codon  GGC
+PRE SN counts :  1  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGG
+query amino  G  and codon  GGG
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : E  and codon  GAG
+query amino  E  and codon  GAG
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : I  and codon  ATT
+query amino  I  and codon  ATT
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGG
+query amino  G  and codon  GGG
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : E  and codon  GAA
+query amino  E  and codon  GAA
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : I  and codon  ATC
+query amino  I  and codon  ATC
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : N  and codon  AAT
+query amino  N  and codon  AAT
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : H  and codon  CAT
+query amino  H  and codon  CAT
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGT
+query amino  S  and codon  AGT
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGA
+query amino  G  and codon  GGA
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGC
+query amino  S  and codon  AGC
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : N  and codon  AAC
+query amino  N  and codon  AAC
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : Y  and codon  TAC
+query amino  Y  and codon  TAC
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : N  and codon  AAC
+query amino  N  and codon  AAC
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : P  and codon  CCG
+query amino  P  and codon  CCG
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTC
+query amino  L  and codon  CTC
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGT
+query amino  S  and codon  AGT
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : R  and codon  CGA
+query amino  R  and codon  CGA
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : V  and codon  GTC
+query amino  V  and codon  GTC
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : I  and codon  ATA
+query amino  I  and codon  ATA
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCA
+query amino  *  and codon  TAA
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  1
+Detected no gaps in codons
+subject amino : V  and codon  GTA
+query amino  V  and codon  GTA
+PRE SN counts :  2  and  1
+POST SN counts :  2  and  1
+Detected no gaps in codons
+subject amino : D  and codon  GAC
+query amino  G  and codon  GGC
+PRE SN counts :  2  and  1
+POST SN counts :  2  and  2
+Detected no gaps in codons
+subject amino : T  and codon  ACG
+query amino  T  and codon  ACG
+PRE SN counts :  2  and  2
+POST SN counts :  2  and  2
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  2  and  2
+POST SN counts :  2  and  2
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  2  and  2
+POST SN counts :  2  and  2
+Detected no gaps in codons
+subject amino : N  and codon  AAC
+query amino  N  and codon  AAC
+PRE SN counts :  2  and  2
+POST SN counts :  2  and  2
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  2  and  2
+POST SN counts :  2  and  2
+Detected no gaps in codons
+subject amino : F  and codon  TTC
+query amino  F  and codon  TTC
+PRE SN counts :  2  and  2
+POST SN counts :  2  and  2
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  2  and  2
+POST SN counts :  2  and  2
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  2  and  2
+POST SN counts :  2  and  2
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  2  and  2
+POST SN counts :  2  and  2
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  2  and  2
+POST SN counts :  2  and  2
+Detected no gaps in codons
+subject amino : S  and codon  AGC
+query amino  S  and codon  AGC
+PRE SN counts :  2  and  2
+POST SN counts :  2  and  2
+Detected no gaps in codons
+subject amino : S  and codon  TCT
+query amino  S  and codon  TCT
+PRE SN counts :  2  and  2
+POST SN counts :  2  and  2
+Detected no gaps in codons
+subject amino : V  and codon  GTG
+query amino  V  and codon  GTG
+PRE SN counts :  2  and  2
+POST SN counts :  2  and  2
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  2  and  2
+POST SN counts :  2  and  2
+Detected no gaps in codons
+subject amino : A  and codon  GCC
+query amino  A  and codon  GCC
+PRE SN counts :  2  and  2
+POST SN counts :  2  and  2
+Detected no gaps in codons
+subject amino : A  and codon  GCG
+query amino  A  and codon  GCG
+PRE SN counts :  2  and  2
+POST SN counts :  2  and  2
+Detected no gaps in codons
+subject amino : D  and codon  GAC
+query amino  D  and codon  GAC
+PRE SN counts :  2  and  2
+POST SN counts :  2  and  2
+Detected no gaps in codons
+subject amino : T  and codon  ACG
+query amino  T  and codon  ACG
+PRE SN counts :  2  and  2
+POST SN counts :  2  and  2
+Detected no gaps in codons
+subject amino : A  and codon  GCT
+query amino  A  and codon  GCT
+PRE SN counts :  2  and  2
+POST SN counts :  2  and  2
+Detected no gaps in codons
+subject amino : V  and codon  GTG
+query amino  V  and codon  GTG
+PRE SN counts :  2  and  2
+POST SN counts :  2  and  2
+Detected no gaps in codons
+subject amino : Y  and codon  TAT
+query amino  Y  and codon  TAT
+PRE SN counts :  2  and  2
+POST SN counts :  2  and  2
+Detected no gaps in codons
+subject amino : Y  and codon  TAC
+query amino  Y  and codon  TAC
+PRE SN counts :  2  and  2
+POST SN counts :  2  and  2
+Detected no gaps in codons
+subject amino : C  and codon  TGT
+query amino  C  and codon  TGT
+PRE SN counts :  2  and  2
+POST SN counts :  2  and  2
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGC
+query amino  G  and codon  GGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGA
+query amino  G  and codon  GGA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : V  and codon  GTC
+query amino  V  and codon  GTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : V  and codon  GTC
+query amino  V  and codon  GTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCA
+query amino  S  and codon  TCA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : V  and codon  GTG
+query amino  V  and codon  GTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTA
+query amino  L  and codon  CTA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGC
+query amino  G  and codon  GGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : A  and codon  GCA
+query amino  A  and codon  GCA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGA
+query amino  G  and codon  GGA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  TTG
+query amino  L  and codon  TTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : P  and codon  CCT
+query amino  P  and codon  CCT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCG
+query amino  S  and codon  TCG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : E  and codon  GAG
+query amino  E  and codon  GAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTC
+query amino  L  and codon  CTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : C  and codon  TGC
+query amino  C  and codon  TGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : A  and codon  GCT
+query amino  A  and codon  GCT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : V  and codon  GTC
+query amino  V  and codon  GTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Y  and codon  TAT
+query amino  Y  and codon  TAT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGT
+query amino  G  and codon  GGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGG
+query amino  G  and codon  GGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : F  and codon  TTC
+query amino  F  and codon  TTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGT
+query amino  S  and codon  AGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGT
+query amino  G  and codon  GGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Y  and codon  TAC
+query amino  Y  and codon  TAC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Y  and codon  TAC
+query amino  Y  and codon  TAC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGC
+query amino  S  and codon  AGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : I  and codon  ATC
+query amino  I  and codon  ATC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : R  and codon  CGC
+query amino  R  and codon  CGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : P  and codon  CCA
+query amino  P  and codon  CCT
+PRE SN counts :  0  and  0
+POST SN counts :  1  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGG
+query amino  G  and codon  GGC
+PRE SN counts :  1  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGG
+query amino  G  and codon  GGG
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : E  and codon  GAG
+query amino  E  and codon  GAG
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : I  and codon  ATT
+query amino  I  and codon  ATT
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGG
+query amino  G  and codon  GGG
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : E  and codon  GAA
+query amino  E  and codon  GAA
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : I  and codon  ATC
+query amino  I  and codon  ATC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : N  and codon  AAT
+query amino  N  and codon  AAT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : H  and codon  CAT
+query amino  H  and codon  CAT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGT
+query amino  S  and codon  AGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGA
+query amino  G  and codon  GGA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGC
+query amino  S  and codon  AGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : N  and codon  AAC
+query amino  N  and codon  AAC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Y  and codon  TAC
+query amino  Y  and codon  TAC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : N  and codon  AAC
+query amino  N  and codon  AAC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : P  and codon  CCG
+query amino  P  and codon  CCG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTC
+query amino  L  and codon  CTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGT
+query amino  S  and codon  AGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : R  and codon  CGA
+query amino  R  and codon  CGA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : V  and codon  GTC
+query amino  V  and codon  GTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : I  and codon  ATA
+query amino  I  and codon  ATA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCA
+query amino  *  and codon  TAA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : V  and codon  GTA
+query amino  V  and codon  GTA
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : D  and codon  GAC
+query amino  G  and codon  GGC
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : T  and codon  ACG
+query amino  T  and codon  ACG
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : N  and codon  AAC
+query amino  N  and codon  AAC
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : F  and codon  TTC
+query amino  F  and codon  TTC
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : S  and codon  AGC
+query amino  S  and codon  AGC
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : S  and codon  TCT
+query amino  S  and codon  TCT
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : V  and codon  GTG
+query amino  V  and codon  GTG
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : A  and codon  GCC
+query amino  A  and codon  GCC
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : A  and codon  GCG
+query amino  A  and codon  GCG
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : D  and codon  GAC
+query amino  D  and codon  GAC
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : T  and codon  ACG
+query amino  T  and codon  ACG
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : A  and codon  GCT
+query amino  A  and codon  GCT
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : V  and codon  GTG
+query amino  V  and codon  GTG
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : Y  and codon  TAT
+query amino  Y  and codon  TAT
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : Y  and codon  TAC
+query amino  Y  and codon  TAC
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : C  and codon  TGT
+query amino  C  and codon  TGT
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : V  and codon  GTG
+query amino  V  and codon  GTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTA
+query amino  L  and codon  CTA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGC
+query amino  G  and codon  GGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : A  and codon  GCA
+query amino  A  and codon  GCA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGA
+query amino  G  and codon  GGA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  TTG
+query amino  L  and codon  TTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : P  and codon  CCT
+query amino  P  and codon  CCT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCG
+query amino  S  and codon  TCG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : E  and codon  GAG
+query amino  E  and codon  GAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTC
+query amino  L  and codon  CTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : C  and codon  TGC
+query amino  C  and codon  TGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : A  and codon  GCT
+query amino  A  and codon  GCT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : V  and codon  GTC
+query amino  V  and codon  GTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Y  and codon  TAT
+query amino  Y  and codon  TAT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGT
+query amino  G  and codon  GGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGG
+query amino  G  and codon  GGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : F  and codon  TTC
+query amino  F  and codon  TTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGT
+query amino  S  and codon  AGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGT
+query amino  G  and codon  GGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Y  and codon  TAC
+query amino  Y  and codon  TAC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Y  and codon  TAC
+query amino  Y  and codon  TAC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGC
+query amino  S  and codon  AGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : I  and codon  ATC
+query amino  I  and codon  ATC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : R  and codon  CGC
+query amino  R  and codon  CGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : P  and codon  CCA
+query amino  P  and codon  CCT
+PRE SN counts :  0  and  0
+POST SN counts :  1  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGG
+query amino  G  and codon  GGC
+PRE SN counts :  1  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGG
+query amino  G  and codon  GGG
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : E  and codon  GAG
+query amino  E  and codon  GAG
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : W  and codon  TGG
+query amino  W  and codon  TGG
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : I  and codon  ATT
+query amino  I  and codon  ATT
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGG
+query amino  G  and codon  GGG
+PRE SN counts :  2  and  0
+POST SN counts :  2  and  0
+Detected no gaps in codons
+subject amino : E  and codon  GAA
+query amino  E  and codon  GAA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : I  and codon  ATC
+query amino  I  and codon  ATC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : N  and codon  AAT
+query amino  N  and codon  AAT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : H  and codon  CAT
+query amino  H  and codon  CAT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGT
+query amino  S  and codon  AGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : G  and codon  GGA
+query amino  G  and codon  GGA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGC
+query amino  S  and codon  AGC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : N  and codon  AAC
+query amino  N  and codon  AAC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : Y  and codon  TAC
+query amino  Y  and codon  TAC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : N  and codon  AAC
+query amino  N  and codon  AAC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : P  and codon  CCG
+query amino  P  and codon  CCG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : L  and codon  CTC
+query amino  L  and codon  CTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  AGT
+query amino  S  and codon  AGT
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : R  and codon  CGA
+query amino  R  and codon  CGA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : V  and codon  GTC
+query amino  V  and codon  GTC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : I  and codon  ATA
+query amino  I  and codon  ATA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  0
+Detected no gaps in codons
+subject amino : S  and codon  TCA
+query amino  *  and codon  TAA
+PRE SN counts :  0  and  0
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : V  and codon  GTA
+query amino  V  and codon  GTA
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  1
+Detected no gaps in codons
+subject amino : D  and codon  GAC
+query amino  G  and codon  GGC
+PRE SN counts :  0  and  1
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : T  and codon  ACG
+query amino  T  and codon  ACG
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : N  and codon  AAC
+query amino  N  and codon  AAC
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : Q  and codon  CAG
+query amino  Q  and codon  CAG
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : F  and codon  TTC
+query amino  F  and codon  TTC
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : S  and codon  TCC
+query amino  S  and codon  TCC
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : K  and codon  AAG
+query amino  K  and codon  AAG
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : L  and codon  CTG
+query amino  L  and codon  CTG
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : S  and codon  AGC
+query amino  S  and codon  AGC
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : S  and codon  TCT
+query amino  S  and codon  TCT
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : V  and codon  GTG
+query amino  V  and codon  GTG
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : T  and codon  ACC
+query amino  T  and codon  ACC
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : A  and codon  GCC
+query amino  A  and codon  GCC
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : A  and codon  GCG
+query amino  A  and codon  GCG
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : D  and codon  GAC
+query amino  D  and codon  GAC
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : T  and codon  ACG
+query amino  T  and codon  ACG
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : A  and codon  GCT
+query amino  A  and codon  GCT
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : V  and codon  GTG
+query amino  V  and codon  GTG
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : Y  and codon  TAT
+query amino  Y  and codon  TAT
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : Y  and codon  TAC
+query amino  Y  and codon  TAC
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : C  and codon  TGT
+query amino  C  and codon  TGT
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : A  and codon  GCG
+query amino  A  and codon  GCG
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+Detected no gaps in codons
+subject amino : R  and codon  AGA
+query amino  R  and codon  AGA
+PRE SN counts :  0  and  2
+POST SN counts :  0  and  2
+ALL_DICT {'vd_junction': 'cagtaccggc', 'vj_junction': None, 'D': 'IGHD3-3*01', 'J': 'IGHJ4*02', 'dj_junction': 'tac', 'V': 'IGHV4-34*01'}
+#1 productive_rearrangement -> False
+#2 read_name -> FR3_STOP
+#3 top_D -> IGHD3-3*01
+#4 top_J -> IGHJ4*02
+#5 top_V -> IGHV4-34*01
+#6 vdj_server_ann_imgt_CDR1_base_sub -> 0
+#7 vdj_server_ann_imgt_CDR1_bsb_freq -> 0.0
+#8 vdj_server_ann_imgt_CDR1_deletions -> 0
+#9 vdj_server_ann_imgt_CDR1_frm_msk -> [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2]
+#10 vdj_server_ann_imgt_CDR1_insertions -> 0
+#11 vdj_server_ann_imgt_CDR1_mutations -> 0
+#12 vdj_server_ann_imgt_CDR1_nonsynonymous_bsb -> 0
+#13 vdj_server_ann_imgt_CDR1_ns_rto -> 0
+#14 vdj_server_ann_imgt_CDR1_pct_id -> 1
+#15 vdj_server_ann_imgt_CDR1_qry_aln -> GGTGGGTCCTTCAGTGGTTACTAC
+#16 vdj_server_ann_imgt_CDR1_qry_end -> 101
+#17 vdj_server_ann_imgt_CDR1_qry_srt -> 78
+#18 vdj_server_ann_imgt_CDR1_ref_aln -> GGTGGGTCCTTCAGTGGTTACTAC
+#19 vdj_server_ann_imgt_CDR1_stp_cdn -> False
+#20 vdj_server_ann_imgt_CDR1_synonymous_bsb -> 0
+#21 vdj_server_ann_imgt_CDR2_base_sub -> 0
+#22 vdj_server_ann_imgt_CDR2_bsb_freq -> 0.0
+#23 vdj_server_ann_imgt_CDR2_deletions -> 0
+#24 vdj_server_ann_imgt_CDR2_frm_msk -> [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2]
+#25 vdj_server_ann_imgt_CDR2_insertions -> 0
+#26 vdj_server_ann_imgt_CDR2_mutations -> 0
+#27 vdj_server_ann_imgt_CDR2_nonsynonymous_bsb -> 0
+#28 vdj_server_ann_imgt_CDR2_ns_rto -> 0
+#29 vdj_server_ann_imgt_CDR2_pct_id -> 1
+#30 vdj_server_ann_imgt_CDR2_qry_aln -> ATCAATCATAGTGGAAGCACC
+#31 vdj_server_ann_imgt_CDR2_qry_end -> 173
+#32 vdj_server_ann_imgt_CDR2_qry_srt -> 153
+#33 vdj_server_ann_imgt_CDR2_ref_aln -> ATCAATCATAGTGGAAGCACC
+#34 vdj_server_ann_imgt_CDR2_stp_cdn -> False
+#35 vdj_server_ann_imgt_CDR2_synonymous_bsb -> 0
+#36 vdj_server_ann_imgt_FR1_base_sub -> 0
+#37 vdj_server_ann_imgt_FR1_bsb_freq -> 0.0
+#38 vdj_server_ann_imgt_FR1_deletions -> 0
+#39 vdj_server_ann_imgt_FR1_frm_msk -> [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2]
+#40 vdj_server_ann_imgt_FR1_insertions -> 0
+#41 vdj_server_ann_imgt_FR1_mutations -> 0
+#42 vdj_server_ann_imgt_FR1_nonsynonymous_bsb -> 0
+#43 vdj_server_ann_imgt_FR1_ns_rto -> 0
+#44 vdj_server_ann_imgt_FR1_pct_id -> 1
+#45 vdj_server_ann_imgt_FR1_qry_aln -> CAGGTGCAGCTACAGCAGTGGGGCGCAGGACTGTTGAAGCCTTCGGAGACCCTGTCCCTCACCTGCGCTGTCTAT
+#46 vdj_server_ann_imgt_FR1_qry_end -> 77
+#47 vdj_server_ann_imgt_FR1_qry_srt -> 3
+#48 vdj_server_ann_imgt_FR1_ref_aln -> CAGGTGCAGCTACAGCAGTGGGGCGCAGGACTGTTGAAGCCTTCGGAGACCCTGTCCCTCACCTGCGCTGTCTAT
+#49 vdj_server_ann_imgt_FR1_stp_cdn -> False
+#50 vdj_server_ann_imgt_FR1_synonymous_bsb -> 0
+#51 vdj_server_ann_imgt_FR2_base_sub -> 2
+#52 vdj_server_ann_imgt_FR2_bsb_freq -> 0.0392156862745
+#53 vdj_server_ann_imgt_FR2_deletions -> 1
+#54 vdj_server_ann_imgt_FR2_frm_msk -> [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2]
+#55 vdj_server_ann_imgt_FR2_insertions -> 1
+#56 vdj_server_ann_imgt_FR2_mutations -> 4
+#57 vdj_server_ann_imgt_FR2_nonsynonymous_bsb -> 0
+#58 vdj_server_ann_imgt_FR2_ns_rto -> 0.0
+#59 vdj_server_ann_imgt_FR2_pct_id -> 0
+#60 vdj_server_ann_imgt_FR2_qry_aln -> TGGAGCTGGATCCGCCAGCCACCCTGGCAAGGGGCT-GAGTGGATTGGGGAA
+#61 vdj_server_ann_imgt_FR2_qry_end -> 152
+#62 vdj_server_ann_imgt_FR2_qry_srt -> 102
+#63 vdj_server_ann_imgt_FR2_ref_aln -> TGGAGCTGGATCCGCCAGCC-CCCAGGGAAGGGGCTGGAGTGGATTGGGGAA
+#64 vdj_server_ann_imgt_FR2_stp_cdn -> False
+#65 vdj_server_ann_imgt_FR2_synonymous_bsb -> 2
+#66 vdj_server_ann_imgt_FR3_base_sub -> 2
+#67 vdj_server_ann_imgt_FR3_bsb_freq -> 0.0175438596491
+#68 vdj_server_ann_imgt_FR3_deletions -> 0
+#69 vdj_server_ann_imgt_FR3_frm_msk -> [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2]
+#70 vdj_server_ann_imgt_FR3_insertions -> 0
+#71 vdj_server_ann_imgt_FR3_mutations -> 2
+#72 vdj_server_ann_imgt_FR3_nonsynonymous_bsb -> 2
+#73 vdj_server_ann_imgt_FR3_ns_rto -> 0
+#74 vdj_server_ann_imgt_FR3_pct_id -> 0
+#75 vdj_server_ann_imgt_FR3_qry_aln -> AACTACAACCCGTCCCTCAAGAGTCGAGTCACCATATAAGTAGGCACGTCCAAGAACCAGTTCTCCCTGAAGCTGAGCTCTGTGACCGCCGCGGACACGGCTGTGTATTACTGT
+#76 vdj_server_ann_imgt_FR3_qry_end -> 287
+#77 vdj_server_ann_imgt_FR3_qry_srt -> 174
+#78 vdj_server_ann_imgt_FR3_ref_aln -> AACTACAACCCGTCCCTCAAGAGTCGAGTCACCATATCAGTAGACACGTCCAAGAACCAGTTCTCCCTGAAGCTGAGCTCTGTGACCGCCGCGGACACGGCTGTGTATTACTGT
+#79 vdj_server_ann_imgt_FR3_stp_cdn -> True
+#80 vdj_server_ann_imgt_FR3_synonymous_bsb -> 0
+#81 vdj_server_ann_imgt_cdr3_na -> gcgagaggcagtaccggccgatttttggagtggttattatactttgactac
+#82 vdj_server_ann_imgt_cdr3_tr -> ARGSTGRFLEWLLYFDY
+#83 vdj_server_ann_kabat_CDR1_base_sub -> 0
+#84 vdj_server_ann_kabat_CDR1_bsb_freq -> 0.0
+#85 vdj_server_ann_kabat_CDR1_deletions -> 0
+#86 vdj_server_ann_kabat_CDR1_frm_msk -> [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2]
+#87 vdj_server_ann_kabat_CDR1_insertions -> 0
+#88 vdj_server_ann_kabat_CDR1_mutations -> 0
+#89 vdj_server_ann_kabat_CDR1_nonsynonymous_bsb -> 0
+#90 vdj_server_ann_kabat_CDR1_ns_rto -> 0
+#91 vdj_server_ann_kabat_CDR1_pct_id -> 1
+#92 vdj_server_ann_kabat_CDR1_qry_aln -> GGTTACTACTGGAGC
+#93 vdj_server_ann_kabat_CDR1_qry_end -> 107
+#94 vdj_server_ann_kabat_CDR1_qry_srt -> 93
+#95 vdj_server_ann_kabat_CDR1_ref_aln -> GGTTACTACTGGAGC
+#96 vdj_server_ann_kabat_CDR1_stp_cdn -> False
+#97 vdj_server_ann_kabat_CDR1_synonymous_bsb -> 0
+#98 vdj_server_ann_kabat_CDR2_base_sub -> 0
+#99 vdj_server_ann_kabat_CDR2_bsb_freq -> 0.0
+#100 vdj_server_ann_kabat_CDR2_deletions -> 0
+#101 vdj_server_ann_kabat_CDR2_frm_msk -> [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2]
+#102 vdj_server_ann_kabat_CDR2_insertions -> 0
+#103 vdj_server_ann_kabat_CDR2_mutations -> 0
+#104 vdj_server_ann_kabat_CDR2_nonsynonymous_bsb -> 0
+#105 vdj_server_ann_kabat_CDR2_ns_rto -> 0
+#106 vdj_server_ann_kabat_CDR2_pct_id -> 1
+#107 vdj_server_ann_kabat_CDR2_qry_aln -> GAAATCAATCATAGTGGAAGCACCAACTACAACCCGTCCCTCAAGAGT
+#108 vdj_server_ann_kabat_CDR2_qry_end -> 197
+#109 vdj_server_ann_kabat_CDR2_qry_srt -> 150
+#110 vdj_server_ann_kabat_CDR2_ref_aln -> GAAATCAATCATAGTGGAAGCACCAACTACAACCCGTCCCTCAAGAGT
+#111 vdj_server_ann_kabat_CDR2_stp_cdn -> False
+#112 vdj_server_ann_kabat_CDR2_synonymous_bsb -> 0
+#113 vdj_server_ann_kabat_FR1_base_sub -> 0
+#114 vdj_server_ann_kabat_FR1_bsb_freq -> 0.0
+#115 vdj_server_ann_kabat_FR1_deletions -> 0
+#116 vdj_server_ann_kabat_FR1_frm_msk -> [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2]
+#117 vdj_server_ann_kabat_FR1_insertions -> 0
+#118 vdj_server_ann_kabat_FR1_mutations -> 0
+#119 vdj_server_ann_kabat_FR1_nonsynonymous_bsb -> 0
+#120 vdj_server_ann_kabat_FR1_ns_rto -> 0
+#121 vdj_server_ann_kabat_FR1_pct_id -> 1
+#122 vdj_server_ann_kabat_FR1_qry_aln -> CAGGTGCAGCTACAGCAGTGGGGCGCAGGACTGTTGAAGCCTTCGGAGACCCTGTCCCTCACCTGCGCTGTCTATGGTGGGTCCTTCAGT
+#123 vdj_server_ann_kabat_FR1_qry_end -> 92
+#124 vdj_server_ann_kabat_FR1_qry_srt -> 3
+#125 vdj_server_ann_kabat_FR1_ref_aln -> CAGGTGCAGCTACAGCAGTGGGGCGCAGGACTGTTGAAGCCTTCGGAGACCCTGTCCCTCACCTGCGCTGTCTATGGTGGGTCCTTCAGT
+#126 vdj_server_ann_kabat_FR1_stp_cdn -> False
+#127 vdj_server_ann_kabat_FR1_synonymous_bsb -> 0
+#128 vdj_server_ann_kabat_FR2_base_sub -> 2
+#129 vdj_server_ann_kabat_FR2_bsb_freq -> 0.047619047619
+#130 vdj_server_ann_kabat_FR2_deletions -> 1
+#131 vdj_server_ann_kabat_FR2_frm_msk -> [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2]
+#132 vdj_server_ann_kabat_FR2_insertions -> 1
+#133 vdj_server_ann_kabat_FR2_mutations -> 4
+#134 vdj_server_ann_kabat_FR2_nonsynonymous_bsb -> 0
+#135 vdj_server_ann_kabat_FR2_ns_rto -> 0.0
+#136 vdj_server_ann_kabat_FR2_pct_id -> 0
+#137 vdj_server_ann_kabat_FR2_qry_aln -> TGGATCCGCCAGCCACCCTGGCAAGGGGCT-GAGTGGATTGGG
+#138 vdj_server_ann_kabat_FR2_qry_end -> 149
+#139 vdj_server_ann_kabat_FR2_qry_srt -> 108
+#140 vdj_server_ann_kabat_FR2_ref_aln -> TGGATCCGCCAGCC-CCCAGGGAAGGGGCTGGAGTGGATTGGG
+#141 vdj_server_ann_kabat_FR2_stp_cdn -> False
+#142 vdj_server_ann_kabat_FR2_synonymous_bsb -> 2
+#143 vdj_server_ann_kabat_FR3_base_sub -> 2
+#144 vdj_server_ann_kabat_FR3_bsb_freq -> 0.0208333333333
+#145 vdj_server_ann_kabat_FR3_deletions -> 0
+#146 vdj_server_ann_kabat_FR3_frm_msk -> [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2]
+#147 vdj_server_ann_kabat_FR3_insertions -> 0
+#148 vdj_server_ann_kabat_FR3_mutations -> 2
+#149 vdj_server_ann_kabat_FR3_nonsynonymous_bsb -> 2
+#150 vdj_server_ann_kabat_FR3_ns_rto -> 0
+#151 vdj_server_ann_kabat_FR3_pct_id -> 0
+#152 vdj_server_ann_kabat_FR3_qry_aln -> CGAGTCACCATATAAGTAGGCACGTCCAAGAACCAGTTCTCCCTGAAGCTGAGCTCTGTGACCGCCGCGGACACGGCTGTGTATTACTGTGCGAGA
+#153 vdj_server_ann_kabat_FR3_qry_end -> 293
+#154 vdj_server_ann_kabat_FR3_qry_srt -> 198
+#155 vdj_server_ann_kabat_FR3_ref_aln -> CGAGTCACCATATCAGTAGACACGTCCAAGAACCAGTTCTCCCTGAAGCTGAGCTCTGTGACCGCCGCGGACACGGCTGTGTATTACTGTGCGAGA
+#156 vdj_server_ann_kabat_FR3_stp_cdn -> True
+#157 vdj_server_ann_kabat_FR3_synonymous_bsb -> 0
+#158 vdj_server_ann_kabat_cdr3_na -> ggcagtaccggccgatttttggagtggttattatactttgactac
+#159 vdj_server_ann_kabat_cdr3_tr -> GSTGRFLEWLLYFDY
+#160 vdj_server_ann_whole_seq_base_sub -> 4
+#161 vdj_server_ann_whole_seq_bsb_freq -> 0.012539184953
+#162 vdj_server_ann_whole_seq_deletions -> 1
+#163 vdj_server_ann_whole_seq_insertions -> 1
+#164 vdj_server_ann_whole_seq_mutations -> 6
+#165 vdj_server_ann_whole_seq_nonsynonymous_bsb -> 2
+#166 vdj_server_ann_whole_seq_ns_rto -> 1.0
+#167 vdj_server_ann_whole_seq_pct_id -> 0.987460815047
+#168 vdj_server_ann_whole_seq_stp_cdn -> True
+#169 vdj_server_ann_whole_seq_synonymous_bsb -> 2
