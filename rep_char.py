@@ -312,7 +312,12 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
 
 
 	#productive rearrangement 
-	annMap['productive_rearrangement']=getProductiveRearrangmentFlag(read_result_obj,meta,organism,imgtdb_obj)
+	#if IMGT CDR3 length is a multiple of 3 and it's not (-1), then consider it productive
+	if(cdr3_map['imgt']!=(-1)):
+		if((cdr3_map['imgt'])%3==0):
+			annMap['vdj_server_ann_productive_rearrangement']=True
+		else:
+			annMap['vdj_server_ann_productive_rearrangement']=False			
 
 	#VDJSERVER V REGION ANNOTATIONS
 	mode_list=get_domain_modes()
@@ -613,7 +618,8 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None"):
 		"vdj_server_ann_whole_seq_ns_rto",
 		"vdj_server_ann_whole_seq_pct_id",
 		"vdj_server_ann_whole_seq_stp_cdn",
-		"vdj_server_ann_whole_seq_synonymous_bsb"
+		"vdj_server_ann_whole_seq_synonymous_bsb",
+		"vdj_server_ann_productive_rearrangement",
 	]
 	m['read_id#']=rid
 	#fHandle=open(fPath,'a')
