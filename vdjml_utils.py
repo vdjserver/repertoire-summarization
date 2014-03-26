@@ -3,7 +3,7 @@
 from pprint import pprint
 from utils import printMap,repStr
 from segment_utils import getNAProductiveRearrangmentFlagFromVJHitLineData,getRegionAlignmentFromLargerVAlignment
-from vdjml_igblast_parse import extractJunctionRegionSeq
+from vdjml_igblast_parse import extractJunctionRegionSeq,rev_comp_dna
 from igblast_utils import buildAlignmentWholeSeqs
 from alignment import alignment
 
@@ -117,6 +117,8 @@ def getHitInfo(read_result_obj,meta,alleleName,query_record=None,imgtdb_obj=None
 						s_start_line=ret_map['s. start']
 						s_end_line=ret_map['s. end']
 						query_str=str(query_record.seq)
+						if(ret_map['is_inverted']):
+							query_str=rev_comp_dna(query_str)
 						query_for_btop=query_str[q_start_line-1:q_end_line]
 						sbjct=imgtdb_obj.getRefDirSetFNASeqGivenOrgAndAllele(ret_map['subject ids'],organism)
 						sbjct_for_btop=sbjct[s_start_line-1:s_end_line]
