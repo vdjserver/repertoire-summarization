@@ -11,7 +11,7 @@ from Bio import SeqIO
 from segment_utils import IncrementMapWrapper,getVRegionsList,getRegionSpecifcCharacterization,getEmptyRegCharMap,getAdjustedCDR3StartFromRefDirSetAllele,getTheFrameForThisReferenceAtThisPosition,getCDR3RegionSpecificCharacterizationSubAln,getVRegionStartAndStopGivenRefData,getADJCDR3EndFromJAllele
 from char_utils import getNumberBaseSubsFromBTOP,getNumberIndelsFromBTOP,getIndelMapFromBTOP
 from alignment import alignment
-from vdjml_igblast_parse import rev_comp_dna
+from vdjml_igblast_parse import rev_comp_dna,getRegPosFromInvertedPos
 import re
 
 
@@ -175,15 +175,46 @@ def cdr3RegCharAnalysis(vMap,dMap,jMap,mode,cdr3_anal_map,organism,imgtdb_obj):
 
 
 
-#def getValnWholeSeqStopFlag(vInfo,imgtdb_obj,organism,annMap):
-#	if(not(vInfo==None)):
-#		vAlnObj=alignment(vInfo['query seq'],vInfo['subject seq'],vInfo['q. start'],vInfo['q. end'],vInfo['s. start'],vInfo['s. end'])
-#		vAlnNoGapStart=vAlnObj.getGEQAlignmentFirstNonGap()
-#		s_start=vAlnNoGapStart.s_start
-#		s_start_frame=getTheFrameForThisReferenceAtThisPosition(vInfo['subject ids'],organism,imgtdb_obj,s_start)
-#		q_start=vAlnNoGapStart.q_start
-#		
-#		numNToAdd=s_start_frame
+def getValnWholeSeqStopFlag(vInfo,jInfo,imgtdb_obj,organism,annMap,seq_rec):
+	if(not(vInfo==None)):
+		vAlnObj=alignment(vInfo['query seq'],vInfo['subject seq'],vInfo['q. start'],vInfo['q. end'],vInfo['s. start'],vInfo['s. end'])
+		vAlnNoGapStart=vAlnObj.getGEQAlignmentFirstNonGap()
+		s_start=vAlnNoGapStart.s_start
+		s_start_frame=getTheFrameForThisReferenceAtThisPosition(vInfo['subject ids'],organism,imgtdb_obj,s_start)
+		numNToAdd=s_start_frame%3
+		Ns=repStr("N",numNToAdd)
+		q_start=vAlnNoGapStart.q_start
+		print "Initial q_start is ",q_start
+		q_end=vAlnNoGapStart.q_end
+		#if(vInfo['is_inverted']):
+		#	q_start=getRegPosFromInvertedPos(q_start,len(seq_rec.seq))
+		#	print "q_start after inversion : ",q_start
+		#	q_end=getRegPosFromInvertedPos(q_end,len(seq_rec.seq))
+		if(not(jInfo==None)):
+			jAlnObj=alignment(jInfo['query seq'],jInfo['subject seq'],jInfo['q. start'],jInfo['q. end'],jInfo['s. start'],jInfo['s. end'])
+			j_q_end=jAlnObj.q_end
+			print "Initial q_end from j",j_q_end			
+			#if(jInfo['is_inverted']):
+			#	j_q_end=getRegPosFromInvertedPos(j_q_end,len(seq_rec.seq))
+			print "Used q_end from j",j_q_end
+			q_end=max(q_end,j_q_end)
+		if(vInfo['is_inverted']):
+			query_to_exm=rev_comp_dna(str(seq_rec.seq))[q_start-1:q_end+1]
+		else:
+			query_to_exm=str(seq_rec.seq)[q_start-1:q_end+1]
+		query_to_exm=Ns+query_to_exm
+		trx_to_exm=biopythonTranslate(query_to_exm)
+		print "The query and translation to examine for ",seq_rec.id," (with q_start=",q_start," and q_end=",q_end,")  :"
+		print query_to_exm
+		print trx_to_exm
+		if(trx_to_exm.find("*")!=(-1)):
+			return True
+		else:
+			return False
+	else:
+		return None
+		
+
 
 
 
@@ -257,6 +288,9 @@ def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap):
 			NSub=repStr("N",numN)
 			NQry=repStr("N",numN)
 			vCharMap=preCDR3Aln.characterize()
+			print "the vCharMap annotation map and alignment (for whole seq named ",vInfo['query id'],") is "
+			printMap(vCharMap)
+			print preCDR3Aln.getNiceString()
 			jCharMap=postCDR3AlnObj.characterize()
 			#to get/compute the 'whole' map, add up the "non-special" values
 			#otherwise, compute them specially
@@ -336,7 +370,8 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
 	for w in whole_char_map:
 		new_key=global_key_base+'whole_seq_'+w
 		annMap[new_key]=whole_char_map[w]
-
+	whole_seq_stp_cdn_Tot_flag=getValnWholeSeqStopFlag(vInfo,jInfo,imgtdb_obj,organism,annMap,read_rec)
+	annMap['vdj_server_whole_vj_stp_cdn']=whole_seq_stp_cdn_Tot_flag
 
 	#productive rearrangement 
 	#if IMGT CDR3 length is a multiple of 3 and it's not (-1), then consider it productive
@@ -650,6 +685,7 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None"):
 		"vdj_server_ann_whole_seq_synonymous_bsb",
 		"vdj_server_ann_whole_seq_cdr3_stp_cdn",
 		"vdj_server_ann_productive_rearrangement",
+		"vdj_server_whole_vj_stp_cdn"
 	]
 	m['read_id#']=rid
 	#fHandle=open(fPath,'a')
