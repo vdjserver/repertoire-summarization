@@ -4,6 +4,16 @@ import random
 from utils import makeEmptyArrayOfDigitsOfLen,biopythonTranslate,getNumberBpInAlnStr
 import re
 
+def getNumStartingDashes(s):
+	dre=re.compile(r'^(\-+)')
+	sr=re.search(dre,s)
+	if(sr):
+		dashes=sr.group(1)
+		return len(dashes)
+	else:
+		return 0
+
+
 #class for two-seq alignment methods/tools/data
 class alignment:
 
@@ -28,6 +38,27 @@ class alignment:
 		self.s_frame_mask=Cs_frame_mask
 
 
+	def adjustSFJForSAlnGaps(self,setSFMVal):
+		if(self.s_frame_mask==None or len(self.s_aln)<=0):
+			#raise Exception("Error, require a frame mask and valid s_aln to adjust FM for gaps in s_aln!")
+			return
+		else:
+			if(len(self.s_frame_mask)!=len(self.s_aln) or len(self.s_frame_mask)<=0 or len(self.s_aln)<=0):
+				return
+			else:
+				if(re.match(r'^\-+$',self.s_aln)):
+					return
+				numInitialDashes=getNumStartingDashes(self.s_aln)
+				if(numInitialDashes>1):
+					#special case
+					pass
+				for p in range(len(self.s_aln)-1):
+					next_p=p+1
+					if(self.s_aln[next_p]=="-"):
+						self.s_frame_mask[next_p]=(self.s_frame_mask[p]+1)%3
+						
+
+
 
 	#set frame mask so that the first subject base has the given value
 	def setSFM(self,firstFrame=0):
@@ -36,7 +67,7 @@ class alignment:
 		temp=0
 		#print "setsfm called..."
 		if(len(self.s_aln)<=0):
-			print "setsfm early return..."
+			#print "setsfm early return..."
 			self.s_mask=nfm
 			return
 		if(self.s_aln[temp]=="-"):
@@ -48,6 +79,7 @@ class alignment:
 				current+=1			
 			temp+=1
 		self.s_frame_mask=nfm
+		self.adjustSFJForSAlnGaps(firstFrame)
 		#print "just set self.s_frame_mask to ",self.s_frame_mask
 
 
@@ -212,6 +244,7 @@ class alignment:
 		return pl
 
 
+
 	#ins, del, bsb, syn/non-sym
 	def characterize(self):
 		char_map=dict()
@@ -250,6 +283,7 @@ class alignment:
 			frame_mask[temp_index+1]==1 and 
 			frame_mask[temp_index+2]==2 
 			):
+				#print "temp_index=",temp_index
 				#print "encountered a codon...."
 				s_codon=self.s_aln[temp_index:(temp_index+3)]
 				s_codon_w_gaps=s_codon
@@ -263,15 +297,16 @@ class alignment:
 					q_amino=str(biopythonTranslate(q_codon))
 					if(q_amino=="*"):
 						stp_cdn=True
+						#print "DETECTED A STOP CODON AT TEMP_INDEX",temp_index
 				if(s_codon.find("-")==(-1) and q_codon.find("-")==(-1)):
 					#ANALYSIS FOR CODONS WITH NO GAPS
 					#no gaps, perform analysis
-					print "Detected no gaps in codons"
+					#print "Detected no gaps in codons"
 					s_amino=str(biopythonTranslate(s_codon))
-					print "subject amino :",s_amino," and codon ",s_codon
+					#print "subject amino :",s_amino," and codon ",s_codon
 					q_amino=str(biopythonTranslate(q_codon))
-					print "query amino ",q_amino," and codon ",q_codon
-					print "PRE SN counts : ",num_syn," and ",num_nsy
+					#print "query amino ",q_amino," and codon ",q_codon
+					#print "PRE SN counts : ",num_syn," and ",num_nsy
 					for cp in range(3):
 						if(s_codon[cp]!=q_codon[cp] and s_amino==q_amino):
 							#SYNONYMOUS mutation
@@ -281,7 +316,7 @@ class alignment:
 							#NONSYNONYMOUS MUTATION
 							num_nsy+=1
 							#num_bsb+=1
-					print "POST SN counts : ",num_syn," and ",num_nsy
+					#print "POST SN counts : ",num_syn," and ",num_nsy
 				else:
 					#ANALYSIS FOR CODONS WITHOUT GAPS
 					for cp in range(3):
@@ -289,16 +324,10 @@ class alignment:
 							#num_bsb+=1
 							#already accounted for at beginning
 							pass
-				#q_codon_space=getCodonSpace(q_codon)
-				#s_codon_space=getCodonSpace(s_codon)
-				#q_codon_set=getCodonSpaceAsSet(q_codon_space)
-				#s_codon_set=getCodonSpaceAsSet(s_codon_space)
-				#print "The codon space from query codon ",q_codon," is ",q_codon_space," and the set is ",q_codon_set
-				#print "The subject cd space from subject ",s_codon," is ",s_codon_space," and the set is ",s_codon_set
-				# "The query amino space is ",getAminosFromCodonSpace(s_codon_space)
+
 				temp_index+=3
 			else:
-				#print "encountered a single...."
+				#print "encountered a single.... temp_index=",temp_index
 				if(self.s_aln[temp_index]!=self.q_aln[temp_index] and self.s_aln[temp_index]!="-" and self.q_aln[temp_index]!="-"):
 					#num_bsb+=1
 					pass
