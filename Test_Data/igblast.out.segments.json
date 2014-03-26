@@ -1,6 +1,6 @@
 {
 "label":"human",
-"value":33
+"value":35
 ,
 "children": [
 {
@@ -3662,17 +3662,17 @@
  , 
 {
 "label":"IGKJ",
-"value":0
+"value":1
 ,
 "children": [
 {
 "label":"IGKJ1",
-"value":0
+"value":1
 ,
 "children": [
 {
 "label":"IGKJ1*01",
-"value":0
+"value":1
  }
  ] 
  }
@@ -3749,7 +3749,7 @@
  , 
 {
 "label":"IGKV",
-"value":0
+"value":1
 ,
 "children": [
 {
@@ -5182,17 +5182,17 @@
  , 
 {
 "label":"IGKV4",
-"value":0
+"value":1
 ,
 "children": [
 {
 "label":"IGKV4-1",
-"value":0
+"value":1
 ,
 "children": [
 {
 "label":"IGKV4-1*01",
-"value":0
+"value":1
  }
  ] 
  }

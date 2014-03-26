@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <vdjml version="0.0" xmlns="http://vdjserver.org/xml/schema/vdjml/">
    <meta>
-      <generator name="libVDJML" version="0.0.8-1-ge0428ef" time_gmt="2014-Mar-26 20:37:49"/>
+      <generator name="libVDJML" version="0.0.8-1-ge0428ef" time_gmt="2014-Mar-26 21:42:44"/>
       <aligner aligner_id="1" name="IgBLAST" version="2.2.27+" uri="INSERT_ALIGERN_URI_HERE" run_id="0">
          <parameters>IG_BLAST_PARAMETERS</parameters>
       </aligner>
@@ -544,6 +544,41 @@
                <region name="FWR3" num_system="IMGT" aligner_id="1" pos0="174" len="114" identity="99.1%"/>
                <region name="dj_junction" num_system="IMGT" aligner_id="1" pos0="327" len="3" identity="0%"/>
                <region name="vd_junction" num_system="IMGT" aligner_id="1" pos0="296" len="10" identity="0%"/>
+            </combination>
+         </vdj_alignment>
+      </read>
+      <read read_id="S62695.1">
+         <vdj_alignment>
+            <segment_match segment_match_id="1" pos0="0" len="282">
+               <btop>282</btop>
+               <gl_seg_match gl_seg_match_id="1" num_system="IMGT" name="IGKV4-1*01" gl_db_id="1" type="V" aligner_id="1" pos0="17" len="282" identity="100%" score="282"/>
+            </segment_match>
+            <segment_match segment_match_id="2" pos0="0" len="278">
+               <btop>8AC1TA5GT9TCGA2CG2GA2GA6AC2ATAC5AG1TG4CT9T-T-A-T-A-C-A-G-C-T-C-C-A-A-C-A-A-T-1AGGC1AG1TA7TC17AT2AC3CG4TC1AG3GC5TC2CTTG1GT5TC3CA3ACACTA1CT2GTGA4TA1AC1CA1AG11CT14TG27GT8GT1GT20AG3TA3</btop>
+               <gl_seg_match gl_seg_match_id="1" num_system="IMGT" name="IGKV3-15*01" gl_db_id="1" type="V" aligner_id="1" pos0="17" len="260" identity="76.26%" score="142"/>
+            </segment_match>
+            <segment_match segment_match_id="3" pos0="0" len="278">
+               <btop>8AC1TA5GT2GT6TCGA2CG2GA2GA6AC2ATAC5AG1TG4CT9TATGACTAAG5C-C-A-A-C-A-A-T-A-A-G-A-A-C-T-5GT1TC17AT2AG3CG4TC1AG3GC5TC2CTTG1GT5TC3CA3ACACTA1CT2GCGA4TA1AC1CA1AG11CT14TC27GC8GT1GT20AGTG6</btop>
+               <gl_seg_match gl_seg_match_id="1" num_system="IMGT" name="IGKV3D-7*01" gl_db_id="1" type="V" aligner_id="1" pos0="17" len="263" identity="76.26%" score="142"/>
+            </segment_match>
+            <segment_match segment_match_id="4" pos0="282" len="38">
+               <btop>38</btop>
+               <gl_seg_match gl_seg_match_id="1" num_system="IMGT" name="IGKJ1*01" gl_db_id="1" type="J" aligner_id="1" pos0="0" len="38" identity="100%" score="38"/>
+            </segment_match>
+            <segment_match segment_match_id="5" pos0="286" len="34">
+               <btop>9CGAG15AG7</btop>
+               <gl_seg_match gl_seg_match_id="1" num_system="IMGT" name="IGKJ4*02" gl_db_id="1" type="J" aligner_id="1" pos0="4" len="34" identity="91.18%" score="22"/>
+            </segment_match>
+            <segment_match segment_match_id="6" pos0="297" len="23">
+               <btop>15AG7</btop>
+               <gl_seg_match gl_seg_match_id="1" num_system="IMGT" name="IGKJ4*01" gl_db_id="1" type="J" aligner_id="1" pos0="15" len="23" identity="95.65%" score="19"/>
+            </segment_match>
+            <combination segments="1,4">
+               <region name="CDR1" num_system="IMGT" aligner_id="1" pos0="61" len="36" identity="100%"/>
+               <region name="CDR2" num_system="IMGT" aligner_id="1" pos0="148" len="9" identity="100%"/>
+               <region name="FWR1" num_system="IMGT" aligner_id="1" pos0="0" len="61" identity="100%"/>
+               <region name="FWR2" num_system="IMGT" aligner_id="1" pos0="97" len="51" identity="100%"/>
+               <region name="FWR3" num_system="IMGT" aligner_id="1" pos0="157" len="108" identity="100%"/>
             </combination>
          </vdj_alignment>
       </read>
