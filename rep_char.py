@@ -174,7 +174,20 @@ def cdr3RegCharAnalysis(vMap,dMap,jMap,mode,cdr3_anal_map,organism,imgtdb_obj):
 
 
 
-def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism):
+
+#def getValnWholeSeqStopFlag(vInfo,imgtdb_obj,organism,annMap):
+#	if(not(vInfo==None)):
+#		vAlnObj=alignment(vInfo['query seq'],vInfo['subject seq'],vInfo['q. start'],vInfo['q. end'],vInfo['s. start'],vInfo['s. end'])
+#		vAlnNoGapStart=vAlnObj.getGEQAlignmentFirstNonGap()
+#		s_start=vAlnNoGapStart.s_start
+#		s_start_frame=getTheFrameForThisReferenceAtThisPosition(vInfo['subject ids'],organism,imgtdb_obj,s_start)
+#		q_start=vAlnNoGapStart.q_start
+#		
+#		numNToAdd=s_start_frame
+
+
+
+def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap):
 	if(not(vInfo==None)):
 		#at least work with V
 		v_cdr3_start=getAdjustedCDR3StartFromRefDirSetAllele(vInfo['subject ids'],imgtdb_obj,organism,"imgt")
@@ -254,6 +267,16 @@ def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism):
 					totCharMap[k]=vCharMap[k]+jCharMap[k]
 			if(vCharMap['stp_cdn'] or jCharMap['stp_cdn']):
 				totCharMap['stp_cdn']=True
+			
+			if('vdj_server_ann_imgt_cdr3_tr' in annMap):
+				starPos=annMap['vdj_server_ann_imgt_cdr3_tr'].find("*")
+				if(starPos!=(-1)):
+					totCharMap['cdr3_stp_cdn']=True
+				else:
+					totCharMap['cdr3_stp_cdn']=False
+			else:
+				totCharMap['cdr3_stp_cdn']=False
+				
 			#handle pct id and bsb_freq specially
 			totQ=getNumberBpInAlnStr(postCDR3AlnObj.q_aln)+getNumberBpInAlnStr(preCDR3Aln.q_aln)
 			totBS=totCharMap['base_sub']
@@ -304,8 +327,12 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
 			if(seg=='V'):
 				noneSeg_flag=True
 
+
+	#annotations such as NA and AA from CDR3 from cdr3_map
+	annMap=readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,annMap,cdr3_map)
+
 	#whole seq characterization
-	whole_char_map=returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism)
+	whole_char_map=returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap)
 	for w in whole_char_map:
 		new_key=global_key_base+'whole_seq_'+w
 		annMap[new_key]=whole_char_map[w]
@@ -317,7 +344,9 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
 		if((cdr3_map['imgt'])%3==0):
 			annMap['vdj_server_ann_productive_rearrangement']=True
 		else:
-			annMap['vdj_server_ann_productive_rearrangement']=False			
+			annMap['vdj_server_ann_productive_rearrangement']=False
+	else:
+		annMap['vdj_server_ann_productive_rearrangement']="N/A"
 
 	#VDJSERVER V REGION ANNOTATIONS
 	mode_list=get_domain_modes()
@@ -346,7 +375,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
 				#pass
 
 	#sys.exit(0)
-	annMap=readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,annMap,cdr3_map)
+	
 	annMap['read_name']=read_rec.id
 	getAlignmentString(read_result_obj,meta,query_record,imgtdb_obj,organism)
 	#analyze_combinations(read_result_obj,meta,organism,imgtdb_obj,read_rec,annMap)
@@ -619,6 +648,7 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None"):
 		"vdj_server_ann_whole_seq_pct_id",
 		"vdj_server_ann_whole_seq_stp_cdn",
 		"vdj_server_ann_whole_seq_synonymous_bsb",
+		"vdj_server_ann_whole_seq_cdr3_stp_cdn",
 		"vdj_server_ann_productive_rearrangement",
 	]
 	m['read_id#']=rid
