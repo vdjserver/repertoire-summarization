@@ -61,6 +61,37 @@ class alignment:
 			self.s_frame_mask=Cs_frame_mask
 
 
+
+	#get subalignment with first subject/query non-gapped position start
+	def getGEQAlignmentFirstNonGap(self):
+		s_pos=self.s_start
+		q_pos=self.q_start
+		if(s_pos==0 or q_pos==0):
+			return self
+		if(len(self.s_aln)<=0 or len(self.q_aln)<=0):
+			return self
+		allGaps=re.compile(r'^\-+$')
+		if(allGaps.match(self.s_aln) or allGaps.match(self.q_aln)):
+			return self
+		if(self.s_aln[0]!="-" and self.q_aln[0]!="-"):
+			return self
+		sdashRe=re.compile(r'^(\-+)[^\-]')
+		sreres=re.match(sdashRe,self.s_aln)
+		qreres=re.match(sdashRe,self.q_aln)
+		if(sreres):
+			dashes=sreres.group(1)
+			num_dashes=len(dashes)
+			nq_start=self.q_start+num_dashes
+			return self.getAlnAtAndCond(nq_start,"query","geq")
+		else:
+			dashes=qreres.group(1)
+			num_dashes=len(dashes)
+			ns_start=self.s_start+num_dashes
+			return self.getAlnAtAndCond(sq_start,"subject","geq")
+		
+
+
+
 	#build an alignment from a BTOP
 	#returns array of query, then match/midline, then subject based on btop alignment specification
 	@staticmethod
@@ -442,6 +473,11 @@ class alignment:
 		t_s_to=29
 		test_aln=alignment(t_q_aln,t_s_aln,t_q_from,t_q_to,t_s_from,t_s_to)
 		test_aln.setSFM()
+		sub_aln_no_gap=test_aln.getGEQAlignmentFirstNonGap()
+		print "The test_aln is ",
+		print test_aln.getNiceString()
+		print "First non-gap both is "
+		print sub_aln_no_gap.getNiceString()
 		testGOL=True
 		if(testGOL):
 			for c in range(t_q_from-2,t_q_to+2):
