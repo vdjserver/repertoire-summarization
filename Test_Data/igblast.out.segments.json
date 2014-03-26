@@ -1,11 +1,11 @@
 {
 "label":"human",
-"value":9
+"value":33
 ,
 "children": [
 {
 "label":"IGHD",
-"value":3
+"value":11
 ,
 "children": [
 {
@@ -200,17 +200,17 @@
  , 
 {
 "label":"IGHD3",
-"value":3
+"value":11
 ,
 "children": [
 {
 "label":"IGHD3-3",
-"value":3
+"value":11
 ,
 "children": [
 {
 "label":"IGHD3-3*01",
-"value":3
+"value":11
  }
  , 
 {
@@ -540,7 +540,7 @@
  , 
 {
 "label":"IGHJ",
-"value":3
+"value":11
 ,
 "children": [
 {
@@ -627,7 +627,7 @@
  , 
 {
 "label":"IGHJ4",
-"value":3
+"value":11
 ,
 "children": [
 {
@@ -637,7 +637,7 @@
  , 
 {
 "label":"IGHJ4*02",
-"value":3
+"value":11
  }
  , 
 {
@@ -695,7 +695,7 @@
  , 
 {
 "label":"IGHV",
-"value":3
+"value":11
 ,
 "children": [
 {
@@ -2820,7 +2820,7 @@
  , 
 {
 "label":"IGHV4",
-"value":3
+"value":11
 ,
 "children": [
 {
@@ -3062,12 +3062,12 @@
  , 
 {
 "label":"IGHV4-34",
-"value":3
+"value":11
 ,
 "children": [
 {
 "label":"IGHV4-34*01",
-"value":3
+"value":11
  }
  , 
 {
