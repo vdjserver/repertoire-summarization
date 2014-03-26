@@ -313,7 +313,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
 
 	#productive rearrangement 
 	#if IMGT CDR3 length is a multiple of 3 and it's not (-1), then consider it productive
-	if(cdr3_map['imgt']!=(-1)):
+	if(cdr3_map['imgt']!=(-1) and cdr3_map['imgt']>0):
 		if((cdr3_map['imgt'])%3==0):
 			annMap['vdj_server_ann_productive_rearrangement']=True
 		else:
