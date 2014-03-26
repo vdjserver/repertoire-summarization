@@ -6,6 +6,7 @@ from segment_utils import getNAProductiveRearrangmentFlagFromVJHitLineData,getRe
 from vdjml_igblast_parse import extractJunctionRegionSeq,rev_comp_dna
 from igblast_utils import buildAlignmentWholeSeqs
 from alignment import alignment
+import vdjml
 
 def getAlignmentString(read_result_obj,meta,query_record=None,imgtdb_obj=None,organism=None):
 	topVDJ=getTopVDJItems(read_result_obj,meta)
@@ -239,13 +240,14 @@ def getTopVDJItems(read_result_obj,meta):
 				#print meta[gls_match.gl_segment_].name_
 				#type_from_meta=meta[gls_match.gl_segment_].gst_
 				#print "META_TYPE",
-				if(names[seg_type]==None):
-					#print "USING ",meta[gls_match.gl_segment_].name_
-					names[seg_type]=meta[gls_match.gl_segment_].name_
+				vdjml_look_seg_type=vdjml.segment_type(gls_match,meta)
+				if(names[vdjml_look_seg_type]==None):
+					print "USING ",meta[gls_match.gl_segment_].name_
+					names[vdjml_look_seg_type]=meta[gls_match.gl_segment_].name_
 				else:
-					#print "SKIPPING ",meta[gls_match.gl_segment_].name_
+					print "SKIPPING ",meta[gls_match.gl_segment_].name_," fail on emptiness"
 					pass
-			seg_id+=1
+				seg_id+=1
 		#print "\n\n\n\n\n"
 	#print "Returning from TOP : "
 	#printMap(names)
