@@ -242,10 +242,10 @@ def getTopVDJItems(read_result_obj,meta):
 				#print "META_TYPE",
 				vdjml_look_seg_type=vdjml.segment_type(gls_match,meta)
 				if(names[vdjml_look_seg_type]==None):
-					print "USING ",meta[gls_match.gl_segment_].name_
+					#print "USING ",meta[gls_match.gl_segment_].name_
 					names[vdjml_look_seg_type]=meta[gls_match.gl_segment_].name_
 				else:
-					print "SKIPPING ",meta[gls_match.gl_segment_].name_," fail on emptiness"
+					#print "SKIPPING ",meta[gls_match.gl_segment_].name_," fail on emptiness"
 					pass
 				seg_id+=1
 		#print "\n\n\n\n\n"
