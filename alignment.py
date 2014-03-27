@@ -38,6 +38,9 @@ class alignment:
 		self.s_frame_mask=Cs_frame_mask
 
 
+
+
+
 	#adjust frame mask for when the s_aln in the alignment starts with "-" (gaps)
 	def adjustSFJForSAlnGaps(self,setSFMVal):
 		if(self.s_frame_mask==None or len(self.s_aln)<=0):
@@ -51,7 +54,7 @@ class alignment:
 					return
 				numInitialDashes=getNumStartingDashes(self.s_aln)
 				if(numInitialDashes>0):
-					#print numInitialDashes,">0!"
+					print numInitialDashes,">0!"
 					for p in range(numInitialDashes):
 						b_index=numInitialDashes-p-1
 						#print "b_index=",b_index
@@ -74,7 +77,7 @@ class alignment:
 		nfm=list()
 		current=firstFrame
 		temp=0
-		#print "setsfm called..."
+		print "setsfm called with firstFrame==",firstFrame
 		if(len(self.s_aln)<=0):
 			#print "setsfm early return..."
 			self.s_mask=nfm
@@ -82,11 +85,18 @@ class alignment:
 		if(self.s_aln[temp]=="-"):
 			current-=1
 			current=current%3
-		while(temp<len(self.s_aln)):
-			if(self.s_aln[temp]!="-"):
-				current+=1	
-			nfm.append(current%3)		
-			temp+=1
+		if(self.s_aln.startswith("-")):
+			while(temp<len(self.s_aln)):
+				if(self.s_aln[temp]!="-"):
+					current+=1
+				nfm.append(current%3)
+				temp+=1			
+		else:
+			while(temp<len(self.s_aln)):
+				nfm.append(current%3)
+				if(self.s_aln[temp]!="-"):
+					current+=1
+				temp+=1
 		self.s_frame_mask=nfm
 		self.adjustSFJForSAlnGaps(firstFrame)
 		#print "just set self.s_frame_mask to ",self.s_frame_mask
@@ -292,30 +302,30 @@ class alignment:
 			frame_mask[temp_index+1]==1 and 
 			frame_mask[temp_index+2]==2 
 			):
-				#print "temp_index=",temp_index
-				#print "encountered a codon...."
+				print "temp_index=",temp_index
+				print "encountered a codon...."
 				s_codon=self.s_aln[temp_index:(temp_index+3)]
 				s_codon_w_gaps=s_codon
 				#s_codon=re.sub(r'\-','N',s_codon)
-				#print "s codon is ",s_codon
+				print "s codon is ",s_codon
 				q_codon=self.q_aln[temp_index:(temp_index+3)]
 				q_codon_w_gaps=q_codon
 				#q_codon=re.sub(r'\-','N',q_codon)
-				#print "q codon is ",q_codon
+				print "q codon is ",q_codon
 				if(q_codon.find("-")==(-1)):
 					q_amino=str(biopythonTranslate(q_codon))
 					if(q_amino=="*"):
 						stp_cdn=True
-						#print "DETECTED A STOP CODON AT TEMP_INDEX",temp_index
+						print "DETECTED A STOP CODON AT TEMP_INDEX",temp_index
 				if(s_codon.find("-")==(-1) and q_codon.find("-")==(-1)):
 					#ANALYSIS FOR CODONS WITH NO GAPS
 					#no gaps, perform analysis
-					#print "Detected no gaps in codons"
+					print "Detected no gaps in codons"
 					s_amino=str(biopythonTranslate(s_codon))
-					#print "subject amino :",s_amino," and codon ",s_codon
+					print "subject amino :",s_amino," and codon ",s_codon
 					q_amino=str(biopythonTranslate(q_codon))
-					#print "query amino ",q_amino," and codon ",q_codon
-					#print "PRE SN counts : ",num_syn," and ",num_nsy
+					print "query amino ",q_amino," and codon ",q_codon
+					print "PRE SN counts : ",num_syn," and ",num_nsy
 					for cp in range(3):
 						if(s_codon[cp]!=q_codon[cp] and s_amino==q_amino):
 							#SYNONYMOUS mutation
@@ -325,7 +335,7 @@ class alignment:
 							#NONSYNONYMOUS MUTATION
 							num_nsy+=1
 							#num_bsb+=1
-					#print "POST SN counts : ",num_syn," and ",num_nsy
+					print "POST SN counts : ",num_syn," and ",num_nsy
 				else:
 					#ANALYSIS FOR CODONS WITHOUT GAPS
 					for cp in range(3):
@@ -336,7 +346,7 @@ class alignment:
 
 				temp_index+=3
 			else:
-				#print "encountered a single.... temp_index=",temp_index
+				print "encountered a single.... temp_index=",temp_index
 				if(self.s_aln[temp_index]!=self.q_aln[temp_index] and self.s_aln[temp_index]!="-" and self.q_aln[temp_index]!="-"):
 					#num_bsb+=1
 					pass
@@ -525,6 +535,7 @@ class alignment:
 		print "The test_aln is ",
 		print test_aln.getNiceString()
 		print "First non-gap both is "
+		sub_aln_no_gap.setSFM()
 		print sub_aln_no_gap.getNiceString()
 		testGOL=False
 		if(testGOL):
