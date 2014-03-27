@@ -51,7 +51,7 @@ class alignment:
 					return
 				numInitialDashes=getNumStartingDashes(self.s_aln)
 				if(numInitialDashes>0):
-					print numInitialDashes,">0!"
+					#print numInitialDashes,">0!"
 					for p in range(numInitialDashes):
 						b_index=numInitialDashes-p-1
 						#print "b_index=",b_index
