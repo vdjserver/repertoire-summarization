@@ -38,6 +38,7 @@ class alignment:
 		self.s_frame_mask=Cs_frame_mask
 
 
+	#adjust frame mask for when the s_aln in the alignment starts with "-" (gaps)
 	def adjustSFJForSAlnGaps(self,setSFMVal):
 		if(self.s_frame_mask==None or len(self.s_aln)<=0):
 			#raise Exception("Error, require a frame mask and valid s_aln to adjust FM for gaps in s_aln!")
@@ -49,9 +50,17 @@ class alignment:
 				if(re.match(r'^\-+$',self.s_aln)):
 					return
 				numInitialDashes=getNumStartingDashes(self.s_aln)
-				if(numInitialDashes>1):
-					#special case
-					pass
+				if(numInitialDashes>0):
+					print numInitialDashes,">0!"
+					for p in range(numInitialDashes):
+						b_index=numInitialDashes-p-1
+						#print "b_index=",b_index
+						mask_val=setSFMVal-p-1
+						#print "p=",p," and setSFMVal=",setSFMVal
+						#print "mask_val premod=",mask_val
+						mask_val=(mask_val%3)
+						#print "mask_val=",mask_val
+						self.s_frame_mask[b_index]=mask_val
 				for p in range(len(self.s_aln)-1):
 					next_p=p+1
 					if(self.s_aln[next_p]=="-"):
@@ -74,9 +83,9 @@ class alignment:
 			current-=1
 			current=current%3
 		while(temp<len(self.s_aln)):
-			nfm.append(current%3)
 			if(self.s_aln[temp]!="-"):
-				current+=1			
+				current+=1	
+			nfm.append(current%3)		
 			temp+=1
 		self.s_frame_mask=nfm
 		self.adjustSFJForSAlnGaps(firstFrame)
@@ -494,6 +503,16 @@ class alignment:
 	@staticmethod
 	def test():
 		print "TEST!"
+		g_q_aln="CCCGATT-CATA-TACA"
+		g_s_aln="----AT-ACCATATTA-"
+		g_q_from=7
+		g_q_to=21
+		g_s_from=19
+		g_s_to=29
+		test_aln=alignment(g_q_aln,g_s_aln,g_q_from,g_q_to,g_s_from,g_s_to)
+		test_aln.setSFM()
+		print "biggap test : "
+		print test_aln.getNiceString()
 		t_q_aln="GATT-CATA-TACA"
 		t_s_aln="-AT-ACCATATTA-"
 		t_q_from=10
@@ -507,7 +526,7 @@ class alignment:
 		print test_aln.getNiceString()
 		print "First non-gap both is "
 		print sub_aln_no_gap.getNiceString()
-		testGOL=True
+		testGOL=False
 		if(testGOL):
 			for c in range(t_q_from-2,t_q_to+2):
 				print "\n"
@@ -538,7 +557,7 @@ class alignment:
 				print belowc.getNiceString()
 				print belowc.characterize()
 				print belowc.getPosList()
-		for s in range(100):
+		for s in range(10):
 			start=int(random.random()*50)
 			end=start+int(random.random()*10)
 			#start=27;end=29
