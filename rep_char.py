@@ -393,8 +393,12 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
 			key_base=global_key_base+mode+"_"
 			if(regionAlignment!=None and not(noneSeg_flag)):
 				reg_ann=regionAlignment.characterize()
-				#print "got ann "
-				#printMap(reg_ann)
+				#if(mode=="imgt" and read_rec.id=="FR3_STOP" and region=="FR3"):
+				#	print "got ann "
+				#	printMap(reg_ann)
+				#	print "The alignment nice : "
+				#	print regionAlignment.getNiceString()
+				#	sys.exit(0)
 				for key in reg_ann:
 					annMap[key_base+region+"_"+key]=reg_ann[key]
 				annMap[key_base+region+'_qry_aln']=regionAlignment.q_aln
