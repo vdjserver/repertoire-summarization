@@ -157,6 +157,8 @@ for org in organisms:
 
 
 
+#cmd for running igblastn to extract kabat info
+#igblastn -query ../human_IG_V.fna  -germline_db_V /usr/local/igblast_from_lonestar/database/human_gl_V   -germline_db_D /usr/local/igblast_from_lonestar/database/human_gl_D  -germline_db_J /usr/local/igblast_from_lonestar/database/human_gl_J -auxiliary_data /usr/local/igblast_from_lonestar/optional_file/human_gl.aux    -domain_system kabat   -organism human  -outfmt '7 qseqid qgi qacc qaccver qlen sseqid sallseqid sgi sallgi sacc saccver sallacc slen qstart qend sstart send qseq sseq evalue bitscore score length pident nident mismatch positive gapopen gaps ppos frames qframe sframe btop'
 
 
 
