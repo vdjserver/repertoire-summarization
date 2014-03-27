@@ -1516,7 +1516,8 @@ def alleleIsIG(an):
 	else:
 		return True
 
-
+#given the imgtobj, refname, and reforganism
+#obtain the base folder for IMGT lookups
 def getIMGTRegionBaseFolderForNONCDR3(refName,refOrg,imgtdb_obj):
 	lookupFile=None
 	if(alleleIsIG(refName)):
@@ -1576,8 +1577,8 @@ def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 			print "ERROR, UNKNOWN ORGANISM ",refOrg
 			sys.exit(0)
 	elif(mode=="imgt" or mode=="IMGT"):
-		if(1==1):
-			lookupFile=getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region)
+		if(refOrg=="human" or refOrg=="Mus_musculus"):
+			lookupFile=getIMGTRegionBaseFolderForNONCDR3(refName,refOrg,imgtdb_obj,region)
 		else:
 			print "ERROR, UNKNOWN ORGANISM ",refOrg
 			sys.exit(0)
