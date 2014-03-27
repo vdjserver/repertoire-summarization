@@ -757,6 +757,9 @@ def getRegionAlignmentFromLargerVAlignment(sub_info_map,org,mode,region_name,img
 		return None
 	else:
 		region_frame_start=(ref_region_interval[0]-ref_region_transcript_start)%3
+		#print "ref_region_interval : ",ref_region_interval
+		#print "ref_region_transcript_start : ",ref_region_transcript_start
+		#print "region_frame_start : ",region_frame_start
 		aln_obj=alignment(sub_info_map['query seq'],sub_info_map['subject seq'],sub_info_map['q. start'],sub_info_map['q. end'],sub_info_map['s. start'],sub_info_map['s. end'])
 		region_aln=aln_obj.getSubAlnInc(ref_region_interval[0],ref_region_interval[1],"subject")
 		region_aln.setSFM(region_frame_start)
@@ -1501,6 +1504,36 @@ def getVRegionsList(includeCDR3=False):
 
 
 
+def alleleIsTR(an):
+	if(an.startswith("TR")):
+		return True
+	else:
+		return False
+
+def alleleIsIG(an):
+	if(alleleIsTR(an)):
+		return False
+	else:
+		return True
+
+
+def getIMGTRegionBaseFolderForNONCDR3(refName,refOrg,imgtdb_obj):
+	lookupFile=None
+	if(alleleIsIG(refName)):
+		if(refOrg=="human"):
+			lookupFile=imgtdb_obj.getBaseDir()+"/human/ReferenceDirectorySet/HUMAN_REF/IMGT_HighV-QUEST_individual_files_folder"
+		elif(refOrg=="Mus_musculus"):
+			lookupFile=imgtdb_obj.getBaseDir()+"/Mus_musculus/ReferenceDirectorySet/MOUSE/IMGT_HighV-QUEST_individual_files_folder"	
+	else:
+		if(refOrg=="human"):
+			lookupFile=imgtdb_obj.getBaseDir()+"/human/ReferenceDirectorySet/HUMAN_TR_V/IMGT_HighV-QUEST_individual_files_folder
+		elif(refOrg=="Mus_musculus"):
+			lookupFile=imgtdb_obj.getBaseDir()+"/Mus_musculus/ReferenceDirectorySet/MOUSE_TR_V/IMGT_HighV-QUEST_individual_files_folder"
+	return lookupFile
+		
+
+
+
 #have a cache map for region information for reference data
 reg_adj_map=dict()
 reg_adj_map["human"]=dict()
@@ -1543,10 +1576,8 @@ def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 			print "ERROR, UNKNOWN ORGANISM ",refOrg
 			sys.exit(0)
 	elif(mode=="imgt" or mode=="IMGT"):
-		if(refOrg=="human"):
-			lookupFile=imgtdb_obj.getBaseDir()+"/human/ReferenceDirectorySet/HUMAN_REF/IMGT_HighV-QUEST_individual_files_folder"
-		elif(refOrg=="Mus_musculus"):
-			lookupFile=imgtdb_obj.getBaseDir()+"/Mus_musculus/ReferenceDirectorySet/MOUSE/IMGT_HighV-QUEST_individual_files_folder"
+		if(1==1):
+			lookupFile=getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region)
 		else:
 			print "ERROR, UNKNOWN ORGANISM ",refOrg
 			sys.exit(0)
