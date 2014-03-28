@@ -44,7 +44,7 @@ do
 				echo "BLAST_DB_ROOT is $BLAST_DB_ROOT"
 				echo "Now analyzing seq type $SEQ_TYPE for $ORGANISM" ; 
 				IGBLAST_EXEC=$IGDATA/bin/igblastn
-				echo "FOUND $QRY" ;qq
+				echo "FOUND $QRY" ;
 				echo "Starting IgBLAST with outfmt 7 at "
 				date
 				$IGBLAST_EXEC -domain_system $DCMODE  -query $QRY -germline_db_V $DB_V -germline_db_D $DB_D -germline_db_J $DB_J  -ig_seqtype $IGB_SEQ_FLAG -auxiliary_data $AUX_PATH -outfmt '7 qseqid qgi qacc qaccver qlen sseqid sallseqid sgi sallgi sacc saccver sallacc slen qstart qend sstart send qseq sseq evalue bitscore score length pident nident mismatch positive gapopen gaps ppos frames qframe sframe btop'  >$OUTPUT
