@@ -8,7 +8,7 @@ from imgt_utils import imgt_db
 from cdr3_hist import CDR3LengthAnalysisVDMLOBJ,histoMapClass
 from vdjml_utils import getTopVDJItems,getRegionsObjsFromSegmentCombo,getHitInfo,getProductiveRearrangmentFlag,getVDJServerRegionAlignmentFromLargerVAlignmentPyObj,getAlignmentString
 from Bio import SeqIO
-from segment_utils import IncrementMapWrapper,getVRegionsList,getRegionSpecifcCharacterization,getEmptyRegCharMap,getAdjustedCDR3StartFromRefDirSetAllele,getTheFrameForThisReferenceAtThisPosition,getCDR3RegionSpecificCharacterizationSubAln,getVRegionStartAndStopGivenRefData,getADJCDR3EndFromJAllele
+from segment_utils import IncrementMapWrapper,getVRegionsList,getRegionSpecifcCharacterization,getEmptyRegCharMap,getAdjustedCDR3StartFromRefDirSetAllele,getTheFrameForThisReferenceAtThisPosition,getCDR3RegionSpecificCharacterizationSubAln,getVRegionStartAndStopGivenRefData,getADJCDR3EndFromJAllele,alleleIsTR
 from char_utils import getNumberBaseSubsFromBTOP,getNumberIndelsFromBTOP,getIndelMapFromBTOP
 from alignment import alignment
 from vdjml_igblast_parse import rev_comp_dna,getRegPosFromInvertedPos
@@ -375,43 +375,53 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
 
 	#productive rearrangement 
 	#if IMGT CDR3 length is a multiple of 3 and it's not (-1), then consider it productive
-	if(cdr3_map['imgt']!=(-1) and cdr3_map['imgt']>0):
-		if((cdr3_map['imgt'])%3==0):
-			annMap['vdj_server_ann_productive_rearrangement']=True
+	if(not(noneSeg_flag)):
+		if(cdr3_map['imgt']!=(-1) and cdr3_map['imgt']>0):
+			if((cdr3_map['imgt'])%3==0):
+				annMap['vdj_server_ann_productive_rearrangement']=True
+			else:
+				annMap['vdj_server_ann_productive_rearrangement']=False
 		else:
-			annMap['vdj_server_ann_productive_rearrangement']=False
-	else:
-		annMap['vdj_server_ann_productive_rearrangement']="N/A"
+			#annMap['vdj_server_ann_productive_rearrangement']="N/A"
+			pass
 
 	#VDJSERVER V REGION ANNOTATIONS
 	mode_list=get_domain_modes()
-	for mode in mode_list:
-		for region in getVRegionsList():
-			#print "Now to analyze region ",region," in mode",mode
-			#raInfo=getVDJServerRegionAlignmentFromLargerVAlignmentPyObj(read_result_obj,meta,organism,mode,region,imgtdb_obj,False,read_rec)
-			regionAlignment=getVDJServerRegionAlignmentFromLargerVAlignmentPyObj(read_result_obj,meta,organism,mode,region,imgtdb_obj,False,read_rec)
-			key_base=global_key_base+mode+"_"
-			if(regionAlignment!=None and not(noneSeg_flag)):
-				reg_ann=regionAlignment.characterize()
-				#if(mode=="imgt" and read_rec.id=="FR3_STOP" and region=="FR3"):
-				#	print "got ann "
-				#	printMap(reg_ann)
-				#	print "The alignment nice : "
-				#	print regionAlignment.getNiceString()
-				#	sys.exit(0)
-				for key in reg_ann:
-					annMap[key_base+region+"_"+key]=reg_ann[key]
-				annMap[key_base+region+'_qry_aln']=regionAlignment.q_aln
-				annMap[key_base+region+'_qry_srt']=regionAlignment.q_start
-				annMap[key_base+region+'_qry_end']=regionAlignment.q_end
-				annMap[key_base+region+'_ref_aln']=regionAlignment.s_aln
-				annMap[key_base+region+'_frm_msk']=regionAlignment.s_frame_mask
+	if(not(noneSeg_flag)):
+		for mode in mode_list:
+			if(not(mode=="kabat" and alleleIsTR(topVDJ[seg]))):
+				for region in getVRegionsList():
+					#print "Now to analyze region ",region," in mode",mode
+					#raInfo=getVDJServerRegionAlignmentFromLargerVAlignmentPyObj(read_result_obj,meta,organism,mode,region,imgtdb_obj,False,read_rec)
+					regionAlignment=getVDJServerRegionAlignmentFromLargerVAlignmentPyObj(read_result_obj,meta,organism,mode,region,imgtdb_obj,False,read_rec)
+					key_base=global_key_base+mode+"_"
+					if(regionAlignment!=None and not(noneSeg_flag)):
+						reg_ann=regionAlignment.characterize()
+						#if(mode=="imgt" and read_rec.id=="FR3_STOP" and region=="FR3"):
+						#	print "got ann "
+						#	printMap(reg_ann)
+						#	print "The alignment nice : "
+						#	print regionAlignment.getNiceString()
+						#	sys.exit(0)
+						for key in reg_ann:
+							annMap[key_base+region+"_"+key]=reg_ann[key]
+						annMap[key_base+region+'_qry_aln']=regionAlignment.q_aln
+						annMap[key_base+region+'_qry_srt']=regionAlignment.q_start
+						annMap[key_base+region+'_qry_end']=regionAlignment.q_end
+						annMap[key_base+region+'_ref_aln']=regionAlignment.s_aln
+						annMap[key_base+region+'_frm_msk']=regionAlignment.s_frame_mask
+					else:
+						#print raInfo
+						reg_ann=getEmptyRegCharMap()
+						for key in reg_ann:
+							annMap[key_base+region+"_"+key]=(-1)
+						#pass
 			else:
-				#print raInfo
-				reg_ann=getEmptyRegCharMap()
-				for key in reg_ann:
-					annMap[key_base+region+"_"+key]=(-1)
-				#pass
+				#if mode=kabat and type is TR, then skip the regions!
+				pass
+	else:
+		#no annotation possible if V is empty!
+		pass
 
 	#sys.exit(0)
 	

@@ -4,7 +4,7 @@ import os
 import re
 import glob
 from os.path import basename
-from segment_utils import getFastaListOfDescs,getQueryIndexGivenSubjectIndexAndAlignment,getAdjustedCDR3StartFromRefDirSetAllele,getADJCDR3EndFromJAllele,getEmptyRegCharMap
+from segment_utils import getFastaListOfDescs,getQueryIndexGivenSubjectIndexAndAlignment,getAdjustedCDR3StartFromRefDirSetAllele,getADJCDR3EndFromJAllele,getEmptyRegCharMap,alleleIsTR
 from imgt_utils import imgt_db
 from utils import read_fasta_file_into_map,biopythonTranslate,printMap,get_domain_modes,repStr,looksLikeAlleleStr
 from igblast_utils import printNiceAlignment,buildAlignmentWholeSeqs,buildAlignmentWholeSeqsDirect
@@ -376,6 +376,9 @@ def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
 			cdr3_hist[dm]=(-1)
 			cdr3_hist[dm+'_from']=(-1)
 			cdr3_hist[dm+'_to']=(-1)
+			if(alleleIsTR(currentV) and dm=="kabat"):
+				#no kabat analysis for CDR3 TR!
+				return cdr3_hist
 			#print "processing in ",dm
 			if(not currentV in rsmap[dm]):
 				#print currentV,"not in lookup for dm=",dm

@@ -139,16 +139,17 @@ def writeKabatRegionsFromIGBLASTKabatResult(k,o):
 
 
 #organisms=["Mus_musculus","human"]
-organisms=["Mus_musculus"]
+#organisms=["Mus_musculus"]
+organisms=["human"]
 
 for org in organisms:
-	igblast="/home/data/DATABASE/01_22_2014/"+org+"/ReferenceDirectorySet/KABAT/igblastn.kabat.out"
-	out="/home/data/DATABASE/01_22_2014/"+org+"/ReferenceDirectorySet/KABAT/Vlookup.tsv"
+	igblast="/home/data/DATABASE/01_22_2014/"+org+"/ReferenceDirectorySet/KABAT_TR/igblastn.kabat.out"
+	out="/home/data/DATABASE/01_22_2014/"+org+"/ReferenceDirectorySet/KABAT_TR/Vlookup.tsv"
 	if(os.path.exists(igblast) and not os.path.exists(out)):
 		print "proceed on kabat V"
 		writeKabatRegionsFromIGBLASTKabatResult(igblast,out)
-	xml="/home/data/DATABASE/01_22_2014/"+org+"/ReferenceDirectorySet/KABAT/blastx.out.xml"
-	out="/home/data/DATABASE/01_22_2014/"+org+"/ReferenceDirectorySet/KABAT/Jlookup.tsv"
+	xml="/home/data/DATABASE/01_22_2014/"+org+"/ReferenceDirectorySet/KABAT_TR/blastx.out.xml"
+	out="/home/data/DATABASE/01_22_2014/"+org+"/ReferenceDirectorySet/KABAT_TR/Jlookup.tsv"
 	if(os.path.exists(xml) and not os.path.exists(out)):
 		print "proceed on kabat J"
 		writeKabatJCDR3End(xml,out)
@@ -160,7 +161,7 @@ for org in organisms:
 #cmd for running igblastn to extract kabat info
 #igblastn -query ../human_IG_V.fna  -germline_db_V /usr/local/igblast_from_lonestar/database/human_gl_V   -germline_db_D /usr/local/igblast_from_lonestar/database/human_gl_D  -germline_db_J /usr/local/igblast_from_lonestar/database/human_gl_J -auxiliary_data /usr/local/igblast_from_lonestar/optional_file/human_gl.aux    -domain_system kabat   -organism human  -outfmt '7 qseqid qgi qacc qaccver qlen sseqid sallseqid sgi sallgi sacc saccver sallacc slen qstart qend sstart send qseq sseq evalue bitscore score length pident nident mismatch positive gapopen gaps ppos frames qframe sframe btop'
 
-
+#blastx -query ../human_TR_J.fna -db /home/esalina2/Downloads/IMGT_02.13.2014/www.imgt.org/download/GENE-DB/IMGTGENEDB-ReferenceSequences.fasta-AA-WithoutGaps-F+ORF+inframeP  -outfmt 5  -max_target_seqs 1   > blastx.out.xml
 
 
 

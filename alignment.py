@@ -302,30 +302,30 @@ class alignment:
 			frame_mask[temp_index+1]==1 and 
 			frame_mask[temp_index+2]==2 
 			):
-				print "temp_index=",temp_index
-				print "encountered a codon...."
+				#print "temp_index=",temp_index
+				#print "encountered a codon...."
 				s_codon=self.s_aln[temp_index:(temp_index+3)]
 				s_codon_w_gaps=s_codon
 				#s_codon=re.sub(r'\-','N',s_codon)
-				print "s codon is ",s_codon
+				#print "s codon is ",s_codon
 				q_codon=self.q_aln[temp_index:(temp_index+3)]
 				q_codon_w_gaps=q_codon
 				#q_codon=re.sub(r'\-','N',q_codon)
-				print "q codon is ",q_codon
+				#print "q codon is ",q_codon
 				if(q_codon.find("-")==(-1)):
 					q_amino=str(biopythonTranslate(q_codon))
 					if(q_amino=="*"):
 						stp_cdn=True
-						print "DETECTED A STOP CODON AT TEMP_INDEX",temp_index
+						#print "DETECTED A STOP CODON AT TEMP_INDEX",temp_index
 				if(s_codon.find("-")==(-1) and q_codon.find("-")==(-1)):
 					#ANALYSIS FOR CODONS WITH NO GAPS
 					#no gaps, perform analysis
-					print "Detected no gaps in codons"
+					#print "Detected no gaps in codons"
 					s_amino=str(biopythonTranslate(s_codon))
-					print "subject amino :",s_amino," and codon ",s_codon
+					#print "subject amino :",s_amino," and codon ",s_codon
 					q_amino=str(biopythonTranslate(q_codon))
-					print "query amino ",q_amino," and codon ",q_codon
-					print "PRE SN counts : ",num_syn," and ",num_nsy
+					#print "query amino ",q_amino," and codon ",q_codon
+					#print "PRE SN counts : ",num_syn," and ",num_nsy
 					for cp in range(3):
 						if(s_codon[cp]!=q_codon[cp] and s_amino==q_amino):
 							#SYNONYMOUS mutation
@@ -335,7 +335,7 @@ class alignment:
 							#NONSYNONYMOUS MUTATION
 							num_nsy+=1
 							#num_bsb+=1
-					print "POST SN counts : ",num_syn," and ",num_nsy
+					#print "POST SN counts : ",num_syn," and ",num_nsy
 				else:
 					#ANALYSIS FOR CODONS WITHOUT GAPS
 					for cp in range(3):
@@ -346,7 +346,7 @@ class alignment:
 
 				temp_index+=3
 			else:
-				print "encountered a single.... temp_index=",temp_index
+				#print "encountered a single.... temp_index=",temp_index
 				if(self.s_aln[temp_index]!=self.q_aln[temp_index] and self.s_aln[temp_index]!="-" and self.q_aln[temp_index]!="-"):
 					#num_bsb+=1
 					pass

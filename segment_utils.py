@@ -651,6 +651,9 @@ cdr3_adj_map["Mus_musculus"]["imgt"]=dict()
 def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human",mode="imgt"):
 	#use this map as a caching mechanism!
 	global cdr3_adj_map
+	if(mode=="kabat" and alleleIsTR(allele)):
+		#no kabat for CDR3 for TR!
+		return (-1)
 	if(1==1):
 		if(mode=="imgt"):
 			#read the HIGH-VQUEST ANNOTATION
@@ -660,10 +663,7 @@ def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human",m
 					return cdr3_adj_map[organism]["imgt"][allele]
 			else:
 				cdr3_adj_map[organism]=dict()
-			if(organism=="Mus_musculus"):
-				baseDir=imgtdb_obj.getBaseDir()+"/Mus_musculus/ReferenceDirectorySet/MOUSE/IMGT_HighV-QUEST_individual_files_folder"
-			elif(organism=="human"):
-				baseDir=imgtdb_obj.getBaseDir()+"/human/ReferenceDirectorySet/HUMAN_REF/IMGT_HighV-QUEST_individual_files_folder"
+			baseDir=getIMGTRegionBaseFolderForNONCDR3(allele,organism,imgtdb_obj)
 			fglobstr=baseDir+"/*"
 			imgt_files=glob.glob(fglobstr)
 			fileToUse=None
@@ -1527,7 +1527,7 @@ def getIMGTRegionBaseFolderForNONCDR3(refName,refOrg,imgtdb_obj):
 			lookupFile=imgtdb_obj.getBaseDir()+"/Mus_musculus/ReferenceDirectorySet/MOUSE/IMGT_HighV-QUEST_individual_files_folder"	
 	else:
 		if(refOrg=="human"):
-			lookupFile=imgtdb_obj.getBaseDir()+"/human/ReferenceDirectorySet/HUMAN_TR_V/IMGT_HighV-QUEST_individual_files_folder
+			lookupFile=imgtdb_obj.getBaseDir()+"/human/ReferenceDirectorySet/HUMAN_TR_V/IMGT_HighV-QUEST_individual_files_folder"
 		elif(refOrg=="Mus_musculus"):
 			lookupFile=imgtdb_obj.getBaseDir()+"/Mus_musculus/ReferenceDirectorySet/MOUSE_TR_V/IMGT_HighV-QUEST_individual_files_folder"
 	return lookupFile
@@ -1578,7 +1578,7 @@ def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 			sys.exit(0)
 	elif(mode=="imgt" or mode=="IMGT"):
 		if(refOrg=="human" or refOrg=="Mus_musculus"):
-			lookupFile=getIMGTRegionBaseFolderForNONCDR3(refName,refOrg,imgtdb_obj,region)
+			lookupFile=getIMGTRegionBaseFolderForNONCDR3(refName,refOrg,imgtdb_obj)
 		else:
 			print "ERROR, UNKNOWN ORGANISM ",refOrg
 			sys.exit(0)
