@@ -229,7 +229,7 @@ def getTopVDJItems(read_result_obj,meta):
 		for i in segment_combination.segments():
 			segment_match = read_result_obj[i]
 			#print "got a segment match, id=",i," from combination # ",str(int(s+1))
-			seg_type=segTypes[seg_id]
+			#seg_type=segTypes[seg_id]
 			#seg_type=segment_match.vdj
 			#seg_type=segment_match.vdj_
 			#print "the seg type is ",seg_type
