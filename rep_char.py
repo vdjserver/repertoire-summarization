@@ -24,7 +24,7 @@ global_key_base="vdj_server_ann_"
 # 1) the segment counts (a list of 1, 2, or 3 items) , 
 # 2) the cdr3_lengths (kabat and imgt) ( a dict() with two keys)
 # 3) a clone of the object, but with additional (with additional read information)
-def rep_char_read(read_result_obj,meta,organism,imgtdb_obj,read_rec):
+def rep_char_read(read_result_obj,meta,organism,imgtdb_obj,read_rec,skip_char=False):
 	#print "In loop analyzing ",read_result_obj.id()
 
 
@@ -40,7 +40,7 @@ def rep_char_read(read_result_obj,meta,organism,imgtdb_obj,read_rec):
 	return_obj['cdr3_length_results']=cdr3_length_results
 
 	#perform own annotation
-	read_ann_map=readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_length_results)
+	read_ann_map=readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_length_results,skip_char)
 	return_obj['ann_map']=read_ann_map
 
 	#printMap(read_ann_map,True)
@@ -66,11 +66,13 @@ def readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,read_ann
 			query_cdr3=qw[f-1:t]
 			read_ann_map[global_key_base+mode+'_cdr3_na']=query_cdr3
 			read_ann_map[global_key_base+mode+'_cdr3_tr']=biopythonTranslate(read_ann_map[global_key_base+mode+'_cdr3_na'])
-			vMap=getHitInfo(read_result_obj,meta,read_ann_map['top_V'],read_rec,imgtdb_obj,organism)
-			dMap=None
-			if(read_ann_map['top_D'] is not None):
-				dMap=getHitInfo(read_result_obj,meta,read_ann_map['top_D'],read_rec,imgtdb_obj,organism)
-			jMap=getHitInfo(read_result_obj,meta,read_ann_map['top_J'],read_rec,imgtdb_obj,organism)
+			#this stuff below was once in here becuase we might've done some CDR3 specific annotation...but
+			#it is commented out for now because such goals are either postponed or canceled
+			#vMap=getHitInfo(read_result_obj,meta,read_ann_map['top_V'],read_rec,imgtdb_obj,organism)
+			#dMap=None
+			#if(read_ann_map['top_D'] is not None):
+			#	dMap=getHitInfo(read_result_obj,meta,read_ann_map['top_D'],read_rec,imgtdb_obj,organism)
+			#jMap=getHitInfo(read_result_obj,meta,read_ann_map['top_J'],read_rec,imgtdb_obj,organism)
 			#cdr3RegCharAnalysis(vMap,dMap,jMap,mode,cdr3_length_results,organism,imgtdb_obj)
 			#getCDR3RegionSpecificCharacterizationSubAln(vMap,dMap,jMap,organism,imgtdb_obj,mode,read_rec)
 			#sys.exit(0)
@@ -333,7 +335,7 @@ def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap):
 #given a read object, meta data, organism and database data and the read record and CDR3 data
 #make a characterization map using the database/lookups
 #of regions FR1, CDR1, FR2, CDR2, FR3
-def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
+def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip_char=False):
 	#print "To annotate a read...."
 	global global_key_base
 	topVDJ=getTopVDJItems(read_result_obj,meta)
@@ -365,68 +367,73 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map):
 	#annotations such as NA and AA from CDR3 from cdr3_map
 	annMap=readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,annMap,cdr3_map)
 
-	#whole seq characterization
-	whole_char_map=returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap)
-	for w in whole_char_map:
-		new_key=global_key_base+'whole_seq_'+w
-		annMap[new_key]=whole_char_map[w]
-	whole_seq_stp_cdn_Tot_flag=getValnWholeSeqStopFlag(vInfo,jInfo,imgtdb_obj,organism,annMap,read_rec)
-	annMap['vdj_server_whole_vj_stp_cdn']=whole_seq_stp_cdn_Tot_flag
 
-	#productive rearrangement 
-	#if IMGT CDR3 length is a multiple of 3 and it's not (-1), then consider it productive
-	if(not(noneSeg_flag)):
-		if(cdr3_map['imgt']!=(-1) and cdr3_map['imgt']>0):
-			if((cdr3_map['imgt'])%3==0):
-				annMap['vdj_server_ann_productive_rearrangement']=True
-			else:
-				annMap['vdj_server_ann_productive_rearrangement']=False
-		else:
-			#annMap['vdj_server_ann_productive_rearrangement']="N/A"
-			pass
 
-	#VDJSERVER V REGION ANNOTATIONS
-	mode_list=get_domain_modes()
-	if(not(noneSeg_flag)):
-		for mode in mode_list:
-			if(not(mode=="kabat" and alleleIsTR(topVDJ[seg]))):
-				for region in getVRegionsList():
-					#print "Now to analyze region ",region," in mode",mode
-					#raInfo=getVDJServerRegionAlignmentFromLargerVAlignmentPyObj(read_result_obj,meta,organism,mode,region,imgtdb_obj,False,read_rec)
-					regionAlignment=getVDJServerRegionAlignmentFromLargerVAlignmentPyObj(read_result_obj,meta,organism,mode,region,imgtdb_obj,False,read_rec)
-					key_base=global_key_base+mode+"_"
-					if(regionAlignment!=None and not(noneSeg_flag)):
-						reg_ann=regionAlignment.characterize()
-						#if(mode=="imgt" and read_rec.id=="FR3_STOP" and region=="FR3"):
-						#	print "got ann "
-						#	printMap(reg_ann)
-						#	print "The alignment nice : "
-						#	print regionAlignment.getNiceString()
-						#	sys.exit(0)
-						for key in reg_ann:
-							annMap[key_base+region+"_"+key]=reg_ann[key]
-						annMap[key_base+region+'_qry_aln']=regionAlignment.q_aln
-						annMap[key_base+region+'_qry_srt']=regionAlignment.q_start
-						annMap[key_base+region+'_qry_end']=regionAlignment.q_end
-						annMap[key_base+region+'_ref_aln']=regionAlignment.s_aln
-						annMap[key_base+region+'_frm_msk']=regionAlignment.s_frame_mask
-					else:
-						#print raInfo
-						reg_ann=getEmptyRegCharMap()
-						for key in reg_ann:
-							annMap[key_base+region+"_"+key]=(-1)
-						#pass
+	#characterization beyond segments/CDR3
+	if(not(skip_char)):
+		#whole seq characterization
+		whole_char_map=returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap)
+		for w in whole_char_map:
+			new_key=global_key_base+'whole_seq_'+w
+			annMap[new_key]=whole_char_map[w]
+		whole_seq_stp_cdn_Tot_flag=getValnWholeSeqStopFlag(vInfo,jInfo,imgtdb_obj,organism,annMap,read_rec)
+		annMap['vdj_server_whole_vj_stp_cdn']=whole_seq_stp_cdn_Tot_flag
+
+		#productive rearrangement 
+		#if IMGT CDR3 length is a multiple of 3 and it's not (-1), then consider it productive
+		if(not(noneSeg_flag)):
+			if(cdr3_map['imgt']!=(-1) and cdr3_map['imgt']>0):
+				if((cdr3_map['imgt'])%3==0):
+					annMap['vdj_server_ann_productive_rearrangement']=True
+				else:
+					annMap['vdj_server_ann_productive_rearrangement']=False
 			else:
-				#if mode=kabat and type is TR, then skip the regions!
+				#annMap['vdj_server_ann_productive_rearrangement']="N/A"
 				pass
-	else:
-		#no annotation possible if V is empty!
-		pass
+		mode_list=get_domain_modes()
+		if(not(noneSeg_flag)):
+			for mode in mode_list:
+				if(not(mode=="kabat" and alleleIsTR(topVDJ[seg]))):
+					for region in getVRegionsList():
+						#print "Now to analyze region ",region," in mode",mode
+						#raInfo=getVDJServerRegionAlignmentFromLargerVAlignmentPyObj(read_result_obj,meta,organism,mode,region,imgtdb_obj,False,read_rec)
+						regionAlignment=getVDJServerRegionAlignmentFromLargerVAlignmentPyObj(read_result_obj,meta,organism,mode,region,imgtdb_obj,False,read_rec)
+						key_base=global_key_base+mode+"_"
+						if(regionAlignment!=None and not(noneSeg_flag)):
+							reg_ann_show_msg=False
+							#reg_ann_msg="characterization for region="+region+" mode="+mode+" for read="+read_rec.id
+							reg_ann_msg=None
+							reg_ann=regionAlignment.characterize(reg_ann_msg,reg_ann_show_msg)
+							#if(mode=="imgt" and read_rec.id=="FR3_STOP" and region=="FR3"):
+							#	print "got ann "
+							#	printMap(reg_ann)
+							#	print "The alignment nice : "
+							#	print regionAlignment.getNiceString()
+							#	sys.exit(0)
+							for key in reg_ann:
+								annMap[key_base+region+"_"+key]=reg_ann[key]
+							annMap[key_base+region+'_qry_aln']=regionAlignment.q_aln
+							annMap[key_base+region+'_qry_srt']=regionAlignment.q_start
+							annMap[key_base+region+'_qry_end']=regionAlignment.q_end
+							annMap[key_base+region+'_ref_aln']=regionAlignment.s_aln
+							annMap[key_base+region+'_frm_msk']=regionAlignment.s_frame_mask
+						else:
+							#print raInfo
+							reg_ann=getEmptyRegCharMap()
+							for key in reg_ann:
+								annMap[key_base+region+"_"+key]=(-1)
+							#pass
+				else:
+					#if mode=kabat and type is TR, then skip the regions!
+					pass
+		else:
+			#no annotation possible if V is empty!
+			pass
 
 	#sys.exit(0)
 	
 	annMap['read_name']=read_rec.id
-	getAlignmentString(read_result_obj,meta,query_record,imgtdb_obj,organism)
+	#getAlignmentString(read_result_obj,meta,query_record,imgtdb_obj,organism)
 	#analyze_combinations(read_result_obj,meta,organism,imgtdb_obj,read_rec,annMap)
 	printMap(annMap,True)
 	return annMap
@@ -729,6 +736,7 @@ def add_rep_char_args_to_parser(parser):
 	parser.description+=' Generate read-level repertoire-characterization data.'
 	parser.add_argument('-json_out',type=str,nargs=1,default="/dev/stdout",help="output file for the JSON segment count IMGT hierarchy")
 	parser.add_argument('-cdr3_hist_out',type=str,nargs=1,default="/dev/stdout",help="output file for the CDR3 histogram of lengths (both kabat and imgt systems)")
+	parser.add_argument('-skip_char',action='store_true', default=False,help="If this is set, then characterization besides asignment and CDR3 length is skipped")
 	parser.add_argument('vdj_db',type=str,nargs=1,help="path to the VDJ root REQUIRED")
 	parser.add_argument('qry_fasta',type=str,nargs=1,help="path to the input fasta file of query (Rep-Seq) data input to IgBLAST")
 	#parser.add_argument('-region_out'
@@ -772,7 +780,7 @@ if (__name__=="__main__"):
 			query_record=fasta_reader.next()
 			
 			#analyze a read's results
-			read_analysis_results=rep_char_read(read_result_obj,meta,organism,imgtdb_obj,query_record)
+			read_analysis_results=rep_char_read(read_result_obj,meta,organism,imgtdb_obj,query_record,args.skip_char)
 
 			#handle cdr3 length/histogram
 			if('cdr3_length_results' in read_analysis_results):
@@ -792,6 +800,7 @@ if (__name__=="__main__"):
 			rrw(read_result_obj)
 
 			#write rep-char
+
 			appendAnnToFileWithMap(fHandle,read_analysis_results['ann_map'],read_num)
 
 			#increment the read number
