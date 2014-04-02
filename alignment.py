@@ -265,7 +265,7 @@ class alignment:
 
 
 	#ins, del, bsb, syn/non-sym
-	def characterize(self):
+	def characterize(self,charMsg=None,showAln=False):
 		char_map=dict()
 		num_ins=0
 		num_del=0
@@ -273,6 +273,11 @@ class alignment:
 		num_nsy=0
 		num_bsb=0
 		stp_cdn=False	
+
+		if(not(charMsg==None)):
+			print charMsg
+		if(showAln):
+			print self.getNiceString()
 
 		#do counts that are independent of codons/translations
 		for i in range(len(self.s_aln)):
@@ -306,11 +311,9 @@ class alignment:
 				#print "encountered a codon...."
 				s_codon=self.s_aln[temp_index:(temp_index+3)]
 				s_codon_w_gaps=s_codon
-				#s_codon=re.sub(r'\-','N',s_codon)
 				#print "s codon is ",s_codon
 				q_codon=self.q_aln[temp_index:(temp_index+3)]
 				q_codon_w_gaps=q_codon
-				#q_codon=re.sub(r'\-','N',q_codon)
 				#print "q codon is ",q_codon
 				if(q_codon.find("-")==(-1)):
 					q_amino=str(biopythonTranslate(q_codon))
@@ -325,7 +328,7 @@ class alignment:
 					#print "subject amino :",s_amino," and codon ",s_codon
 					q_amino=str(biopythonTranslate(q_codon))
 					#print "query amino ",q_amino," and codon ",q_codon
-					#print "PRE SN counts : ",num_syn," and ",num_nsy
+					#print "PRE SYN/NSY counts : ",num_syn," and ",num_nsy
 					for cp in range(3):
 						if(s_codon[cp]!=q_codon[cp] and s_amino==q_amino):
 							#SYNONYMOUS mutation
@@ -335,7 +338,7 @@ class alignment:
 							#NONSYNONYMOUS MUTATION
 							num_nsy+=1
 							#num_bsb+=1
-					#print "POST SN counts : ",num_syn," and ",num_nsy
+					#print "POST SYN/NSY counts : ",num_syn," and ",num_nsy
 				else:
 					#ANALYSIS FOR CODONS WITHOUT GAPS
 					for cp in range(3):
