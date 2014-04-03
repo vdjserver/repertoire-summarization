@@ -280,13 +280,29 @@ class alignment:
 			print self.getNiceString()
 
 		#do counts that are independent of codons/translations
+		tot_num_base_to_base_alns=0
 		for i in range(len(self.s_aln)):
+			if(self.s_aln[i]!="-" and self.q_aln[i]!="-"):
+				tot_num_base_to_base_alns+=1
 			if(self.s_aln[i]=="-"):
 				num_ins+=1
 			elif(self.q_aln[i]=="-"):
 				num_del+=1
 			elif(self.q_aln[i]!=self.s_aln[i]):
 				num_bsb+=1
+		if(tot_num_base_to_base_alns>0):
+			char_map['bsb_freq']=float(num_bsb)/float(tot_num_base_to_base_alns)
+			id_tot_rto=float(tot_num_base_to_base_alns-num_bsb)/float(tot_num_base_to_base_alns)
+			char_map['pct_id']=id_tot_rto
+		else:
+			char_map['bsb_freq']=0
+			char_map['pct_id']=0
+		#fill in the map
+		char_map['insertions']=num_ins
+		char_map['deletions']=num_del
+		char_map['base_sub']=num_bsb
+		char_map['mutations']=num_bsb+num_del+num_ins
+		
 
 		#if there is a frame, load it
 		#otherwise, load a dummy frame
@@ -355,27 +371,8 @@ class alignment:
 					pass
 				temp_index+=1
 		#fill in the map
-		char_map['insertions']=num_ins
-		char_map['deletions']=num_del
-		char_map['base_sub']=num_bsb
 		char_map['synonymous_bsb']=num_syn
 		char_map['nonsynonymous_bsb']=num_nsy
-		char_map['mutations']=num_bsb+num_del+num_ins
-		if(len(self.q_aln)==0):
-			char_map['bsb_freq']=0
-		elif(getNumberBpInAlnStr(self.q_aln)!=0):
-			char_map['bsb_freq']=float(num_bsb)/float(getNumberBpInAlnStr(self.q_aln))
-		else:
-			char_map['bsb_freq']=float(0.0)
-		if(len(self.s_aln)>0 and len(self.q_aln)>0):
-			mlen=min(getNumberBpInAlnStr(self.q_aln),getNumberBpInAlnStr(self.s_aln))
-			if(mlen!=0):
-				comp_pct_id=(mlen-num_bsb)/mlen
-				char_map['pct_id']=comp_pct_id
-			else:
-				char_map['pct_id']=0
-		else:
-			char_map['pct_id']=0
 		if(num_syn!=0):
 			ns_ratio=float(num_nsy)/float(num_syn)
 		else:
