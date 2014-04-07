@@ -16,6 +16,7 @@ from alignment import alignment
 
 
 
+
 #pretty print a tree
 def prettyPrintTree(t):
 	pp = pprint.PrettyPrinter()
@@ -1551,9 +1552,14 @@ def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 			if(refName in reg_adj_map[refOrg][mode]):
 				if(region in reg_adj_map[refOrg][mode][refName]):
 					#print "using cache for ",refName," o=",refOrg," region=",region," and mode=",mode
+					#print "to return", reg_adj_map[refOrg][mode][refName][region]
+					#sys.exit(0)
 					return reg_adj_map[refOrg][mode][refName][region]
+				else:
+					pass
+					#region start/stop not in reg_adj_map[refOrg][mode][refName]
 			else:
-				#refname not in it, so add it
+				#refname not in org->mode map, so add it
 				#print "adding refname key=",refName
 				reg_adj_map[refOrg][mode][refName]=dict()
 		else:
