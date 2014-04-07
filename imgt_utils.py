@@ -1512,9 +1512,12 @@ class imgt_db:
 
 	#given a complete descriptor and organism, fetch the corresponding reference directory set sequence
 	def getRefDirSetFNAGivenCompleteDescriptor(self,descriptor,organism):
+		#print "in getRefDirSetFNAGivenCompleteDescriptor with desc='"+descriptor+"' org=",organism
 		if(self.ref_dir_set_desc_seqs_map==None):
 			self.ref_dir_set_desc_seqs_map=dict()
 		if(descriptor in self.ref_dir_set_desc_seqs_map):
+			#print "using lookup in getRefDirSetFNAGivenCompleteDescriptor"
+			#sys.exit(0)
 			return self.ref_dir_set_desc_seqs_map[descriptor]
 		myloci=get_loci_list()
 		for locus in myloci:
@@ -1543,16 +1546,29 @@ class imgt_db:
 	#given an allele name and an organism string, extract the fasta descriptor with the specified allele name
 	#use dictionary for cache purposes
 	def extractDescriptorLine(self,allele_name,org="human"):
+		#print "inside EDL allele_name=",allele_name," org=",org
+		#sys.exit(0)
+		#this little code here does a cache lookup
+		if(not(self.org_allele_name_desc_map==None)):
+			#print "using EDL dict to see if org=",org," is in it...."
+			if(org in self.org_allele_name_desc_map):
+				if(allele_name in self.org_allele_name_desc_map[org]):
+					#print "Using cache lookup for EDL with org=",org,"and to return ",self.org_allele_name_desc_map[org][allele_name]
+					#sys.exit(0)
+					return self.org_allele_name_desc_map[org][allele_name]
+				else:
+					#print "INNermost EDL cache test fails"
+					pass
+			else:
+				#print "org ain't in EDL map!"
+				pass
+		else:
+			#print "initing EDL dict..."
+			self.org_allele_name_desc_map=dict()
+		#sys.exit(0)
 		if(self.db_base==None):
 			#self.db_base=self.db_base
 			raise Exception("Error, db_base not set! Did you initialize???")
-		#this little code here does a cache lookup
-		if(not(self.org_allele_name_desc_map==None)):
-			if(org in org_allele_name_desc_map):
-				if(allele_name in org_allele_name_desc_map[org]):
-					return org_allele_name_desc_map[org][allele_name]
-		else:
-			org_allele_name_desc_map=dict()
 		org_dir=self.db_base+"/"+org
 		to_be_returned=None
 		if(os.path.isdir(org_dir)):
@@ -1563,13 +1579,13 @@ class imgt_db:
 				for fna_line in fna_reader:
 					if(fna_line.startswith(">")):
 						descriptor=fna_line[1:]
-						if(not(org in org_allele_name_desc_map)):
-							org_allele_name_desc_map[org]=dict()
+						if(not(org in self.org_allele_name_desc_map)):
+							self.org_allele_name_desc_map[org]=dict()
 						pieces=descriptor.split("|")
 						descriptor_allele=pieces[1]
 						if(descriptor_allele.strip()==allele_name.strip()):
 							to_be_returned=descriptor.strip()
-						org_allele_name_desc_map[org][descriptor_allele.strip()]=descriptor
+						self.org_allele_name_desc_map[org][descriptor_allele.strip()]=descriptor.strip()
 			if(not(to_be_returned==None)):
 				return to_be_returned
 			else:
