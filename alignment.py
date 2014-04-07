@@ -4,6 +4,8 @@ import random
 from utils import makeEmptyArrayOfDigitsOfLen,biopythonTranslate,getNumberBpInAlnStr
 import re
 
+
+
 def getNumStartingDashes(s):
 	dre=re.compile(r'^(\-+)')
 	sr=re.search(dre,s)
@@ -12,6 +14,8 @@ def getNumStartingDashes(s):
 		return len(dashes)
 	else:
 		return 0
+
+
 
 
 #class for two-seq alignment methods/tools/data
@@ -606,6 +610,9 @@ class alignment:
 		if(self.s_frame_mask is not None):
 			s_final+="\nSFMK:"+str(self.s_frame_mask)
 		return s_final
+
+
+
 
 
 if (__name__=="__main__"):
