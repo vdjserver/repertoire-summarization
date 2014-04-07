@@ -5,7 +5,6 @@ from utils import printMap,repStr
 from segment_utils import getNAProductiveRearrangmentFlagFromVJHitLineData,getRegionAlignmentFromLargerVAlignment
 from vdjml_igblast_parse import extractJunctionRegionSeq,rev_comp_dna
 from igblast_utils import buildAlignmentWholeSeqs
-from alignment import alignment
 import vdjml
 
 def getAlignmentString(read_result_obj,meta,query_record=None,imgtdb_obj=None,organism=None):
