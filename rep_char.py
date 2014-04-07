@@ -11,8 +11,13 @@ from Bio import SeqIO
 from segment_utils import IncrementMapWrapper,getVRegionsList,getRegionSpecifcCharacterization,getEmptyRegCharMap,getAdjustedCDR3StartFromRefDirSetAllele,getTheFrameForThisReferenceAtThisPosition,getCDR3RegionSpecificCharacterizationSubAln,getVRegionStartAndStopGivenRefData,getADJCDR3EndFromJAllele,alleleIsTR
 from char_utils import getNumberBaseSubsFromBTOP,getNumberIndelsFromBTOP,getIndelMapFromBTOP
 from alignment import alignment
+from CharacterizationThread import CharacterizationThread
 from vdjml_igblast_parse import rev_comp_dna,getRegPosFromInvertedPos
 import re
+import Queue
+import threading
+import time
+import multiprocessing
 
 
 
@@ -331,6 +336,10 @@ def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap):
 	emptyMap=getEmptyRegCharMap()
 	return emptyMap
 	
+
+
+characterization_queue=Queue.Queue()
+characterization_thread_set=None
 			
 #given a read object, meta data, organism and database data and the read record and CDR3 data
 #make a characterization map using the database/lookups
@@ -391,38 +400,70 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 				#annMap['vdj_server_ann_productive_rearrangement']="N/A"
 				pass
 		mode_list=get_domain_modes()
+		global characterization_thread_set
+		global characterization_queue
+		if(characterization_thread_set==None):
+			num_cpus=multiprocessing.cpu_count()
+			num_cpus=1
+			#num_threads=max(1,num_cpus-1)
+			num_threads=1
+			print "USING NUM_THREADS=",num_threads
+			characterization_thread_set=set()
+			for c in range(num_threads):
+				#print "ABOUT TO CALL CONST...."
+				temp_thread=CharacterizationThread(characterization_queue)
+				#print "RETURNED FROM CONSTRUCTOR"
+				temp_thread.setDaemon(True)
+				#sys.exit(0)
+				temp_thread.start()
+				characterization_thread_set.add(temp_thread)
 		if(not(noneSeg_flag)):
+			for temp_thread in characterization_thread_set:
+				temp_thread.clear_result()
 			for mode in mode_list:
 				if(not(mode=="kabat" and alleleIsTR(topVDJ[seg]))):
 					for region in getVRegionsList():
 						#print "Now to analyze region ",region," in mode",mode
 						#raInfo=getVDJServerRegionAlignmentFromLargerVAlignmentPyObj(read_result_obj,meta,organism,mode,region,imgtdb_obj,False,read_rec)
-						regionAlignment=getVDJServerRegionAlignmentFromLargerVAlignmentPyObj(read_result_obj,meta,organism,mode,region,imgtdb_obj,False,read_rec)
+						#regionAlignment=getVDJServerRegionAlignmentFromLargerVAlignmentPyObj(read_result_obj,meta,organism,mode,region,imgtdb_obj,False,read_rec)
 						key_base=global_key_base+mode+"_"
-						if(regionAlignment!=None and not(noneSeg_flag)):
-							reg_ann_show_msg=False
-							#reg_ann_msg="characterization for region="+region+" mode="+mode+" for read="+read_rec.id
-							reg_ann_msg=None
-							reg_ann=regionAlignment.characterize(reg_ann_msg,reg_ann_show_msg)
-							#if(mode=="imgt" and read_rec.id=="FR3_STOP" and region=="FR3"):
-							#	print "got ann "
-							#	printMap(reg_ann)
-							#	print "The alignment nice : "
-							#	print regionAlignment.getNiceString()
-							#	sys.exit(0)
-							for key in reg_ann:
-								annMap[key_base+region+"_"+key]=reg_ann[key]
-							annMap[key_base+region+'_qry_aln']=regionAlignment.q_aln
-							annMap[key_base+region+'_qry_srt']=regionAlignment.q_start
-							annMap[key_base+region+'_qry_end']=regionAlignment.q_end
-							annMap[key_base+region+'_ref_aln']=regionAlignment.s_aln
-							annMap[key_base+region+'_frm_msk']=regionAlignment.s_frame_mask
-						else:
-							#print raInfo
-							reg_ann=getEmptyRegCharMap()
-							for key in reg_ann:
-								annMap[key_base+region+"_"+key]=(-1)
-							#pass
+						char_job_dict=dict()
+						char_job_dict['read_result_obj']=read_result_obj
+						char_job_dict['meta']=meta
+						char_job_dict['organism']=organism
+						char_job_dict['mode']=mode
+						char_job_dict['region']=region
+						char_job_dict['imgtdb_obj']=imgtdb_obj
+						char_job_dict['wholeOnly']=False
+						char_job_dict['read_rec']=read_rec
+						char_job_dict['key_base']=key_base
+						char_job_dict['region']=region
+						char_job_dict['noneSeg_flag']=noneSeg_flag
+						characterization_queue.put(char_job_dict)
+						#if(regionAlignment!=None and not(noneSeg_flag)):
+						#	reg_ann_show_msg=False
+						#	#reg_ann_msg="characterization for region="+region+" mode="+mode+" for read="+read_rec.id
+						#	reg_ann_msg=None
+						#	reg_ann=regionAlignment.characterize(reg_ann_msg,reg_ann_show_msg)
+						#	#if(mode=="imgt" and read_rec.id=="FR3_STOP" and region=="FR3"):
+						#	#	print "got ann "
+						#	#	printMap(reg_ann)
+						#	#	print "The alignment nice : "
+						#	#	print regionAlignment.getNiceString()
+						#	#	sys.exit(0)
+						#	for key in reg_ann:
+						#		annMap[key_base+region+"_"+key]=reg_ann[key]
+						#	annMap[key_base+region+'_qry_aln']=regionAlignment.q_aln
+						#	annMap[key_base+region+'_qry_srt']=regionAlignment.q_start
+						#	annMap[key_base+region+'_qry_end']=regionAlignment.q_end
+						#	annMap[key_base+region+'_ref_aln']=regionAlignment.s_aln
+						#	annMap[key_base+region+'_frm_msk']=regionAlignment.s_frame_mask
+						#else:
+						#	#print raInfo
+						#	#reg_ann=getEmptyRegCharMap()
+						#	#for key in reg_ann:
+						#	#	annMap[key_base+region+"_"+key]=(-1)
+						#	pass
 				else:
 					#if mode=kabat and type is TR, then skip the regions!
 					pass
@@ -431,6 +472,12 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 			pass
 
 	#sys.exit(0)
+	characterization_queue.join()
+	for temp_thread in characterization_thread_set:
+		temp_results=temp_thread.get_result()
+		if(temp_results is not None):
+			for temp_key in temp_results:
+				annMap[temp_key]=temp_results[temp_key]
 	
 	annMap['read_name']=read_rec.id
 	#getAlignmentString(read_result_obj,meta,query_record,imgtdb_obj,organism)
