@@ -338,6 +338,7 @@ def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap):
 	
 
 
+#characterization_queue=multiprocessing.JoinableQueue()
 characterization_queue=Queue.Queue()
 characterization_thread_set=None
 			
@@ -404,9 +405,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 		global characterization_queue
 		if(characterization_thread_set==None):
 			num_cpus=multiprocessing.cpu_count()
-			num_cpus=1
-			#num_threads=max(1,num_cpus-1)
-			num_threads=1
+			num_threads=max(1,num_cpus-1)
 			print "USING NUM_THREADS=",num_threads
 			characterization_thread_set=set()
 			for c in range(num_threads):
@@ -471,9 +470,9 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 			#no annotation possible if V is empty!
 			pass
 
-	#sys.exit(0)
 	characterization_queue.join()
 	for temp_thread in characterization_thread_set:
+		#temp_thread.join()
 		temp_results=temp_thread.get_result()
 		if(temp_results is not None):
 			for temp_key in temp_results:
