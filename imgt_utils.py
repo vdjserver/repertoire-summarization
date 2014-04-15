@@ -648,6 +648,7 @@ def formRefDirURL(species,locus):
 		#IMGT/V-QUEST reference sequences in FASTA format:  
 		#Nucleotide sequences with gaps according to the IMGT unique numbering 
 		#for F+ORF+in-frame P alleles, including orphons
+		#see also URLS/links here : http://www.imgt.org/vquest/refseqh.html
 		base+="IMGT_GENE-DB/GENElect?query=7.14+"+locus+"&species="+species
 		return base
 	else:
