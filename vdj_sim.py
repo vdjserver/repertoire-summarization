@@ -135,9 +135,14 @@ def compatibleForRecombination(c1,c2):
 
 
 
+
+
+
+
+
 #using the input fastas and flags (and max sim)
 #writer simulated VDJs to STDOUT
-def vdj_sim(vFasta,dFasta,jFasta,selected_loci_classes,max_sim=float("inf")):
+def vdj_sim(vFasta,dFasta,jFasta,selected_loci_classes,mut_lam,max_sim=float("inf")):
 	vMap=read_fasta_file_into_map(vFasta)
 	vMom=partitionIntoClassMaps(vMap)
 	num_miss_V=0
@@ -171,12 +176,40 @@ def vdj_sim(vFasta,dFasta,jFasta,selected_loci_classes,max_sim=float("inf")):
 		if(num_miss_D==len(dMom.keys())):
 			print "ERROR, loci classes from selected loci classes is ",selected_loci_classes," but classes read from D FASTA are ",dMom.keys(),". No data found for selected classes ! Abort!"
 			import sys
-			sys.exit(0)			
+			sys.exit(0)
 	num_sim=0
+	fasta_available_loci_classes=list()
+	for m in vMom:
+		if(not(m in fasta_available_loci_classes)):
+			fasta_available_loci_classes.append(m)
+	for m in jMom:
+		if(not(m in fasta_available_loci_classes)):
+			fasta_available_loci_classes.append(m)
+	selected_and_available_loci_classes=list()
+	for a in fasta_available_loci_classes:
+		if(not(a in selected_loci_classes)):
+			#if something is available, but not selected, then give no warning
+			pass
+		else:
+			selected_and_available_loci_classes.append(a)
+	list_of_selected_but_unavailble=list()
+	for s in selected_loci_classes:
+		if(not(s in fasta_available_loci_classes)):
+			list_of_selected_but_unavailble.append(s)
+	if(len(list_of_selected_but_unavailble)>0):
+		import sys
+		warn_msg="WARNING : The following loci are selected, but unavailable from the supplied FASTA files : "+str(list_of_selected_but_unavailble)
+		sys.stderr.write(warn_msg+"\n")
+	if(len(selected_and_available_loci_classes)==0):
+		warn_msg="ERROR : availble loci (from FASTA) are : "+str(fasta_available_loci_classes)+" but selected loci are "+str(selected_loci_classes)+"!"
+		import sys
+		sys.stderr.write(warn_msg+"\n")
+		sys.exit(2)
 	while(num_sim<max_sim):
 		print (num_sim+1)
 		#make a random class choice from the list of selected classes
-		selected_random_class=random.choice(selected_loci_classes)
+		#MOM='map of maps'
+		selected_random_class=random.choice(selected_and_available_loci_classes)
 		vPool=vMom[selected_random_class]
 		jPool=jMom[selected_random_class]
 		dPool=None
@@ -271,7 +304,18 @@ if (__name__=="__main__"):
 	parser.add_argument('-dfasta',type=str,nargs=1,help="path to the D fasta file for heavy chains")
 	parser.add_argument('-loci',type=str,nargs=1,help="comma-separated list of allowed loci classes (default these 7 : \"IGH,IGK,IGV,TRA,TRB,TRD,TRG\")")
 	parser.add_argument('-num_seqs',type=int,default=float("inf"),nargs=1,help="the number of sequences to simulate")
+	parser.add_argument('-mut_lam',type=float,default=float(0.5),nargs=1,help="the lambda parameter for SHM")
 	args = parser.parse_args()
+	mut_lam=None
+	if(type(args.mut_lam)==list):
+		mut_lam=args.mut_lam[0]
+	else:
+		#print "args.mut_lam is ",args.mut_lam
+		mut_lam=args.mut_lam
+	if(mut_lam<0):
+		print "ERROR, selected mut_lam is negative! Abort !"
+		import sys
+		sys.exit(1)
 	if(not(args.loci is None)):
 		selected_loci_classes=args.loci
 		selected_loci_classes=selected_loci_classes[0]
@@ -300,7 +344,7 @@ if (__name__=="__main__"):
 	if(args.dfasta):
 		dFasta=args.dfasta[0]
 	jFasta=args.jfasta[0]
-	vdj_sim(vFasta,dFasta,jFasta,selected_loci_classes,max_sim)
+	vdj_sim(vFasta,dFasta,jFasta,selected_loci_classes,mut_lam,max_sim)
 
 
 	
