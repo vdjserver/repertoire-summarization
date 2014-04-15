@@ -1,6 +1,7 @@
 #!/bin/bash -x 
 VDJ_DB_ROOT=/home/data/DATABASE/01_22_2014
-IGDATA=/usr/local/igblast-1.2.0
+#IGDATA=/usr/local/igblast-1.2.0
+IGDATA=/usr/local/igblast-1.3.0
 for ORGANISM in Mus_musculus human ;
 do
 	echo "Now analyzing for organism=$ORGANISM" ;
@@ -47,7 +48,7 @@ do
 				echo "FOUND $QRY" ;
 				echo "Starting IgBLAST with outfmt 7 at "
 				date
-				$IGBLAST_EXEC -domain_system $DCMODE  -query $QRY -germline_db_V $DB_V -germline_db_D $DB_D -germline_db_J $DB_J  -ig_seqtype $IGB_SEQ_FLAG -auxiliary_data $AUX_PATH -outfmt '7 qseqid qgi qacc qaccver qlen sseqid sallseqid sgi sallgi sacc saccver sallacc slen qstart qend sstart send qseq sseq evalue bitscore score length pident nident mismatch positive gapopen gaps ppos frames qframe sframe btop'  >$OUTPUT
+				$IGBLAST_EXEC  -num_threads 6   -domain_system $DCMODE  -query $QRY -germline_db_V $DB_V -germline_db_D $DB_D -germline_db_J $DB_J  -ig_seqtype $IGB_SEQ_FLAG -auxiliary_data $AUX_PATH -outfmt '7 qseqid qgi qacc qaccver qlen sseqid sallseqid sgi sallgi sacc saccver sallacc slen qstart qend sstart send qseq sseq evalue bitscore score length pident nident mismatch positive gapopen gaps ppos frames qframe sframe btop'  >$OUTPUT
 				echo "IgBLAST with outfmt 7 finished at "
 				date
 				echo "Now running IgBLAST for human-readable output ..."
