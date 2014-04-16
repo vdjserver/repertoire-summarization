@@ -379,7 +379,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 
 
 
-	#characterization beyond segments/CDR3
+	#characterization beside segments/CDR3
 	if(not(skip_char)):
 		#whole seq characterization
 		whole_char_map=returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap)
@@ -400,12 +400,16 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 			else:
 				#annMap['vdj_server_ann_productive_rearrangement']="N/A"
 				pass
+
+		#regions characterization FR1, FR2, FR3, CDR1, CDR2 (imgt and kabat)
 		mode_list=get_domain_modes()
 		global characterization_thread_set
 		global characterization_queue
+		num_submitted_jobs=0
 		if(characterization_thread_set==None):
 			num_cpus=multiprocessing.cpu_count()
-			num_threads=max(1,num_cpus-1)
+			num_threads=max(1,num_cpus+1)
+			#num_threads=1
 			print "USING NUM_THREADS=",num_threads
 			characterization_thread_set=set()
 			for c in range(num_threads):
@@ -439,6 +443,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 						char_job_dict['region']=region
 						char_job_dict['noneSeg_flag']=noneSeg_flag
 						characterization_queue.put(char_job_dict)
+						print "JUST SUBMITTED A CHAR_QUEUE JOB :",char_job_dict
 						#if(regionAlignment!=None and not(noneSeg_flag)):
 						#	reg_ann_show_msg=False
 						#	#reg_ann_msg="characterization for region="+region+" mode="+mode+" for read="+read_rec.id
@@ -470,7 +475,10 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 			#no annotation possible if V is empty!
 			pass
 
+	print "CHAR_QUEUE pre-join...."
 	characterization_queue.join()
+	time.sleep(1)
+	print "CHAR_QUEUE passed join!!!"
 	for temp_thread in characterization_thread_set:
 		#temp_thread.join()
 		temp_results=temp_thread.get_result()
