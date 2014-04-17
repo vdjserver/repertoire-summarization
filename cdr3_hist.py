@@ -426,7 +426,7 @@ def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
 						#cdr3_hist[dm+'_from']=(-1)
 						#cdr3_hist[dm+'_to']=(-1)
 				else:
-					#print "BADQRYMAP Failure to map to query for mode=",dm," V=",currentV," J=",currentJ," read=",currentQueryName," REFSTART=",ref_cdr3_start,"QRYSTART=",qry_cdr3_start,"REFEND=",ref_cdr3_end,"QRYEND=",qry_cdr3_end
+					#print "BADQRYMAP Failure to map to query for mode=",dm," V=",currentV," J=",currentJ," read=",vMap['query id'],"  REFSTART=",ref_cdr3_start,"QRYSTART=",qry_cdr3_start,"REFEND=",ref_cdr3_end,"QRYEND=",qry_cdr3_end
 					pass
 			else:
 				#print "BADREFMAP mode=",dm," refVCDR3=(-1) for ",currentV," = ",ref_cdr3_start," or refJCDR3 ",currentJ," = ",ref_cdr3_end
