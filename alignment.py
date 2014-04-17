@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import random
-from utils import makeEmptyArrayOfDigitsOfLen,biopythonTranslate,getNumberBpInAlnStr
+from utils import makeEmptyArrayOfDigitsOfLen,biopythonTranslate,getNumberBpInAlnStr,biopythonTranslate
 import re
 
 
@@ -17,6 +17,84 @@ def getNumStartingDashes(s):
 
 
 
+class CodonAnalysis:
+	
+	#internal data
+	codon_amino_map=None
+	amino_codon_map=None
+
+	#make a list of codons
+	def make_codons(self):
+		bases=["A","C","G","T","a","c","g","t"]
+		codons=list()
+		for b1 in range(len(bases)):
+			for b2 in range(len(bases)):
+				for b3 in range(len(bases)):
+					codon=bases[b1]+bases[b2]+bases[b3]
+					codons.append(codon)
+		return codons
+
+	#make a list of aminos
+	def make_aminos(self):
+		amino_set=set()
+		codons=self.make_codons()
+		for codon in codons:
+			amino=str(biopythonTranslate(codon))
+			amino_set.add(amino)
+		amino_list=list()
+		for amino in amino_set:
+			amino_list.append(amino)
+		return amino_list
+
+
+
+	#initialize that codon->amino map
+	def init_ca_map(self):
+		codons=self.make_codons()
+		self.codon_amino_map=dict()
+		ascii_list=list()
+		for a in range(33,122):
+			ascii_list.append(chr(a))
+		for b1 in ascii_list:
+			for b2 in ascii_list:
+				for b3 in ascii_list:
+					codon=b1+b2+b3
+					self.codon_amino_map[codon]="X"
+		for codon in codons:
+			amino=str(biopythonTranslate(codon))
+			self.codon_amino_map[codon]=amino
+
+	
+	#initialize the amino->codons map!
+	def init_ac_map(self):
+		aminos=self.make_aminos()
+		self.amino_codon_map=dict()
+		for amino in aminos:
+			codons=self.make_codons()
+			codons_that_make_this_amino=list()
+			for codon in codons:
+				if(self.codon_amino_map[codon]==amino):
+					codons_that_make_this_amino.append(codon)
+			self.amino_codon_map[amino]=codons_that_make_this_amino
+
+	#lookup-based translation
+	def fastTrans(self,codon):
+		return self.codon_amino_map[codon]
+
+	def __init__(self):
+		#init ca map
+		self.init_ca_map()
+		#print "CA MAP"
+		#print self.codon_amino_map
+		self.init_ac_map()
+		#print "AC MAP"
+		#print self.amino_codon_map
+		#sys.exit(0)
+
+
+
+codonAnalyzer=CodonAnalysis()
+
 
 #class for two-seq alignment methods/tools/data
 class alignment:
@@ -29,6 +107,7 @@ class alignment:
 	q_start=(-1)
 	q_end=(-1)
 	s_frame_mask=None
+	global codonAnalyzer
 	
 
 	#constructor
@@ -268,8 +347,9 @@ class alignment:
 
 
 
-	#ins, del, bsb, syn/non-sym
+	#ins, del, bsb, syn/non-sym, stp
 	def characterize(self,charMsg=None,showAln=False):
+		global codonAnalyzer
 		char_map=dict()
 		num_ins=0
 		num_del=0
@@ -335,29 +415,36 @@ class alignment:
 				q_codon=self.q_aln[temp_index:(temp_index+3)]
 				q_codon_w_gaps=q_codon
 				#print "q codon is ",q_codon
-				if(q_codon.find("-")==(-1)):
-					q_amino=str(biopythonTranslate(q_codon))
-					if(q_amino=="*"):
-						stp_cdn=True
-						#print "DETECTED A STOP CODON AT TEMP_INDEX",temp_index
+				if(not(stp_cdn)):
+					if(q_codon.find("-")==(-1)):
+						#q_amino=str(biopythonTranslate(q_codon))
+						q_amino=codonAnalyzer.fastTrans(q_codon)
+						if(q_amino=="*"):
+							stp_cdn=True
+							#print "DETECTED A STOP CODON AT TEMP_INDEX",temp_index
 				if(s_codon.find("-")==(-1) and q_codon.find("-")==(-1)):
 					#ANALYSIS FOR CODONS WITH NO GAPS
 					#no gaps, perform analysis
 					#print "Detected no gaps in codons"
-					s_amino=str(biopythonTranslate(s_codon))
+					#s_amino=str(biopythonTranslate(s_codon))
+					s_amino=codonAnalyzer.fastTrans(s_codon)
 					#print "subject amino :",s_amino," and codon ",s_codon
-					q_amino=str(biopythonTranslate(q_codon))
+					#q_amino=str(biopythonTranslate(q_codon))
+					q_amino=codonAnalyzer.fastTrans(q_codon)
 					#print "query amino ",q_amino," and codon ",q_codon
-					#print "PRE SYN/NSY counts : ",num_syn," and ",num_nsy
-					for cp in range(3):
-						if(s_codon[cp]!=q_codon[cp] and s_amino==q_amino):
-							#SYNONYMOUS mutation
-							num_syn+=1
-							#num_bsb+=1
-						elif(s_codon[cp]!=q_codon[cp] and s_amino!=q_amino):
-							#NONSYNONYMOUS MUTATION
-							num_nsy+=1
-							#num_bsb+=1
+					#print "PRE SYN/NSY counts : ",num_syn," and ",num_nsy 
+					if(s_amino==q_amino):
+						syn=True
+					else:
+						syn=False
+					if(syn):
+						for cp in range(3):
+							if(s_codon[cp]!=q_codon[cp]):
+								num_syn+=1
+					else:
+						for cp in range(3):
+							if(s_codon[cp]!=q_codon[cp]):
+								num_nsy+=1
 					#print "POST SYN/NSY counts : ",num_syn," and ",num_nsy
 				else:
 					#ANALYSIS FOR CODONS WITHOUT GAPS
