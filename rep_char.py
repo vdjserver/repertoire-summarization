@@ -71,6 +71,9 @@ def readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,read_ann
 			query_cdr3=qw[f-1:t]
 			read_ann_map[global_key_base+mode+'_cdr3_na']=query_cdr3
 			read_ann_map[global_key_base+mode+'_cdr3_tr']=biopythonTranslate(read_ann_map[global_key_base+mode+'_cdr3_na'])
+			#add in lengths!
+			read_ann_map[global_key_base+mode+'_cdr3_na_len']=len(query_cdr3)
+			read_ann_map[global_key_base+mode+'_cdr3_nr_len']=len(read_ann_map[global_key_base+mode+'_cdr3_tr'])
 			#this stuff below was once in here becuase we might've done some CDR3 specific annotation...but
 			#it is commented out for now because such goals are either postponed or canceled
 			#vMap=getHitInfo(read_result_obj,meta,read_ann_map['top_V'],read_rec,imgtdb_obj,organism)
@@ -82,8 +85,9 @@ def readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,read_ann
 			#getCDR3RegionSpecificCharacterizationSubAln(vMap,dMap,jMap,organism,imgtdb_obj,mode,read_rec)
 			#sys.exit(0)
 		else:
-			read_ann_map[global_key_base+mode+'_cdr3_na']=""
-			read_ann_map[global_key_base+mode+'_cdr3_tr']=read_ann_map[global_key_base+mode+'_cdr3_na']
+			#read_ann_map[global_key_base+mode+'_cdr3_na']=""
+			#$read_ann_map[global_key_base+mode+'_cdr3_tr']=read_ann_map[global_key_base+mode+'_cdr3_na']
+			pass
 	return read_ann_map
 
 
@@ -182,7 +186,7 @@ def cdr3RegCharAnalysis(vMap,dMap,jMap,mode,cdr3_anal_map,organism,imgtdb_obj):
 
 
 
-def getValnWholeSeqStopFlag(vInfo,jInfo,imgtdb_obj,organism,annMap,seq_rec):
+def getValnWholeSeqStopFlag(vInfo,dInfo,jInfo,imgtdb_obj,organism,annMap,seq_rec):
 	if(not(vInfo==None)):
 		vAlnObj=alignment(vInfo['query seq'],vInfo['subject seq'],vInfo['q. start'],vInfo['q. end'],vInfo['s. start'],vInfo['s. end'])
 		vAlnNoGapStart=vAlnObj.getGEQAlignmentFirstNonGap()
@@ -192,6 +196,7 @@ def getValnWholeSeqStopFlag(vInfo,jInfo,imgtdb_obj,organism,annMap,seq_rec):
 		Ns=repStr("N",numNToAdd)
 		q_start=vAlnNoGapStart.q_start
 		print "Initial q_start is ",q_start
+		#translate all the way to the end of the query here!!!!
 		q_end=vAlnNoGapStart.q_end
 		#if(vInfo['is_inverted']):
 		#	q_start=getRegPosFromInvertedPos(q_start,len(seq_rec.seq))
@@ -204,7 +209,18 @@ def getValnWholeSeqStopFlag(vInfo,jInfo,imgtdb_obj,organism,annMap,seq_rec):
 			#if(jInfo['is_inverted']):
 			#	j_q_end=getRegPosFromInvertedPos(j_q_end,len(seq_rec.seq))
 			print "Used q_end from j",j_q_end
+			#the purpose of this "max" function is to let q_end stay where it is in the case the J aligns BEFORE V does!
 			q_end=max(q_end,j_q_end)
+		else:
+			#no J alignment so try to get end of D alignment
+			if(not(dInfo==None)):
+				dAlnObj=alignment(dInfo['query seq'],dInfo['subject seq'],dInfo['q. start'],dInfo['q. end'],dInfo['s. start'],dInfo['s. end'])
+				d_q_end=dAlnObj.q_end
+				print "Initial q_end from d",d_q_end
+				q_end=max(q_end,d_q_end)
+			else:
+				#d is none
+				pass
 		if(vInfo['is_inverted']):
 			query_to_exm=rev_comp_dna(str(seq_rec.seq))[q_start-1:q_end+1]
 		else:
@@ -358,6 +374,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 			annMap['top_'+seg]="None"			
 
 	vInfo=None
+	dInfo=None
 	jInfo=None
 	noneSeg_flag=False
 	for seg in topVDJ:
@@ -370,6 +387,8 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 				vInfo=hit_info
 			elif(seg=="J" and not(hit_info==None)):
 				jInfo=hit_info
+			elif(seg=="D" and not(hit_info==None)):
+				dInfo=hit_info
 		else:
 			if(seg=='V'):
 				noneSeg_flag=True
@@ -391,7 +410,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 		for w in whole_char_map:
 			new_key=global_key_base+'whole_seq_'+w
 			annMap[new_key]=whole_char_map[w]
-		whole_seq_stp_cdn_Tot_flag=getValnWholeSeqStopFlag(vInfo,jInfo,imgtdb_obj,organism,annMap,read_rec)
+		whole_seq_stp_cdn_Tot_flag=getValnWholeSeqStopFlag(vInfo,dInfo,jInfo,imgtdb_obj,organism,annMap,read_rec)
 		annMap['vdj_server_whole_vj_stp_cdn']=whole_seq_stp_cdn_Tot_flag
 
 		#productive rearrangement 
