@@ -6,7 +6,7 @@ import subprocess
 import urllib2
 import re
 from subprocess import call
-import nwalign as nw
+#import nwalign as nw
 import pickle
 
 
