@@ -363,7 +363,7 @@ class alignment:
 		if(showAln):
 			print self.getNiceString()
 
-		#do counts that are independent of codons/translations
+		#do counts that are independent of codons/translations (bsb, indels, and their frequencies)
 		tot_num_base_to_base_alns=0
 		for i in range(len(self.s_aln)):
 			if(self.s_aln[i]!="-" and self.q_aln[i]!="-"):
@@ -374,11 +374,19 @@ class alignment:
 				num_del+=1
 			elif(self.q_aln[i]!=self.s_aln[i]):
 				num_bsb+=1
+		num_indels=num_ins+num_del
 		if(tot_num_base_to_base_alns>0):
 			char_map['bsb_freq']=float(num_bsb)/float(tot_num_base_to_base_alns)
 			id_tot_rto=float(tot_num_base_to_base_alns-num_bsb)/float(tot_num_base_to_base_alns)
 			char_map['pct_id']=id_tot_rto
+			indel_rate=float(num_indels)/float(num_indels+tot_num_base_to_base_alns)
+			char_map['indel_freq']=indel_rate
 		else:
+			if(num_indels>0):
+				indel_rate=float(1.0)
+			else:
+				indel_rate=0
+			char_map['indel_freq']=indel_rate
 			char_map['bsb_freq']=0
 			char_map['pct_id']=0
 		#fill in the map
