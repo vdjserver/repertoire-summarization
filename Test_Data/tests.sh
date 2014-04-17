@@ -1,7 +1,7 @@
 #!/bin/bash -x 
 VDJ_DB_ROOT=/home/data/DATABASE/01_22_2014
-IGDATA=/usr/local/igblast-1.2.0
-#IGDATA=/usr/local/igblast-1.3.0
+#IGDATA=/usr/local/igblast-1.2.0
+IGDATA=/usr/local/igblast-1.3.0
 for ORGANISM in Mus_musculus human ;
 do
 	echo "Now analyzing for organism=$ORGANISM" ;
@@ -48,15 +48,15 @@ do
 				echo "FOUND $QRY" ;
 				echo "Starting IgBLAST with outfmt 7 at "
 				date
-				$IGBLAST_EXEC  -num_threads 6   -domain_system $DCMODE  -query $QRY -germline_db_V $DB_V -germline_db_D $DB_D -germline_db_J $DB_J  -ig_seqtype $IGB_SEQ_FLAG -auxiliary_data $AUX_PATH -outfmt '7 qseqid qgi qacc qaccver qlen sseqid sallseqid sgi sallgi sacc saccver sallacc slen qstart qend sstart send qseq sseq evalue bitscore score length pident nident mismatch positive gapopen gaps ppos frames qframe sframe btop'  >$OUTPUT
+				time $IGBLAST_EXEC  -num_threads 6   -domain_system $DCMODE  -query $QRY -germline_db_V $DB_V -germline_db_D $DB_D -germline_db_J $DB_J  -ig_seqtype $IGB_SEQ_FLAG -auxiliary_data $AUX_PATH -outfmt '7 qseqid qgi qacc qaccver qlen sseqid sallseqid sgi sallgi sacc saccver sallacc slen qstart qend sstart send qseq sseq evalue bitscore score length pident nident mismatch positive gapopen gaps ppos frames qframe sframe btop'  >$OUTPUT
 				echo "IgBLAST with outfmt 7 finished at "
 				date
-				echo "Now running IgBLAST for human-readable output ..."
+				time echo "Now running IgBLAST for human-readable output ..."
 				$IGBLAST_EXEC -domain_system $DCMODE  -query $QRY -germline_db_V $DB_V -germline_db_D $DB_D -germline_db_J $DB_J  -ig_seqtype $IGB_SEQ_FLAG -auxiliary_data $AUX_PATH -show_translation >$OUTPUT_HUMAN 
 				echo "IgBLAST for human-readable output finished."
 				date
 				echo "Now running repertoire characterization ..."
-				../rep_char.py -json_out $RC_CDR3_SEG_JSON -cdr3_hist_out $RC_CDR3_HIST $RC_IN $RC_VDJML $RC_OUT $RC_DB $QRY 1>$RC_LOG_OUT 2>$RC_LOG_ERR
+				time ../rep_char.py -json_out $RC_CDR3_SEG_JSON -cdr3_hist_out $RC_CDR3_HIST $RC_IN $RC_VDJML $RC_OUT $RC_DB $QRY 1>$RC_LOG_OUT 2>$RC_LOG_ERR
 			else
 				echo "QUERY $QRY NOT FOUND" ;
 			fi ;
