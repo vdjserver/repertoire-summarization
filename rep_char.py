@@ -340,6 +340,7 @@ def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap):
 
 #characterization_queue=multiprocessing.JoinableQueue()
 characterization_queue=Queue.Queue()
+characterization_queue_results=Queue.Queue()
 characterization_thread_set=None
 			
 #given a read object, meta data, organism and database data and the read record and CDR3 data
@@ -380,6 +381,10 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 
 
 	#characterization beside segments/CDR3
+	global characterization_thread_set
+	global characterization_queue
+	global characterization_queue_results
+	num_submitted_jobs=0
 	if(not(skip_char)):
 		#whole seq characterization
 		whole_char_map=returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap)
@@ -403,18 +408,17 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 
 		#regions characterization FR1, FR2, FR3, CDR1, CDR2 (imgt and kabat)
 		mode_list=get_domain_modes()
-		global characterization_thread_set
-		global characterization_queue
-		num_submitted_jobs=0
+
 		if(characterization_thread_set==None):
 			num_cpus=multiprocessing.cpu_count()
-			num_threads=max(1,num_cpus+1)
+			num_threads=max(1,num_cpus)
 			#num_threads=1
+			#num_threads=10
 			print "USING NUM_THREADS=",num_threads
 			characterization_thread_set=set()
 			for c in range(num_threads):
 				#print "ABOUT TO CALL CONST...."
-				temp_thread=CharacterizationThread(characterization_queue)
+				temp_thread=CharacterizationThread(characterization_queue,characterization_queue_results)
 				#print "RETURNED FROM CONSTRUCTOR"
 				temp_thread.setDaemon(True)
 				#sys.exit(0)
@@ -443,6 +447,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 						char_job_dict['region']=region
 						char_job_dict['noneSeg_flag']=noneSeg_flag
 						characterization_queue.put(char_job_dict)
+						num_submitted_jobs+=1
 						print "JUST SUBMITTED A CHAR_QUEUE JOB :",char_job_dict
 						#if(regionAlignment!=None and not(noneSeg_flag)):
 						#	reg_ann_show_msg=False
@@ -475,16 +480,17 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 			#no annotation possible if V is empty!
 			pass
 
-	print "CHAR_QUEUE pre-join...."
-	characterization_queue.join()
-	time.sleep(1)
-	print "CHAR_QUEUE passed join!!!"
-	for temp_thread in characterization_thread_set:
-		#temp_thread.join()
-		temp_results=temp_thread.get_result()
-		if(temp_results is not None):
-			for temp_key in temp_results:
-				annMap[temp_key]=temp_results[temp_key]
+	if(num_submitted_jobs>0):
+		print "CHAR_QUEUE pre-join...."
+		characterization_queue.join()
+		get_res=0
+		while(get_res<num_submitted_jobs):
+			temp_results=characterization_queue_results.get()
+			if(temp_results is not None):
+				for temp_key in temp_results:
+					annMap[temp_key]=temp_results[temp_key]			
+			get_res+=1
+	
 	
 	annMap['read_name']=read_rec.id
 	#getAlignmentString(read_result_obj,meta,query_record,imgtdb_obj,organism)
