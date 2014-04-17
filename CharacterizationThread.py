@@ -11,10 +11,11 @@ class CharacterizationThread(threading.Thread):
 		self.result=None
 	def get_result(self):
 		return self.result
-	def __init__(self,queue):
+	def __init__(self,queue,result_queue):
 		#print "IN INIT OF CharacterizationThread"
 		threading.Thread.__init__(self)
 		self.queue=queue
+		self.result_queue=result_queue
 	def run(self):
 		while(True):
 			try:
@@ -54,6 +55,7 @@ class CharacterizationThread(threading.Thread):
 						annMap[key_base+region+'_frm_msk']=regionAlignment.s_frame_mask
 						self.result=annMap
 				print "to call CHAR_QUEUE task_done..."
+				self.result_queue.put(self.result)
 				self.queue.task_done()
 				print "called CHAR_QUEUE task_done..."
 			except:
