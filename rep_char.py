@@ -457,6 +457,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 						#regionAlignment=getVDJServerRegionAlignmentFromLargerVAlignmentPyObj(read_result_obj,meta,organism,mode,region,imgtdb_obj,False,read_rec)
 						key_base=global_key_base+mode+"_"
 						char_job_dict=dict()
+						char_job_dict['refName']=topVDJ[seg]
 						char_job_dict['read_result_obj']=read_result_obj
 						char_job_dict['meta']=meta
 						char_job_dict['organism']=organism
@@ -807,7 +808,7 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None"):
 	]
 
 	m[keys[0]]=rid
-	#keys=m.keys()
+	keys=m.keys()
 	keys.sort()
 
 	if(rid==1):
