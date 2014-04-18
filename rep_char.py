@@ -85,8 +85,11 @@ def readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,read_ann
 			#getCDR3RegionSpecificCharacterizationSubAln(vMap,dMap,jMap,organism,imgtdb_obj,mode,read_rec)
 			#sys.exit(0)
 		else:
-			#read_ann_map[global_key_base+mode+'_cdr3_na']=""
-			#$read_ann_map[global_key_base+mode+'_cdr3_tr']=read_ann_map[global_key_base+mode+'_cdr3_na']
+			read_ann_map[global_key_base+mode+'_cdr3_na']=""
+			read_ann_map[global_key_base+mode+'_cdr3_tr']=""
+			#add in lengths!
+			read_ann_map[global_key_base+mode+'_cdr3_na_len']=""
+			read_ann_map[global_key_base+mode+'_cdr3_tr_len']=""
 			pass
 	return read_ann_map
 
