@@ -3,6 +3,7 @@
 import random
 from utils import makeEmptyArrayOfDigitsOfLen,biopythonTranslate,getNumberBpInAlnStr,biopythonTranslate
 import re
+import threading
 
 
 
@@ -22,10 +23,11 @@ class CodonAnalysis:
 	#internal data
 	codon_amino_map=None
 	amino_codon_map=None
+	bases=["A","C","G","T","a","c","g","t"]
 
 	#make a list of codons
 	def make_codons(self):
-		bases=["A","C","G","T","a","c","g","t"]
+		bases=self.bases
 		codons=list()
 		for b1 in range(len(bases)):
 			for b2 in range(len(bases)):
@@ -46,6 +48,29 @@ class CodonAnalysis:
 			amino_list.append(amino)
 		return amino_list
 
+	#test for ambiguity
+	def is_unambiguous_base(self,b):
+		if(b in self.bases):
+			return True
+		else:
+			return False
+
+	#test for codon ambiguity
+	def is_unambiguous_codon(self,c):
+		if(type(c)==list):
+			for base in c:
+				ba=self.is_unambiguous_base(base)
+				if(not(ba)):
+					return False
+		elif(type(c)==str):
+			for bi in range(len(c)):
+				base=c[bi]
+				ba=self.is_unambiguous_base(base)
+				if(not(ba)):
+					return False
+		else:
+			return False
+		return True
 
 
 	#initialize that codon->amino map
@@ -94,8 +119,7 @@ class CodonAnalysis:
 
 
 codonAnalyzer=CodonAnalysis()
-
-
+char_lock = threading.Lock()
 #class for two-seq alignment methods/tools/data
 class alignment:
 
@@ -108,6 +132,7 @@ class alignment:
 	q_end=(-1)
 	s_frame_mask=None
 	global codonAnalyzer
+	valid_bases=codonAnalyzer.bases
 	
 
 	#constructor
@@ -373,7 +398,9 @@ class alignment:
 			elif(self.q_aln[i]=="-"):
 				num_del+=1
 			elif(self.q_aln[i]!=self.s_aln[i]):
-				num_bsb+=1
+				if(self.q_aln[i] in self.valid_bases and self.s_aln[i] in self.valid_bases  ):
+					#make sure that the base is unambiguous
+					num_bsb+=1
 		num_indels=num_ins+num_del
 		if(tot_num_base_to_base_alns>0):
 			char_map['bsb_freq']=float(num_bsb)/float(tot_num_base_to_base_alns)
@@ -408,6 +435,8 @@ class alignment:
 
 		#do frame-dependent calculations
 		temp_index=0
+		codon_list=list()
+		amino_list=list()
 		while(temp_index<len(self.s_aln)):
 			if(
 			temp_index<len(self.s_aln)-2 and 
@@ -418,10 +447,11 @@ class alignment:
 				#print "temp_index=",temp_index
 				#print "encountered a codon...."
 				s_codon=self.s_aln[temp_index:(temp_index+3)]
-				s_codon_w_gaps=s_codon
+				#s_codon_w_gaps=s_codon
 				#print "s codon is ",s_codon
 				q_codon=self.q_aln[temp_index:(temp_index+3)]
-				q_codon_w_gaps=q_codon
+				codon_list.append(str(q_codon))
+				#q_codon_w_gaps=q_codon
 				#print "q codon is ",q_codon
 				if(not(stp_cdn)):
 					if(q_codon.find("-")==(-1)):
@@ -429,33 +459,39 @@ class alignment:
 						q_amino=codonAnalyzer.fastTrans(q_codon)
 						if(q_amino=="*"):
 							stp_cdn=True
-							#print "DETECTED A STOP CODON AT TEMP_INDEX",temp_index
 				if(s_codon.find("-")==(-1) and q_codon.find("-")==(-1)):
-					#ANALYSIS FOR CODONS WITH NO GAPS
+					#ANALYSIS FOR TWO CODONS WITH NO GAPS
 					#no gaps, perform analysis
 					#print "Detected no gaps in codons"
 					#s_amino=str(biopythonTranslate(s_codon))
 					s_amino=codonAnalyzer.fastTrans(s_codon)
 					#print "subject amino :",s_amino," and codon ",s_codon
 					#q_amino=str(biopythonTranslate(q_codon))
-					q_amino=codonAnalyzer.fastTrans(q_codon)
+					q_amino=str(codonAnalyzer.fastTrans(q_codon))
+					amino_list.append(str(q_amino))
 					#print "query amino ",q_amino," and codon ",q_codon
 					#print "PRE SYN/NSY counts : ",num_syn," and ",num_nsy 
 					if(s_amino==q_amino):
 						syn=True
 					else:
 						syn=False
-					if(syn):
-						for cp in range(3):
-							if(s_codon[cp]!=q_codon[cp]):
-								num_syn+=1
-					else:
-						for cp in range(3):
-							if(s_codon[cp]!=q_codon[cp]):
-								num_nsy+=1
-					#print "POST SYN/NSY counts : ",num_syn," and ",num_nsy
+					if(codonAnalyzer.is_unambiguous_codon(q_codon) and codonAnalyzer.is_unambiguous_codon(s_codon)):
+						if(syn):
+							for cp in range(3):
+								if(s_codon[cp]!=q_codon[cp]):
+									num_syn+=1
+						else:
+							for cp in range(3):
+								if(s_codon[cp]!=q_codon[cp]):
+									num_nsy+=1
+						#print "POST SYN/NSY counts : ",num_syn," and ",num_nsy
 				else:
-					#ANALYSIS FOR CODONS WITHOUT GAPS
+					#ANALYSIS FOR CODONS WITH any gap
+					if(q_codon.find("-")==(-1)):
+						q_amino=str(codonAnalyzer.fastTrans(q_codon))
+						amino_list.append(q_amino)
+					else:
+						amino_list.append("X")
 					for cp in range(3):
 						if(s_codon[cp]!="-" and q_codon[cp]!="-" and s_codon[cp]!=q_codon[cp]):
 							#num_bsb+=1
@@ -465,6 +501,8 @@ class alignment:
 				temp_index+=3
 			else:
 				#print "encountered a single.... temp_index=",temp_index
+				codon_list.append("("+self.q_aln[temp_index]+")")
+				amino_list.append("-")
 				if(self.s_aln[temp_index]!=self.q_aln[temp_index] and self.s_aln[temp_index]!="-" and self.q_aln[temp_index]!="-"):
 					#num_bsb+=1
 					pass
@@ -478,6 +516,9 @@ class alignment:
 			ns_ratio=0
 		char_map['ns_rto']=ns_ratio
 		char_map['stp_cdn']=stp_cdn
+		j_str=""
+		char_map['aminos']=j_str.join(amino_list)
+		char_map['codons']=codon_list
 		return char_map
 
 
