@@ -267,7 +267,7 @@ def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap):
 				#could not detect CDR3 end! so just return V map data
 				return preCDR3Aln.characterize()
 			elif(jAlnObj.q_end<=preCDR3Aln.q_start or jAlnObj.q_end<=preCDR3Aln.q_end):
-				#j alignment within V so just return V ; avoid double countings
+				#j alignment TOTALLY within V so just return V ; avoid double countings
 				return preCDR3Aln.characterize()
 			else:
 				postCDR3AlnStart=J_cdr3_end+1
@@ -286,7 +286,7 @@ def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap):
 				postCDR3AlnObj=jAlnObj.getAlnAtAndCond(new_q_start,"query","geq")
 			if(postCDR3AlnObj.s_start==postCDR3AlnStart):
 				#great, set the FRAME mask to start with zero cause the alignment starts where it ideally should start
-				#print "postCDR3AlnObj.s_start=",postCDR3AlnObj.s_start,", and postCDR3AlnStart=", postCDR3AlnStart," so normal case for SFM"
+				print "postCDR3AlnObj.s_start=",postCDR3AlnObj.s_start,", and postCDR3AlnStart=", postCDR3AlnStart," so normal case for SFM"
 				postCDR3AlnObj.setSFM(0)
 			elif(postCDR3AlnStart<postCDR3AlnObj.s_start):
 				#if the alignment starts later, set the proper frame mask start
@@ -317,10 +317,13 @@ def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap):
 			print "the vCharMap annotation map and alignment (for whole seq named ",vInfo['query id'],") is "
 			printMap(vCharMap)
 			print preCDR3Aln.getNiceString()
+			print "the jCharMap annotation map and alignment (for whole seq name ",jInfo['query id'],") is "
+			print postCDR3AlnObj.getNiceString()
 			jCharMap=postCDR3AlnObj.characterize()
+			printMap(jCharMap)
 			#to get/compute the 'whole' map, add up the "non-special" values
 			#otherwise, compute them specially
-			toSkip=['bsb_freq','pct_id','ns_rto']
+			toSkip=['bsb_freq','pct_id','ns_rto','indel_freq']
 			totCharMap=dict()
 			for k in vCharMap:
 				if(not(k in toSkip)):
@@ -337,15 +340,17 @@ def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap):
 			else:
 				totCharMap['cdr3_stp_cdn']=False
 				
-			#handle pct id and bsb_freq specially
+			#handle pct id , bsb_freq , indel_freq specially
 			totQ=getNumberBpInAlnStr(postCDR3AlnObj.q_aln)+getNumberBpInAlnStr(preCDR3Aln.q_aln)
 			totBS=totCharMap['base_sub']
 			if(totQ!=0):
 				totCharMap['pct_id']=float((float(totQ)-float(totBS))/float(totQ))
 				totCharMap['bsb_freq']=float(totCharMap['base_sub'])/float(totQ)
+				totCharMap['indel_freq']=float(totCharMap['insertions']+totCharMap['deletions'])/float(totQ+totCharMap['insertions']+totCharMap['deletions'])
 			else:
 				totCharMap['pct_id']=0.0
 				totCharMap['bsb_freq']=0
+				totCharMap['indel_freq']=0
 			#handle ns_ratio
 			if(totCharMap['synonymous_bsb']!=0):
 				totCharMap['ns_rto']=float(totCharMap['nonsynonymous_bsb'])/float(totCharMap['synonymous_bsb'])
