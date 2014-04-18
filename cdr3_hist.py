@@ -358,13 +358,27 @@ for d in domain_list:
 
 
 
+
+def getEmptyCDR3Map():
+	domain_modes=get_domain_modes()
+	cdr3_hist=dict()
+	for dm in domain_modes:
+		cdr3_hist[dm+'_from']=(-1)
+		cdr3_hist[dm+'_to']=(-1)
+		cdr3_hist[dm]=(-1)
+	return cdr3_hist
+		
+		
+
+
+
 #given info maps for V and J and the returnd a 
 #dictionary with kabat and imgt lengths
 def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
 	#currentQueryName=str(currentQueryName.strip())
 	currentV=vMap['subject ids']
 	currentJ=jMap['subject ids']
-	cdr3_hist=dict()
+	cdr3_hist=getEmptyCDR3Map()
 	if(vMap['query id'].find("reversed|")==0):
 		cdr3_hist['qry_rev']=True
 	else:
@@ -421,10 +435,8 @@ def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
 						cdr3_hist[dm+'_from']=qry_cdr3_start
 						cdr3_hist[dm+'_to']=qry_cdr3_end
 					else:
-						#messed up alignment presumably due to overlap!
-						cdr3_hist[dm]=(-1)
-						#cdr3_hist[dm+'_from']=(-1)
-						#cdr3_hist[dm+'_to']=(-1)
+						#messed up alignment presumably due to overlap! or in the RARE case where J aligns before V in the read!
+						pass
 				else:
 					#print "BADQRYMAP Failure to map to query for mode=",dm," V=",currentV," J=",currentJ," read=",vMap['query id'],"  REFSTART=",ref_cdr3_start,"QRYSTART=",qry_cdr3_start,"REFEND=",ref_cdr3_end,"QRYEND=",qry_cdr3_end
 					pass
@@ -434,6 +446,10 @@ def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
 	else:
 		#print "Ref names ",currentV," and ",currentJ," don't appear alleleic!"
 		pass
+	#print "***************************\n"
+	#print "RETURNING THIS CDR3_HIST for ",vMap['query id'],":"
+	#printMap(cdr3_hist)
+	#print "***************************\n"	
 	return cdr3_hist
 
 
