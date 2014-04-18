@@ -502,7 +502,7 @@ class alignment:
 			else:
 				#print "encountered a single.... temp_index=",temp_index
 				codon_list.append("("+self.q_aln[temp_index]+")")
-				amino_list.append("-")
+				amino_list.append("(-)")
 				if(self.s_aln[temp_index]!=self.q_aln[temp_index] and self.s_aln[temp_index]!="-" and self.q_aln[temp_index]!="-"):
 					#num_bsb+=1
 					pass
