@@ -4,6 +4,7 @@ import multiprocessing
 import threading
 from vdjml_utils import getVDJServerRegionAlignmentFromLargerVAlignmentPyObj
 from alignment import alignment
+from segment_utils import getTheFrameForThisReferenceAtThisPosition
 
 #thread class for parallel charactgerization of regions
 class CharacterizationThread(threading.Thread):
@@ -35,9 +36,13 @@ class CharacterizationThread(threading.Thread):
 				if(not(noneSeg_flag)):
 					regionAlignment=getVDJServerRegionAlignmentFromLargerVAlignmentPyObj(read_result_obj,meta,organism,mode,region,imgtdb_obj,False,read_rec)
 					if(regionAlignment!=None):
+						s_start=regionAlignment.s_start
+						refName=char_job_dict['refName']
+						firstFrame=getTheFrameForThisReferenceAtThisPosition(refName,organism,imgtdb_obj,s_start)
+						regionAlignment.setSFM(firstFrame)
 						reg_ann_show_msg=False
-						#reg_ann_msg="characterization for region="+region+" mode="+mode+" for read="+read_rec.id
-						reg_ann_msg=None
+						reg_ann_msg="characterization for region="+region+" mode="+mode+" for read="+read_rec.id
+						#reg_ann_msg=None
 						reg_ann=regionAlignment.characterize(reg_ann_msg,reg_ann_show_msg)
 						#if(mode=="imgt" and read_rec.id=="FR3_STOP" and region=="FR3"):
 						#	print "got ann "
