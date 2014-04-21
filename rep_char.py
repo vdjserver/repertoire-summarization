@@ -631,8 +631,10 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None"):
 	"top_D",
 	"top_J",
 	"top_V",
+	"vdj_server_ann_imgt_CDR1_aminos",
 	"vdj_server_ann_imgt_CDR1_base_sub",
 	"vdj_server_ann_imgt_CDR1_bsb_freq",
+	"vdj_server_ann_imgt_CDR1_codons",
 	"vdj_server_ann_imgt_CDR1_deletions",
 	"vdj_server_ann_imgt_CDR1_frm_msk",
 	"vdj_server_ann_imgt_CDR1_indel_freq",
@@ -647,8 +649,10 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None"):
 	"vdj_server_ann_imgt_CDR1_ref_aln",
 	"vdj_server_ann_imgt_CDR1_stp_cdn",
 	"vdj_server_ann_imgt_CDR1_synonymous_bsb",
+	"vdj_server_ann_imgt_CDR2_aminos",
 	"vdj_server_ann_imgt_CDR2_base_sub",
 	"vdj_server_ann_imgt_CDR2_bsb_freq",
+	"vdj_server_ann_imgt_CDR2_codons",
 	"vdj_server_ann_imgt_CDR2_deletions",
 	"vdj_server_ann_imgt_CDR2_frm_msk",
 	"vdj_server_ann_imgt_CDR2_indel_freq",
@@ -663,8 +667,10 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None"):
 	"vdj_server_ann_imgt_CDR2_ref_aln",
 	"vdj_server_ann_imgt_CDR2_stp_cdn",
 	"vdj_server_ann_imgt_CDR2_synonymous_bsb",
+	"vdj_server_ann_imgt_FR1_aminos",
 	"vdj_server_ann_imgt_FR1_base_sub",
 	"vdj_server_ann_imgt_FR1_bsb_freq",
+	"vdj_server_ann_imgt_FR1_codons",
 	"vdj_server_ann_imgt_FR1_deletions",
 	"vdj_server_ann_imgt_FR1_frm_msk",
 	"vdj_server_ann_imgt_FR1_indel_freq",
@@ -679,8 +685,10 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None"):
 	"vdj_server_ann_imgt_FR1_ref_aln",
 	"vdj_server_ann_imgt_FR1_stp_cdn",
 	"vdj_server_ann_imgt_FR1_synonymous_bsb",
+	"vdj_server_ann_imgt_FR2_aminos",
 	"vdj_server_ann_imgt_FR2_base_sub",
 	"vdj_server_ann_imgt_FR2_bsb_freq",
+	"vdj_server_ann_imgt_FR2_codons",
 	"vdj_server_ann_imgt_FR2_deletions",
 	"vdj_server_ann_imgt_FR2_frm_msk",
 	"vdj_server_ann_imgt_FR2_indel_freq",
@@ -695,8 +703,10 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None"):
 	"vdj_server_ann_imgt_FR2_ref_aln",
 	"vdj_server_ann_imgt_FR2_stp_cdn",
 	"vdj_server_ann_imgt_FR2_synonymous_bsb",
+	"vdj_server_ann_imgt_FR3_aminos",
 	"vdj_server_ann_imgt_FR3_base_sub",
 	"vdj_server_ann_imgt_FR3_bsb_freq",
+	"vdj_server_ann_imgt_FR3_codons",
 	"vdj_server_ann_imgt_FR3_deletions",
 	"vdj_server_ann_imgt_FR3_frm_msk",
 	"vdj_server_ann_imgt_FR3_indel_freq",
@@ -715,8 +725,10 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None"):
 	"vdj_server_ann_imgt_cdr3_na_len",
 	"vdj_server_ann_imgt_cdr3_tr",
 	"vdj_server_ann_imgt_cdr3_tr_len",
+	"vdj_server_ann_kabat_CDR1_aminos",
 	"vdj_server_ann_kabat_CDR1_base_sub",
 	"vdj_server_ann_kabat_CDR1_bsb_freq",
+	"vdj_server_ann_kabat_CDR1_codons",
 	"vdj_server_ann_kabat_CDR1_deletions",
 	"vdj_server_ann_kabat_CDR1_frm_msk",
 	"vdj_server_ann_kabat_CDR1_indel_freq",
@@ -731,8 +743,10 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None"):
 	"vdj_server_ann_kabat_CDR1_ref_aln",
 	"vdj_server_ann_kabat_CDR1_stp_cdn",
 	"vdj_server_ann_kabat_CDR1_synonymous_bsb",
+	"vdj_server_ann_kabat_CDR2_aminos",
 	"vdj_server_ann_kabat_CDR2_base_sub",
 	"vdj_server_ann_kabat_CDR2_bsb_freq",
+	"vdj_server_ann_kabat_CDR2_codons",
 	"vdj_server_ann_kabat_CDR2_deletions",
 	"vdj_server_ann_kabat_CDR2_frm_msk",
 	"vdj_server_ann_kabat_CDR2_indel_freq",
@@ -747,8 +761,10 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None"):
 	"vdj_server_ann_kabat_CDR2_ref_aln",
 	"vdj_server_ann_kabat_CDR2_stp_cdn",
 	"vdj_server_ann_kabat_CDR2_synonymous_bsb",
+	"vdj_server_ann_kabat_FR1_aminos",
 	"vdj_server_ann_kabat_FR1_base_sub",
 	"vdj_server_ann_kabat_FR1_bsb_freq",
+	"vdj_server_ann_kabat_FR1_codons",
 	"vdj_server_ann_kabat_FR1_deletions",
 	"vdj_server_ann_kabat_FR1_frm_msk",
 	"vdj_server_ann_kabat_FR1_indel_freq",
@@ -763,8 +779,10 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None"):
 	"vdj_server_ann_kabat_FR1_ref_aln",
 	"vdj_server_ann_kabat_FR1_stp_cdn",
 	"vdj_server_ann_kabat_FR1_synonymous_bsb",
+	"vdj_server_ann_kabat_FR2_aminos",
 	"vdj_server_ann_kabat_FR2_base_sub",
 	"vdj_server_ann_kabat_FR2_bsb_freq",
+	"vdj_server_ann_kabat_FR2_codons",
 	"vdj_server_ann_kabat_FR2_deletions",
 	"vdj_server_ann_kabat_FR2_frm_msk",
 	"vdj_server_ann_kabat_FR2_indel_freq",
@@ -779,8 +797,10 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None"):
 	"vdj_server_ann_kabat_FR2_ref_aln",
 	"vdj_server_ann_kabat_FR2_stp_cdn",
 	"vdj_server_ann_kabat_FR2_synonymous_bsb",
+	"vdj_server_ann_kabat_FR3_aminos",
 	"vdj_server_ann_kabat_FR3_base_sub",
 	"vdj_server_ann_kabat_FR3_bsb_freq",
+	"vdj_server_ann_kabat_FR3_codons",
 	"vdj_server_ann_kabat_FR3_deletions",
 	"vdj_server_ann_kabat_FR3_frm_msk",
 	"vdj_server_ann_kabat_FR3_indel_freq",
@@ -800,9 +820,11 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None"):
 	"vdj_server_ann_kabat_cdr3_tr",
 	"vdj_server_ann_kabat_cdr3_tr_len",
 	"vdj_server_ann_productive_rearrangement",
+	"vdj_server_ann_whole_seq_aminos",
 	"vdj_server_ann_whole_seq_base_sub",
 	"vdj_server_ann_whole_seq_bsb_freq",
 	"vdj_server_ann_whole_seq_cdr3_stp_cdn",
+	"vdj_server_ann_whole_seq_codons",
 	"vdj_server_ann_whole_seq_deletions",
 	"vdj_server_ann_whole_seq_indel_freq",
 	"vdj_server_ann_whole_seq_insertions",
@@ -812,11 +834,11 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None"):
 	"vdj_server_ann_whole_seq_pct_id",
 	"vdj_server_ann_whole_seq_stp_cdn",
 	"vdj_server_ann_whole_seq_synonymous_bsb",
-	"vdj_server_whole_vj_stp_cdn"
+	"vdj_server_whole_vj_stp_cdn",
 	]
 
 	m[keys[0]]=rid
-	keys=m.keys()
+	#keys=m.keys()
 	keys.sort()
 
 	if(rid==1):
@@ -933,5 +955,6 @@ if (__name__=="__main__"):
 	else:
 		#print "error in args!"
 		parser.print_help()
+
 
 
