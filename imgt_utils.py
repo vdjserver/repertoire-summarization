@@ -679,6 +679,11 @@ def countNumApparentFastaRecsInStr(s):
 	for l in lines:
 		if(l.startswith("&gt;")):
 			n+=1
+		elif(l.startswith(">")):
+			n+=1
+		else:
+			#print "Couldn't find a fasta in ",l[0:10],"...."
+			pass
 	return n
 
 
@@ -719,29 +724,42 @@ def downloadRefDirFasta(locus,species,URLOverRide=None):
 	#html=f.read()
 	#print html
 	html= readAURL(url)
-	print "THE HTML READ IS ",html
+	#print "THE HTML READ IS ",html
 	matchObj = re.search( r'Number\s+of\s+results\s*=\s*(\d+)', html, re.M|re.I)
 	#matchObj = re.match( r'=(\d+)', html, re.M|re.I)
 	if(matchObj):
 		num_expected=int(matchObj.group(1))
 		print "THE NUM EXPECTED IS ",num_expected
 		soup=BeautifulSoup(html)
-		y=soup.find('pre') #returns data between <pre> tags
+		y=soup.find_all('pre') #returns data between <pre> tags
 		pre_num=0
 		for a in y:
 			print "GOT A PRE ",pre_num
-			print a
+			#print a[0:10]
+			pre_num+=1
+		print "Total number pre found : ",pre_num
+		pre_num=0			
+		for a in y:
+			print "GOT A PRE ",pre_num
+			pre_num+=1
+			#print a
 			print "the type : ",type(a)
 			if a is not None:
 				z_num=int(countNumApparentFastaRecsInStr(str(a)))
 				print "An apparent is ",z_num
-				print "The source apparent is ",a
+				#print "The source apparent is ",a
 				if(z_num==num_expected):
-					print "got expected fasta: ",a
+					#print "got expected fasta: ",a
 					fastaString=a
-					print fastaString
+					#print fastaString
 					fastaString=filterOutFastaStringFromFastaPre(str(fastaString))
 					return str(fastaString)
+				else:
+					#print "Error, expected ",num_expected," FASTA records, but found ",z_num," records instead!"
+					pass
+			else:
+				print "SOUP failed to find a <pre> tag from which FASTA can be extracted!"
+		
 	else:
 		print "\nFAILURE TO MATCH! from URL=",url
 
@@ -978,40 +996,6 @@ def init_hierarchy_count_map(hierarchy_file):
 
 
 
-
-#given a tree object, recursively explore it and
-#aggregate a list of all the alleles (ABC*01)
-#and return that list
-def get_list_of_alleles_appearing_in_tree(t):
-	listOfAlleles=list()
-	for k in t:
-		name=str(k)
-		if(looksLikeAlleleStr(name)):
-			listOfAlleles.append(k)
-		recList=get_list_of_alleles_appearing_in_tree(t[k])
-		listOfAlleles=listOfAlleles+recList
-	return listOfAlleles
-
-
-
-
-
-
-#given a list of IMGT descriptors
-#return the list back, but just the IMGT allele names
-def getIMGTNameListFromFastaMap(fm):
-	imgtList=list()
-	for k in fm:
-		pieces=k.split('|')
-		imgt_name=pieces[1]
-		imgtList.append(imgt_name)
-	return imgtList
-
-
-
-
-
-
 #determine if all strings in a list are allelic
 #if at least one FAILS return false
 def areAllItemsInListIMGTAlleles(l):
@@ -1022,30 +1006,6 @@ def areAllItemsInListIMGTAlleles(l):
 
 
 
-
-
-
-
-#for all strings in a list, force them to be "allelic"
-#(if they're not already allelic) by adding *01 at the end
-def allelifyList(l):
-	#print "NOW ALLEFYING A LIST, THE INPUT LIST IS :"
-	#printList(l)
-	goodlist=list()
-	for i in l:
-		#print "Examining ",i," in the list..."
-		#print "GOOD LIST IS CURRENTLY:"
-		#printList(goodlist)
-		alleleRegex=re.compile(r'\*\d+$')
-		if(not (looksLikeAlleleStr(i))):
-			#print "NEED TO ALLELIFY IT!"
-			goodlist.append(i+"*01")
-		else:
-			#print "it's already allelified!"
-			goodlist.append(i)
-	#print "RETURNING A 'GOOD' LIST:"
-	#printList(goodlist)
-	return goodlist
 
 
 
@@ -1338,19 +1298,28 @@ class imgt_db:
 	#function members
 
 	#return the organism list
-	def getOrganismList(self):
-		return self.ol
-		#thedir=self.db_base
-		#org_list=list()
-		#total_list=[ name for name in os.listdir(thedir) if os.path.isdir(os.path.join(thedir, name)) ]
-		#print "total_list is ",total_list
-		#for tl in total_list:
-		#	tls=str(tl.strip())
-		#	if(tls.startswith("www.") or tls.startswith("ftp.")):
-		#		pass
-		#	else:
-		#		org_list.append(tl.strip())
-		#return org_list
+	def getOrganismList(self,fromHardCode=True):
+		if(fromHardCode):
+			#get from a hard-coded list in this file
+			return self.ol
+		else:
+			#get downloaded organism!
+			thedir=self.db_base
+			org_list=list()
+			total_list=[ name for name in os.listdir(thedir) if os.path.isdir(os.path.join(thedir, name)) ]
+			print "total_list is ",total_list
+			search_and_avoid=["\.py","down","\.pkl"]
+			for tl in total_list:
+				tls=str(tl.strip())
+				if(tls.startswith("www.") or tls.startswith("ftp.")):
+					pass
+				matched_no_regex=True
+				for s in search_and_avoid:
+					if(re.search(s,tsl,re.IGNORECASE)):
+						matched_no_regex=False
+				if(matched_no_regex):
+					org_list.append(tl.strip())
+			return org_list
 
 
 
@@ -1366,7 +1335,7 @@ class imgt_db:
 	def download_imgt_RefDirSeqs_AndGeneTables_HumanAndMouse(self,unconditionalForceReplace=False):
 		print "in download_imgt_RefDirSeqs_AndGeneTables_HumanAndMouse"
 		base=self.db_base
-		organisms=self.getOrganismList()
+		organisms=self.getOrganismList(True)
 		print "To download for ",organisms
 		for organism in organisms:
 			#do all organisms
