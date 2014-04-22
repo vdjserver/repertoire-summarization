@@ -5,8 +5,8 @@ import pprint, pickle
 import os
 import subprocess
 from subprocess import Popen
-import urllib2
-from urlgrabber import urlopen
+#import urllib2
+#from urlgrabber import urlopen
 import re
 from subprocess import call
 #import nwalign as nw
