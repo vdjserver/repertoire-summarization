@@ -649,8 +649,16 @@ def formRefDirURL(species,locus):
 		#Nucleotide sequences with gaps according to the IMGT unique numbering 
 		#for F+ORF+in-frame P alleles, including orphons
 		#see also URLS/links here : http://www.imgt.org/vquest/refseqh.html
+		#IMGT/V-QUEST reference directory sets
+		#    The IMGT/V-QUEST reference directory sets are constituted by sets of sequences which contain the V-REGION, D-REGION and J-REGION alleles, isolated from the Functional (F), ORF and in-frame pseudogene (P) allele IMGT reference sequences. By definition, these sets contain one sequence for each allele. Allele names of these sequences are shown in red in Alignments of alleles.
+		#    The IMGT/V-QUEST reference directory sets also include orphons.
+		#    The human and the mouse IG and TR sets are exhaustive and correspond to the IMGT/GENE-DB content in terms of F+ORF+in-frame P genes and alleles.
+		#    IMGT/V-QUEST reference directory sets comprise IG and TR sets (for one or several species) which are used in IMGT/V-QUEST for the identification and alignment of the input sequence. 
 		base+="IMGT_GENE-DB/GENElect?query=7.14+"+locus+"&species="+species
 		return base
+
+		
+
 	else:
 		exceptionStatus="Invalid locus or invalid species for reference directory set URL formation!"
 		exceptionStatus+="\nLocus ("+locus+") legitimacy : "+str(isLegitimateLoci(locus))
@@ -707,33 +715,35 @@ def downloadRefDirFasta(locus,species,URLOverRide=None):
 	#url="file:///home/data/vdj_server/igblast_routines/GENElect?query=7.2+IGHD&species=Homo+sapiens"
 	#Number of results=162
 	print "THE URL IS ",url
-	f = urllib2.urlopen(url)
-	html=f.read()
+	#f = urllib2.urlopen(url)
+	#html=f.read()
 	#print html
-	matchObj = re.search( r'Number of results=(\d+)', html, re.M|re.I)
+	html= readAURL(url)
+	print "THE HTML READ IS ",html
+	matchObj = re.search( r'Number\s+of\s+results\s*=\s*(\d+)', html, re.M|re.I)
 	#matchObj = re.match( r'=(\d+)', html, re.M|re.I)
 	if(matchObj):
 		num_expected=int(matchObj.group(1))
-		#print "THE NUM EXPECTED IS ",num_expected
+		print "THE NUM EXPECTED IS ",num_expected
 		soup=BeautifulSoup(html)
 		y=soup.find('pre') #returns data between <pre> tags
 		pre_num=0
 		for a in y:
-			#print "GOT A PRE ",pre_num
-			#print a
-			#print "the type : ",type(a)
+			print "GOT A PRE ",pre_num
+			print a
+			print "the type : ",type(a)
 			if a is not None:
 				z_num=int(countNumApparentFastaRecsInStr(str(a)))
-				#print "An apparent is ",z_num
-				#print "The source apparent is ",a
+				print "An apparent is ",z_num
+				print "The source apparent is ",a
 				if(z_num==num_expected):
-					#print "got expected fasta: ",a
+					print "got expected fasta: ",a
 					fastaString=a
-					#print fastaString
+					print fastaString
 					fastaString=filterOutFastaStringFromFastaPre(str(fastaString))
 					return str(fastaString)
 	else:
-		print "FAILURE TO MATCH!"
+		print "\nFAILURE TO MATCH! from URL=",url
 
 
 
@@ -1329,16 +1339,18 @@ class imgt_db:
 
 	#return the organism list
 	def getOrganismList(self):
-		thedir=self.db_base
-		org_list=list()
-		total_list=[ name for name in os.listdir(thedir) if os.path.isdir(os.path.join(thedir, name)) ]
-		for tl in total_list:
-			tls=str(tl.strip())
-			if(tls.startswith("www.") or tls.startswith("ftp.")):
-				pass
-			else:
-				org_list.append(tl.strip())
-		return org_list
+		return self.ol
+		#thedir=self.db_base
+		#org_list=list()
+		#total_list=[ name for name in os.listdir(thedir) if os.path.isdir(os.path.join(thedir, name)) ]
+		#print "total_list is ",total_list
+		#for tl in total_list:
+		#	tls=str(tl.strip())
+		#	if(tls.startswith("www.") or tls.startswith("ftp.")):
+		#		pass
+		#	else:
+		#		org_list.append(tl.strip())
+		#return org_list
 
 
 
@@ -1352,11 +1364,14 @@ class imgt_db:
 
 	#download gene tables and reference directory sets from imgt
 	def download_imgt_RefDirSeqs_AndGeneTables_HumanAndMouse(self,unconditionalForceReplace=False):
+		print "in download_imgt_RefDirSeqs_AndGeneTables_HumanAndMouse"
 		base=self.db_base
-		organisms=getOrganismList()
+		organisms=self.getOrganismList()
+		print "To download for ",organisms
 		for organism in organisms:
 			#do all organisms
 			loci=get_loci_list()
+			print "To download for ",loci
 			for locus in loci:
 				#do all 17 groups
 				print "Downloading",locus,"for",organism,"at",formatNiceDateTimeStamp(),"..."
