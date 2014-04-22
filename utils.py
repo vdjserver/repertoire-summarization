@@ -1,13 +1,27 @@
 #!/usr/bin/env python
-from datetime import datetime, date, time
+from datetime import datetime
+import time
 import pprint, pickle
 import os
 import subprocess
+from subprocess import Popen
 import urllib2
+from urlgrabber import urlopen
 import re
 from subprocess import call
 #import nwalign as nw
 import pickle
+import sys
+
+
+#used with argparse
+def extractAsItemOrFirstFromList(t):
+	if(type(t)==list):
+		if(len(t)>0):
+			return t[0]
+	else:
+		return t
+	return None
 
 
 
@@ -752,11 +766,38 @@ def readFileIntoString(path):
 	return data
 
 
-#read a URL using urllib2
+
+def readFileURL(url):
+	url=url.strip()
+	file_part="file://"
+	url=url[len(file_part):]
+	reader=open(url,'r')
+	data=reader.read()
+	return data
+
+def isFileURL(url):
+	url=url.strip()
+	if(url.startswith("file://")):
+		return True
+	else:
+		return False
+
+
+#read a URL using wget or local
 def readAURL(url):
-	f = urllib2.urlopen(url)
-	html=f.read()
-	return html
+	#f = urllib2.urlopen(url,None,60)
+	#html=f.read()
+	#from urlgrabber import urlopen
+	#swith to urlgrabber!
+	#fo = urlopen(url)
+	#data = fo.read()
+	#fo.close()
+	if(isFileURL(url)):
+		return readFileURL(url)
+	url=url.strip()
+	cmd_and_args=["wget","-O","/dev/stdout",url]
+	data = Popen( cmd_and_args  , stdout=subprocess.PIPE).communicate()[0]
+	return data
 
 #assuming a directory exists write a string to a file whose path is in
 #that directory
@@ -770,6 +811,11 @@ def writeStringToFilePathAssumingDirectoryExists(string,file_path):
 #download a URL and write it to a local file assuming the 
 #directory where the file will be written to exists
 def downloadURLToLocalFileAssumingDirectoryExists(url,local):
+	print "\n\n******************************"
+	print "Trying to read URL ",url
+	print "and save to",local
+	print "******************************\n\n"	
+	url_content=None
 	url_content=readAURL(url)
 	writeStringToFilePathAssumingDirectoryExists(url_content,local)
 
