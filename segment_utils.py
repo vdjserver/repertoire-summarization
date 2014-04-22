@@ -8,10 +8,12 @@ import re
 import pprint
 from imgt_utils import get_loci_list,imgt_db
 import glob
-from utils import biopythonTranslate
 from igblast_utils import printNiceAlignment
-from utils import printMap,makeAllMapValuesVal,getAlnAtAndCond,removeTerminatingSemicolonIfItExists,getNumberBpInAlnStr
+#from utils import printMap,makeAllMapValuesVal,getAlnAtAndCond,removeTerminatingSemicolonIfItExists,getNumberBpInAlnStr,printList,readFileIntoString,read_fasta_string,read_fasta_into_map,getIMGTNameListFromFastaMap,allelifyList,merge_maps,write_map_to_file,get_list_of_alleles_appearing_in_tree
+#from utils import biopythonTranslate
+from utils import *
 from alignment import alignment
+import os
 
 
 
@@ -212,19 +214,6 @@ def analyze_download_dir_forVDJserver(base_dir,countsMap=None,specifiedOrganism=
 			#print "SHOWING CLONE NAME MAP:"
 			#printMap(clone_names)
 			print "\n\n\n\n"
-			treeAlleles=get_list_of_alleles_appearing_in_tree(locusHierarchyData)
-			setSameStats=(set(fastaAlleleList) == set(treeAlleles))
-			if setSameStats:
-				print "The fasta/RefDirNames ARE the same as the hierarchy allele names!!! :)"
-			else:
-				print "SAD the fasta/RefDirNames ARE different from the hierarchy allele names!!! :("
-			briefSetDiff(fastaAlleleList,treeAlleles,"fasta alleles "+organism+"_"+locus,"tree alleles "+organism+"_"+locus)			
-			extendedSortedSetDiff(fastaAlleleList,treeAlleles,"fasta alleles "+organism+"_"+locus,"tree alleles "+organism+"_"+locus)
-			print "THIS IS THE PRETTY PRINT FOR LOCUS HIERARCHY DATA, o=",organism,"l=",locus
-			prettyPrintTree(locusHierarchyData)
-			print "THIS IS THE PRETTY PRINT FOR ORG HIERARCHY DATA"
-			org_hierarchy[organism][locus]=locusHierarchyData
-			prettyPrintTree(org_hierarchy)
 			#from
 			#http://stackoverflow.com/questions/82831/how-do-i-check-if-a-file-exists-using-python
 			patchPath=geneTableHTMLFiles[0]+".patch"
@@ -232,12 +221,27 @@ def analyze_download_dir_forVDJserver(base_dir,countsMap=None,specifiedOrganism=
 				print "Found a patch file (",patchPath,") found, so now patching is being performed....."
 				locusHierarchyData=patchlocusHierarchyData(locusHierarchyData,patchPath)
 				print "AFTER PATCHING, THE HIERARCHY IS NOW :"
-				prettyPrintTree(locusHierarchyData)
-				print "THIS IS THE PRETTY PRINT FOR PATCHED ORG HIERARCHY DATA"
+				#prettyPrintTree(locusHierarchyData)
+				#print "THIS IS THE PRETTY PRINT FOR PATCHED ORG HIERARCHY DATA"
 				org_hierarchy[organism][locus]=locusHierarchyData
-				prettyPrintTree(org_hierarchy)
+				#prettyPrintTree(org_hierarchy)
+				print "END SHOW PATCH"
 			else:
 				print "No patch file (",patchPath,") found, so no patching being performed....."
+			treeAlleles=get_list_of_alleles_appearing_in_tree(locusHierarchyData)
+			setSameStats=(set(fastaAlleleList) == set(treeAlleles))
+			print "For organism=",organism,"locus=",locus
+			if setSameStats:
+				print "After patching, the fasta/RefDirNames ARE the same as the hierarchy allele names!!! :)"
+			else:
+				print "SAD even after patching the fasta/RefDirNames ARE different from the hierarchy allele names!!! :("
+			briefSetDiff(fastaAlleleList,treeAlleles,"fasta alleles "+organism+"_"+locus,"tree alleles "+organism+"_"+locus)			
+			extendedSortedSetDiff(fastaAlleleList,treeAlleles,"fasta alleles "+organism+"_"+locus,"tree alleles "+organism+"_"+locus)
+			print "THIS IS THE PRETTY PRINT FOR LOCUS HIERARCHY DATA, o=",organism,"l=",locus
+			prettyPrintTree(locusHierarchyData)
+			print "THIS IS THE PRETTY PRINT FOR ORG HIERARCHY DATA"
+			org_hierarchy[organism][locus]=locusHierarchyData
+			prettyPrintTree(org_hierarchy)
 			clone_names_by_org[organism]=merge_maps(clone_names_by_org[organism],clone_names)
 			print "\n\n\n"
 	#prettyPrintTree(org_hierarchy)
