@@ -392,6 +392,64 @@ def test_nonexistent_touchable_and_del(f):
 	return True
 
 
+
+#given a list of IMGT descriptors
+#return the list back, but just the IMGT allele names
+def getIMGTNameListFromFastaMap(fm):
+	imgtList=list()
+	for k in fm:
+		pieces=k.split('|')
+		imgt_name=pieces[1]
+		imgtList.append(imgt_name)
+	return imgtList
+
+
+
+
+#given a tree object, recursively explore it and
+#aggregate a list of all the alleles (ABC*01)
+#and return that list
+def get_list_of_alleles_appearing_in_tree(t):
+	listOfAlleles=list()
+	for k in t:
+		name=str(k)
+		if(looksLikeAlleleStr(name)):
+			listOfAlleles.append(k)
+		recList=get_list_of_alleles_appearing_in_tree(t[k])
+		listOfAlleles=listOfAlleles+recList
+	return listOfAlleles
+
+
+
+
+
+
+
+
+#for all strings in a list, force them to be "allelic"
+#(if they're not already allelic) by adding *01 at the end
+def allelifyList(l):
+	#print "NOW ALLEFYING A LIST, THE INPUT LIST IS :"
+	#printList(l)
+	goodlist=list()
+	for i in l:
+		#print "Examining ",i," in the list..."
+		#print "GOOD LIST IS CURRENTLY:"
+		#printList(goodlist)
+		alleleRegex=re.compile(r'\*\d+$')
+		if(not (looksLikeAlleleStr(i))):
+			#print "NEED TO ALLELIFY IT!"
+			goodlist.append(i+"*01")
+		else:
+			#print "it's already allelified!"
+			goodlist.append(i)
+	#print "RETURNING A 'GOOD' LIST:"
+	#printList(goodlist)
+	return goodlist
+
+
+
+
 #read a fasta file into a map (descriptors as keys, sequences as values)
 def read_fasta_file_into_map(fasta_path,alwaysSeqToUpper=True,removeNonIUPAC=True):
 	fasta_data=read_fasta(fasta_path,alwaysSeqToUpper)
