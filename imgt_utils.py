@@ -1297,6 +1297,7 @@ class imgt_db:
 	####################
 	#function members
 
+
 	#return the organism list
 	def getOrganismList(self,fromHardCode=True):
 		if(fromHardCode):
@@ -1308,7 +1309,7 @@ class imgt_db:
 			org_list=list()
 			total_list=[ name for name in os.listdir(thedir) if os.path.isdir(os.path.join(thedir, name)) ]
 			print "total_list is ",total_list
-			search_and_avoid=["\.py","down","\.pkl"]
+			search_and_avoid=["\.py","down","\.pkl","\.sh"]
 			for tl in total_list:
 				tls=str(tl.strip())
 				if(tls.startswith("www.") or tls.startswith("ftp.")):
@@ -1384,16 +1385,23 @@ class imgt_db:
 
 	#download from IMGT
 	def buildAndExecuteWGETDownloadScript(self):
+		if(not(os.path.isdir(self.getBaseDir()))):
+			print "ERROR, failed to find directory ",self.getBaseDir(),"!"
+			print "Skipping download of imgt.org annotations/database files!"
+			return
 		refDBURL="http://www.imgt.org/download/"
 		wgetCMD="cd "+self.db_base+"\n"
 		wgetCMD+="/usr/bin/wget -r -np "+refDBURL+"GENE-DB/ "+refDBURL+"/LIGM-DB/\n"
-		wgetCMD+="/usr/bin/wget -m http://www.vbase2.org\n"
-		vbase_down="www.vbase2.org"
+		#we're not using VBASE any more!
+		#wgetCMD+="/usr/bin/wget -m http://www.vbase2.org\n"
+		#vbase_down="www.vbase2.org"
 		#don't download these fetch fasta from the data record queries
 		#down_human_vbase_cmd="/usr/bin/wget -O "+vbase_down+"/humanall.fasta http://www.vbase2.org/download/humanall.fasta"
 		#down_mouse_vbase_cmd="/usr/bin/wget -O "+vbase_down+"/mouseall.fasta http://www.vbase2.org/download/mouseall.fasta"
 		#wgetCMD+="if [ -d \""+vbase_down+"\" ] ; then "+down_human_vbase_cmd+" ; "+down_mouse_vbase_cmd+" ; else echo \"APPARENT ERROR IN DOWNLOADING VBASE!\" ; fi ;\n"
-		wgetScriptPath=base_dir+"/wgetscript.sh"
+		uncomp_cmd="echo \"Now searching for .Z compressed files to uncompress ...\" ; for COMPRESSED in `find "+str(self.db_base)+"|grep -P '\.Z$'` ; do UNCOMPRESSED=`echo $COMPRESSED|sed -r \"s/\.Z//gi\"` ;    echo \"Found compressed file $COMPRESSED ... to uncompress it to $UNCOMPRESSED ...\" ; echo \"USING command uncompress -c $COMPRESSED > $UNCOMPRESSED\" ; uncompress -c $COMPRESSED > $UNCOMPRESSED ; done ;\n"
+		wgetCMD+=uncomp_cmd
+		wgetScriptPath=self.db_base+"/wgetscript.sh"
 		wgetScriptOutLog=wgetScriptPath+".log.out"
 		wgetScriptErrLog=wgetScriptPath+".log.err"
 		write_temp_bash_script(wgetCMD,wgetScriptPath)
@@ -1449,12 +1457,14 @@ class imgt_db:
 
 
 	#read index into dict/map
-	def cacheIndex(self,indexPath,existingCache=None):
+	def cacheIndex(self,indexPath=None,existingCache=None):
 		if(not(self.accession_start_stop_map==None)):
 			#it's already initialized
 			return
-		self.indexPath=self.imgt_dat_path+self.db_idx_extension
-		if(not(os.path.exists(indexPath))):
+		if(indexPath is None):
+			self.indexPath=str(str(self.imgt_dat_path)+str(self.db_idx_extension))
+		print "Cacheing index for imgt.dat file ",self.imgt_dat_path
+		if(not(os.path.exists(self.indexPath))):
 			indexIMGTDatFile(self.imgt_dat_path,self.indexPath)
 		if(not(existingCache==None)):
 			if(self.accession_start_stop_map==None):
@@ -1462,7 +1472,7 @@ class imgt_db:
 			self.accession_start_stop_map=merge_maps(self.accession_start_stop_map,existingCache)
 		else:
 			self.accession_start_stop_map=dict()
-		idxReader=open(indexPath,'r')
+		idxReader=open(self.indexPath,'r')
 		for line in idxReader:
 			line=line.strip()
 			pieces=line.split("\t")
@@ -1617,9 +1627,10 @@ class imgt_db:
 	#index the imgt.dat file
 	def indexIMGTDatFile(self,filepath=None,indexfile=None):
 		if(filepath==None):
-			filepath=self.db_base+"www.imgt.org/download/LIGM-DB/imgt.dat"
+			filepath=self.db_base+"/"+self.imgt_dat_rel_path
 		if(indexfile==None):
 			indexfile=filepath+self.db_idx_extension
+		print "Creating index file from ",filepath," ... writing index to ",indexfile
 		reader=open(filepath,'r')
 		acc_re=re.compile(r'^ID\s+([A-Z0-9]+)\s')
 		embl_tpa_re=re.compile(r'^DR\s+EMBL\-TPA;\s+([^\s]+)\.\s*$')
