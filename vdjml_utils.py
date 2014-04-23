@@ -66,7 +66,7 @@ def getJunctionRegionByname(read_result_obj,meta,junc_name,combID=0):
 				return region
 		return None
 
-	
+
 
 
 #given a read object, meta object, and an allele name
@@ -202,6 +202,49 @@ def getRegionsObjsFromSegmentCombo(segment_combo,meta,ann_map):
 		ann_map_key='vdj_server_ann_'
 		
 
+	
+#map VDJ to True or False indicating a tie or not in the scores
+def getVDJTieMap(t_map):
+	tie_map=dict()
+	for seg in t_map:
+		score_list=list()
+		for name in seg:
+			score=seg[name]
+			score_list.append(score)
+		score_set=set(score_list)
+		if(len(score_set)==len(score_list)):
+			tie_map[seg]=False
+		else:
+			tie_map[seg]=True
+	return tie_map
+
+
+
+
+#return a map assiigning BLAST scores to germline segment hits
+def getTypeNameScoreMap(read_result_obj,meta):
+	t_map=dict()
+	#print "in getHitsAndScores"
+	segment_matches=read_result_obj.segment_matches()
+	#print "got segment_matches ",segment_matches
+	for segment_match in segment_matches:
+		#print "Looking at a segment_match ",segment_match
+		for gls_match in segment_match.germline_segments():
+			vdjml_look_seg_type=vdjml.segment_type(gls_match,meta)
+			#print "seg_type=",vdjml_look_seg_type
+			name=meta[gls_match.gl_segment_].name_
+			#print "The name is ",name
+			score=gls_match.score()
+			#print "score=",score
+			if(vdjml_look_seg_type in t_map):
+				pass
+			else:
+				t_map[vdjml_look_seg_type]=dict()
+			t_map[vdjml_look_seg_type][name]=score
+	#print "GRAND RESULT\n"
+	#print t_map
+	return t_map
+		
 
 
 
