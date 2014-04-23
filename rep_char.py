@@ -2,11 +2,12 @@
 
 import vdjml
 from vdjml_igblast_parse import scanOutputToVDJML,makeParserArgs,makeVDJMLDefaultMetaAndFactoryFromArgs
-from utils import printMap,get_domain_modes,biopythonTranslate,makeAllMapValuesVal,getNumberBpInAlnStr,repStr
+#from utils import printMap,get_domain_modes,biopythonTranslate,makeAllMapValuesVal,getNumberBpInAlnStr,repStr
+from utils import *
 from pprint import pprint
 from imgt_utils import imgt_db
 from cdr3_hist import CDR3LengthAnalysisVDMLOBJ,histoMapClass
-from vdjml_utils import getTopVDJItems,getRegionsObjsFromSegmentCombo,getHitInfo,getProductiveRearrangmentFlag,getVDJServerRegionAlignmentFromLargerVAlignmentPyObj,getAlignmentString
+from vdjml_utils import getTopVDJItems,getRegionsObjsFromSegmentCombo,getHitInfo,getProductiveRearrangmentFlag,getVDJServerRegionAlignmentFromLargerVAlignmentPyObj,getAlignmentString,getTypeNameScoreMap
 from Bio import SeqIO
 from segment_utils import IncrementMapWrapper,getVRegionsList,getRegionSpecifcCharacterization,getEmptyRegCharMap,getAdjustedCDR3StartFromRefDirSetAllele,getTheFrameForThisReferenceAtThisPosition,getCDR3RegionSpecificCharacterizationSubAln,getVRegionStartAndStopGivenRefData,getADJCDR3EndFromJAllele,alleleIsTR
 from char_utils import getNumberBaseSubsFromBTOP,getNumberIndelsFromBTOP,getIndelMapFromBTOP
@@ -245,6 +246,7 @@ def getValnWholeSeqStopFlag(vInfo,dInfo,jInfo,imgtdb_obj,organism,annMap,seq_rec
 
 
 def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap):
+	global global_key_base
 	if(not(vInfo==None)):
 		#at least work with V
 		v_cdr3_start=getAdjustedCDR3StartFromRefDirSetAllele(vInfo['subject ids'],imgtdb_obj,organism,"imgt")
@@ -334,8 +336,8 @@ def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap):
 			if(vCharMap['stp_cdn'] or jCharMap['stp_cdn']):
 				totCharMap['stp_cdn']=True
 			
-			if('vdj_server_ann_imgt_cdr3_tr' in annMap):
-				starPos=annMap['vdj_server_ann_imgt_cdr3_tr'].find("*")
+			if(global_key_base+'imgt_cdr3_tr' in annMap):
+				starPos=annMap[global_key_base+'imgt_cdr3_tr'].find("*")
 				if(starPos!=(-1)):
 					totCharMap['cdr3_stp_cdn']=True
 				else:
@@ -429,9 +431,9 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 		if(not(noneSeg_flag)):
 			if(cdr3_map['imgt']!=(-1) and cdr3_map['imgt']>0):
 				if((cdr3_map['imgt'])%3==0):
-					annMap['vdj_server_ann_productive_rearrangement']=True
+					annMap[global_key_base+'productive_rearrangement']=True
 				else:
-					annMap['vdj_server_ann_productive_rearrangement']=False
+					annMap[global_key_base+'productive_rearrangement']=False
 			else:
 				#annMap['vdj_server_ann_productive_rearrangement']="N/A"
 				pass
@@ -526,7 +528,22 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 	annMap['read_name']=read_rec.id
 	#getAlignmentString(read_result_obj,meta,query_record,imgtdb_obj,organism)
 	#analyze_combinations(read_result_obj,meta,organism,imgtdb_obj,read_rec,annMap)
-	printMap(annMap,True)
+	#printMap(annMap,True)
+	t_map=getTypeNameScoreMap(read_result_obj,meta)
+	tie_map=getVDJTieMap(t_map)
+	segments=get_segment_list()
+	for segment in segments:
+		key=global_key_base+segment+'_hitscorelist'
+		if(segment in t_map):
+			annMap[key]=t_map[segment]
+		else:
+			annMap[key]=None
+		key=global_key_base+segment+'_tie'
+		if(segment in tie_map):
+			annMap[key]=tie_map[segment]
+		else:
+			annMap[key]=False
+
 	return annMap
 
 
@@ -903,13 +920,15 @@ if (__name__=="__main__"):
 		rep_char_out=args.char_out[0]
 		fHandle=open(rep_char_out,'w')
 		for read_result_obj in scanOutputToVDJML(args.igblast_in[0],fact,query_fasta):
+
+
 			#prepare for the iteration and give a possible status message...
 			if(read_num>1 and read_num%1000==0):
 				print "Processed read",read_num,"..."
 			elif(read_num==1):
 				print "Processing reads..."
 			query_record=fasta_reader.next()
-			
+
 			#analyze a read's results
 			read_analysis_results=rep_char_read(read_result_obj,meta,organism,imgtdb_obj,query_record,args.skip_char)
 
