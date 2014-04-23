@@ -11,6 +11,7 @@ import re
 from subprocess import call
 #import nwalign as nw
 import pickle
+import glob
 import sys
 
 
@@ -393,13 +394,19 @@ def test_nonexistent_touchable_and_del(f):
 
 
 
+#get the IMGT name from the RDS descriptor
+def getIMGTNameFromRefDirSetDescriptor(desc):
+	pieces=desc.split('|')
+	imgt_name=pieces[1]
+	return imgt_name
+
+
 #given a list of IMGT descriptors
 #return the list back, but just the IMGT allele names
 def getIMGTNameListFromFastaMap(fm):
 	imgtList=list()
 	for k in fm:
-		pieces=k.split('|')
-		imgt_name=pieces[1]
+		imgt_name=getIMGTNameFromRefDirSetDescriptor
 		imgtList.append(imgt_name)
 	return imgtList
 
@@ -421,9 +428,27 @@ def get_list_of_alleles_appearing_in_tree(t):
 
 
 
+def get_segment_list():
+	return ["V","D","J"]
 
 
 
+
+def blastFormatFNAInDir(d,blastformtexecpath):
+	fnas=glob.glob(d+"/*.fna")
+	for fna in fnas:
+		format_cmd=blastformtexecpath+" -parse_seqids -dbtype nucl -in "+fna
+		print "BLASTDB Formatting ",fna," with ",format_cmd
+		out_path=fna+".blastfmt.out"
+		err_path=fna+".blastfmt.err"
+		out_handle=open(out_path,'w')
+		err_handle=open(err_path,'w')
+		proc=subprocess.Popen(format_cmd,stdout=out_handle,stderr=err_handle,shell="/bin/bash")
+		ret_val=proc.wait()
+		out_handle.close()
+		err_handle.close()
+		
+		
 
 
 #for all strings in a list, force them to be "allelic"
