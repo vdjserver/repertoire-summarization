@@ -17,8 +17,10 @@ from Bio.Blast import NCBIXML
 import sys, traceback
 import pickle
 import ntpath
-from utils import looksLikeAlleleStr
+#from utils import looksLikeAlleleStr
+from utils import *
 from Bio import SeqIO
+import glob
 
 
 #find the number of leaves
@@ -1297,6 +1299,42 @@ class imgt_db:
 	####################
 	#function members
 
+
+	#for each locus, for each organism, dump it into a FASTA to be blast formatted
+	def prepareFASTAForBLASTFormatting(self):
+		organisms=self.getOrganismList()
+		for organism in organisms:
+			loci=get_loci_list()
+			for locus in loci:
+				rds_base=self.db_base+"/"+organism+"/ReferenceDirectorySet/"
+				source_html_fna=rds_base+locus+".html.fna"
+				target_fna=rds_base+"/"+organism+"_"+locus[0:2]+"_"+locus[3]+".fna"
+				fna_map=read_fasta_file_into_map(source_html_fna)
+				blast_fna_map=dict()
+				for desc in fna_map:
+					blast_desc=getIMGTNameFromRefDirSetDescriptor(desc)
+					blast_fna_map[blast_desc]=fna_map[desc]
+				blast_writer=open(target_fna,'a')
+				num_descs=len(fna_map)
+				rec_num=0
+				for blast_desc in blast_fna_map:
+					desc_str=">"+blast_desc
+					dna_str=blast_fna_map[blast_desc]
+					dna_str=re.sub(r'\.','',dna_str)
+					blast_writer.write(desc_str+"\n"+dna_str)
+					if(rec_num==num_descs-1):
+						pass
+					else:
+						blast_writer.write("\n")
+				blast_writer.close()
+					
+				
+
+	def blastFormatFNAInRefDirSetDirs(self,makeblastdbbin):
+		organisms=self.getOrganismList()
+		for organism in organisms:
+			rds_base=self.db_base+"/"+organism+"/ReferenceDirectorySet/"
+			blastFormatFNAInDir(rds_base,makeblastdbbin)
 
 	#return the organism list
 	def getOrganismList(self,fromHardCode=True):
