@@ -2,25 +2,11 @@
 
 import re
 import os
-from utils import printMap
+from utils import *
 from Bio.Blast import NCBIXML
 
 
 #ROUTINES FOR MAKING LOOKUP TABLES OF KABAT MODE
-
-
-
-
-
-
-def isIntegral(s):
-	ire=re.compile(r'^\s*(\d+)\s*$')
-	sr=re.search(ire,s)
-	if(sr):
-		return True
-	else:
-		return False
-
 
 
 
@@ -105,7 +91,7 @@ def writeKabatRegionsFromIGBLASTKabatResult(k,o):
 					reg_map[currentQuery][region]=dict()
 					reg_map[currentQuery][region]["start"]=(-1)
 					reg_map[currentQuery][region]["stop"]=(-1)
-				if(line.startswith(region)):
+				if(line.startswith(region) or line.startswith(re.sub(r'W','',region))):
 					pieces=line.split("\t")
 					start=pieces[1]
 					stop=pieces[2]
@@ -137,22 +123,22 @@ def writeKabatRegionsFromIGBLASTKabatResult(k,o):
 			writer.write("\n")
 	writer.close()
 
+if (__name__=="__main__"):
+	#organisms=["Mus_musculus","human"]
+	#organisms=["Mus_musculus"]
+	organisms=["human"]
 
-#organisms=["Mus_musculus","human"]
-#organisms=["Mus_musculus"]
-organisms=["human"]
-
-for org in organisms:
-	igblast="/home/data/DATABASE/01_22_2014/"+org+"/ReferenceDirectorySet/KABAT_TR/igblastn.kabat.out"
-	out="/home/data/DATABASE/01_22_2014/"+org+"/ReferenceDirectorySet/KABAT_TR/Vlookup.tsv"
-	if(os.path.exists(igblast) and not os.path.exists(out)):
-		print "proceed on kabat V"
-		writeKabatRegionsFromIGBLASTKabatResult(igblast,out)
-	xml="/home/data/DATABASE/01_22_2014/"+org+"/ReferenceDirectorySet/KABAT_TR/blastx.out.xml"
-	out="/home/data/DATABASE/01_22_2014/"+org+"/ReferenceDirectorySet/KABAT_TR/Jlookup.tsv"
-	if(os.path.exists(xml) and not os.path.exists(out)):
-		print "proceed on kabat J"
-		writeKabatJCDR3End(xml,out)
+	for org in organisms:
+		igblast="/home/data/DATABASE/01_22_2014/"+org+"/ReferenceDirectorySet/KABAT_TR/igblastn.kabat.out"
+		out="/home/data/DATABASE/01_22_2014/"+org+"/ReferenceDirectorySet/KABAT_TR/Vlookup.tsv"
+		if(os.path.exists(igblast) and not os.path.exists(out)):
+			print "proceed on kabat V"
+			writeKabatRegionsFromIGBLASTKabatResult(igblast,out)
+		xml="/home/data/DATABASE/01_22_2014/"+org+"/ReferenceDirectorySet/KABAT_TR/blastx.out.xml"
+		out="/home/data/DATABASE/01_22_2014/"+org+"/ReferenceDirectorySet/KABAT_TR/Jlookup.tsv"
+		if(os.path.exists(xml) and not os.path.exists(out)):
+			print "proceed on kabat J"
+			writeKabatJCDR3End(xml,out)
 
 
 

@@ -171,6 +171,28 @@ def biopythonTranslate(dna):
 
 
 
+def isIntegral(s):
+	ire=re.compile(r'^\s*(\d+)\s*$')
+	sr=re.search(ire,s)
+	if(sr):
+		return True
+	else:
+		return False
+
+
+
+
+
+
+
+
+def fileLineCount(f):
+	reader=open(f,'r')
+	line_count=0
+	for line in reader:
+		line_count+=1
+	reader.close()
+	return line_count
 
 
 #using a map and key 
@@ -449,6 +471,15 @@ def blastFormatFNAInDir(d,blastformtexecpath):
 		err_handle.close()
 		
 		
+
+def runCmdButGetNoStdOutOrStdErr(cmd):
+	out_handle=open("/dev/null",'w')
+	err_handle=open("/dev/null",'w')
+	proc=subprocess.Popen(cmd,stdout=out_handle,stderr=err_handle,shell="/bin/bash")
+	ret_val=proc.wait()
+	out_handle.close()
+	err_handle.close()	
+
 
 
 #for all strings in a list, force them to be "allelic"
