@@ -205,11 +205,15 @@ def getRegionsObjsFromSegmentCombo(segment_combo,meta,ann_map):
 	
 #map VDJ to True or False indicating a tie or not in the scores
 def getVDJTieMap(t_map):
+	#print "t_map is ",t_map
 	tie_map=dict()
 	for seg in t_map:
+		#print "current seg : ",seg
+		seg_map=t_map[seg]
+		#print "seg_map ",seg_map
 		score_list=list()
-		for name in seg:
-			score=seg[name]
+		for name in seg_map:
+			score=seg_map[name]
 			score_list.append(score)
 		score_set=set(score_list)
 		if(len(score_set)==len(score_list)):
