@@ -22,6 +22,7 @@ def writeKabatJCDR3End(k,o):
 	writer=open(o,'w')
 	for record in blast_records:
 		numRec+=1
+		print "\n\n\n******************"
 		print "query : ",record.query
 		query_name=record.query
 		if(len(record.alignments)<1):
@@ -29,7 +30,7 @@ def writeKabatJCDR3End(k,o):
 			cdr_map[query_name]=(-1)
 			continue
 		alignment=record.alignments[0]
-		print "An alignment length is ",alignment.length
+		print "An alignment found for ",str(query_name)," has length ",alignment.length
 		if(len(alignment.hsps)<1):
 			cdr_map[query_name]=(-1)
 			print "TOO FEW HSPs",query_name
@@ -37,9 +38,8 @@ def writeKabatJCDR3End(k,o):
 		hsps=alignment.hsps
 		hsp=alignment.hsps[0]
 		query_trans=hsp.query
-		print query_trans
 		query_start=hsp.query_start
-		print "query_start is ",query_start
+		print "HSP",str(hsp),"\n"
 		if(query_name.startswith("IGH")):
 			myre=heavy_re
 		else:
@@ -47,17 +47,21 @@ def writeKabatJCDR3End(k,o):
 		sr=re.search(myre,query_trans)
 		if(sr):
 			search_position=sr.start()
-			print "The searched_position is ",search_position
+			print "A search position was found using regex ",str(myre.pattern)
+			print "The searched_position (AA space) is ",search_position
 			#multipy by 3 to get into NA-space
 			search_position*=3
 			print "in na space no offset : ",search_position
 			#add the offset for query start
 			search_position+=(query_start-1)
+			print "in na space WITH offset : ",search_position
 			cdr_map[query_name]=int(search_position)
 			print query_name+" ---> "+str(cdr_map[query_name])
 			writer.write(str(query_name)+"\t"+str(cdr_map[query_name])+"\n")
 		else:
-			print "WARNING , NOT FOUND!"
+			print "WARNING , regex "+str(myre.pattern)+" NOT FOUND at query = "+str(query_name)+" in file ",k," recording (-1) as CDR3 end!"
+			writer.write(str(query_name)+"\t-1\n")
+			
 		#print "\n\n\n"
 	writer.close()
 	#print "numRecs is ",numRec
