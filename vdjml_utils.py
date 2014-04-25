@@ -204,7 +204,7 @@ def getRegionsObjsFromSegmentCombo(segment_combo,meta,ann_map):
 
 	
 #map VDJ to True or False indicating a tie or not in the scores
-def getVDJTieMap(t_map):
+def getVDJTieMap(t_map,topVDJ):
 	#print "t_map is ",t_map
 	tie_map=dict()
 	for seg in t_map:
@@ -216,10 +216,13 @@ def getVDJTieMap(t_map):
 			score=seg_map[name]
 			score_list.append(score)
 		score_set=set(score_list)
-		if(len(score_set)==len(score_list)):
-			tie_map[seg]=False
-		else:
-			tie_map[seg]=True
+		tie_map[seg]=False
+		if(topVDJ!=None):
+			if(seg in topVDJ):
+				top_score=seg_map[topVDJ[seg]]
+				score_count=score_list.count(top_score)
+				if(score_count!=1 and score_count>1):
+					tie_map[seg]=True
 	return tie_map
 
 
