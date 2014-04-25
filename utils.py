@@ -613,8 +613,8 @@ def removeTerminatingSemicolonIfItExists(s):
 
 
 #wrapper to call makeblastdb to format a blast DB
-def format_blast_db(fastaPath):
-	format_db_cmd="/usr/local/bin/makeblastdb -dbtype nucl -in "+fastaPath
+def format_blast_db(fastaPath,dbtype="nucl",formatdbbin="/usr/local/bin/makeblastdb"):
+	format_db_cmd=formatdbbin+" -dbtype "+dbtype+" -in "+fastaPath
 	print "The format cmd is ",format_db_cmd
 	try:
 		call(format_db_cmd.split(" "))
