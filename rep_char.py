@@ -524,13 +524,12 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 					annMap[temp_key]=temp_results[temp_key]			
 			get_res+=1
 	
-	
 	annMap['read_name']=read_rec.id
 	#getAlignmentString(read_result_obj,meta,query_record,imgtdb_obj,organism)
 	#analyze_combinations(read_result_obj,meta,organism,imgtdb_obj,read_rec,annMap)
 	#printMap(annMap,True)
 	t_map=getTypeNameScoreMap(read_result_obj,meta)
-	tie_map=getVDJTieMap(t_map)
+	tie_map=getVDJTieMap(t_map,topVDJ)
 	segments=get_segment_list()
 	for segment in segments:
 		key=global_key_base+segment+'_hitscorelist'
@@ -648,6 +647,12 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None"):
 	"top_D",
 	"top_J",
 	"top_V",
+	"vdj_server_ann_D_hitscorelist",
+	"vdj_server_ann_D_tie",
+	"vdj_server_ann_J_hitscorelist",
+	"vdj_server_ann_J_tie",
+	"vdj_server_ann_V_hitscorelist",
+	"vdj_server_ann_V_tie",
 	"vdj_server_ann_imgt_CDR1_aminos",
 	"vdj_server_ann_imgt_CDR1_base_sub",
 	"vdj_server_ann_imgt_CDR1_bsb_freq",
@@ -742,96 +747,6 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None"):
 	"vdj_server_ann_imgt_cdr3_na_len",
 	"vdj_server_ann_imgt_cdr3_tr",
 	"vdj_server_ann_imgt_cdr3_tr_len",
-	"vdj_server_ann_kabat_CDR1_aminos",
-	"vdj_server_ann_kabat_CDR1_base_sub",
-	"vdj_server_ann_kabat_CDR1_bsb_freq",
-	"vdj_server_ann_kabat_CDR1_codons",
-	"vdj_server_ann_kabat_CDR1_deletions",
-	"vdj_server_ann_kabat_CDR1_frm_msk",
-	"vdj_server_ann_kabat_CDR1_indel_freq",
-	"vdj_server_ann_kabat_CDR1_insertions",
-	"vdj_server_ann_kabat_CDR1_mutations",
-	"vdj_server_ann_kabat_CDR1_nonsynonymous_bsb",
-	"vdj_server_ann_kabat_CDR1_ns_rto",
-	"vdj_server_ann_kabat_CDR1_pct_id",
-	"vdj_server_ann_kabat_CDR1_qry_aln",
-	"vdj_server_ann_kabat_CDR1_qry_end",
-	"vdj_server_ann_kabat_CDR1_qry_srt",
-	"vdj_server_ann_kabat_CDR1_ref_aln",
-	"vdj_server_ann_kabat_CDR1_stp_cdn",
-	"vdj_server_ann_kabat_CDR1_synonymous_bsb",
-	"vdj_server_ann_kabat_CDR2_aminos",
-	"vdj_server_ann_kabat_CDR2_base_sub",
-	"vdj_server_ann_kabat_CDR2_bsb_freq",
-	"vdj_server_ann_kabat_CDR2_codons",
-	"vdj_server_ann_kabat_CDR2_deletions",
-	"vdj_server_ann_kabat_CDR2_frm_msk",
-	"vdj_server_ann_kabat_CDR2_indel_freq",
-	"vdj_server_ann_kabat_CDR2_insertions",
-	"vdj_server_ann_kabat_CDR2_mutations",
-	"vdj_server_ann_kabat_CDR2_nonsynonymous_bsb",
-	"vdj_server_ann_kabat_CDR2_ns_rto",
-	"vdj_server_ann_kabat_CDR2_pct_id",
-	"vdj_server_ann_kabat_CDR2_qry_aln",
-	"vdj_server_ann_kabat_CDR2_qry_end",
-	"vdj_server_ann_kabat_CDR2_qry_srt",
-	"vdj_server_ann_kabat_CDR2_ref_aln",
-	"vdj_server_ann_kabat_CDR2_stp_cdn",
-	"vdj_server_ann_kabat_CDR2_synonymous_bsb",
-	"vdj_server_ann_kabat_FR1_aminos",
-	"vdj_server_ann_kabat_FR1_base_sub",
-	"vdj_server_ann_kabat_FR1_bsb_freq",
-	"vdj_server_ann_kabat_FR1_codons",
-	"vdj_server_ann_kabat_FR1_deletions",
-	"vdj_server_ann_kabat_FR1_frm_msk",
-	"vdj_server_ann_kabat_FR1_indel_freq",
-	"vdj_server_ann_kabat_FR1_insertions",
-	"vdj_server_ann_kabat_FR1_mutations",
-	"vdj_server_ann_kabat_FR1_nonsynonymous_bsb",
-	"vdj_server_ann_kabat_FR1_ns_rto",
-	"vdj_server_ann_kabat_FR1_pct_id",
-	"vdj_server_ann_kabat_FR1_qry_aln",
-	"vdj_server_ann_kabat_FR1_qry_end",
-	"vdj_server_ann_kabat_FR1_qry_srt",
-	"vdj_server_ann_kabat_FR1_ref_aln",
-	"vdj_server_ann_kabat_FR1_stp_cdn",
-	"vdj_server_ann_kabat_FR1_synonymous_bsb",
-	"vdj_server_ann_kabat_FR2_aminos",
-	"vdj_server_ann_kabat_FR2_base_sub",
-	"vdj_server_ann_kabat_FR2_bsb_freq",
-	"vdj_server_ann_kabat_FR2_codons",
-	"vdj_server_ann_kabat_FR2_deletions",
-	"vdj_server_ann_kabat_FR2_frm_msk",
-	"vdj_server_ann_kabat_FR2_indel_freq",
-	"vdj_server_ann_kabat_FR2_insertions",
-	"vdj_server_ann_kabat_FR2_mutations",
-	"vdj_server_ann_kabat_FR2_nonsynonymous_bsb",
-	"vdj_server_ann_kabat_FR2_ns_rto",
-	"vdj_server_ann_kabat_FR2_pct_id",
-	"vdj_server_ann_kabat_FR2_qry_aln",
-	"vdj_server_ann_kabat_FR2_qry_end",
-	"vdj_server_ann_kabat_FR2_qry_srt",
-	"vdj_server_ann_kabat_FR2_ref_aln",
-	"vdj_server_ann_kabat_FR2_stp_cdn",
-	"vdj_server_ann_kabat_FR2_synonymous_bsb",
-	"vdj_server_ann_kabat_FR3_aminos",
-	"vdj_server_ann_kabat_FR3_base_sub",
-	"vdj_server_ann_kabat_FR3_bsb_freq",
-	"vdj_server_ann_kabat_FR3_codons",
-	"vdj_server_ann_kabat_FR3_deletions",
-	"vdj_server_ann_kabat_FR3_frm_msk",
-	"vdj_server_ann_kabat_FR3_indel_freq",
-	"vdj_server_ann_kabat_FR3_insertions",
-	"vdj_server_ann_kabat_FR3_mutations",
-	"vdj_server_ann_kabat_FR3_nonsynonymous_bsb",
-	"vdj_server_ann_kabat_FR3_ns_rto",
-	"vdj_server_ann_kabat_FR3_pct_id",
-	"vdj_server_ann_kabat_FR3_qry_aln",
-	"vdj_server_ann_kabat_FR3_qry_end",
-	"vdj_server_ann_kabat_FR3_qry_srt",
-	"vdj_server_ann_kabat_FR3_ref_aln",
-	"vdj_server_ann_kabat_FR3_stp_cdn",
-	"vdj_server_ann_kabat_FR3_synonymous_bsb",
 	"vdj_server_ann_kabat_cdr3_na",
 	"vdj_server_ann_kabat_cdr3_na_len",
 	"vdj_server_ann_kabat_cdr3_tr",
@@ -851,11 +766,11 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None"):
 	"vdj_server_ann_whole_seq_pct_id",
 	"vdj_server_ann_whole_seq_stp_cdn",
 	"vdj_server_ann_whole_seq_synonymous_bsb",
-	"vdj_server_whole_vj_stp_cdn",
+	"vdj_server_whole_vj_stp_cdn"
 	]
 
 	m[keys[0]]=rid
-	#keys=m.keys()
+	keys=m.keys()
 	keys.sort()
 
 	if(rid==1):
