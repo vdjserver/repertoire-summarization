@@ -35,7 +35,7 @@ def downloadAndPrep(imgtdb_obj,makeblastdbbin,igblastnbin,kvMap,blastx_bin):
 	#imgtdb_obj.prepareFASTAForBLASTFormatting()
 	#imgtdb_obj.blastFormatFNAInRefDirSetDirs(makeblastdbbin)
 	#downloadIMGTGENE_DB_and_LIGM_DB_and_index(imgtdb_obj)
-	kabat_process(imgtdb_obj,igblastnbin,blastx_bin,kvMap)
+	kabat_process(imgtdb_obj,igblastnbin,blastx_bin,kvMap,makeblastdbbin)
 
 
 
@@ -44,7 +44,7 @@ def downloadAndPrep(imgtdb_obj,makeblastdbbin,igblastnbin,kvMap,blastx_bin):
 #run igblastn on V data against the IGBLAST-provided database 
 #run the kabat routines on the IGBLAST output to make the KABAT region lookup tables
 #run blastx with the J nucleotides as the input/query data using IMGT reference data as the 
-def kabat_process(imgtdb_obj,igblastnbin,blastxbin,kvMap):
+def kabat_process(imgtdb_obj,igblastnbin,blastxbin,kvMap,makeblastdbbin):
 	#find  /home/data/DATABASE/01_22_2014/|grep -Pi 'ReferenceDirectorySet/.*_[A-Z]{2}_V\.fna$'
 	imgtdb_base=imgtdb_obj.getBaseDir()
 	organisms=imgtdb_obj.getOrganismList()
@@ -53,15 +53,15 @@ def kabat_process(imgtdb_obj,igblastnbin,blastxbin,kvMap):
 		#DO V LOOKUPS HERE : FR1,CDR1,FR2,CDR2,FR3
 		stList=["IG"]
 		for st in stList:
+			kabat_dir=imgtdb_base+"/"+organism+"/ReferenceDirectorySet/KABAT/"
+			if(not os.path.exists(kabat_dir)):
+				os.mkdir()
 			V_glob=imgtdb_base+"/"+organism+"/ReferenceDirectorySet/*_"+st+"_V.fna"
 			glob_res_v=glob.glob(V_glob)
 			if(len(glob_res_v)==1):
 				queryFile=glob_res_v[0]
 				if(os.path.exists(queryFile)):
 					print "Found query file ",queryFile
-					kabat_dir=imgtdb_base+"/"+organism+"/ReferenceDirectorySet/KABAT/"
-					if(not os.path.exists(kabat_dir)):
-						os.mkdir()
 					db_base_key=None
 					aux_org=None
 					if(organism=="human"):
@@ -100,12 +100,33 @@ def kabat_process(imgtdb_obj,igblastnbin,blastxbin,kvMap):
 							print "Now generating V lookup for ",organism," IG from igblast output ",igblast_output," and writing to ",Vlookup
 							writeKabatRegionsFromIGBLASTKabatResult(igblast_output,Vlookup)											
 				else:
-					print "file ",IG_V," not found!"
+					print "file ",queryFile," not found!"
 			else:
 				print "Error in GLOBBING for files for kabat process!"
-				print "GLOB",IG_V_glob," resulted in ",len(glob_res_v)," files found!"
-				print "GLOB",TR_V_glob," resulted in ",len(glob_res_tr_v)," files found !"
-				print "KABAT V lookups not to be available!!!!"
+				print "GLOB",V_glob," resulted in ",len(glob_res_v)," files found!"
+				print "KABAT V lookup not to be available!!!!"
+			J_glob=imgtdb_base+"/"+organism+"/ReferenceDirectorySet/*_"+st+"_J.fna"
+			glob_res_j=glob.glob(J_glob)
+			if(len(glob_res_j)==1):
+				queryFile=glob_res_j[0]
+				blastx_fna_db=imgtdb_obj.getBaseDir()+"/www.imgt.org/download/GENE-DB/IMGTGENEDB-ReferenceSequences.fasta-AA-WithoutGaps-F+ORF+inframeP"
+				if(not(os.path.exists(blastx_fna_db))):
+					print "Error, could not find ",blastx_fna_db," for J CDR3 KABAT!"
+				else:
+					print "Now formatting for blastx :",blastx_fna_db
+					format_blast_db(blastx_fna_db,"prot",makeblastdbbin)
+					blastx_xml_out=kabat_dir+"/blastx.out.xml"
+					blastxcmd=blastxbin+"   -max_target_seqs  1   -query "+queryFile+" -outfmt 5 -db "+blastx_fna_db+" -out "+blastx_xml_out
+					print "Now to run blastx with command ",blastxcmd
+					runCmdButGetNoStdOutOrStdErr(blastxcmd)
+					Jlookup=kabat_dir+"/Jlookup.tsv"
+					print "\nWriting Jlookup to ",Jlookup,"\n\n"
+					writeKabatJCDR3End(blastx_xml_out,Jlookup)
+			else:
+				print "Error in GLOBBING for files for kabat process!"
+				print "GLOB",J_glob," resulted in ",len(glob_res_j)," files found!"
+				print "KABAT J lookup not to be available!!!!"
+
 
 
 
