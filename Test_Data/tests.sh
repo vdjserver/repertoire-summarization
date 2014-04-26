@@ -1,5 +1,6 @@
 #!/bin/bash -x 
 VDJ_DB_ROOT=/home/data/DATABASE/01_22_2014
+#VDJ_DB_ROOT=/home/data/DATABASE/04_22_2014
 #IGDATA=/usr/local/igblast-1.2.0
 IGDATA=/usr/local/igblast-1.3.0
 for ORGANISM in Mus_musculus human ;
@@ -16,6 +17,7 @@ do
 	do
 		echo -e "\n\n\n\n\n******************************************"
 		QRY=$ORGANISM.$SEQ_TYPE.fna
+		echo "USING query file = $QRY "
 		for DCMODE in kabat imgt ; 
 		do
 			if [ "$SEQ_TYPE" == "TR" ]; then
@@ -56,9 +58,10 @@ do
 				echo "IgBLAST for human-readable output finished."
 				date
 				echo "Now running repertoire characterization ..."
-				time ../rep_char.py -json_out $RC_CDR3_SEG_JSON -cdr3_hist_out $RC_CDR3_HIST $RC_IN $RC_VDJML $RC_OUT $RC_DB $QRY 1>$RC_LOG_OUT 2>$RC_LOG_ERR
+				time ../rep_char.py -json_out $RC_CDR3_SEG_JSON -cdr3_hist_out $RC_CDR3_HIST $RC_IN $RC_VDJML $RC_OUT $RC_DB $QRY $ORGANISM  1>$RC_LOG_OUT 2>$RC_LOG_ERR
 			else
 				echo "QUERY $QRY NOT FOUND" ;
+				echo 'So no analysis for it being done !'
 			fi ;
 
 		done ;
