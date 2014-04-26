@@ -803,7 +803,7 @@ def add_rep_char_args_to_parser(parser):
 	parser.add_argument('vdj_db',type=str,nargs=1,help="path to the VDJ root REQUIRED")
 	parser.add_argument('qry_fasta',type=str,nargs=1,help="path to the input fasta file of query (Rep-Seq) data input to IgBLAST")
 	#parser.add_argument('-region_out'
-	#parser.add_argument('-db_species',type=str,nargs=1,default="human",help="species of the db")
+	parser.add_argument('db_organism',type=str,nargs=1,default="human",help="organism",choices=["human","Mus_musculus"])
 	return parser
 
 
@@ -824,7 +824,7 @@ if (__name__=="__main__"):
 		query_fasta=args.qry_fasta[0]
 		fasta_reader=SeqIO.parse(open(query_fasta, "r"), "fasta")
 		modes=['kabat','imgt']
-		organism=args.db_species
+		organism=extractAsItemOrFirstFromList(args.db_organism)
 		my_cdr3_map=histoMapClass(modes)
 		cdr3_hist_out_file=args.cdr3_hist_out
 		segment_counter=IncrementMapWrapper()
