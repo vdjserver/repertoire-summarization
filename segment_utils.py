@@ -686,7 +686,9 @@ def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human",m
 						lineNum+=1
 			if(fileToUse==None):
 				#print "Found no file to use"
-				pass
+				print "ERROR, could not find IMGT file to use for CDR3 annotation for ",allele," of organism ",organism,"!"
+				cdr3_adj_map[organism]["imgt"][allele]=(-1)
+				return  cdr3_adj_map[organism]["imgt"][allele]
 			else:
 				#print "Found file ",fileToUse,"to use to start at line=",annotationStartLine
 				pass
@@ -1497,7 +1499,10 @@ def getTheFrameForThisReferenceAtThisPosition(refName,organism,imgtdb_obj,refPos
 			if(start!=(-1)):
 				#assume start is in frame 0
 				return (refPos-start)%3
-	raise Exception("ERROR, COULD NOT FIND ANY FRAME POSITION AT ALL FOR ",refName," with organism=",organism)
+	eMsg="ERROR, COULD NOT FIND ANY FRAME POSITION AT ALL FOR "+refName+" with organism="+organism
+	print eMsg
+	raise Exception(eMsg+"\nIs frame data avaialble in the database?!?!?  Re-run but skipping annotation ('-skip_char')")
+	#raise Exception()
 
 
 
