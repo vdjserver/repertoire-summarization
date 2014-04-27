@@ -27,26 +27,45 @@ do
 				echo "SEQ_TYPE has the value 'IG'"
 				IGB_SEQ_FLAG="Ig"
 			fi
+
+			#echo "Want work for mode=$DCMODE" ;
+			OUTPUT=$QRY.igblast.$DCMODE.out
+			RC_IN=$OUTPUT
+			OUTPUT_HUMAN=$OUTPUT.human_readable.txt
+			BLAST_DB_ROOT=${BLAST_DB_ORG_ROOT}$SEQ_TYPE
+			DB_V=${BLAST_DB_ROOT}_V.fna
+			DB_D=${BLAST_DB_ROOT}_D.fna
+			DB_J=${BLAST_DB_ROOT}_J.fna
+			RC_VDJML=$RC_IN.rc.vdjml
+			RC_CDR3_HIST=$RC_IN.cdr3_hist.tsv
+			RC_CDR3_SEG_JSON=$RC_IN.segments.json
+			RC_OUT=$RC_IN.rc_out.tsv
+			RC_DB=$VDJ_DB_ROOT
+			RC_LOG_OUT=${RC_OUT}.log
+			RC_LOG_ERR=${RC_OUT}.err
+			echo "BLAST_DB_ROOT is $BLAST_DB_ROOT"
+			echo "Now analyzing seq type $SEQ_TYPE for $ORGANISM" ; 
+			IGBLAST_EXEC=$IGDATA/bin/igblastn
+
+			echo "Running VDJ sim for data..."
+			SIM_DATA=$ORGANISM.$SEQ_TYPE.$DCMODE.sim.fna
+			SIM_D=${VDJ_DB_ROOT}/${ORGANISM}/ReferenceDirectorySet/${ORGANISM}_${SEQ_TYPE}_D.fna
+			SIM_V=${VDJ_DB_ROOT}/${ORGANISM}/ReferenceDirectorySet/${ORGANISM}_${SEQ_TYPE}_V.fna
+			SIM_J=${VDJ_DB_ROOT}/${ORGANISM}/ReferenceDirectorySet/${ORGANISM}_${SEQ_TYPE}_J.fna
+			../vdj_sim.py -num_seqs 100 -dfasta ${SIM_D} ${SIM_V} ${SIM_J} > ${SIM_DATA}
+			SIM_B_OUT=${SIM_DATA}.igblast.out
+			echo "Running IgBLAST for sim data $SIM_DATA ..."
+			time $IGBLAST_EXEC  -num_threads 6   -domain_system $DCMODE  -query ${SIM_DATA} -germline_db_V $DB_V -germline_db_D $DB_D -germline_db_J $DB_J  -ig_seqtype $IGB_SEQ_FLAG -auxiliary_data $AUX_PATH -outfmt '7 qseqid qgi qacc qaccver qlen sseqid sallseqid sgi sallgi sacc saccver sallacc slen qstart qend sstart send qseq sseq evalue bitscore score length pident nident mismatch positive gapopen gaps ppos frames qframe sframe btop' > $SIM_B_OUT
+			SIM_JSON=$SIM_B_OUT.json
+			SIM_CDR3=$SIM_B_OUT.cdr3_hist.tsv
+			SIM_VDJML=$SIM_B_OUT.vdjml
+			SIM_RC_OUT=$SIM_B_OUT.rc_out.tsv
+			SIM_RC_OUT_LOG=${SIM_RC_OUT}.log
+			SIM_RC_OUT_ERR=${SIM_RC_OUT}.err
+			time ../rep_char.py -json_out $SIM_JSON -cdr3_hist_out $SIM_CDR3 $SIM_B_OUT $SIM_VDJML $SIM_RC_OUT $RC_DB ${SIM_DATA} $ORGANISM  1>$SIM_RC_OUT_LOG 2>$SIM_RC_OUT_ERR
 			if [ -f "$QRY" ]  ;
 			then
-				#echo "Want work for mode=$DCMODE" ;
-				OUTPUT=$QRY.igblast.$DCMODE.out
-				RC_IN=$OUTPUT
-				OUTPUT_HUMAN=$OUTPUT.human_readable.txt
-				BLAST_DB_ROOT=${BLAST_DB_ORG_ROOT}$SEQ_TYPE
-				DB_V=${BLAST_DB_ROOT}_V.fna
-				DB_D=${BLAST_DB_ROOT}_D.fna
-				DB_J=${BLAST_DB_ROOT}_J.fna
-				RC_VDJML=$RC_IN.rc.vdjml
-				RC_CDR3_HIST=$RC_IN.cdr3_hist.tsv
-				RC_CDR3_SEG_JSON=$RC_IN.segments.json
-				RC_OUT=$RC_IN.rc_out.tsv
-				RC_DB=$VDJ_DB_ROOT
-				RC_LOG_OUT=${RC_OUT}.log
-				RC_LOG_ERR=${RC_OUT}.err
-				echo "BLAST_DB_ROOT is $BLAST_DB_ROOT"
-				echo "Now analyzing seq type $SEQ_TYPE for $ORGANISM" ; 
-				IGBLAST_EXEC=$IGDATA/bin/igblastn
+
 				echo "FOUND $QRY" ;
 				echo "Starting IgBLAST with outfmt 7 at "
 				date
