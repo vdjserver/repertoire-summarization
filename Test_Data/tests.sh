@@ -52,7 +52,7 @@ do
 			SIM_D=${VDJ_DB_ROOT}/${ORGANISM}/ReferenceDirectorySet/${ORGANISM}_${SEQ_TYPE}_D.fna
 			SIM_V=${VDJ_DB_ROOT}/${ORGANISM}/ReferenceDirectorySet/${ORGANISM}_${SEQ_TYPE}_V.fna
 			SIM_J=${VDJ_DB_ROOT}/${ORGANISM}/ReferenceDirectorySet/${ORGANISM}_${SEQ_TYPE}_J.fna
-			../vdj_sim.py -num_seqs 100 -dfasta ${SIM_D} ${SIM_V} ${SIM_J} > ${SIM_DATA}
+			../vdj_sim.py -num_seqs 50 -dfasta ${SIM_D} ${SIM_V} ${SIM_J} > ${SIM_DATA}
 			SIM_B_OUT=${SIM_DATA}.igblast.out
 			echo "Running IgBLAST for sim data $SIM_DATA ..."
 			time $IGBLAST_EXEC  -num_threads 6   -domain_system $DCMODE  -query ${SIM_DATA} -germline_db_V $DB_V -germline_db_D $DB_D -germline_db_J $DB_J  -ig_seqtype $IGB_SEQ_FLAG -auxiliary_data $AUX_PATH -outfmt '7 qseqid qgi qacc qaccver qlen sseqid sallseqid sgi sallgi sacc saccver sallacc slen qstart qend sstart send qseq sseq evalue bitscore score length pident nident mismatch positive gapopen gaps ppos frames qframe sframe btop' > $SIM_B_OUT
