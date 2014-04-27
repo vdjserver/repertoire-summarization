@@ -1656,6 +1656,8 @@ def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 						reg_end=matchRes.group(4)
 						if(gt==">"):
 							reg_end=(-1)
+						if(region=="FR1" and reg_end!=(-1)):
+							reg_start=1
 						region_interval=[int(reg_start),int(reg_end)]
 						reg_adj_map[refOrg]["imgt"][refName][region]=region_interval
 						imgt_reader.close()
