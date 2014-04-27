@@ -206,7 +206,7 @@ def vdj_sim(vFasta,dFasta,jFasta,selected_loci_classes,mut_lam,max_sim=float("in
 		sys.stderr.write(warn_msg+"\n")
 		sys.exit(2)
 	while(num_sim<max_sim):
-		print (num_sim+1)
+		#print (num_sim+1)
 		#make a random class choice from the list of selected classes
 		#MOM='map of maps'
 		selected_random_class=random.choice(selected_and_available_loci_classes)
@@ -303,7 +303,7 @@ if (__name__=="__main__"):
 	parser.add_argument('jfasta',type=str,nargs=1,help="path to the J fasta file")
 	parser.add_argument('-dfasta',type=str,nargs=1,help="path to the D fasta file for heavy chains")
 	parser.add_argument('-loci',type=str,nargs=1,help="comma-separated list of allowed loci classes (default these 7 : \"IGH,IGK,IGV,TRA,TRB,TRD,TRG\")")
-	parser.add_argument('-num_seqs',type=int,default=float("inf"),nargs=1,help="the number of sequences to simulate")
+	parser.add_argument('-num_seqs',type=int,default=float("inf"),nargs=1,help="the number of sequences to simulate (default : infinity!) ")
 	parser.add_argument('-mut_lam',type=float,default=float(0.5),nargs=1,help="the lambda parameter for SHM")
 	args = parser.parse_args()
 	mut_lam=None
