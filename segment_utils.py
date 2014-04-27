@@ -1746,7 +1746,7 @@ class IncrementMapWrapper():
 	#JSONIFY into hierarchy
 	def JSONIFYIntoHierarchy(self,db_base,organism,filterbyFastaAlleles=False):
 		hierarchy=getHierarchyByOrganism(db_base+"/"+organism+"/GeneTables/",organism,filterbyFastaAlleles)
-		JSON=jsonify_hierarchy(hierarchy,"human",self.count_map,"value")
+		JSON=jsonify_hierarchy(hierarchy,organism,self.count_map,"value")
 		return JSON
 
 
