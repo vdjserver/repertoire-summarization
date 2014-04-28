@@ -1347,7 +1347,7 @@ class imgt_db:
 			org_list=list()
 			total_list=[ name for name in os.listdir(thedir) if os.path.isdir(os.path.join(thedir, name)) ]
 			print "total_list is ",total_list
-			search_and_avoid=["\.py","down","\.pkl","\.sh"]
+			search_and_avoid=["\.py","down","\.pkl","\.sh","\.zip"]
 			for tl in total_list:
 				tls=str(tl.strip())
 				if(tls.startswith("www.") or tls.startswith("ftp.")):
