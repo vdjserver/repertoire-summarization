@@ -30,7 +30,7 @@ from utils import extractAsItemOrFirstFromList
 
 
 def merge(input_list,output_file):
-	only_first=["?xml","meta","generator","aligner","parameters"]
+	only_first=["?xml","meta","generator","aligner","parameters","germline_db"]
 	straddle=["read_results","vdjml"]
 	if(len(input_list)==1):
 		reader=open(input_list[0])
@@ -42,22 +42,50 @@ def merge(input_list,output_file):
 	else:
 		#print "input multi"
 		firstIndex=0
-		lastIndex=len(input_files)-1
+		lastIndex=len(input_list)-1
 		writer=open(output_file,'w')
 		tagRE=re.compile(r'^\s*<\/?([^\s>]+)')
-		for i in range(len(input_files)):
-			if(i==firstIndex or (i==firstIndex and len(input_files)==1):
+		closeRE=re.compile(r'^\s*<\s*\/')
+		for i in range(len(input_list)):
+			if(i==firstIndex or (i==firstIndex and len(input_list)==1)):
 				inFirst=True
 			else:
 				inFirst=False
-			if(i==lastIndex or (i==lastIndex and len(input_files)==1):
+			if(i==lastIndex or (i==lastIndex and len(input_list)==1)):
 				inLast=True
 			else:
 				inLast=False
-			reader=open(input_files[i],'r')
+			reader=open(input_list[i],'r')
 			for line in reader:
-				tsr=re.search(
-			
+				tsr=re.search(tagRE,line)
+				passLine=True
+				if(tsr):
+					tag=tsr.group(1)
+					#print "got tag "+str(tag)+" from line "+str(line[0:min(20,len(line))])
+					if((tag in only_first) and (inFirst==True)):
+						passLine=True
+					elif((tag in only_first) and (inFirst==False)):
+						passLine=False
+					elif(tag in straddle and (inFirst==True or inLast==True)):
+						passLine=True
+					else:
+						passLine=True
+					closeREsearch=re.search(closeRE,line)
+					if(closeREsearch):
+						closeTag=True
+					else:
+						closeTag=False
+					#print "got closeStatus="+str(closeTag)+" from line "+str(line[0:min(20,len(line))])
+					if(closeTag==False and (tag in straddle) and (inFirst==False and inLast==True)):
+						passLine=False
+					elif(closeTag==True and (tag in straddle) and (inFirst==True and inLast==False)):
+						passLine=False
+				else:
+					print "got no tag from ",line
+					sys.exit(0)
+				if(passLine):
+					writer.write(line)
+		writer.close()
 			
 
 
