@@ -4,6 +4,7 @@ import random
 from utils import read_fasta_file_into_map
 from imgt_utils import get_loci_list,get_heavy_loci
 import numpy
+import sys
 
 
 #global variable for V(D)J data!
@@ -11,6 +12,19 @@ vMap=None
 dMap=None
 jMap=None
 bps=["A","C","G","T"]
+seg_counts=dict()
+
+
+#given a map of (integral) counts return a frequence map (for normalization)
+def get_freqs_from_counts(counts):
+	total=0
+	for s in counts:
+		total+=counts[s]
+	freqs=dict()
+	for s in counts:
+		freqs[s]=float(counts[s])/float(total)
+	return freqs
+
 
 #make a random junction string
 def rand_jun(min_len,max_len):
@@ -143,6 +157,7 @@ def compatibleForRecombination(c1,c2):
 #using the input fastas and flags (and max sim)
 #writer simulated VDJs to STDOUT
 def vdj_sim(vFasta,dFasta,jFasta,selected_loci_classes,mut_lam,max_sim=float("inf")):
+	global seg_counts
 	vMap=read_fasta_file_into_map(vFasta)
 	vMom=partitionIntoClassMaps(vMap)
 	num_miss_V=0
@@ -234,6 +249,16 @@ def vdj_sim(vFasta,dFasta,jFasta,selected_loci_classes,mut_lam,max_sim=float("in
 			descriptor+="|chain_type=light"
 		recomb['shm_seq']=dummySHM(recomb['seq'],0.5)
 		print descriptor+"\n"+recomb['shm_seq']
+		selected_segments=list()
+		seg_keys=['vKey','dKey','jKey']
+		for s in seg_keys:
+			if(s in recomb):
+				segment=recomb[s]
+				if(segment!="None"):
+					if(segment in seg_counts):
+						seg_counts[segment]+=1
+					else:
+						seg_counts[segment]=1						
 		num_sim+=1
 	
 
@@ -345,7 +370,13 @@ if (__name__=="__main__"):
 		dFasta=args.dfasta[0]
 	jFasta=args.jfasta[0]
 	vdj_sim(vFasta,dFasta,jFasta,selected_loci_classes,mut_lam,max_sim)
-
+	freqs=get_freqs_from_counts(seg_counts)
+	seg_keys=seg_counts.keys()
+	seg_keys.sort()
+	sys.stderr.write("Segment\tFrequency\n")
+	for seg in seg_keys:
+		sys.stderr.write(seg+"\t"+str(freqs[seg])+"\n")
+	
 
 	
 
