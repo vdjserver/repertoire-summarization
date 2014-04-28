@@ -1514,6 +1514,7 @@ def getTheFrameForThisReferenceAtThisPosition(refName,organism,imgtdb_obj,refPos
 				):
 				return (refPos-interval_r_next_start)%3
 			else:
+				pass
 				#print "interval_r=",interval_r
 				#print "interval_r_next=",interval_r_next
 	eMsg="ERROR, COULD NOT FIND ANY FRAME POSITION AT ALL FOR "+refName+" with organism="+organism
