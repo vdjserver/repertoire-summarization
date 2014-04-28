@@ -1,0 +1,8 @@
+*.vdjml
+*.tsv
+*.json
+*.err
+*.log
+*.txt
+*.out
+*.sim.fna
