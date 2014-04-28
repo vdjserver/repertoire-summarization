@@ -1493,18 +1493,23 @@ def ofLeftmostJNucleotideNotAligningToJGetItsFrameAssumingJunctionSegmentOverlap
 def getTheFrameForThisReferenceAtThisPosition(refName,organism,imgtdb_obj,refPos):
 	regions=getVRegionsList()
 	for r in range(len(regions)):
-		interval_r=getVRegionStartAndStopGivenRefData(refName,organism,imgtdb_obj,region[r],"imgt")
-		interval_r_next=getVRegionStartAndStopGivenRefData(refName,organism,imgtdb_obj,region[r+1],"imgt")
+		interval_r=getVRegionStartAndStopGivenRefData(refName,organism,imgtdb_obj,regions[r],"imgt")
+		interval_r_next=getVRegionStartAndStopGivenRefData(refName,organism,imgtdb_obj,regions[r+1],"imgt")
 		if(interval_r!=None and interval_r_next!=None):
 			interval_r_start=int(interval_r[0])
 			interval_r_stop=int(interval_r[1])
 			interval_r_next_start=int(interval_r_next[0])
-			interval_r_next_stop=int(interval_r_next[1]
-			if(interval_r_start!=(-1) and interval_r_stop!=(-1) and interval_r_next_start!=(-1) and interval_r_next_stop!=(-1)):
+			interval_r_next_stop=int(interval_r_next[1])
+			if(
+				interval_r_start!=(-1) and 
+				interval_r_stop!=(-1) and 
+				interval_r_next_start!=(-1) and 
+				interval_r_next_stop!=(-1)
+				):
 				return (refPos-interval_r_next_start)%3
 	eMsg="ERROR, COULD NOT FIND ANY FRAME POSITION AT ALL FOR "+refName+" with organism="+organism
 	print eMsg
-	raise Exception(eMsg+"\nIs frame data avaialble in the database?!?!?  Re-run but skipping annotation ('-skip_char')")
+	raise Exception(eMsg+"\nIs frame data avaialble in the database?!?!? Consider Re-run but skipping annotation ('-skip_char')")
 	#raise Exception()
 
 
@@ -1520,7 +1525,7 @@ def getVRegionsList(includeCDR3=False):
 def alleleIsTR(an):
 	if(an.startswith("TR")):
 		return True
-	else:
+	else: 
 		return False
 
 def alleleIsIG(an):
