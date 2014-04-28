@@ -1491,10 +1491,16 @@ def ofLeftmostJNucleotideNotAligningToJGetItsFrameAssumingJunctionSegmentOverlap
 
 #at the indicated position find the frame by using the first imgt delineation start as a "base" or "frame of reference"
 def getTheFrameForThisReferenceAtThisPosition(refName,organism,imgtdb_obj,refPos):
-	regions=getVRegionsList()
-	for r in range(len(regions)):
+	regions=getVRegionsList(True)
+	for r in range(len(regions)-1):
+		#print "refName=",refName
+		#print "refOrg=",organism
+		#print "r=",r
+		#print "region=",regions[r]
 		interval_r=getVRegionStartAndStopGivenRefData(refName,organism,imgtdb_obj,regions[r],"imgt")
 		interval_r_next=getVRegionStartAndStopGivenRefData(refName,organism,imgtdb_obj,regions[r+1],"imgt")
+		#print "interval_r=",interval_r
+		#print "interval_r_next=",interval_r_next
 		if(interval_r!=None and interval_r_next!=None):
 			interval_r_start=int(interval_r[0])
 			interval_r_stop=int(interval_r[1])
@@ -1507,6 +1513,9 @@ def getTheFrameForThisReferenceAtThisPosition(refName,organism,imgtdb_obj,refPos
 				interval_r_next_stop!=(-1)
 				):
 				return (refPos-interval_r_next_start)%3
+			else:
+				#print "interval_r=",interval_r
+				#print "interval_r_next=",interval_r_next
 	eMsg="ERROR, COULD NOT FIND ANY FRAME POSITION AT ALL FOR "+refName+" with organism="+organism
 	print eMsg
 	raise Exception(eMsg+"\nIs frame data avaialble in the database?!?!? Consider Re-run but skipping annotation ('-skip_char')")
