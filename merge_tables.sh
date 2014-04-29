@@ -1,0 +1,23 @@
+#!/bin/bash
+LOOP_NUM=1
+while [ -n "$1" ]
+	do
+	echo "Current Parameter: $1 , Remaining $#"
+	echo "LOOP_NUM $LOOP_NUM"
+	INFILE=$1
+	if [ $LOOP_NUM == "1" ] ; then
+		#echo "first loop"
+		#echo "INFILE is $INFILE"
+		cat $INFILE
+	else
+		#echo "subsequent loop...."
+		#echo "INFILE is $INFILE"
+		cat $INFILE |awk '{if(NR>1) {print $0}}'
+	fi ;
+	#Pass $1 to some bash function or do whatever
+	shift
+	LOOP_NUM=`expr $LOOP_NUM + 1`
+done
+
+
+
