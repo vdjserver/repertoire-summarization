@@ -4,7 +4,7 @@ import os
 import re
 import glob
 import argparse
-from utils import extractAsItemOrFirstFromList
+from utils import extractAsItemOrFirstFromList,fileLineCount
 
 
 
@@ -30,10 +30,15 @@ if (__name__=="__main__"):
 				elif(line_num==1 and not(inFirst)):
 					pass
 				elif(line_num!=1):
-					print "line_num=",line_num
-					print "line=",line
-					pieces=line.split('\t')					
+					#print "line_num=",line_num
+					#print "line=",line
+					pieces=line.split('\t')	
+					pieces[0]=pieces[0].strip()
+					pieces[0]=int(pieces[0])
+					#print "\n*****\npieces[0]=",pieces[0],"\n*******"
+					#print pieces[0]+accum
 					pieces[0]+=accum
+					pieces[0]=str(pieces[0])
 					joiner="\t"
 					line=joiner.join(pieces)
 					print line
