@@ -75,11 +75,17 @@ def merge(input_list,output_file):
 						closeTag=True
 					else:
 						closeTag=False
-					#print "got closeStatus="+str(closeTag)+" from line "+str(line[0:min(20,len(line))])
-					if(closeTag==False and (tag in straddle) and (inFirst==False and inLast==True)):
-						passLine=False
-					elif(closeTag==True and (tag in straddle) and (inFirst==True and inLast==False)):
-						passLine=False
+					if(tag in straddle):
+						#print "got tag ",tag
+						if((tag in straddle) and not(inFirst) and not(inLast)):
+							passLine=False
+						elif((tag in straddle) and closeTag and inFirst):
+							passLine=False
+						elif((tag in straddle) and not(closeTag) and inLast):
+							passLine=False
+						elif((tag in straddle) and closeTag and inLast):
+							passLine=True
+
 				else:
 					print "got no tag from ",line
 					sys.exit(0)
