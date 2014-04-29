@@ -1501,12 +1501,13 @@ class imgt_db:
 			return
 		if(self.indexPath is None):
 			self.indexPath=str(str(self.imgt_dat_path)+str(self.db_idx_extension))
-		print "Cacheing index for imgt.dat file ",self.imgt_dat_path
+		#print "Cacheing index for imgt.dat file ",self.imgt_dat_path
 		if(not(os.path.exists(str(self.indexPath)))):
-			print "Creating the index",str(self.indexPath)," first because it doesn't exist..."
+			#print "Creating the index",str(self.indexPath)," first because it doesn't exist..."
 			self.indexIMGTDatFile(self.imgt_dat_path,self.indexPath)
 		else:
-			print "The index file ",str(self.indexPath)," was found, so no need to re-create it...."
+			#print "The index file ",str(self.indexPath)," was found, so no need to re-create it...."
+			pass
 		if(not(existingCache==None)):
 			if(self.accession_start_stop_map==None):
 				self.accession_start_stop_map=dict()
