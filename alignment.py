@@ -162,7 +162,7 @@ class alignment:
 					return
 				numInitialDashes=getNumStartingDashes(self.s_aln)
 				if(numInitialDashes>0):
-					print numInitialDashes,">0!"
+					#print numInitialDashes,">0!"
 					for p in range(numInitialDashes):
 						b_index=numInitialDashes-p-1
 						#print "b_index=",b_index
@@ -185,7 +185,7 @@ class alignment:
 		nfm=list()
 		current=firstFrame
 		temp=0
-		print "setsfm called with firstFrame==",firstFrame
+		#print "setsfm called with firstFrame==",firstFrame
 		if(len(self.s_aln)<=0):
 			#print "setsfm early return..."
 			self.s_mask=nfm
@@ -255,61 +255,39 @@ class alignment:
 	#returns array of query, then match/midline, then subject based on btop alignment specification
 	@staticmethod
 	def buildAlignmentWithBTOP(btop,q,s,debug=False,level=0):
-		if(debug):	
-			print repeatString("\t",level)+"At begging of call, btop=",btop,"q=",q,"s=",s
 		aln=["","",""]
 		aln[0]=str("")
 		aln[1]=str("")
 		aln[2]=str("")
-		if(debug):
-			print "now performing digital tests..."
 		dm=re.search('^(\d+)[^0-9]',btop)
 		adm=re.search('^(\d+)$',btop)
 		if adm:
 			#BTOP is 100% digital
-			if(debug):		
-				print repeatString("\t",level)+"matched all digital..."
 			btopv=int(adm.group(1))
 			aln[0]=q
 			aln[1]=repeatString("|",btopv)
 			aln[2]=s
-			if(debug):
-				print repeatString("\t",level)+"from all digital btop=",btop," returning : "
-				for x in range(len(aln)):
-					print repeatString("\t",level)+aln[x]
 			return alignment(aln[0],aln[1])
 		elif dm:
 			#BTOP only starts with digits...
-			if(debug):
-				print repeatString("\t",level)+"matched start digital..."
 			digitString=dm.group(1)
 			size=int(digitString)
 			aln[0]=q[:size]
 			aln[2]=s[:size]
 			aln[1]=repeatString("|",size)
-			if(debug):
-				print repeatString("\t",level)+"From little btop :",digitString," got "
-				for x in range(len(aln)):
-					print repeatString("\t",level)+aln[x]
 			rec=buildAlignmentWholeSeqs(btop[len(digitString):],q[(size-0):],s[(size-0):],debug,level+1)
 			aln[0]+=rec[0]
 			aln[1]+=rec[1]
 			aln[2]+=rec[2]
 			return alignment(aln[0],aln[1])
-		if(debug):
-			print "no digital tests passed...doing letter tests...."
 		firstTwoLetters=re.search('^([a-z\\-])([a-z\\-])',btop,re.IGNORECASE)
 		if firstTwoLetters:
 			#BTOP starts with a dash and a letter, a letter and a dash, or two letters
-			if(debug):
-				print "aligns first two letters..."
 			firstLetter=firstTwoLetters.group(1)
 			secondLetter=firstTwoLetters.group(2)
 			aln[0]=firstLetter
 			aln[1]=str("X")
 			aln[2]=secondLetter
-			if(debug):		
-				print "First-two letters alignment = \n"+getNiceAlignment(aln)
 			if(len(btop)>2):
 				rec=["","",""]
 				if(firstLetter=="-" or secondLetter=="-"):
@@ -323,11 +301,7 @@ class alignment:
 				aln[1]+=rec[1]
 				aln[2]+=rec[2]
 			else:
-				if(debug):
-					print "returning next-to-last aln"
 				return alignment(aln[0],aln[1])
-		if(debug):
-			print "returning last aln"
 		return alignment(aln[0],aln[1])
 
 
@@ -383,10 +357,10 @@ class alignment:
 		num_bsb=0
 		stp_cdn=False	
 
-		if(not(charMsg==None)):
-			print charMsg
-		if(showAln):
-			print self.getNiceString()
+		#if(not(charMsg==None)):
+		#	print charMsg
+		#if(showAln):
+		#	print self.getNiceString()
 
 		#do counts that are independent of codons/translations (bsb, indels, and their frequencies)
 		tot_num_base_to_base_alns=0
