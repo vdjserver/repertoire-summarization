@@ -20,9 +20,9 @@ class CharacterizationThread(threading.Thread):
 	def run(self):
 		while(True):
 			try:
-				print "to call CHAR_QUEUE get"
+				#print "to call CHAR_QUEUE get"
 				char_job_dict=self.queue.get()
-				print "called CHAR_QUEUE get"
+				#print "called CHAR_QUEUE get"
 				read_result_obj=char_job_dict['read_result_obj']
 				meta=char_job_dict['meta']
 				organism=char_job_dict['organism']
@@ -59,10 +59,10 @@ class CharacterizationThread(threading.Thread):
 						annMap[key_base+region+'_ref_aln']=regionAlignment.s_aln
 						annMap[key_base+region+'_frm_msk']=regionAlignment.s_frame_mask
 						self.result=annMap
-				print "to call CHAR_QUEUE task_done..."
+				#print "to call CHAR_QUEUE task_done..."
 				self.result_queue.put(self.result)
 				self.queue.task_done()
-				print "called CHAR_QUEUE task_done..."
+				#print "called CHAR_QUEUE task_done..."
 			except:
 				import traceback,sys
 				print "Exception in user code:"
