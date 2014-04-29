@@ -181,7 +181,14 @@ def isIntegral(s):
 
 
 
-
+def countFastaReads(fastaFile):
+	f=open(fastaFile,'r')
+	fc=0
+	for line in f:
+		if(line.startswith(">")):
+			fc+=1
+	f.close()
+	return fc
 
 
 
