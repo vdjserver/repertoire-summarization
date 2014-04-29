@@ -16,13 +16,23 @@ with agregrated counts, 3) read-level summary statistics
 The rep_char.py script is designed to support the above 4 functions.
 If run over several igblast outputs that should subsequently be 
 merged the following scripts can be used to logicaly merge outputs:
-1) cdr3_hist.py can logically merge CDR3 length histogram data
-2) json_seg_merge.py can be used to logically merge JSON count data
-[TODO INSERT LIST OF 2 MERGERS HERE for merging VDJML data and
-rep_char.py output data]
+1) cdr3_hist.py can logically merge CDR3 length histogram data,
+2) json_seg_merge.py can be used to logically merge JSON count data,
+3) vdjml_merge.py can be used to merge VDJML files, and 4) merge_tables.sh
+can be used to merge TSV (or CSV) files  (using cat and awk).
 
-To get help on any of the scripts run it as seen here, and 
-use the "-h" flag for "help"!
+To get help on any of the *.pyscripts run it as seen here, and 
+use the "-h" flag for "help"!  For the .sh scripts please 
+
+NOTE : use of rep_char.py require that the python module "vdjml" be usable.
+
+NOTE : rep_char.py expect to be able to find "vdjml_igblast_parse.py".  One way to enable finding is 
+with a soft-link as seen here with the link pointing to the file
+
+esalina2@eddiecomp:/home/data/vdj_server/repertoire-summarization$ ls -alh vdjml_igblast_parse.py 
+lrwxrwxrwx 1 esalina2 esalina2 31 Mar 25 10:05 vdjml_igblast_parse.py -> ../vdjml/vdjml_igblast_parse.py
+
+
 
 -Eddie Salinas
 VDJ Server Team Member
