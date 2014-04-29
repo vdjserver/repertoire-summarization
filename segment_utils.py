@@ -607,7 +607,8 @@ def getCDR3EndFromJData(allele,imgtdb_obj,org="human"):
 						#subtract 3 becuase we want to ignore the TRP or PHE residue and look at the residue immediately preceding
 						return c_end-3
 	else:
-		print "failed to get a start!"
+		#print "failed to get a start!"
+		pass
 	#os.remove(tmp_file_path)
 	return None
 
@@ -760,7 +761,7 @@ def getRegionAlignmentFromLargerVAlignment(sub_info_map,org,mode,region_name,img
 	ref_region_transcript_start=getVRegionStartAndStopGivenRefData(sub_name,org,imgtdb_obj,region_name,"imgt")[0]
 	#print "For reference=",sub_name," for org=",org," region=",region_name," got (mode=",mode,")region=",ref_region_interval
 	if(ref_region_interval[0]==(-1) or ref_region_interval[1]==(-1)):
-		print "Can't get region info, start or stop of ref region is neg 1...."
+		#print "Can't get region info, start or stop of ref region is neg 1...."
 		return None
 	else:
 		region_frame_start=(ref_region_interval[0]-ref_region_transcript_start)%3
