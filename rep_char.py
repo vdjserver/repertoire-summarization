@@ -19,6 +19,7 @@ import Queue
 import threading
 import time
 import multiprocessing
+import math
 
 
 
@@ -826,6 +827,12 @@ if (__name__=="__main__"):
 		#print "a fact is ",fact
 		#print "the file is ",args.igblast_in[0]
 		query_fasta=extractAsItemOrFirstFromList(args.qry_fasta)
+		if(os.path.exists(query_fasta) and os.path.isfile(query_fasta)):
+			#tot_reads=countFastaReads(query_fasta)
+			tot_reads=None
+			#do we really wanna count the reads?????
+		else:
+			tot_reads=None
 		fasta_reader=SeqIO.parse(open(query_fasta, "r"), "fasta")
 		modes=['kabat','imgt']
 		my_cdr3_map=histoMapClass(modes)
@@ -837,11 +844,21 @@ if (__name__=="__main__"):
 		rrw = vdjml.Vdjml_writer(extractAsItemOrFirstFromList(args.vdjml_out), meta)
 		rep_char_out=extractAsItemOrFirstFromList(args.char_out)
 		fHandle=open(rep_char_out,'w')
+		if(tot_reads==None):
+			every_read=100
+		else:
+			every_read=math.log(tot_reads,10.0)
+			if(every_read<=1):
+				every_read=1
+			else:
+				every_read=int(every_read)
+				every_read=int(10**every_read)
+			#print "every_read at ",every_read
 		for read_result_obj in scanOutputToVDJML(extractAsItemOrFirstFromList(args.igblast_in),fact,query_fasta):
 
 
 			#prepare for the iteration and give a possible status message...
-			if(read_num>1 and read_num%1000==0):
+			if(read_num>1 and read_num%every_read==0):
 				print "Processing read",read_num,"..."
 			elif(read_num==1):
 				print "Processing reads..."
@@ -891,7 +908,7 @@ if (__name__=="__main__"):
 		if(type(segments_json_out)==list):
 			segments_json_out=segments_json_out
 		if(not(segments_json_out=="/dev/null")):
-			print "Writing JSON segment counts output..."
+			print "Writing JSON segment counts output to ",segments_json_out,"..."
 			segment_counter.JSONIFYToFile(extractAsItemOrFirstFromList(args.vdj_db),organism,segments_json_out)
 			print "Writing JSON segment counts output complete!"
 
