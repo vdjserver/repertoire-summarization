@@ -174,11 +174,11 @@ def cdr3RegCharAnalysis(vMap,dMap,jMap,mode,cdr3_anal_map,organism,imgtdb_obj):
 			temp_v_pos+=1
 		temp_v+=1
 	#cdr3_v_char_map=getRegionSpecifcCharacterization(cdr3_s_aln,cdr3_q_aln,"CDR3",frame_mask,dMode)
-	print "THE CDR3 ALN IN V is (q top, s bottom)"
-	print cdr3_q_aln
-	print frame_mask
-	print "stop here"
-	print "last q",temp_v_q_pos
+	#print "THE CDR3 ALN IN V is (q top, s bottom)"
+	#print cdr3_q_aln
+	#print frame_mask
+	#print "stop here"
+	#print "last q",temp_v_q_pos
 	getCDR3SpecifcCharacterization(cdr3_s_aln,cdr3_q_aln,frame_mask,temp_v_q_pos,(-1))
 	map_map=dict()
 	super_s=makeEmptyArrayOfStringsOfLen(jMap['q. end'])
@@ -199,7 +199,7 @@ def getValnWholeSeqStopFlag(vInfo,dInfo,jInfo,imgtdb_obj,organism,annMap,seq_rec
 		numNToAdd=s_start_frame%3
 		Ns=repStr("N",numNToAdd)
 		q_start=vAlnNoGapStart.q_start
-		print "Initial q_start is ",q_start
+		#print "Initial q_start is ",q_start
 		#translate all the way to the end of the query here!!!!
 		q_end=vAlnNoGapStart.q_end
 		#if(vInfo['is_inverted']):
@@ -209,10 +209,10 @@ def getValnWholeSeqStopFlag(vInfo,dInfo,jInfo,imgtdb_obj,organism,annMap,seq_rec
 		if(not(jInfo==None)):
 			jAlnObj=alignment(jInfo['query seq'],jInfo['subject seq'],jInfo['q. start'],jInfo['q. end'],jInfo['s. start'],jInfo['s. end'])
 			j_q_end=jAlnObj.q_end
-			print "Initial q_end from j",j_q_end			
+			#print "Initial q_end from j",j_q_end			
 			#if(jInfo['is_inverted']):
 			#	j_q_end=getRegPosFromInvertedPos(j_q_end,len(seq_rec.seq))
-			print "Used q_end from j",j_q_end
+			#print "Used q_end from j",j_q_end
 			#the purpose of this "max" function is to let q_end stay where it is in the case the J aligns BEFORE V does!
 			q_end=max(q_end,j_q_end)
 		else:
@@ -220,7 +220,7 @@ def getValnWholeSeqStopFlag(vInfo,dInfo,jInfo,imgtdb_obj,organism,annMap,seq_rec
 			if(not(dInfo==None)):
 				dAlnObj=alignment(dInfo['query seq'],dInfo['subject seq'],dInfo['q. start'],dInfo['q. end'],dInfo['s. start'],dInfo['s. end'])
 				d_q_end=dAlnObj.q_end
-				print "Initial q_end from d",d_q_end
+				#print "Initial q_end from d",d_q_end
 				q_end=max(q_end,d_q_end)
 			else:
 				#d is none
@@ -231,9 +231,9 @@ def getValnWholeSeqStopFlag(vInfo,dInfo,jInfo,imgtdb_obj,organism,annMap,seq_rec
 			query_to_exm=str(seq_rec.seq)[q_start-1:q_end+1]
 		query_to_exm=Ns+query_to_exm
 		trx_to_exm=biopythonTranslate(query_to_exm)
-		print "The query and translation to examine for ",seq_rec.id," (with q_start=",q_start," and q_end=",q_end,")  :"
-		print query_to_exm
-		print trx_to_exm
+		#print "The query and translation to examine for ",seq_rec.id," (with q_start=",q_start," and q_end=",q_end,")  :"
+		#print query_to_exm
+		#print trx_to_exm
 		if(trx_to_exm.find("*")!=(-1)):
 			return True
 		else:
@@ -288,23 +288,23 @@ def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap):
 				postCDR3AlnObj=jAlnObj.getAlnAtAndCond(new_q_start,"query","geq")
 			if(postCDR3AlnObj.s_start==postCDR3AlnStart):
 				#great, set the FRAME mask to start with zero cause the alignment starts where it ideally should start
-				print "postCDR3AlnObj.s_start=",postCDR3AlnObj.s_start,", and postCDR3AlnStart=", postCDR3AlnStart," so normal case for SFM"
+				#print "postCDR3AlnObj.s_start=",postCDR3AlnObj.s_start,", and postCDR3AlnStart=", postCDR3AlnStart," so normal case for SFM"
 				postCDR3AlnObj.setSFM(0)
 			elif(postCDR3AlnStart<postCDR3AlnObj.s_start):
 				#if the alignment starts later, set the proper frame mask start
-				print "postCDR3AlnStart=",postCDR3AlnStart," and postCDR3AlnObj.s_start=",postCDR3AlnObj.s_start," so setting SFM as ",str(int(int(postCDR3AlnObj.s_start-postCDR3AlnStart)%3))
+				#print "postCDR3AlnStart=",postCDR3AlnStart," and postCDR3AlnObj.s_start=",postCDR3AlnObj.s_start," so setting SFM as ",str(int(int(postCDR3AlnObj.s_start-postCDR3AlnStart)%3))
 				postCDR3AlnObj.setSFM((postCDR3AlnObj.s_start-postCDR3AlnStart)%3)
 			else:
 				#postCDR3AlnStart>=postCDR3AlnObj.s_start ?????
-				print "postCDR3AlnStart=",postCDR3AlnStart
-				print "postCDR3AlnObj.s_start",postCDR3AlnObj.s_start
-				print "vINFO",vInfo
-				print "jINFO",jInfo
-				print "J_cdr3_end=",J_cdr3_end
-				print "VALNOBJ"
-				print vAlnObj.getNiceString()
-				print "postCDR3"
-				print postCDR3AlnObj.getNiceString()
+				#print "postCDR3AlnStart=",postCDR3AlnStart
+				#print "postCDR3AlnObj.s_start",postCDR3AlnObj.s_start
+				#print "vINFO",vInfo
+				#print "jINFO",jInfo
+				#print "J_cdr3_end=",J_cdr3_end
+				#print "VALNOBJ"
+				#print vAlnObj.getNiceString()
+				#print "postCDR3"
+				#print postCDR3AlnObj.getNiceString()
 				raise Exception('postCDR3AlnStart>postCDR3AlnObj.s_start ?????  Error in alignment class???')
 				#ALIGNMENT. Q_FROM=45 Q_TO=51 S_FROM=19 S_TO=25
 				#QURY:GCAGGAG
@@ -316,13 +316,13 @@ def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap):
 			NSub=repStr("N",numN)
 			NQry=repStr("N",numN)
 			vCharMap=preCDR3Aln.characterize()
-			print "the vCharMap annotation map and alignment (for whole seq named ",vInfo['query id'],") is "
-			printMap(vCharMap)
-			print preCDR3Aln.getNiceString()
-			print "the jCharMap annotation map and alignment (for whole seq name ",jInfo['query id'],") is "
-			print postCDR3AlnObj.getNiceString()
+			#print "the vCharMap annotation map and alignment (for whole seq named ",vInfo['query id'],") is "
+			#printMap(vCharMap)
+			#print preCDR3Aln.getNiceString()
+			#print "the jCharMap annotation map and alignment (for whole seq name ",jInfo['query id'],") is "
+			##print postCDR3AlnObj.getNiceString()
 			jCharMap=postCDR3AlnObj.characterize()
-			printMap(jCharMap)
+			#printMap(jCharMap)
 			#to get/compute the 'whole' map, add up the "non-special" values
 			#otherwise, compute them specially
 			toSkip=['bsb_freq','pct_id','ns_rto','indel_freq']
@@ -391,8 +391,8 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 	jInfo=None
 	noneSeg_flag=False
 	for seg in topVDJ:
-		print "in second loop...."
-		print "seg=",seg
+		#print "in second loop...."
+		#print "seg=",seg
 		if(topVDJ[seg] is not None):
 			#print "to get info...."
 			hit_info=getHitInfo(read_result_obj,meta,topVDJ[seg],read_rec,imgtdb_obj,organism)
@@ -446,7 +446,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 			num_threads=max(1,num_cpus)
 			#num_threads=1
 			#num_threads=10
-			print "USING NUM_THREADS=",num_threads
+			#print "USING NUM_THREADS=",num_threads
 			characterization_thread_set=set()
 			for c in range(num_threads):
 				#print "ABOUT TO CALL CONST...."
@@ -481,7 +481,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 						char_job_dict['noneSeg_flag']=noneSeg_flag
 						characterization_queue.put(char_job_dict)
 						num_submitted_jobs+=1
-						print "JUST SUBMITTED A CHAR_QUEUE JOB :",char_job_dict
+						#print "JUST SUBMITTED A CHAR_QUEUE JOB :",char_job_dict
 						#if(regionAlignment!=None and not(noneSeg_flag)):
 						#	reg_ann_show_msg=False
 						#	#reg_ann_msg="characterization for region="+region+" mode="+mode+" for read="+read_rec.id
@@ -514,7 +514,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 			pass
 
 	if(num_submitted_jobs>0):
-		print "CHAR_QUEUE pre-join...."
+		#print "CHAR_QUEUE pre-join...."
 		characterization_queue.join()
 		get_res=0
 		while(get_res<num_submitted_jobs):
@@ -552,7 +552,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 def analyze_combinations(read_result_obj,meta,organism,imgtdb_obj,read_rec,read_ann_map):
 	segment_combinations=read_result_obj.segment_combinations()
 	for s in range(len(segment_combinations)):
-		print "LOOKING AT COMBINATION # ",str(int(s+1))," of ",str(len(segment_combinations))," FOR READ ID=",read_result_obj.id()
+		#print "LOOKING AT COMBINATION # ",str(int(s+1))," of ",str(len(segment_combinations))," FOR READ ID=",read_result_obj.id()
 		segment_combination=segment_combinations[s]
 		analyzeRegionObjsFromSegmentCombo(segment_combination,meta,organism,imgtdb_obj,read_rec,read_ann_map)
 
@@ -561,11 +561,11 @@ def analyze_combinations(read_result_obj,meta,organism,imgtdb_obj,read_rec,read_
 
 def analyzeRegionObjsFromSegmentCombo(segment_combo,meta,organism,imgtdb_obj,read_rec,read_ann_map):
 	global global_key_base
-	print "got a segment combo : ",segment_combo
-	print "regions is ",segment_combo.regions
-	print "now calling....",
+	#print "got a segment combo : ",segment_combo
+	#print "regions is ",segment_combo.regions
+	#print "now calling....",
 	regions=segment_combo.regions()
-	print "the type of regions is ",str(type(regions))
+	#print "the type of regions is ",str(type(regions))
 	for region in regions:
 		#print "region???",region
 		#print "range : ",region.range_
@@ -596,11 +596,13 @@ def analyzeRegionObjsFromSegmentCombo(segment_combo,meta,organism,imgtdb_obj,rea
 			end_match=(vdj_end==igblast_end)
 			#print "start and end matches : ",strt_match," and ",end_match
 			if(strt_match and end_match):
-				print "total match!"
+				#print "total match!"
+				pass
 			else:
-				print "at least one mismatch! igblast start/end : ",igblast_start," and ",igblast_end," vdj start/end     : ",vdj_start," and ",vdj_end," : query=",read_ann_map['read_name']," seg=",read_ann_map['top_V']," rgn=",rgn_nm," rrv : ",getVRegionStartAndStopGivenRefData(read_ann_map['top_V'],organism,imgtdb_obj,rgn_nm,rgn_ns)
+				#print "at least one mismatch! igblast start/end : ",igblast_start," and ",igblast_end," vdj start/end     : ",vdj_start," and ",vdj_end," : query=",read_ann_map['read_name']," seg=",read_ann_map['top_V']," rgn=",rgn_nm," rrv : ",getVRegionStartAndStopGivenRefData(read_ann_map['top_V'],organism,imgtdb_obj,rgn_nm,rgn_ns)
+				pass
 		else:
-			print "no lookup found for ",lookup_qry_start," and ",lookup_qry_end
+			#print "no lookup found for ",lookup_qry_start," and ",lookup_qry_end
 			pass
 
 
@@ -623,7 +625,7 @@ def vSegmentRegionVDJAnalyse(read_result_obj,meta,organism,imgtdb_obj,read_rec):
 	segment_combinations=read_result_obj.segment_combinations()
 	for s in range(len(segment_combinations)):
 		segment_combination=segment_combinations[s]
-		print "Looking at combination #",str(s+1)
+		#print "Looking at combination #",str(s+1)
 		getRegionsObjsFromSegmentCombo(segment_combination)
 		#sc1 = vdjml.Segment_combination(scb)
 		#scb.add_region(name=reg_name,read_range=reg_interval,metric=mm)
@@ -820,27 +822,27 @@ if (__name__=="__main__"):
 		mf=makeVDJMLDefaultMetaAndFactoryFromArgs(args)
 		meta=mf[0]
 		fact=mf[1]
-		imgtdb_obj=imgt_db(args.vdj_db[0])
+		imgtdb_obj=imgt_db(extractAsItemOrFirstFromList(args.vdj_db))
 		#print "a fact is ",fact
 		#print "the file is ",args.igblast_in[0]
-		query_fasta=args.qry_fasta[0]
+		query_fasta=extractAsItemOrFirstFromList(args.qry_fasta)
 		fasta_reader=SeqIO.parse(open(query_fasta, "r"), "fasta")
 		modes=['kabat','imgt']
 		my_cdr3_map=histoMapClass(modes)
 		cdr3_hist_out_file=args.cdr3_hist_out
 		segment_counter=IncrementMapWrapper()
 		read_num=1
-		segments_json_out=args.json_out
-		print "to write vdjml to ",args.vdjml_out
-		rrw = vdjml.Vdjml_writer(str(args.vdjml_out[0]), meta)
-		rep_char_out=args.char_out[0]
+		segments_json_out=extractAsItemOrFirstFromList(args.json_out)
+		#print "to write vdjml to ",args.vdjml_out
+		rrw = vdjml.Vdjml_writer(extractAsItemOrFirstFromList(args.vdjml_out), meta)
+		rep_char_out=extractAsItemOrFirstFromList(args.char_out)
 		fHandle=open(rep_char_out,'w')
-		for read_result_obj in scanOutputToVDJML(args.igblast_in[0],fact,query_fasta):
+		for read_result_obj in scanOutputToVDJML(extractAsItemOrFirstFromList(args.igblast_in),fact,query_fasta):
 
 
 			#prepare for the iteration and give a possible status message...
 			if(read_num>1 and read_num%1000==0):
-				print "Processed read",read_num,"..."
+				print "Processing read",read_num,"..."
 			elif(read_num==1):
 				print "Processing reads..."
 			query_record=fasta_reader.next()
@@ -872,20 +874,26 @@ if (__name__=="__main__"):
 			#increment the read number
 			read_num+=1
 
+		print "Processed total of",str(read_num-1),"reads!"
+
 		#close rep_char out
 		fHandle.close()
 
 		#write the CDR3 hist when non-dev-null
 		if(type(cdr3_hist_out_file)==list):
-			cdr3_hist_out_file=cdr3_hist_out_file[0]
+			cdr3_hist_out_file=extractAsItemOrFirstFromList(cdr3_hist_out_file)
 		if(not(cdr3_hist_out_file=="/dev/null")):
 			my_cdr3_map.writeToFile(cdr3_hist_out_file)
+			print "Wrote CDR3 lengths histogram to ",cdr3_hist_out_file
+
 
 		#write the segment counts when non-dev-null
 		if(type(segments_json_out)==list):
-			segments_json_out=segments_json_out[0]
+			segments_json_out=segments_json_out
 		if(not(segments_json_out=="/dev/null")):
-			segment_counter.JSONIFYToFile(args.vdj_db[0],organism,segments_json_out)
+			print "Writing JSON segment counts output..."
+			segment_counter.JSONIFYToFile(extractAsItemOrFirstFromList(args.vdj_db),organism,segments_json_out)
+			print "Writing JSON segment counts output complete!"
 
 	else:
 		#print "error in args!"
