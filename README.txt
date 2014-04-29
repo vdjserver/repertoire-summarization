@@ -22,7 +22,7 @@ merged the following scripts can be used to logicaly merge outputs:
 can be used to merge TSV (or CSV) files  (using cat and awk).
 
 To get help on any of the *.pyscripts run it as seen here, and 
-use the "-h" flag for "help"!  For the .sh scripts please 
+use the "-h" flag for "help"!  For the .sh scripts please open them and read the comments.
 
 NOTE : use of rep_char.py require that the python module "vdjml" be usable.
 
