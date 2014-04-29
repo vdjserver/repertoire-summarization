@@ -419,7 +419,10 @@ def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
 				jq_t=int(jMap['q. end'])
 				js_f=int(jMap['s. start'])
 				js_t=int(jMap['s. end'])
+				ref_cdr3_start-=1
 				qry_cdr3_start=getQueryIndexGivenSubjectIndexAndAlignment(vq_aln,vs_aln,vq_f,vq_t,vs_f,vs_t,ref_cdr3_start)
+				if(qry_cdr3_start!=(-1)):
+					qry_cdr3_start+=1
 				qry_cdr3_end=getQueryIndexGivenSubjectIndexAndAlignment(jq_aln,js_aln,jq_f,jq_t,js_f,js_t,ref_cdr3_end,"left")
 				if(qry_cdr3_start!=(-1) and qry_cdr3_end!=(-1)):
 					#query_coding_seq=query_seq_map[currentQueryName]
