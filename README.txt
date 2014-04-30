@@ -14,12 +14,16 @@ with agregrated counts, 3) read-level summary statistics
 , and 4 ) vdjml files of the parsed data.
 
 The rep_char.py script is designed to support the above 4 functions.
+
 If run over several igblast outputs that should subsequently be 
 merged the following scripts can be used to logicaly merge outputs:
 1) cdr3_hist.py can logically merge CDR3 length histogram data,
 2) json_seg_merge.py can be used to logically merge JSON count data,
 3) vdjml_merge.py can be used to merge VDJML files, and 4) merge_tables.py
-can be used to merge TSV tables.
+can be used to merge TSV tables.  NOTE : For 1 and #2, since counts 
+are being merged, input order is not important.  For #3 and #4, since 
+files are being merged and read order too, order is important.  For
+#3 and #4 the input order is used in the output.
 
 To get help on any of the *.pyscripts run it as seen here, and 
 use the "-h" flag for "help"!  For the .sh scripts please open them and read the comments.
