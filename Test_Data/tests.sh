@@ -1,7 +1,5 @@
 #!/bin/bash -x 
 VDJ_DB_ROOT=/home/data/DATABASE/01_22_2014
-#VDJ_DB_ROOT=/home/data/DATABASE/04_22_2014
-#IGDATA=/usr/local/igblast-1.2.0
 IGDATA=/usr/local/igblast-1.3.0
 for ORGANISM in Mus_musculus human ;
 do
