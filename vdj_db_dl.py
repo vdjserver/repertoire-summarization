@@ -135,7 +135,7 @@ if (__name__=="__main__"):
 	parser.add_argument('imgt_db_base',type=str,nargs=1,help="path to a NON-existent directory where downloading will take place")
 	parser.add_argument('makeblastdb_bin',type=str,nargs=1,help="*full* path to the makeblastdb binary executable")
 	parser.add_argument('igblast_bin',type=str,nargs=1,help="*full* path to the igblastn executable")
-	parser.add_argument('blastx_bin',type=str,nargs=1,help="*full path to the blastx binary executable")
+	parser.add_argument('blastx_bin',type=str,nargs=1,help="*full* path to the blastx binary executable")
 	parser.add_argument('map_file',type=str,nargs=1,help="*full* path to the map file (tab-separated key-value pairs)")
 	args=args = parser.parse_args()
 	if(args):
@@ -160,7 +160,7 @@ if (__name__=="__main__"):
 		else:
 			os.makedirs(imgt_db_base)
 		imgtdb_obj=imgt_db(imgt_db_base)
-		downloadAndPrep(imgtdb_obj,makeblastdb_bin,igblast_bin,kvMap,blastx_bin)
+		#downloadAndPrep(imgtdb_obj,makeblastdb_bin,igblast_bin,kvMap,blastx_bin)
 
 
 
