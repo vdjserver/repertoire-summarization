@@ -18,8 +18,8 @@ If run over several igblast outputs that should subsequently be
 merged the following scripts can be used to logicaly merge outputs:
 1) cdr3_hist.py can logically merge CDR3 length histogram data,
 2) json_seg_merge.py can be used to logically merge JSON count data,
-3) vdjml_merge.py can be used to merge VDJML files, and 4) merge_tables.sh
-can be used to merge TSV (or CSV) files  (using cat and awk).
+3) vdjml_merge.py can be used to merge VDJML files, and 4) merge_tables.py
+can be used to merge TSV tables.
 
 To get help on any of the *.pyscripts run it as seen here, and 
 use the "-h" flag for "help"!  For the .sh scripts please open them and read the comments.
