@@ -3,15 +3,8 @@ README for tests.
 To run tests:
 
 1)  open tests.sh and make sure that the variables IGDATA and VDJ_DB_ROOT point to valid directories
-2)  make sure that the AUX_PATH variables for each organism resolve to existing .aux files under the IGDATA directory
-3)  issue the command "../rep_char.py -h" to get the help message for rep_char.  If you can get the help message that should be a good sign that the python files are set up correcly and that the modules can be loaded
+2)  similarly make sure that NEW_PYTHONPATH points to where vdjml_igblast_parse.py can be found (in the vdjml package)
+3)  make sure that the AUX_PATH variables for each organism resolve to existing .aux files under the IGDATA directory
+4)  issue the command "../rep_char.py -h" to get the help message for rep_char.  If you can get the help message that should be a good sign that the python files are set up correcly and that the modules can be loaded
 
-Once the above 3 are done without error, you should be able to issue "./tests.sh" to run through the tests.
-
-
-
-
-
-
-
-
+Once the above 4 are done without error, you should be able to issue "./tests.sh" to run through the tests.
