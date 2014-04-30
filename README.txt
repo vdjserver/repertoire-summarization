@@ -26,9 +26,13 @@ use the "-h" flag for "help"!  For the .sh scripts please open them and read the
 
 NOTE : use of rep_char.py require that the python module "vdjml" be usable.
 
-NOTE : rep_char.py expect to be able to find "vdjml_igblast_parse.py".  One way to enable finding is 
-with a soft-link as seen here with the link pointing to the file
+NOTE : rep_char.py expect to be able to find "vdjml_igblast_parse.py".  
 
+Much testing was done with this version :
+esalina2@eddiecomp:/home/data/vdj_server/repertoire-summarization$ md5sum ./vdjml_igblast_parse.py 
+6f4571fad519527138be25cc62baab6a  ./vdjml_igblast_parse.py
+
+One way to enable finding of the file is  with a soft-link as seen here with the link pointing to the file
 esalina2@eddiecomp:/home/data/vdj_server/repertoire-summarization$ ls -alh vdjml_igblast_parse.py 
 lrwxrwxrwx 1 esalina2 esalina2 31 Mar 25 10:05 vdjml_igblast_parse.py -> ../vdjml/vdjml_igblast_parse.py
 
