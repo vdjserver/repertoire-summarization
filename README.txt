@@ -87,15 +87,5 @@ optional arguments:
                         asignment and CDR3 length is skipped
  
 
-
-
 -Eddie Salinas
 VDJ Server Team Member
-
-
-
-
-
-
-
-
