@@ -1361,7 +1361,9 @@ class imgt_db:
 				seq_types=["IG","TR"]
 				for seq_type in seq_types:
 					fasta=self.db_base+"/"+organism+"/ReferenceDirectorySet/"+organism+"_"+seq_type+"_"+segment+".fna"
-					blastFormatFLEX(fasta,makeblastdbbin)
+					blastFormatFLEX(fasta,makeblastdbbin,True)
+
+
 
 	#return the organism list
 	def getOrganismList(self,fromHardCode=True):
