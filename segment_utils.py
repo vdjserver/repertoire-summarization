@@ -124,7 +124,7 @@ def hierarchyTreeFromGenetableURL(url,locus,listOfAllowableNames=None,existingHi
 								else:
 									my_hier[subgroup][gene_name][allele_name]
 							else:
-								print "NOTE : skipping the addition of ",allele_name," into the hierarchy cause it's not in the list of allowable alleles!"
+								print "NOTE : skipping the addition of ",allele_name," into the hierarchy (url=",url," and locus=",locus,") cause it's not in the list of allowable alleles (RefDirSet Fasta)!"
 	return [my_hier,clone_names_map]
 	
 
@@ -168,11 +168,11 @@ def analyze_download_dir_forVDJserver(base_dir,countsMap=None,specifiedOrganism=
 			print "Analyzing for o=",organism," and l=",locus
 			htmlGeneTablesGlob=base_dir+"/"+organism+"/GeneTables/*"+locus+"*.html"
 			geneTableHTMLFiles=glob.glob(htmlGeneTablesGlob)
-			print "Got html files"
+			#print "Got html files"
 			printList(geneTableHTMLFiles)
 			fastaFilesGlob=base_dir+"/"+organism+"/ReferenceDirectorySet/*"+locus+"*.fna"
 			fastaFiles=glob.glob(fastaFilesGlob)
-			print "got fasta files :"
+			#print "got fasta files :"
 			printList(fastaFiles)
 			fastaMainMap=dict()
 			for fastaFile in fastaFiles:
@@ -199,32 +199,37 @@ def analyze_download_dir_forVDJserver(base_dir,countsMap=None,specifiedOrganism=
 			clone_names_plain=html_data[1]
 			html_data=hierarchyTreeFromGenetableURL("file://"+geneTableHTMLFiles[1],locus,fastaAlleleList,locusHierarchyData)
 			locusHierarchyData=html_data[0]
-			print "GOT HIERARCHY FROM HD0 ORPH:"
-			prettyPrintTree(locusHierarchyData)
-			print "DONE SHOWING PRETTY PRINT GOT HIERARCHY FROM HD0 ORPH"
+			#print "GOT HIERARCHY FROM HD0 ORPH:"
+			#prettyPrintTree(locusHierarchyData)
+			#print "DONE SHOWING PRETTY PRINT GOT HIERARCHY FROM HD0 ORPH"
 			clone_names_orph=html_data[1]	
 			clone_names=merge_maps(clone_names_plain,clone_names_orph)
 			write_map_to_file(clone_names,geneTableHTMLFiles[0]+".clone_names.map")
-			print "GOT FASTA MAP KEY ALLELES :"
-			printList(fastaAlleleList)
-			print "GOT HIERARCHY:"
-			prettyPrintTree(locusHierarchyData)
-			print "DONE SHOWING PRETTY PRINT GOT HIERARCHY"
+			#print "GOT FASTA MAP KEY ALLELES :"
+			#printList(fastaAlleleList)
+			#print "GOT HIERARCHY:"
+			#prettyPrintTree(locusHierarchyData)
+			#print "DONE SHOWING PRETTY PRINT GOT HIERARCHY"
 			#print "SHOWING CLONE NAME MAP:"
 			#printMap(clone_names)
-			print "\n\n\n\n"
+			#print "\n\n\n\n"
 			#from
 			#http://stackoverflow.com/questions/82831/how-do-i-check-if-a-file-exists-using-python
 			patchPath=geneTableHTMLFiles[0]+".patch"
 			if(os.path.isfile(patchPath)):
-				print "Found a patch file (",patchPath,") found, so now patching is being performed....."
+				print "Found a patch file (",patchPath,") ..."
+				prettyPrintTree(locusHierarchyData)
+				patchContents=readFileIntoString(patchPath)
+				print "The patch contents are : "
+				print "\n",patchContents,"\n"
+				print "... now patching is being performed....."
 				locusHierarchyData=patchlocusHierarchyData(locusHierarchyData,patchPath)
 				print "AFTER PATCHING, THE HIERARCHY IS NOW :"
-				#prettyPrintTree(locusHierarchyData)
+				prettyPrintTree(locusHierarchyData)
 				#print "THIS IS THE PRETTY PRINT FOR PATCHED ORG HIERARCHY DATA"
 				org_hierarchy[organism][locus]=locusHierarchyData
 				#prettyPrintTree(org_hierarchy)
-				print "END SHOW PATCH"
+				#print "END SHOW PATCH"
 			else:
 				print "No patch file (",patchPath,") found, so no patching being performed....."
 			treeAlleles=get_list_of_alleles_appearing_in_tree(locusHierarchyData)
@@ -236,11 +241,10 @@ def analyze_download_dir_forVDJserver(base_dir,countsMap=None,specifiedOrganism=
 				print "SAD even after patching the fasta/RefDirNames ARE different from the hierarchy allele names!!! :("
 			briefSetDiff(fastaAlleleList,treeAlleles,"fasta alleles "+organism+"_"+locus,"tree alleles "+organism+"_"+locus)			
 			extendedSortedSetDiff(fastaAlleleList,treeAlleles,"fasta alleles "+organism+"_"+locus,"tree alleles "+organism+"_"+locus)
-			print "THIS IS THE PRETTY PRINT FOR LOCUS HIERARCHY DATA, o=",organism,"l=",locus
-			prettyPrintTree(locusHierarchyData)
-			print "THIS IS THE PRETTY PRINT FOR ORG HIERARCHY DATA"
+			if(not(setSameStats)):
+				print "THIS IS THE PRETTY PRINT FOR LOCUS HIERARCHY DATA, o=",organism,"l=",locus
+				prettyPrintTree(locusHierarchyData)
 			org_hierarchy[organism][locus]=locusHierarchyData
-			prettyPrintTree(org_hierarchy)
 			clone_names_by_org[organism]=merge_maps(clone_names_by_org[organism],clone_names)
 			print "\n\n\n"
 	#prettyPrintTree(org_hierarchy)
