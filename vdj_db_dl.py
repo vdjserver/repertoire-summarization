@@ -32,10 +32,10 @@ def downloadIMGTGENE_DB_and_LIGM_DB_and_index(imgtdb_obj):
 def downloadAndPrep(imgtdb_obj,makeblastdbbin,igblastnbin,kvMap,blastx_bin):
 	#download_ReferenceDirDataHMAndGeneTables(imgtdb_obj):
 	#analyze_download_dir_forVDJserver(imgtdb_obj.getBaseDir())
-	#imgtdb_obj.prepareFASTAForBLASTFormatting()
-	#imgtdb_obj.blastFormatFNAInRefDirSetDirs(makeblastdbbin)
+	imgtdb_obj.prepareFASTAForBLASTFormatting()
+	imgtdb_obj.blastFormatFNAInRefDirSetDirs(makeblastdbbin)
 	#downloadIMGTGENE_DB_and_LIGM_DB_and_index(imgtdb_obj)
-	kabat_process(imgtdb_obj,igblastnbin,blastx_bin,kvMap,makeblastdbbin)
+	#kabat_process(imgtdb_obj,igblastnbin,blastx_bin,kvMap,makeblastdbbin)
 
 
 
@@ -137,9 +137,15 @@ if (__name__=="__main__"):
 	parser.add_argument('igblast_bin',type=str,nargs=1,help="*full* path to the igblastn executable")
 	parser.add_argument('blastx_bin',type=str,nargs=1,help="*full* path to the blastx binary executable")
 	parser.add_argument('map_file',type=str,nargs=1,help="*full* path to the map file (tab-separated key-value pairs)")
+	parser.add_argument('-analyze_only',action='store_true',help="simply analyze the database comparing gene table records with FASTA reference directory records, showing before/after effect of patch files.")
 	args=args = parser.parse_args()
 	if(args):
 		imgt_db_base=extractAsItemOrFirstFromList(args.imgt_db_base)
+		analyze_flag=extractAsItemOrFirstFromList(args.analyze_only)
+		if(analyze_flag):
+			imgtdb_obj=imgt_db(imgt_db_base)
+			analyze_download_dir_forVDJserver(imgtdb_obj.getBaseDir())
+			sys.exit(0)
 		makeblastdb_bin=extractAsItemOrFirstFromList(args.makeblastdb_bin)
 		igblast_bin=extractAsItemOrFirstFromList(args.igblast_bin)
 		blastx_bin=extractAsItemOrFirstFromList(args.blastx_bin)
@@ -160,7 +166,7 @@ if (__name__=="__main__"):
 		else:
 			os.makedirs(imgt_db_base)
 		imgtdb_obj=imgt_db(imgt_db_base)
-		#downloadAndPrep(imgtdb_obj,makeblastdb_bin,igblast_bin,kvMap,blastx_bin)
+		downloadAndPrep(imgtdb_obj,makeblastdb_bin,igblast_bin,kvMap,blastx_bin)
 
 
 
