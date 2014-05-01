@@ -435,7 +435,7 @@ def getIMGTNameFromRefDirSetDescriptor(desc):
 def getIMGTNameListFromFastaMap(fm):
 	imgtList=list()
 	for k in fm:
-		imgt_name=getIMGTNameFromRefDirSetDescriptor
+		imgt_name=getIMGTNameFromRefDirSetDescriptor(k)
 		imgtList.append(imgt_name)
 	return imgtList
 
@@ -466,7 +466,14 @@ def get_segment_list():
 def blastFormatFNAInDir(d,blastformtexecpath):
 	fnas=glob.glob(d+"/*.fna")
 	for fna in fnas:
-		format_cmd=blastformtexecpath+" -parse_seqids -dbtype nucl -in "+fna
+		if(fna.find("_D")!=(-1)):
+			#needing parse_seqids seems to be needed for D segment
+			format_cmd=blastformtexecpath+" -parse_seqids -dbtype nucl -in "+fna
+		else:
+			# parse_seqids seems to be causing issues for V segment
+			format_cmd=blastformtexecpath+" -dbtype nucl -in "+fna
+		if(True):
+			format_cmd=blastformtexecpath+" -dbtype nucl -in "+fna
 		print "BLASTDB Formatting ",fna," with ",format_cmd
 		out_path=fna+".blastfmt.out"
 		err_path=fna+".blastfmt.err"
@@ -477,7 +484,40 @@ def blastFormatFNAInDir(d,blastformtexecpath):
 		out_handle.close()
 		err_handle.close()
 		
-		
+
+
+
+def blastFormatFLEX(fna,blastformtexecpath,parse=False,recLevel=0):
+		format_cmd=blastformtexecpath+" -dbtype nucl -in "+fna
+		if(parse):
+			format_cmd+=" -parse_seqids"
+		print "BLASTDB Formatting ",fna," with ",format_cmd
+		out_path=fna+".blastfmt.out"
+		err_path=fna+".blastfmt.err"
+		if(recLevel>1):
+			print "WARNING, too much recursion in readFileIntoString, check ",err_path," for errors!"
+			sys.exit(0)
+		out_handle=open(out_path,'w')
+		err_handle=open(err_path,'w')
+		proc=subprocess.Popen(format_cmd,stdout=out_handle,stderr=err_handle,shell="/bin/bash")
+		ret_val=proc.wait()
+		out_handle.close()
+		err_handle.close()
+		errLineCount=fileLineCount(err_path)
+		if(errLineCount>0 and parse):
+			print "WARNING encountered BLAST error when -parse_seqids :"
+			errTxt=readFileIntoString(err_path)
+			print errTxt
+			print "now to retry formatting without '-parse_seqids'"
+			blastFormatFLEX(fna,blastformtexecpath,False,recLevel+1)
+		elif(errLineCount>0 and not(parse)):
+			print "WARNING encountered BLAST error when -parse_seqids is OFF :"
+			errTxt=readFileIntoString(err_path)
+			print errTxt
+			print "now to retry formatting wit '-parse_seqids'"
+			blastFormatFLEX(fna,blastformtexecpath,True,recLevel+1)			
+			
+			
 
 def runCmdButGetNoStdOutOrStdErr(cmd):
 	out_handle=open("/dev/null",'w')
