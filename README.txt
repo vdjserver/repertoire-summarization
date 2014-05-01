@@ -10,7 +10,7 @@ taken as input and 4 distinct files are generated as outputs:
 1) CDR3 length histogram (in kabat and imgt modes),
 2) JSON-formatted hierachies of the IMGT alleles and 
 corresponding counts of segments in top combinations
-with agregrated counts, 3) read-level summary statistics
+with agregrated counts, 3) read-level summary statistics (TSV)
 , and 4 ) vdjml files of the parsed data.
 
 The rep_char.py script is designed to support the above 4 functions.
@@ -91,6 +91,7 @@ optional arguments:
                         asignment and CDR3 length is skipped
  
 
+
 ###########################################################
 # REPERTOIRE-CHARACTERIZATION REQUIRES A VDJ_DB DIRECTORY #
 ###########################################################
@@ -143,6 +144,32 @@ esalina2@eddiecomp:/home/data/DATABASE/04_22_2014$ tree -d `pwd`
     └── download
         ├── GENE-DB
         └── LIGM-DB
+
+
+
+
+###########################################################
+# REPERTOIRE-CHARACTERIZATION TEST DIRECTORY              #
+###########################################################
+
+Under the Test_Data director) lies a driver script and data to test 
+some core functionalities.
+
+The driver script is tests.sh.  Besides testing, it can be viewed
+to see some example calls/usages!
+Test data include : human.IG.fna, human.TR.fna (human IG and TR data)
+and Mus_musculus_IG.fna and  Mus_musculus_TR.fna (mouse IG and TR data).
+During the course of script execution IgBLAST is invoked on the data
+in both IMGT and KABAT domain modes.  Also, during the course of
+execution, the vdj_sim.py script uses the VDJ_DB files to 
+simulate VDJ recombination and somatic hypermutatation and
+these data files are also used as part of the tests.
+
+Tests generate VDJML files, characterization output files 
+(TSV-formatted), CDR3 length histograms, and JSON segment count
+data.  Output/error log files are also generated.
+
+
 
 
 
