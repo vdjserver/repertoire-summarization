@@ -1,5 +1,5 @@
 #!/bin/bash -x 
-VDJ_DB_ROOT=/home/data/DATABASE/01_22_2014
+VDJ_DB_ROOT=/home/data/DATABASE/04_22_2014
 IGDATA=/usr/local/igblast-1.3.0
 NEW_PYTHONPATH=/home/data/vdj_server/vdjml/python/
 echo "Adding new PYTHON PATH $NEW_PYTHONPATH"
