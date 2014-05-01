@@ -1327,6 +1327,28 @@ class imgt_db:
 					else:
 						blast_writer.write("\n")
 				blast_writer.close()
+		#downloading of some databases have shown that some sequences can be duplicated
+		#which leads to BLAST formatting errors....so the code below reads a fasta into a
+		#map and writes it back....this way effectively removing duplicates
+		#esalina2@eddiecomp:/home/data/DATABASE/04_22_2014/Mus_musculus/ReferenceDirectorySet$ grep -P 'TRAV15\-1/DV6\-1\*02' *.fna
+		#Mus_musculus_TR_V.fna:>TRAV15-1/DV6-1*02
+		#Mus_musculus_TR_V.fna:>TRAV15-1/DV6-1*02
+		#TRAV.html.fna:>X63939|TRAV15-1/DV6-1*02|Mus musculus|(F)|V-REGION|16..303|292 nt|1| | | | |292+42=334| | |
+		#TRDV.html.fna:>X63939|TRAV15-1/DV6-1*02|Mus musculus|(F)|V-REGION|16..303|292 nt|1| | | | |292+42=334| | |
+		for organism in organisms:
+			loci=get_loci_list()
+			for locus in loci:
+				segments=['V','D','J']
+				for segment in segments:
+					seq_types=["IG","TR"]
+					for seq_type in seq_types:
+						fasta=self.db_base+"/"+organism+"/ReferenceDirectorySet/"+organism+"_"+seq_type+"_"+segment+".fna"
+						fasta_map=read_fasta_file_into_map(fasta)
+						fasta_writer=open(fasta,'w')
+						for desc in fasta_map:
+							fasta_writer.write(">"+desc+"\n"+fasta_map[desc]+"\n")
+						fasta_writer.close()
+
 					
 				
 
@@ -1334,7 +1356,12 @@ class imgt_db:
 		organisms=self.getOrganismList()
 		for organism in organisms:
 			rds_base=self.db_base+"/"+organism+"/ReferenceDirectorySet/"
-			blastFormatFNAInDir(rds_base,makeblastdbbin)
+			segments=['V','D','J']
+			for segment in segments:
+				seq_types=["IG","TR"]
+				for seq_type in seq_types:
+					fasta=self.db_base+"/"+organism+"/ReferenceDirectorySet/"+organism+"_"+seq_type+"_"+segment+".fna"
+					blastFormatFLEX(fasta,makeblastdbbin)
 
 	#return the organism list
 	def getOrganismList(self,fromHardCode=True):
