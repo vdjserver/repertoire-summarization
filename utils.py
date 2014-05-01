@@ -504,18 +504,23 @@ def blastFormatFLEX(fna,blastformtexecpath,parse=False,recLevel=0):
 		out_handle.close()
 		err_handle.close()
 		errLineCount=fileLineCount(err_path)
-		if(errLineCount>0 and parse):
-			print "WARNING encountered BLAST error when -parse_seqids :"
+		if(errLineCount>0):
+			print "\nWARNING, got error during formatting ",fna,"\n"
 			errTxt=readFileIntoString(err_path)
-			print errTxt
-			print "now to retry formatting without '-parse_seqids'"
-			blastFormatFLEX(fna,blastformtexecpath,False,recLevel+1)
-		elif(errLineCount>0 and not(parse)):
-			print "WARNING encountered BLAST error when -parse_seqids is OFF :"
-			errTxt=readFileIntoString(err_path)
-			print errTxt
-			print "now to retry formatting wit '-parse_seqids'"
-			blastFormatFLEX(fna,blastformtexecpath,True,recLevel+1)			
+			print errTxt,"\n\n"
+			
+		#if(errLineCount>0 and parse):
+		#	print "WARNING encountered BLAST error when -parse_seqids :"
+		#	errTxt=readFileIntoString(err_path)
+		#	print errTxt
+		#	print "now to retry formatting without '-parse_seqids'"
+		#	blastFormatFLEX(fna,blastformtexecpath,False,recLevel+1)
+		#elif(errLineCount>0 and not(parse)):
+		#	print "WARNING encountered BLAST error when -parse_seqids is OFF :"
+		#	errTxt=readFileIntoString(err_path)
+		#	print errTxt
+		#	print "now to retry formatting wit '-parse_seqids'"
+		#	blastFormatFLEX(fna,blastformtexecpath,True,recLevel+1)			
 			
 			
 
