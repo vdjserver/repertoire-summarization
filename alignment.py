@@ -219,7 +219,7 @@ class alignment:
 		else:
 			self.s_frame_mask=Cs_frame_mask
 
-
+de 
 
 	#get subalignment with first subject/query non-gapped position start
 	def getGEQAlignmentFirstNonGap(self):
@@ -493,6 +493,8 @@ class alignment:
 		j_str=""
 		char_map['aminos']=j_str.join(amino_list)
 		char_map['codons']=codon_list
+		char_map['length']=abs(int(self.q_start)-int(self.q_end))
+
 		return char_map
 
 
