@@ -245,6 +245,67 @@ def getValnWholeSeqStopFlag(vInfo,dInfo,jInfo,imgtdb_obj,organism,annMap,seq_rec
 
 
 
+#get pre and post CDR3 alignment objects.
+def getPrePostCDR3AlnObjs(vInfo,jInfo,imgtdb_obj,organism,annMap):
+	if(not(vInfo==None)):
+		#at least work with V
+		v_cdr3_start=getAdjustedCDR3StartFromRefDirSetAllele(vInfo['subject ids'],imgtdb_obj,organism,"imgt")
+		if(v_cdr3_start==(-1)):
+			#if CDR3 start is not found, just use the entire thing!
+			v_cdr3_start=vInfo['s. end']+1
+		vAlnObj=alignment(vInfo['query seq'],vInfo['subject seq'],vInfo['q. start'],vInfo['q. end'],vInfo['s. start'],vInfo['s. end'])
+		preCDR3Aln=vAlnObj.getAlnAtAndCond(v_cdr3_start-1,"subject","leq")
+		preCDR3Aln.setSFM(getTheFrameForThisReferenceAtThisPosition(vInfo['subject ids'],organism,imgtdb_obj,preCDR3Aln.s_start))
+		if(jInfo==None):
+			#if no info is found, return the map from just V
+			#return preCDR3Aln.characterize()
+			return 	[preCDR3Aln,None]
+		else:
+			#work on V and J
+			jAlnObj=alignment(jInfo['query seq'],jInfo['subject seq'],jInfo['q. start'],jInfo['q. end'],jInfo['s. start'],jInfo['s. end'])
+			J_cdr3_end=getADJCDR3EndFromJAllele(jInfo['subject ids'],imgtdb_obj,organism,"imgt")
+			#print "jAlnObj"
+			#print jAlnObj.getNiceString()
+			if(J_cdr3_end==(-1)):
+				#could not detect CDR3 end! so just return V map data
+				#return preCDR3Aln.characterize()
+				return [[preCDR3Aln,None]]
+			elif(jAlnObj.q_end<=preCDR3Aln.q_start or jAlnObj.q_end<=preCDR3Aln.q_end):
+				#j alignment TOTALLY within V so just return V ; avoid double countings
+				return [preCDR3Aln,None]
+			else:
+				postCDR3AlnStart=J_cdr3_end+1
+				#okay, got J alignment post-CDR3 position
+			if(postCDR3AlnStart>jAlnObj.s_end):
+				#CDR3 start is after the s_aln end which means J aligns only in CDR3, ....so just return V map
+				return [preCDR3Aln,None]
+			#extract the subalignment at CDR3 end
+			postCDR3AlnObj=jAlnObj.getAlnAtAndCond(postCDR3AlnStart,"subject","geq")
+			if(postCDR3AlnObj.q_start<=preCDR3Aln.q_end):
+				#this is in case V and J overlap in the CDR3 area alignment
+				new_q_start=preCDR3Aln.q_end+1
+				#print "It is deteced that this is in case V and J overlap in the CDR3 area alignment"
+				#print "new q_start is ",new_q_start
+				#adjust the J sub-alignment to start after the V ends
+				postCDR3AlnObj=jAlnObj.getAlnAtAndCond(new_q_start,"query","geq")
+			if(postCDR3AlnObj.s_start==postCDR3AlnStart):
+				#great, set the FRAME mask to start with zero cause the alignment starts where it ideally should start
+				#print "postCDR3AlnObj.s_start=",postCDR3AlnObj.s_start,", and postCDR3AlnStart=", postCDR3AlnStart," so normal case for SFM"
+				postCDR3AlnObj.setSFM(0)
+			elif(postCDR3AlnStart<postCDR3AlnObj.s_start):
+				#if the alignment starts later, set the proper frame mask start
+				#print "postCDR3AlnStart=",postCDR3AlnStart," and postCDR3AlnObj.s_start=",postCDR3AlnObj.s_start," so setting SFM as ",str(int(int(postCDR3AlnObj.s_start-postCDR3AlnStart)%3))
+				postCDR3AlnObj.setSFM((postCDR3AlnObj.s_start-postCDR3AlnStart)%3)
+			else:
+				raise Exception('postCDR3AlnStart>postCDR3AlnObj.s_start ?????  Error in alignment class???')
+			return [preCDR3Aln,postCDR3AlnObj]
+	else:
+		#nothing to work with!? :(
+		return [None,None]
+
+	
+
+
 
 def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap):
 	global global_key_base
