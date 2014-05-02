@@ -356,6 +356,9 @@ de
 		num_nsy=0
 		num_bsb=0
 		stp_cdn=False	
+		aa_reps=0
+		aa_slnt=0
+		length_in_codons=0
 
 		#if(not(charMsg==None)):
 		#	print charMsg
@@ -445,20 +448,26 @@ de
 					amino_list.append(str(q_amino))
 					#print "query amino ",q_amino," and codon ",q_codon
 					#print "PRE SYN/NSY counts : ",num_syn," and ",num_nsy 
+					length_in_codons+=1
 					if(s_amino==q_amino):
 						syn=True
 					else:
 						syn=False
+						aa_reps+=1
+					had_silent=False
 					if(codonAnalyzer.is_unambiguous_codon(q_codon) and codonAnalyzer.is_unambiguous_codon(s_codon)):
 						if(syn):
 							for cp in range(3):
 								if(s_codon[cp]!=q_codon[cp]):
 									num_syn+=1
+									had_silent=True
 						else:
 							for cp in range(3):
 								if(s_codon[cp]!=q_codon[cp]):
 									num_nsy+=1
 						#print "POST SYN/NSY counts : ",num_syn," and ",num_nsy
+						if(had_silent):
+							aa_slnt+=1
 				else:
 					#ANALYSIS FOR CODONS WITH any gap
 					if(q_codon.find("-")==(-1)):
@@ -488,12 +497,19 @@ de
 			ns_ratio=float(num_nsy)/float(num_syn)
 		else:
 			ns_ratio=0
+		if(length_in_codons!=0):
+			char_map['rep_freq']=float(aa_reps)/float(length_in_codons)
+			char_map['slt_freq']=float(aa_slnt)/float(length_in_codons)
+		if(aa_slnt==0):
+			char_map['r_s_rto']=float(aa_reps)/float(aa_slnt)
 		char_map['ns_rto']=ns_ratio
 		char_map['stp_cdn']=stp_cdn
 		j_str=""
 		char_map['aminos']=j_str.join(amino_list)
 		char_map['codons']=codon_list
 		char_map['length']=abs(int(self.q_start)-int(self.q_end))
+		char_map['silent']=aa_slnt
+		char_map['replacement']=aa_reps
 
 		return char_map
 
