@@ -380,23 +380,23 @@ de
 					num_bsb+=1
 		num_indels=num_ins+num_del
 		if(tot_num_base_to_base_alns>0):
-			char_map['bsb_freq']=float(num_bsb)/float(tot_num_base_to_base_alns)
+			char_map['base substitution freq%']=float(num_bsb)/float(tot_num_base_to_base_alns)
 			id_tot_rto=float(tot_num_base_to_base_alns-num_bsb)/float(tot_num_base_to_base_alns)
-			char_map['pct_id']=id_tot_rto
+			char_map['homology%']=id_tot_rto
 			indel_rate=float(num_indels)/float(num_indels+tot_num_base_to_base_alns)
-			char_map['indel_freq']=indel_rate
+			char_map['indel frequency']=indel_rate
 		else:
 			if(num_indels>0):
 				indel_rate=float(1.0)
 			else:
 				indel_rate=0
-			char_map['indel_freq']=indel_rate
-			char_map['bsb_freq']=0
-			char_map['pct_id']=0
+			char_map['indel frequency']=indel_rate
+			char_map['base substitution freq%']=0
+			char_map['homology%']=0
 		#fill in the map
-		char_map['insertions']=num_ins
-		char_map['deletions']=num_del
-		char_map['base_sub']=num_bsb
+		char_map['insertion count']=num_ins
+		char_map['deletion count']=num_del
+		char_map['base substituions']=num_bsb
 		char_map['mutations']=num_bsb+num_del+num_ins
 		
 
@@ -491,25 +491,27 @@ de
 					pass
 				temp_index+=1
 		#fill in the map
-		char_map['synonymous_bsb']=num_syn
-		char_map['nonsynonymous_bsb']=num_nsy
+		char_map['synonymous base substitutions']=num_syn
+		char_map['nonsynonymous base substitutions']=num_nsy
 		if(num_syn!=0):
 			ns_ratio=float(num_nsy)/float(num_syn)
 		else:
 			ns_ratio=0
 		if(length_in_codons!=0):
-			char_map['rep_freq']=float(aa_reps)/float(length_in_codons)
-			char_map['slt_freq']=float(aa_slnt)/float(length_in_codons)
+			char_map['replacement mutation freq%']=float(aa_reps)/float(length_in_codons)
+			char_map['silent mutation freq%']=float(aa_slnt)/float(length_in_codons)
+		else:
+			char_map['replacement mutation freq%']=0
+			char_map['silent mutation freq%']=0
 		if(aa_slnt==0):
 			char_map['r_s_rto']=float(aa_reps)/float(aa_slnt)
 		char_map['ns_rto']=ns_ratio
-		char_map['stp_cdn']=stp_cdn
-		j_str=""
-		char_map['aminos']=j_str.join(amino_list)
-		char_map['codons']=codon_list
+		char_map['Stop codons?']=stp_cdn
+		char_map['AA']=j_str.join(amino_list)
+		char_map['nucleotide read']=codon_list
 		char_map['length']=abs(int(self.q_start)-int(self.q_end))
-		char_map['silent']=aa_slnt
-		char_map['replacement']=aa_reps
+		char_map['silent mutations']=aa_slnt
+		char_map['replacement mutations']=aa_reps
 
 		return char_map
 
