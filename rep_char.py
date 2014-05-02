@@ -246,6 +246,8 @@ def getValnWholeSeqStopFlag(vInfo,dInfo,jInfo,imgtdb_obj,organism,annMap,seq_rec
 
 
 #get pre and post CDR3 alignment objects.
+#this can be use in some whole_seq stuff
+#or in just pre or post CDR3 stuff
 def getPrePostCDR3AlnObjs(vInfo,jInfo,imgtdb_obj,organism,annMap):
 	if(not(vInfo==None)):
 		#at least work with V
