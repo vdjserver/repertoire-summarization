@@ -399,7 +399,7 @@ def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap):
 					else:
 						totCharMap[k]=str(vCharMap[k])+" & "+str(jCharMap[k])
 			if(vCharMap['Stop codons?'] or jCharMap['Stop codons?']):
-				totCharMap['Stop codons?'']=True
+				totCharMap['Stop codons?']=True
 			
 			if(global_key_base+'imgt_cdr3_tr' in annMap):
 				starPos=annMap[global_key_base+'imgt_cdr3_tr'].find("*")
