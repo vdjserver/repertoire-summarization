@@ -219,7 +219,6 @@ class alignment:
 		else:
 			self.s_frame_mask=Cs_frame_mask
 
-de 
 
 	#get subalignment with first subject/query non-gapped position start
 	def getGEQAlignmentFirstNonGap(self):
