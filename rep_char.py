@@ -322,7 +322,7 @@ def returnVAlnAllCharMap(vInfo,imgtdb_obj):
 		for k in vCharMap:
 			newKey=k
 			newKey=newKey[0].upper()+newKey[1:]
-			new_map[newKey+ " (over V)"]
+			new_map[newKey+ " (over V)"]=vCharMap[k]
 		return new_map
 
 
