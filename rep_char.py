@@ -21,7 +21,7 @@ import time
 import multiprocessing
 import math
 
-
+stp 
 
 global_key_base="vdj_server_ann_"
 
@@ -389,7 +389,8 @@ def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap):
 			#printMap(jCharMap)
 			#to get/compute the 'whole' map, add up the "non-special" values
 			#otherwise, compute them specially
-			toSkip=['bsb_freq','pct_id','ns_rto','indel_freq']
+			#toSkip=['bsb_freq','pct_id','ns_rto','indel_freq']
+			toSkip=[]
 			totCharMap=dict()
 			for k in vCharMap:
 				if(not(k in toSkip)):
@@ -397,8 +398,8 @@ def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap):
 						totCharMap[k]=vCharMap[k]+jCharMap[k]
 					else:
 						totCharMap[k]=str(vCharMap[k])+" & "+str(jCharMap[k])
-			if(vCharMap['stp_cdn'] or jCharMap['stp_cdn']):
-				totCharMap['stp_cdn']=True
+			if(vCharMap['Stop codons?'] or jCharMap['Stop codons?']):
+				totCharMap['Stop codons?'']=True
 			
 			if(global_key_base+'imgt_cdr3_tr' in annMap):
 				starPos=annMap[global_key_base+'imgt_cdr3_tr'].find("*")
