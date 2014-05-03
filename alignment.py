@@ -395,7 +395,7 @@ class alignment:
 		#fill in the map
 		char_map['insertion count']=num_ins
 		char_map['deletion count']=num_del
-		char_map['base substituions']=num_bsb
+		char_map['base substitutions']=num_bsb
 		char_map['mutations']=num_bsb+num_del+num_ins
 		
 

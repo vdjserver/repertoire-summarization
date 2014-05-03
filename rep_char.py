@@ -411,15 +411,15 @@ def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap):
 				
 			#handle pct id , bsb_freq , indel_freq specially
 			totQ=getNumberBpInAlnStr(postCDR3AlnObj.q_aln)+getNumberBpInAlnStr(preCDR3Aln.q_aln)
-			totBS=totCharMap['base_sub']
+			totBS=totCharMap['base substitutions']
 			if(totQ!=0):
-				totCharMap['pct_id']=float((float(totQ)-float(totBS))/float(totQ))
-				totCharMap['bsb_freq']=float(totCharMap['base_sub'])/float(totQ)
-				totCharMap['indel_freq']=float(totCharMap['insertions']+totCharMap['deletions'])/float(totQ+totCharMap['insertions']+totCharMap['deletions'])
+				totCharMap['homology%']=float((float(totQ)-float(totBS))/float(totQ))
+				totCharMap['base substitution freq%']=float(totCharMap['base substitutions'])/float(totQ)
+				totCharMap['indel frequency']=float(totCharMap['insertion count']+totCharMap['deletion count'])/float(totQ+totCharMap['insertion count']+totCharMap['deletion count'])
 			else:
-				totCharMap['pct_id']=0.0
-				totCharMap['bsb_freq']=0
-				totCharMap['indel_freq']=0
+				totCharMap['homology%']=0.0
+				totCharMap['base substitution freq%']=0
+				totCharMap['indel frequency']=0
 			#handle ns_ratio
 			if(totCharMap['synonymous_bsb']!=0):
 				totCharMap['ns_rto']=float(totCharMap['nonsynonymous_bsb'])/float(totCharMap['synonymous_bsb'])
