@@ -509,6 +509,7 @@ class alignment:
 
 		char_map['ns_rto']=ns_ratio
 		char_map['Stop codons?']=stp_cdn
+		j_str=""
 		char_map['AA']=j_str.join(amino_list)
 		char_map['nucleotide read']=codon_list
 		char_map['length']=abs(int(self.q_start)-int(self.q_end))
