@@ -513,8 +513,8 @@ class alignment:
 		char_map['AA']=j_str.join(amino_list)
 		char_map['nucleotide read']=codon_list
 		char_map['length']=abs(int(self.q_start)-int(self.q_end))
-		char_map['silent mutations']=aa_slnt
-		char_map['replacement mutations']=aa_reps
+		char_map['silent mutations (codons)']=aa_slnt
+		char_map['replacement mutations (codons)']=aa_reps
 
 		return char_map
 
