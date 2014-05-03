@@ -799,7 +799,7 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None"):
 	"vdj_server_ann_whole_seq_codons",
 	"vdj_server_ann_whole_seq_deletions",
 	"vdj_server_ann_whole_seq_indel_freq",
-	"vdj_server_ann_whole_seq_insertions",p
+	"vdj_server_ann_whole_seq_insertions",
 	"vdj_server_ann_whole_seq_mutations",
 	"vdj_server_ann_whole_seq_nonsynonymous_bsb",
 	"vdj_server_ann_whole_seq_ns_rto",
