@@ -393,7 +393,7 @@ def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap):
 			totCharMap=dict()
 			for k in vCharMap:
 				if(not(k in toSkip)):
-					if(type(vCharMap[k])==type(jCharMap[k]) and type(vCharMap[k])!=str):
+					if(type(vCharMap[k])==type(jCharMap[k]) and type(vCharMap[k])!=str and vCharMap[k]!=None and jCharMap[k]!=None):
 						totCharMap[k]=vCharMap[k]+jCharMap[k]
 					else:
 						totCharMap[k]=str(vCharMap[k])+" & "+str(jCharMap[k])
