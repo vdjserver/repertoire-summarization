@@ -21,7 +21,6 @@ import time
 import multiprocessing
 import math
 
-stp 
 
 global_key_base="vdj_server_ann_"
 
