@@ -421,8 +421,8 @@ def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap):
 				totCharMap['base substitution freq%']=0
 				totCharMap['indel frequency']=0
 			#handle ns_ratio
-			if(totCharMap['synonymous_bsb']!=0):
-				totCharMap['ns_rto']=float(totCharMap['nonsynonymous_bsb'])/float(totCharMap['synonymous_bsb'])
+			if(totCharMap['synonymous base substitutions']!=0):
+				totCharMap['ns_rto']=float(totCharMap['nonsynonymous base substitutions'])/float(totCharMap['synonymous base substitutions'])
 			else:
 				totCharMap['ns_rto']=0
 			return totCharMap
