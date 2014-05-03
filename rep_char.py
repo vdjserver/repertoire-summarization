@@ -312,6 +312,7 @@ def returnVAlnAllCharMap(vInfo,imgtdb_obj):
 	if(vInfo==None):
 		return emptyMap
 	vAlnObj=alignment(vInfo['query seq'],vInfo['subject seq'],vInfo['q. start'],vInfo['q. end'],vInfo['s. start'],vInfo['s. end'])
+	vAlnObj.setSFM(getTheFrameForThisReferenceAtThisPosition(vInfo['subject ids'],organism,imgtdb_obj,int(vInfo['s. start']))
 	if(vAlnObj==None):
 		return emptyMap
 	if(vInfo['q. start']>vInfo['q. end'] or vInfo['q. start']<=0 or vInfo['q. end']<=0):
