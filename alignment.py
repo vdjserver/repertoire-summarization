@@ -502,8 +502,11 @@ class alignment:
 		else:
 			char_map['replacement mutation freq%']=0
 			char_map['silent mutation freq%']=0
-		if(aa_slnt==0):
-			char_map['r_s_rto']=float(aa_reps)/float(aa_slnt)
+		if(aa_slnt!=0):
+			char_map['R:S ratio']=float(aa_reps)/float(aa_slnt)
+		else:
+			char_map['R:S ratio']=0
+
 		char_map['ns_rto']=ns_ratio
 		char_map['Stop codons?']=stp_cdn
 		char_map['AA']=j_str.join(amino_list)
