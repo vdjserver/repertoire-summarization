@@ -505,7 +505,7 @@ class alignment:
 		if(aa_slnt!=0):
 			char_map['R:S ratio']=float(aa_reps)/float(aa_slnt)
 		else:
-			char_map['R:S ratio']=0
+			char_map['R:S ratio']=None
 
 		char_map['ns_rto']=ns_ratio
 		char_map['Stop codons?']=stp_cdn
