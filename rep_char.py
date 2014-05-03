@@ -339,7 +339,7 @@ def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap):
 		return emptyMap
 	elif(preCDR3Aln!=None and postCDR3AlnObj==None):
 		return preCDR3Aln.characterize()
-	elifpreCDR3Aln==None and postCDR3AlnObj!=None):
+	elif(preCDR3Aln==None and postCDR3AlnObj!=None):
 		return emptyMap
 
 	numN=postCDR3AlnObj.q_start-preCDR3Aln.q_end-1
