@@ -270,7 +270,7 @@ def getPrePostCDR3AlnObjs(vInfo,jInfo,imgtdb_obj,organism,annMap):
 			if(J_cdr3_end==(-1)):
 				#could not detect CDR3 end! so just return V map data
 				#return preCDR3Aln.characterize()
-				return [[preCDR3Aln,None]]
+				return [preCDR3Aln,None]
 			elif(jAlnObj.q_end<=preCDR3Aln.q_start or jAlnObj.q_end<=preCDR3Aln.q_end):
 				#j alignment TOTALLY within V so just return V ; avoid double countings
 				return [preCDR3Aln,None]
