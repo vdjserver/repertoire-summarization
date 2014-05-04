@@ -65,16 +65,19 @@ def readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,read_ann
 	for mode in get_domain_modes():
 		f=cdr3_length_results[mode+'_from']
 		t=cdr3_length_results[mode+'_to']
+		len_key_aa="CDR3 AA length ("+mode+")"
+		aa_key="CDR3 AA ("+mode+")
+		
 		if(f!=(-1) and t!=(-1) and cdr3_length_results[mode]!=(-1) ):
 			qw=str(read_rec.seq)
 			if(cdr3_length_results['qry_rev']):
 				qw=rev_comp_dna(qw)
 			query_cdr3=qw[f-1:t]
 			read_ann_map[global_key_base+mode+'_cdr3_na']=query_cdr3
-			read_ann_map[global_key_base+mode+'_cdr3_tr']=biopythonTranslate(read_ann_map[global_key_base+mode+'_cdr3_na'])
+			read_ann_map[aa_key]=biopythonTranslate(read_ann_map[global_key_base+mode+'_cdr3_na'])
 			#add in lengths!
 			read_ann_map[global_key_base+mode+'_cdr3_na_len']=len(query_cdr3)
-			read_ann_map[global_key_base+mode+'_cdr3_tr_len']=len(read_ann_map[global_key_base+mode+'_cdr3_tr'])
+			read_ann_map[len_key_aa]=len(read_ann_map[global_key_base+mode+'_cdr3_tr'])
 			#this stuff below was once in here becuase we might've done some CDR3 specific annotation...but
 			#it is commented out for now because such goals are either postponed or canceled
 			#vMap=getHitInfo(read_result_obj,meta,read_ann_map['top_V'],read_rec,imgtdb_obj,organism)
@@ -87,10 +90,10 @@ def readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,read_ann
 			#sys.exit(0)
 		else:
 			read_ann_map[global_key_base+mode+'_cdr3_na']=""
-			read_ann_map[global_key_base+mode+'_cdr3_tr']=""
+			read_ann_map[aa_key]=""
 			#add in lengths!
 			read_ann_map[global_key_base+mode+'_cdr3_na_len']=""
-			read_ann_map[global_key_base+mode+'_cdr3_tr_len']=""
+			read_ann_map[len_key_aa]=""
 			pass
 	return read_ann_map
 
@@ -461,6 +464,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 		for w in whole_char_map:
 			#new_key=global_key_base+'whole_seq_'+w
 			new_key=w+" (over V and J)"
+			new_key=new_key[0].upper()+new_key[1:]
 			annMap[new_key]=whole_char_map[w]
 		whole_seq_stp_cdn_Tot_flag=getValnWholeSeqStopFlag(vInfo,dInfo,jInfo,imgtdb_obj,organism,annMap,read_rec)
 		annMap['vdj_server_whole_vj_stp_cdn']=whole_seq_stp_cdn_Tot_flag
