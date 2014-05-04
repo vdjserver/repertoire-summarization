@@ -66,7 +66,7 @@ def readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,read_ann
 		f=cdr3_length_results[mode+'_from']
 		t=cdr3_length_results[mode+'_to']
 		len_key_aa="CDR3 AA length ("+mode+")"
-		aa_key="CDR3 AA ("+mode+")
+		aa_key="CDR3 AA ("+mode+")"
 		
 		if(f!=(-1) and t!=(-1) and cdr3_length_results[mode]!=(-1) ):
 			qw=str(read_rec.seq)
