@@ -412,10 +412,11 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 	topVDJ=getTopVDJItems(read_result_obj,meta)
 	annMap=dict()
 	for seg in topVDJ:
+		topkey=seg+" gene (highest score)"
 		if(topVDJ[seg] is not None):
-			annMap['top_'+seg]=topVDJ[seg]
+			annMap[topkey]=topVDJ[seg]
 		else:
-			annMap['top_'+seg]="None"			
+			annMap[topkey]="None"
 
 	vInfo=None
 	dInfo=None
