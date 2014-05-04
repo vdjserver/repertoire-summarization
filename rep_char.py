@@ -77,7 +77,7 @@ def readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,read_ann
 			read_ann_map[aa_key]=biopythonTranslate(read_ann_map[global_key_base+mode+'_cdr3_na'])
 			#add in lengths!
 			read_ann_map[global_key_base+mode+'_cdr3_na_len']=len(query_cdr3)
-			read_ann_map[len_key_aa]=len(read_ann_map[global_key_base+mode+'_cdr3_tr'])
+			read_ann_map[len_key_aa]=len(read_ann_map[aa_key])
 			#this stuff below was once in here becuase we might've done some CDR3 specific annotation...but
 			#it is commented out for now because such goals are either postponed or canceled
 			#vMap=getHitInfo(read_result_obj,meta,read_ann_map['top_V'],read_rec,imgtdb_obj,organism)
