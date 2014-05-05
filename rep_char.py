@@ -941,7 +941,7 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None"):
 
 	m[keys[0]]=rid
 	#keys=m.keys()
-	keys.sort()
+	#keys.sort()
 
 	if(rid==1):
 		for k in range(len(keys)):
