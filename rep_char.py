@@ -697,7 +697,6 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None"):
 	"V gene (highest score)"
 	"D gene (highest score)",
 	"J gene (highest score)",
-
 	"Productive CDR3 rearrangement (T/F)",
 	"Homology% (over V and J)",
 	"Insertion count (over V and J)",
