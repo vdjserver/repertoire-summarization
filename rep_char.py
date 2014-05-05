@@ -472,14 +472,15 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 
 		#productive rearrangement 
 		#if IMGT CDR3 length is a multiple of 3 and it's not (-1), then consider it productive
+		prodRearrangeKey="Productive CDR3 rearrangement (T/F)"
 		if(not(noneSeg_flag)):
 			if(cdr3_map['imgt']!=(-1) and cdr3_map['imgt']>0):
 				if((cdr3_map['imgt'])%3==0):
-					annMap[global_key_base+'productive_rearrangement']=True
+					annMap[prodRearrangeKey]=True
 				else:
-					annMap[global_key_base+'productive_rearrangement']=False
+					annMap[prodRearrangeKey]=False
 			else:
-				#annMap['vdj_server_ann_productive_rearrangement']="N/A"
+				#annMap[prodRearrangeKey]="N/A"
 				pass
 
 		#regions characterization FR1, FR2, FR3, CDR1, CDR2 (imgt and kabat)
@@ -568,7 +569,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 					annMap[temp_key]=temp_results[temp_key]			
 			get_res+=1
 	
-	annMap['read_name']=read_rec.id
+	annMap['Read identifier']=read_rec.id
 	#getAlignmentString(read_result_obj,meta,query_record,imgtdb_obj,organism)
 	#analyze_combinations(read_result_obj,meta,organism,imgtdb_obj,read_rec,annMap)
 	#printMap(annMap,True)
@@ -688,7 +689,7 @@ def vSegmentRegionVDJAnalyse(read_result_obj,meta,organism,imgtdb_obj,read_rec):
 
 def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None"):
 	keys=[
-	"read_id#",
+	"Read sequence #",
 	"read_name",
 	"top_D",
 	"top_J",
