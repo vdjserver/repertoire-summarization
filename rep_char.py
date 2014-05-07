@@ -590,7 +590,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 		if(segment in tie_map):
 			annMap[key]=tie_map[segment]
 		else:
-			annMap[key]=False
+			annMap[key]="None"
 
 	return annMap
 
