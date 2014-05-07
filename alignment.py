@@ -412,7 +412,9 @@ class alignment:
 		#do frame-dependent calculations
 		temp_index=0
 		codon_list=list()
+		s_codon_list=list()
 		amino_list=list()
+		s_amino_list=list()
 		while(temp_index<len(self.s_aln)):
 			if(
 			temp_index<len(self.s_aln)-2 and 
@@ -423,6 +425,7 @@ class alignment:
 				#print "temp_index=",temp_index
 				#print "encountered a codon...."
 				s_codon=self.s_aln[temp_index:(temp_index+3)]
+				s_codon_list.append(str(s_codon))
 				#s_codon_w_gaps=s_codon
 				#print "s codon is ",s_codon
 				q_codon=self.q_aln[temp_index:(temp_index+3)]
@@ -441,6 +444,7 @@ class alignment:
 					#print "Detected no gaps in codons"
 					#s_amino=str(biopythonTranslate(s_codon))
 					s_amino=codonAnalyzer.fastTrans(s_codon)
+					s_amino_list.append(str(s_amino))
 					#print "subject amino :",s_amino," and codon ",s_codon
 					#q_amino=str(biopythonTranslate(q_codon))
 					q_amino=str(codonAnalyzer.fastTrans(q_codon))
@@ -511,7 +515,9 @@ class alignment:
 		char_map['Stop codons?']=stp_cdn
 		j_str=""
 		char_map['AA']=j_str.join(amino_list)
+		char_map['AA_ref']=j_str.join(s_amino_list)
 		char_map['nucleotide read']=codon_list
+		char_map['subject_read']=s_codon_list
 		char_map['length']=abs(int(self.q_start)-int(self.q_end))
 		char_map['silent mutations (codons)']=aa_slnt
 		char_map['replacement mutations (codons)']=aa_reps
