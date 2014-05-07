@@ -373,8 +373,8 @@ def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap):
 	if(vCharMap['Stop codons?'] or jCharMap['Stop codons?']):
 		totCharMap['Stop codons?']=True
 	
-	if(global_key_base+'imgt_cdr3_tr' in annMap):
-		starPos=annMap[global_key_base+'imgt_cdr3_tr'].find("*")
+	if("CDR3 AA (imgt)" in annMap):
+		starPos=annMap["CDR3 AA (imgt)"].find("*")
 		if(starPos!=(-1)):
 			totCharMap['cdr3_stp_cdn']=True
 		else:
@@ -571,7 +571,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 					annMap[temp_key]=temp_results[temp_key]			
 			get_res+=1
 	
-	annMap['Read identifier']=read_rec.id
+	annMap["Read identifier"]=read_rec.id
 	#getAlignmentString(read_result_obj,meta,query_record,imgtdb_obj,organism)
 	#analyze_combinations(read_result_obj,meta,organism,imgtdb_obj,read_rec,annMap)
 	#printMap(annMap,True)
@@ -691,12 +691,12 @@ def vSegmentRegionVDJAnalyse(read_result_obj,meta,organism,imgtdb_obj,read_rec):
 
 
 
-def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None"):
+def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None",logHandle=None):
 	keys=[
 
-	"Read identifier",
 	"Read sequence #",
-	"V gene (highest score)"
+	"Read identifier",
+	"V gene (highest score)",
 	"D gene (highest score)",
 	"J gene (highest score)",
 	"Productive CDR3 rearrangement (T/F)",
@@ -945,6 +945,8 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None"):
 	#keys=m.keys()
 	#keys.sort()
 
+	
+
 	if(rid==1):
 		for k in range(len(keys)):
 			if(k<len(keys)-1):
@@ -962,7 +964,16 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None"):
 		else:
 			fHandle.write(defaultValue+sep)
 	fHandle.write("\n")
-
+	if(not(logHandle==None)):
+		n=0
+		logHandle.write("\n\n\n********************************************\n")
+		mkeys=m.keys()
+		mkeys.sort()
+		for k in mkeys:
+			#logHandle.write(str(n)+"\t"+str(k)+"\t"+str(m[k])+"\n")	
+			logHandle.write(str(m[k])+"\t"+str(k)+"\t"+str(n)+"\n")
+			n+=1
+		
 		
 
 
@@ -1013,6 +1024,8 @@ if (__name__=="__main__"):
 		rrw = vdjml.Vdjml_writer(extractAsItemOrFirstFromList(args.vdjml_out), meta)
 		rep_char_out=extractAsItemOrFirstFromList(args.char_out)
 		fHandle=open(rep_char_out,'w')
+		logFile=rep_char_out+".log"
+		logHandle=open(logFile,'w')
 		if(tot_reads==None):
 			every_read=100
 		else:
@@ -1054,8 +1067,7 @@ if (__name__=="__main__"):
 			rrw(read_result_obj)
 
 			#write rep-char
-
-			appendAnnToFileWithMap(fHandle,read_analysis_results['ann_map'],read_num)
+			appendAnnToFileWithMap(fHandle,read_analysis_results['ann_map'],read_num,None,"None",logHandle)
 
 			#increment the read number
 			read_num+=1
@@ -1064,6 +1076,9 @@ if (__name__=="__main__"):
 
 		#close rep_char out
 		fHandle.close()
+
+		#close log
+		logHandle.close()
 
 		#write the CDR3 hist when non-dev-null
 		if(type(cdr3_hist_out_file)==list):
