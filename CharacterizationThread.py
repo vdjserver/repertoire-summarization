@@ -52,7 +52,8 @@ class CharacterizationThread(threading.Thread):
 						#	sys.exit(0)
 						annMap=dict()
 						for key in reg_ann:
-							annMap[key_base+region+"_"+key]=reg_ann[key]
+							#annMap[key_base+region+"_"+key]=reg_ann[key]
+							annMap[region.upper()+" "+key+" ("+mode+")"]=reg_ann[key]
 						annMap[key_base+region+'_qry_aln']=regionAlignment.q_aln
 						annMap[key_base+region+'_qry_srt']=regionAlignment.q_start
 						annMap[key_base+region+'_qry_end']=regionAlignment.q_end

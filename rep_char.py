@@ -22,7 +22,6 @@ import multiprocessing
 import math
 
 
-
 global_key_base="vdj_server_ann_"
 
 
@@ -66,16 +65,19 @@ def readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,read_ann
 	for mode in get_domain_modes():
 		f=cdr3_length_results[mode+'_from']
 		t=cdr3_length_results[mode+'_to']
+		len_key_aa="CDR3 AA length ("+mode+")"
+		aa_key="CDR3 AA ("+mode+")"
+		
 		if(f!=(-1) and t!=(-1) and cdr3_length_results[mode]!=(-1) ):
 			qw=str(read_rec.seq)
 			if(cdr3_length_results['qry_rev']):
 				qw=rev_comp_dna(qw)
 			query_cdr3=qw[f-1:t]
 			read_ann_map[global_key_base+mode+'_cdr3_na']=query_cdr3
-			read_ann_map[global_key_base+mode+'_cdr3_tr']=biopythonTranslate(read_ann_map[global_key_base+mode+'_cdr3_na'])
+			read_ann_map[aa_key]=biopythonTranslate(read_ann_map[global_key_base+mode+'_cdr3_na'])
 			#add in lengths!
 			read_ann_map[global_key_base+mode+'_cdr3_na_len']=len(query_cdr3)
-			read_ann_map[global_key_base+mode+'_cdr3_tr_len']=len(read_ann_map[global_key_base+mode+'_cdr3_tr'])
+			read_ann_map[len_key_aa]=len(read_ann_map[aa_key])
 			#this stuff below was once in here becuase we might've done some CDR3 specific annotation...but
 			#it is commented out for now because such goals are either postponed or canceled
 			#vMap=getHitInfo(read_result_obj,meta,read_ann_map['top_V'],read_rec,imgtdb_obj,organism)
@@ -88,10 +90,10 @@ def readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,read_ann
 			#sys.exit(0)
 		else:
 			read_ann_map[global_key_base+mode+'_cdr3_na']=""
-			read_ann_map[global_key_base+mode+'_cdr3_tr']=""
+			read_ann_map[aa_key]=""
 			#add in lengths!
 			read_ann_map[global_key_base+mode+'_cdr3_na_len']=""
-			read_ann_map[global_key_base+mode+'_cdr3_tr_len']=""
+			read_ann_map[len_key_aa]=""
 			pass
 	return read_ann_map
 
@@ -245,10 +247,12 @@ def getValnWholeSeqStopFlag(vInfo,dInfo,jInfo,imgtdb_obj,organism,annMap,seq_rec
 
 
 
-#compute alignment characterizations for pre/post CDR3
-#logically sum and return the characterization
-def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap):
-	global global_key_base
+
+#get pre and post CDR3 alignment objects.
+#this can be use in some whole_seq stuff
+#or in just pre or post CDR3 stuff
+def getPrePostCDR3AlnObjs(vInfo,jInfo,imgtdb_obj,organism,annMap):
+
 	if(not(vInfo==None)):
 		#at least work with V
 		v_cdr3_start=getAdjustedCDR3StartFromRefDirSetAllele(vInfo['subject ids'],imgtdb_obj,organism,"imgt")
@@ -260,7 +264,8 @@ def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap):
 		preCDR3Aln.setSFM(getTheFrameForThisReferenceAtThisPosition(vInfo['subject ids'],organism,imgtdb_obj,preCDR3Aln.s_start))
 		if(jInfo==None):
 			#if no info is found, return the map from just V
-			return preCDR3Aln.characterize()
+			#return preCDR3Aln.characterize()
+			return 	[preCDR3Aln,None]
 		else:
 			#work on V and J
 			jAlnObj=alignment(jInfo['query seq'],jInfo['subject seq'],jInfo['q. start'],jInfo['q. end'],jInfo['s. start'],jInfo['s. end'])
@@ -269,16 +274,17 @@ def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap):
 			#print jAlnObj.getNiceString()
 			if(J_cdr3_end==(-1)):
 				#could not detect CDR3 end! so just return V map data
-				return preCDR3Aln.characterize()
+				#return preCDR3Aln.characterize()
+				return [preCDR3Aln,None]
 			elif(jAlnObj.q_end<=preCDR3Aln.q_start or jAlnObj.q_end<=preCDR3Aln.q_end):
 				#j alignment TOTALLY within V so just return V ; avoid double countings
-				return preCDR3Aln.characterize()
+				return [preCDR3Aln,None]
 			else:
 				postCDR3AlnStart=J_cdr3_end+1
 				#okay, got J alignment post-CDR3 position
 			if(postCDR3AlnStart>jAlnObj.s_end):
 				#CDR3 start is after the s_aln end which means J aligns only in CDR3, ....so just return V map
-				return preCDR3Aln.characterize()
+				return [preCDR3Aln,None]
 			#extract the subalignment at CDR3 end
 			postCDR3AlnObj=jAlnObj.getAlnAtAndCond(postCDR3AlnStart,"subject","geq")
 			if(postCDR3AlnObj.q_start<=preCDR3Aln.q_end):
@@ -297,75 +303,103 @@ def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap):
 				#print "postCDR3AlnStart=",postCDR3AlnStart," and postCDR3AlnObj.s_start=",postCDR3AlnObj.s_start," so setting SFM as ",str(int(int(postCDR3AlnObj.s_start-postCDR3AlnStart)%3))
 				postCDR3AlnObj.setSFM((postCDR3AlnObj.s_start-postCDR3AlnStart)%3)
 			else:
-				#postCDR3AlnStart>=postCDR3AlnObj.s_start ?????
-				#print "postCDR3AlnStart=",postCDR3AlnStart
-				#print "postCDR3AlnObj.s_start",postCDR3AlnObj.s_start
-				#print "vINFO",vInfo
-				#print "jINFO",jInfo
-				#print "J_cdr3_end=",J_cdr3_end
-				#print "VALNOBJ"
-				#print vAlnObj.getNiceString()
-				#print "postCDR3"
-				#print postCDR3AlnObj.getNiceString()
 				raise Exception('postCDR3AlnStart>postCDR3AlnObj.s_start ?????  Error in alignment class???')
-				#ALIGNMENT. Q_FROM=45 Q_TO=51 S_FROM=19 S_TO=25
-				#QURY:GCAGGAG
-				#MDLN:X||X|XX
-				#SBCT:ACATGGA
+			return [preCDR3Aln,postCDR3AlnObj]
+	else:
+		#nothing to work with!? :(
+		return [None,None]
 
-				
-			numN=postCDR3AlnObj.q_start-preCDR3Aln.q_end-1
-			NSub=repStr("N",numN)
-			NQry=repStr("N",numN)
-			vCharMap=preCDR3Aln.characterize()
-			#print "the vCharMap annotation map and alignment (for whole seq named ",vInfo['query id'],") is "
-			#printMap(vCharMap)
-			#print preCDR3Aln.getNiceString()
-			#print "the jCharMap annotation map and alignment (for whole seq name ",jInfo['query id'],") is "
-			##print postCDR3AlnObj.getNiceString()
-			jCharMap=postCDR3AlnObj.characterize()
-			#printMap(jCharMap)
-			#to get/compute the 'whole' map, add up the "non-special" values
-			#otherwise, compute them specially
-			toSkip=['bsb_freq','pct_id','ns_rto','indel_freq']
-			totCharMap=dict()
-			for k in vCharMap:
-				if(not(k in toSkip)):
-					if(type(vCharMap[k])==type(jCharMap[k]) and type(vCharMap[k])!=str):
-						totCharMap[k]=vCharMap[k]+jCharMap[k]
-					else:
-						totCharMap[k]=str(vCharMap[k])+" & "+str(jCharMap[k])
-			if(vCharMap['stp_cdn'] or jCharMap['stp_cdn']):
-				totCharMap['stp_cdn']=True
-			
-			if(global_key_base+'imgt_cdr3_tr' in annMap):
-				starPos=annMap[global_key_base+'imgt_cdr3_tr'].find("*")
-				if(starPos!=(-1)):
-					totCharMap['cdr3_stp_cdn']=True
-				else:
-					totCharMap['cdr3_stp_cdn']=False
-			else:
-				totCharMap['cdr3_stp_cdn']=False
-				
-			#handle pct id , bsb_freq , indel_freq specially
-			totQ=getNumberBpInAlnStr(postCDR3AlnObj.q_aln)+getNumberBpInAlnStr(preCDR3Aln.q_aln)
-			totBS=totCharMap['base_sub']
-			if(totQ!=0):
-				totCharMap['pct_id']=float((float(totQ)-float(totBS))/float(totQ))
-				totCharMap['bsb_freq']=float(totCharMap['base_sub'])/float(totQ)
-				totCharMap['indel_freq']=float(totCharMap['insertions']+totCharMap['deletions'])/float(totQ+totCharMap['insertions']+totCharMap['deletions'])
-			else:
-				totCharMap['pct_id']=0.0
-				totCharMap['bsb_freq']=0
-				totCharMap['indel_freq']=0
-			#handle ns_ratio
-			if(totCharMap['synonymous_bsb']!=0):
-				totCharMap['ns_rto']=float(totCharMap['nonsynonymous_bsb'])/float(totCharMap['synonymous_bsb'])
-			else:
-				totCharMap['ns_rto']=0
-			return totCharMap
+	
+#return the char map for the V alignment
+def returnVAlnAllCharMap(vInfo,imgtdb_obj):
+	global global_key_base
 	emptyMap=getEmptyRegCharMap()
-	return emptyMap
+	if(vInfo==None):
+		return emptyMap
+	vAlnObj=alignment(vInfo['query seq'],vInfo['subject seq'],vInfo['q. start'],vInfo['q. end'],vInfo['s. start'],vInfo['s. end'])
+	vAlnObj.setSFM(getTheFrameForThisReferenceAtThisPosition(vInfo['subject ids'],organism,imgtdb_obj,int(vInfo['s. start'])))
+	if(vAlnObj==None):
+		return emptyMap
+	if(vInfo['q. start']>vInfo['q. end'] or vInfo['q. start']<=0 or vInfo['q. end']<=0):
+		return emptyMap
+	else:
+		vCharMap=vAlnObj.characterize()
+		new_map=dict()
+		for k in vCharMap:
+			newKey=k
+			newKey=newKey[0].upper()+newKey[1:]
+			new_map[newKey+ " (over V)"]=vCharMap[k]
+		return new_map
+
+
+
+
+
+def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap):
+	global global_key_base
+	cdr3_surround_aln=getPrePostCDR3AlnObjs(vInfo,jInfo,imgtdb_obj,organism,annMap)
+	preCDR3Aln=cdr3_surround_aln[0]
+	postCDR3AlnObj=cdr3_surround_aln[1]
+	emptyMap=getEmptyRegCharMap()
+	if(preCDR3Aln==None and postCDR3AlnObj==None):
+		return emptyMap
+	elif(preCDR3Aln!=None and postCDR3AlnObj==None):
+		return preCDR3Aln.characterize()
+	elif(preCDR3Aln==None and postCDR3AlnObj!=None):
+		return emptyMap
+
+	numN=postCDR3AlnObj.q_start-preCDR3Aln.q_end-1
+	NSub=repStr("N",numN)
+	NQry=repStr("N",numN)
+	vCharMap=preCDR3Aln.characterize()
+	#print "the vCharMap annotation map and alignment (for whole seq named ",vInfo['query id'],") is "
+	#printMap(vCharMap)
+	#print preCDR3Aln.getNiceString()
+	#print "the jCharMap annotation map and alignment (for whole seq name ",jInfo['query id'],") is "
+	##print postCDR3AlnObj.getNiceString()
+	jCharMap=postCDR3AlnObj.characterize()
+	#printMap(jCharMap)
+	#to get/compute the 'whole' map, add up the "non-special" values
+	#otherwise, compute them specially
+	#toSkip=['bsb_freq','pct_id','ns_rto','indel_freq']
+	toSkip=[]
+	totCharMap=dict()
+	for k in vCharMap:
+		if(not(k in toSkip)):
+			if(type(vCharMap[k])==type(jCharMap[k]) and type(vCharMap[k])!=str and vCharMap[k]!=None and jCharMap[k]!=None):
+				totCharMap[k]=vCharMap[k]+jCharMap[k]
+			else:
+				totCharMap[k]=str(vCharMap[k])+" & "+str(jCharMap[k])
+	if(vCharMap['Stop codons?'] or jCharMap['Stop codons?']):
+		totCharMap['Stop codons?']=True
+	
+	if(global_key_base+'imgt_cdr3_tr' in annMap):
+		starPos=annMap[global_key_base+'imgt_cdr3_tr'].find("*")
+		if(starPos!=(-1)):
+			totCharMap['cdr3_stp_cdn']=True
+		else:
+			totCharMap['cdr3_stp_cdn']=False
+	else:
+		totCharMap['cdr3_stp_cdn']=False
+		#handle pct id , bsb_freq , indel_freq specially
+	totQ=getNumberBpInAlnStr(postCDR3AlnObj.q_aln)+getNumberBpInAlnStr(preCDR3Aln.q_aln)
+	totBS=totCharMap['base substitutions']
+	if(totQ!=0):
+		totCharMap['homology%']=float((float(totQ)-float(totBS))/float(totQ))
+		totCharMap['base substitution freq%']=float(totCharMap['base substitutions'])/float(totQ)
+		totCharMap['indel frequency']=float(totCharMap['insertion count']+totCharMap['deletion count'])/float(totQ+totCharMap['insertion count']+totCharMap['deletion count'])
+	else:
+		totCharMap['homology%']=0.0
+		totCharMap['base substitution freq%']=0
+		totCharMap['indel frequency']=0
+	#handle ns_ratio
+	if(totCharMap['synonymous base substitutions']!=0):
+		totCharMap['ns_rto']=float(totCharMap['nonsynonymous base substitutions'])/float(totCharMap['synonymous base substitutions'])
+	else:
+		totCharMap['ns_rto']=0
+	return totCharMap
+
+
 	
 
 
@@ -383,10 +417,11 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 	topVDJ=getTopVDJItems(read_result_obj,meta)
 	annMap=dict()
 	for seg in topVDJ:
+		topkey=seg+" gene (highest score)"
 		if(topVDJ[seg] is not None):
-			annMap['top_'+seg]=topVDJ[seg]
+			annMap[topkey]=topVDJ[seg]
 		else:
-			annMap['top_'+seg]="None"			
+			annMap[topkey]="None"
 
 	vInfo=None
 	dInfo=None
@@ -420,24 +455,34 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 	global characterization_queue_results
 	num_submitted_jobs=0
 	if(not(skip_char)):
+		#V seq characterization
+		V_map=returnVAlnAllCharMap(vInfo,imgtdb_obj)
+		if(V_map is not None):
+			for k in V_map:
+				annMap[k]=V_map[k]
+
 		#whole seq characterization
 		whole_char_map=returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap)
 		for w in whole_char_map:
-			new_key=global_key_base+'whole_seq_'+w
+			#new_key=global_key_base+'whole_seq_'+w
+			new_key=w+" (over V and J)"
+			new_key=new_key[0].upper()+new_key[1:]
 			annMap[new_key]=whole_char_map[w]
 		whole_seq_stp_cdn_Tot_flag=getValnWholeSeqStopFlag(vInfo,dInfo,jInfo,imgtdb_obj,organism,annMap,read_rec)
 		annMap['vdj_server_whole_vj_stp_cdn']=whole_seq_stp_cdn_Tot_flag
 
+
 		#productive rearrangement 
 		#if IMGT CDR3 length is a multiple of 3 and it's not (-1), then consider it productive
+		prodRearrangeKey="Productive CDR3 rearrangement (T/F)"
 		if(not(noneSeg_flag)):
 			if(cdr3_map['imgt']!=(-1) and cdr3_map['imgt']>0):
 				if((cdr3_map['imgt'])%3==0):
-					annMap[global_key_base+'productive_rearrangement']=True
+					annMap[prodRearrangeKey]=True
 				else:
-					annMap[global_key_base+'productive_rearrangement']=False
+					annMap[prodRearrangeKey]=False
 			else:
-				#annMap['vdj_server_ann_productive_rearrangement']="N/A"
+				#annMap[prodRearrangeKey]="N/A"
 				pass
 
 		#regions characterization FR1, FR2, FR3, CDR1, CDR2 (imgt and kabat)
@@ -526,7 +571,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 					annMap[temp_key]=temp_results[temp_key]			
 			get_res+=1
 	
-	annMap['read_name']=read_rec.id
+	annMap['Read identifier']=read_rec.id
 	#getAlignmentString(read_result_obj,meta,query_record,imgtdb_obj,organism)
 	#analyze_combinations(read_result_obj,meta,organism,imgtdb_obj,read_rec,annMap)
 	#printMap(annMap,True)
@@ -534,12 +579,14 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 	tie_map=getVDJTieMap(t_map,topVDJ)
 	segments=get_segment_list()
 	for segment in segments:
-		key=global_key_base+segment+'_hitscorelist'
+		#key=global_key_base+segment+'_hitscorelist'
+		key=segment+" gene hit/score list"
 		if(segment in t_map):
 			annMap[key]=t_map[segment]
 		else:
 			annMap[key]=None
-		key=global_key_base+segment+'_tie'
+		#key=global_key_base+segment+'_tie'
+		key=segment+" gene tie"
 		if(segment in tie_map):
 			annMap[key]=tie_map[segment]
 		else:
@@ -646,136 +693,257 @@ def vSegmentRegionVDJAnalyse(read_result_obj,meta,organism,imgtdb_obj,read_rec):
 
 def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None"):
 	keys=[
-	"read_id#",
-	"read_name",
-	"top_D",
-	"top_J",
-	"top_V",
-	"vdj_server_ann_D_hitscorelist",
-	"vdj_server_ann_D_tie",
-	"vdj_server_ann_J_hitscorelist",
-	"vdj_server_ann_J_tie",
-	"vdj_server_ann_V_hitscorelist",
-	"vdj_server_ann_V_tie",
-	"vdj_server_ann_imgt_CDR1_aminos",
-	"vdj_server_ann_imgt_CDR1_base_sub",
-	"vdj_server_ann_imgt_CDR1_bsb_freq",
-	"vdj_server_ann_imgt_CDR1_codons",
-	"vdj_server_ann_imgt_CDR1_deletions",
-	"vdj_server_ann_imgt_CDR1_frm_msk",
-	"vdj_server_ann_imgt_CDR1_indel_freq",
-	"vdj_server_ann_imgt_CDR1_insertions",
-	"vdj_server_ann_imgt_CDR1_mutations",
-	"vdj_server_ann_imgt_CDR1_nonsynonymous_bsb",
-	"vdj_server_ann_imgt_CDR1_ns_rto",
-	"vdj_server_ann_imgt_CDR1_pct_id",
-	"vdj_server_ann_imgt_CDR1_qry_aln",
-	"vdj_server_ann_imgt_CDR1_qry_end",
-	"vdj_server_ann_imgt_CDR1_qry_srt",
-	"vdj_server_ann_imgt_CDR1_ref_aln",
-	"vdj_server_ann_imgt_CDR1_stp_cdn",
-	"vdj_server_ann_imgt_CDR1_synonymous_bsb",
-	"vdj_server_ann_imgt_CDR2_aminos",
-	"vdj_server_ann_imgt_CDR2_base_sub",
-	"vdj_server_ann_imgt_CDR2_bsb_freq",
-	"vdj_server_ann_imgt_CDR2_codons",
-	"vdj_server_ann_imgt_CDR2_deletions",
-	"vdj_server_ann_imgt_CDR2_frm_msk",
-	"vdj_server_ann_imgt_CDR2_indel_freq",
-	"vdj_server_ann_imgt_CDR2_insertions",
-	"vdj_server_ann_imgt_CDR2_mutations",
-	"vdj_server_ann_imgt_CDR2_nonsynonymous_bsb",
-	"vdj_server_ann_imgt_CDR2_ns_rto",
-	"vdj_server_ann_imgt_CDR2_pct_id",
-	"vdj_server_ann_imgt_CDR2_qry_aln",
-	"vdj_server_ann_imgt_CDR2_qry_end",
-	"vdj_server_ann_imgt_CDR2_qry_srt",
-	"vdj_server_ann_imgt_CDR2_ref_aln",
-	"vdj_server_ann_imgt_CDR2_stp_cdn",
-	"vdj_server_ann_imgt_CDR2_synonymous_bsb",
-	"vdj_server_ann_imgt_FR1_aminos",
-	"vdj_server_ann_imgt_FR1_base_sub",
-	"vdj_server_ann_imgt_FR1_bsb_freq",
-	"vdj_server_ann_imgt_FR1_codons",
-	"vdj_server_ann_imgt_FR1_deletions",
-	"vdj_server_ann_imgt_FR1_frm_msk",
-	"vdj_server_ann_imgt_FR1_indel_freq",
-	"vdj_server_ann_imgt_FR1_insertions",
-	"vdj_server_ann_imgt_FR1_mutations",
-	"vdj_server_ann_imgt_FR1_nonsynonymous_bsb",
-	"vdj_server_ann_imgt_FR1_ns_rto",
-	"vdj_server_ann_imgt_FR1_pct_id",
-	"vdj_server_ann_imgt_FR1_qry_aln",
-	"vdj_server_ann_imgt_FR1_qry_end",
-	"vdj_server_ann_imgt_FR1_qry_srt",
-	"vdj_server_ann_imgt_FR1_ref_aln",
-	"vdj_server_ann_imgt_FR1_stp_cdn",
-	"vdj_server_ann_imgt_FR1_synonymous_bsb",
-	"vdj_server_ann_imgt_FR2_aminos",
-	"vdj_server_ann_imgt_FR2_base_sub",
-	"vdj_server_ann_imgt_FR2_bsb_freq",
-	"vdj_server_ann_imgt_FR2_codons",
-	"vdj_server_ann_imgt_FR2_deletions",
-	"vdj_server_ann_imgt_FR2_frm_msk",
-	"vdj_server_ann_imgt_FR2_indel_freq",
-	"vdj_server_ann_imgt_FR2_insertions",
-	"vdj_server_ann_imgt_FR2_mutations",
-	"vdj_server_ann_imgt_FR2_nonsynonymous_bsb",
-	"vdj_server_ann_imgt_FR2_ns_rto",
-	"vdj_server_ann_imgt_FR2_pct_id",
-	"vdj_server_ann_imgt_FR2_qry_aln",
-	"vdj_server_ann_imgt_FR2_qry_end",
-	"vdj_server_ann_imgt_FR2_qry_srt",
-	"vdj_server_ann_imgt_FR2_ref_aln",
-	"vdj_server_ann_imgt_FR2_stp_cdn",
-	"vdj_server_ann_imgt_FR2_synonymous_bsb",
-	"vdj_server_ann_imgt_FR3_aminos",
-	"vdj_server_ann_imgt_FR3_base_sub",
-	"vdj_server_ann_imgt_FR3_bsb_freq",
-	"vdj_server_ann_imgt_FR3_codons",
-	"vdj_server_ann_imgt_FR3_deletions",
-	"vdj_server_ann_imgt_FR3_frm_msk",
-	"vdj_server_ann_imgt_FR3_indel_freq",
-	"vdj_server_ann_imgt_FR3_insertions",
-	"vdj_server_ann_imgt_FR3_mutations",
-	"vdj_server_ann_imgt_FR3_nonsynonymous_bsb",
-	"vdj_server_ann_imgt_FR3_ns_rto",
-	"vdj_server_ann_imgt_FR3_pct_id",
-	"vdj_server_ann_imgt_FR3_qry_aln",
-	"vdj_server_ann_imgt_FR3_qry_end",
-	"vdj_server_ann_imgt_FR3_qry_srt",
-	"vdj_server_ann_imgt_FR3_ref_aln",
-	"vdj_server_ann_imgt_FR3_stp_cdn",
-	"vdj_server_ann_imgt_FR3_synonymous_bsb",
-	"vdj_server_ann_imgt_cdr3_na",
-	"vdj_server_ann_imgt_cdr3_na_len",
-	"vdj_server_ann_imgt_cdr3_tr",
-	"vdj_server_ann_imgt_cdr3_tr_len",
-	"vdj_server_ann_kabat_cdr3_na",
-	"vdj_server_ann_kabat_cdr3_na_len",
-	"vdj_server_ann_kabat_cdr3_tr",
-	"vdj_server_ann_kabat_cdr3_tr_len",
-	"vdj_server_ann_productive_rearrangement",
-	"vdj_server_ann_whole_seq_aminos",
-	"vdj_server_ann_whole_seq_base_sub",
-	"vdj_server_ann_whole_seq_bsb_freq",
-	"vdj_server_ann_whole_seq_cdr3_stp_cdn",
-	"vdj_server_ann_whole_seq_codons",
-	"vdj_server_ann_whole_seq_deletions",
-	"vdj_server_ann_whole_seq_indel_freq",
-	"vdj_server_ann_whole_seq_insertions",
-	"vdj_server_ann_whole_seq_mutations",
-	"vdj_server_ann_whole_seq_nonsynonymous_bsb",
-	"vdj_server_ann_whole_seq_ns_rto",
-	"vdj_server_ann_whole_seq_pct_id",
-	"vdj_server_ann_whole_seq_stp_cdn",
-	"vdj_server_ann_whole_seq_synonymous_bsb",
-	"vdj_server_whole_vj_stp_cdn"
+
+	"Read identifier",
+	"Read sequence #",
+	"V gene (highest score)"
+	"D gene (highest score)",
+	"J gene (highest score)",
+	"Productive CDR3 rearrangement (T/F)",
+	"Homology% (over V and J)",
+	"Insertion count (over V and J)",
+	"Deletion count (over V and J)",
+	"Indel frequency (over V and J)",
+	"AA (over V and J)",
+	"AA (over V)",
+	"Base substitution freq% (over V and J)",
+	"Base substitution freq% (over V)",
+	"Base substitutions (over V and J)",
+	"Base substitutions (over V)",
+	"CDR3 AA (imgt)",
+	"CDR3 AA (kabat)",
+	"CDR3 AA length (imgt)",
+	"CDR3 AA length (kabat)",
+	"Cdr3_stp_cdn (over V and J)",
+	"Deletion count (over V)",
+	"FR1 AA (imgt)",
+	"FR1 AA (kabat)",
+	"FR1 R:S ratio (imgt)",
+	"FR1 R:S ratio (kabat)",
+	"FR1 Stop codons? (imgt)",
+	"FR1 Stop codons? (kabat)",
+	"FR1 base substitution freq% (imgt)",
+	"FR1 base substitution freq% (kabat)",
+	"FR1 base substitutions (imgt)",
+	"FR1 base substitutions (kabat)",
+	"FR1 deletion count (imgt)",
+	"FR1 deletion count (kabat)",
+	"FR1 homology% (imgt)",
+	"FR1 homology% (kabat)",
+	"FR1 indel frequency (imgt)",
+	"FR1 indel frequency (kabat)",
+	"FR1 insertion count (imgt)",
+	"FR1 insertion count (kabat)",
+	"FR1 length (imgt)",
+	"FR1 length (kabat)",
+	"FR1 mutations (imgt)",
+	"FR1 mutations (kabat)",
+	"FR1 nonsynonymous base substitutions (imgt)",
+	"FR1 nonsynonymous base substitutions (kabat)",
+	"FR1 ns_rto (imgt)",
+	"FR1 ns_rto (kabat)",
+	"FR1 nucleotide read (imgt)",
+	"FR1 nucleotide read (kabat)",
+	"FR1 replacement mutation freq% (imgt)",
+	"FR1 replacement mutation freq% (kabat)",
+	"FR1 replacement mutations (codons) (imgt)",
+	"FR1 replacement mutations (codons) (kabat)",
+	"FR1 silent mutation freq% (imgt)",
+	"FR1 silent mutation freq% (kabat)",
+	"FR1 silent mutations (codons) (imgt)",
+	"FR1 silent mutations (codons) (kabat)",
+	"FR1 synonymous base substitutions (imgt)",
+	"FR1 synonymous base substitutions (kabat)",
+	"CDR1 AA (imgt)",
+	"CDR1 AA (kabat)",
+	"CDR1 R:S ratio (imgt)",
+	"CDR1 R:S ratio (kabat)",
+	"CDR1 Stop codons? (imgt)",
+	"CDR1 Stop codons? (kabat)",
+	"CDR1 base substitution freq% (imgt)",
+	"CDR1 base substitution freq% (kabat)",
+	"CDR1 base substitutions (imgt)",
+	"CDR1 base substitutions (kabat)",
+	"CDR1 deletion count (imgt)",
+	"CDR1 deletion count (kabat)",
+	"CDR1 homology% (imgt)",
+	"CDR1 homology% (kabat)",
+	"CDR1 indel frequency (imgt)",
+	"CDR1 indel frequency (kabat)",
+	"CDR1 insertion count (imgt)",
+	"CDR1 insertion count (kabat)",
+	"CDR1 length (imgt)",
+	"CDR1 length (kabat)",
+	"CDR1 mutations (imgt)",
+	"CDR1 mutations (kabat)",
+	"CDR1 nonsynonymous base substitutions (imgt)",
+	"CDR1 nonsynonymous base substitutions (kabat)",
+	"CDR1 ns_rto (imgt)",
+	"CDR1 ns_rto (kabat)",
+	"CDR1 nucleotide read (imgt)",
+	"CDR1 nucleotide read (kabat)",
+	"CDR1 replacement mutation freq% (imgt)",
+	"CDR1 replacement mutation freq% (kabat)",
+	"CDR1 replacement mutations (codons) (imgt)",
+	"CDR1 replacement mutations (codons) (kabat)",
+	"CDR1 silent mutation freq% (imgt)",
+	"CDR1 silent mutation freq% (kabat)",
+	"CDR1 silent mutations (codons) (imgt)",
+	"CDR1 silent mutations (codons) (kabat)",
+	"CDR1 synonymous base substitutions (imgt)",
+	"CDR1 synonymous base substitutions (kabat)",
+	"FR2 AA (imgt)",
+	"FR2 AA (kabat)",
+	"FR2 R:S ratio (imgt)",
+	"FR2 R:S ratio (kabat)",
+	"FR2 Stop codons? (imgt)",
+	"FR2 Stop codons? (kabat)",
+	"FR2 base substitution freq% (imgt)",
+	"FR2 base substitution freq% (kabat)",
+	"FR2 base substitutions (imgt)",
+	"FR2 base substitutions (kabat)",
+	"FR2 deletion count (imgt)",
+	"FR2 deletion count (kabat)",
+	"FR2 homology% (imgt)",
+	"FR2 homology% (kabat)",
+	"FR2 indel frequency (imgt)",
+	"FR2 indel frequency (kabat)",
+	"FR2 insertion count (imgt)",
+	"FR2 insertion count (kabat)",
+	"FR2 length (imgt)",
+	"FR2 length (kabat)",
+	"FR2 mutations (imgt)",
+	"FR2 mutations (kabat)",
+	"FR2 nonsynonymous base substitutions (imgt)",
+	"FR2 nonsynonymous base substitutions (kabat)",
+	"FR2 ns_rto (imgt)",
+	"FR2 ns_rto (kabat)",
+	"FR2 nucleotide read (imgt)",
+	"FR2 nucleotide read (kabat)",
+	"FR2 replacement mutation freq% (imgt)",
+	"FR2 replacement mutation freq% (kabat)",
+	"FR2 replacement mutations (codons) (imgt)",
+	"FR2 replacement mutations (codons) (kabat)",
+	"FR2 silent mutation freq% (imgt)",
+	"FR2 silent mutation freq% (kabat)",
+	"FR2 silent mutations (codons) (imgt)",
+	"FR2 silent mutations (codons) (kabat)",
+	"FR2 synonymous base substitutions (imgt)",
+	"FR2 synonymous base substitutions (kabat)",
+	"CDR2 AA (imgt)",
+	"CDR2 AA (kabat)",
+	"CDR2 R:S ratio (imgt)",
+	"CDR2 R:S ratio (kabat)",
+	"CDR2 Stop codons? (imgt)",
+	"CDR2 Stop codons? (kabat)",
+	"CDR2 base substitution freq% (imgt)",
+	"CDR2 base substitution freq% (kabat)",
+	"CDR2 base substitutions (imgt)",
+	"CDR2 base substitutions (kabat)",
+	"CDR2 deletion count (imgt)",
+	"CDR2 deletion count (kabat)",
+	"CDR2 homology% (imgt)",
+	"CDR2 homology% (kabat)",
+	"CDR2 indel frequency (imgt)",
+	"CDR2 indel frequency (kabat)",
+	"CDR2 insertion count (imgt)",
+	"CDR2 insertion count (kabat)",
+	"CDR2 length (imgt)",
+	"CDR2 length (kabat)",
+	"CDR2 mutations (imgt)",
+	"CDR2 mutations (kabat)",
+	"CDR2 nonsynonymous base substitutions (imgt)",
+	"CDR2 nonsynonymous base substitutions (kabat)",
+	"CDR2 ns_rto (imgt)",
+	"CDR2 ns_rto (kabat)",
+	"CDR2 nucleotide read (imgt)",
+	"CDR2 nucleotide read (kabat)",
+	"CDR2 replacement mutation freq% (imgt)",
+	"CDR2 replacement mutation freq% (kabat)",
+	"CDR2 replacement mutations (codons) (imgt)",
+	"CDR2 replacement mutations (codons) (kabat)",
+	"CDR2 silent mutation freq% (imgt)",
+	"CDR2 silent mutation freq% (kabat)",
+	"CDR2 silent mutations (codons) (imgt)",
+	"CDR2 silent mutations (codons) (kabat)",
+	"CDR2 synonymous base substitutions (imgt)",
+	"CDR2 synonymous base substitutions (kabat)",
+	"FR3 AA (imgt)",
+	"FR3 AA (kabat)",
+	"FR3 R:S ratio (imgt)",
+	"FR3 R:S ratio (kabat)",
+	"FR3 Stop codons? (imgt)",
+	"FR3 Stop codons? (kabat)",
+	"FR3 base substitution freq% (imgt)",
+	"FR3 base substitution freq% (kabat)",
+	"FR3 base substitutions (imgt)",
+	"FR3 base substitutions (kabat)",
+	"FR3 deletion count (imgt)",
+	"FR3 deletion count (kabat)",
+	"FR3 homology% (imgt)",
+	"FR3 homology% (kabat)",
+	"FR3 indel frequency (imgt)",
+	"FR3 indel frequency (kabat)",
+	"FR3 insertion count (imgt)",
+	"FR3 insertion count (kabat)",
+	"FR3 length (imgt)",
+	"FR3 length (kabat)",
+	"FR3 mutations (imgt)",
+	"FR3 mutations (kabat)",
+	"FR3 nonsynonymous base substitutions (imgt)",
+	"FR3 nonsynonymous base substitutions (kabat)",
+	"FR3 ns_rto (imgt)",
+	"FR3 ns_rto (kabat)",
+	"FR3 nucleotide read (imgt)",
+	"FR3 nucleotide read (kabat)",
+	"FR3 replacement mutation freq% (imgt)",
+	"FR3 replacement mutation freq% (kabat)",
+	"FR3 replacement mutations (codons) (imgt)",
+	"FR3 replacement mutations (codons) (kabat)",
+	"FR3 silent mutation freq% (imgt)",
+	"FR3 silent mutation freq% (kabat)",
+	"FR3 silent mutations (codons) (imgt)",
+	"FR3 silent mutations (codons) (kabat)",
+	"FR3 synonymous base substitutions (imgt)",
+	"FR3 synonymous base substitutions (kabat)",
+	"Homology% (over V)",
+	"Indel frequency (over V)",
+	"Insertion count (over V)",
+	"Length (over V and J)",
+	"Length (over V)",
+	"Mutations (over V and J)",
+	"Mutations (over V)",
+	"Nonsynonymous base substitutions (over V and J)",
+	"Nonsynonymous base substitutions (over V)",
+	"Ns_rto (over V and J)",
+	"Ns_rto (over V)",
+	"Nucleotide read (over V and J)",
+	"Nucleotide read (over V)",
+	"R:S ratio (over V and J)",
+	"R:S ratio (over V)",
+	"Replacement mutation freq% (over V and J)",
+	"Replacement mutation freq% (over V)",
+	"Replacement mutations (codons) (over V and J)",
+	"Replacement mutations (codons) (over V)",
+	"Silent mutation freq% (over V and J)",
+	"Silent mutation freq% (over V)",
+	"Silent mutations (codons) (over V and J)",
+	"Silent mutations (codons) (over V)",
+	"Stop codons? (over V and J)",
+	"Stop codons? (over V)",
+	"Synonymous base substitutions (over V and J)",
+	"Synonymous base substitutions (over V)",
+	"V gene hit/score list",
+	"V gene tie",
+	"D gene hit/score list",
+	"D gene tie",
+	"J gene hit/score list",
+	"J gene tie"
 	]
 
 	m[keys[0]]=rid
 	#keys=m.keys()
-	keys.sort()
+	#keys.sort()
 
 	if(rid==1):
 		for k in range(len(keys)):
@@ -916,6 +1084,7 @@ if (__name__=="__main__"):
 	else:
 		#print "error in args!"
 		parser.print_help()
+
 
 
 

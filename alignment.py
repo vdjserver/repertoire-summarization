@@ -220,7 +220,6 @@ class alignment:
 			self.s_frame_mask=Cs_frame_mask
 
 
-
 	#get subalignment with first subject/query non-gapped position start
 	def getGEQAlignmentFirstNonGap(self):
 		s_pos=self.s_start
@@ -356,6 +355,9 @@ class alignment:
 		num_nsy=0
 		num_bsb=0
 		stp_cdn=False	
+		aa_reps=0
+		aa_slnt=0
+		length_in_codons=0
 
 		#if(not(charMsg==None)):
 		#	print charMsg
@@ -377,23 +379,23 @@ class alignment:
 					num_bsb+=1
 		num_indels=num_ins+num_del
 		if(tot_num_base_to_base_alns>0):
-			char_map['bsb_freq']=float(num_bsb)/float(tot_num_base_to_base_alns)
+			char_map['base substitution freq%']=float(num_bsb)/float(tot_num_base_to_base_alns)
 			id_tot_rto=float(tot_num_base_to_base_alns-num_bsb)/float(tot_num_base_to_base_alns)
-			char_map['pct_id']=id_tot_rto
+			char_map['homology%']=id_tot_rto
 			indel_rate=float(num_indels)/float(num_indels+tot_num_base_to_base_alns)
-			char_map['indel_freq']=indel_rate
+			char_map['indel frequency']=indel_rate
 		else:
 			if(num_indels>0):
 				indel_rate=float(1.0)
 			else:
 				indel_rate=0
-			char_map['indel_freq']=indel_rate
-			char_map['bsb_freq']=0
-			char_map['pct_id']=0
+			char_map['indel frequency']=indel_rate
+			char_map['base substitution freq%']=0
+			char_map['homology%']=0
 		#fill in the map
-		char_map['insertions']=num_ins
-		char_map['deletions']=num_del
-		char_map['base_sub']=num_bsb
+		char_map['insertion count']=num_ins
+		char_map['deletion count']=num_del
+		char_map['base substitutions']=num_bsb
 		char_map['mutations']=num_bsb+num_del+num_ins
 		
 
@@ -445,20 +447,26 @@ class alignment:
 					amino_list.append(str(q_amino))
 					#print "query amino ",q_amino," and codon ",q_codon
 					#print "PRE SYN/NSY counts : ",num_syn," and ",num_nsy 
+					length_in_codons+=1
 					if(s_amino==q_amino):
 						syn=True
 					else:
 						syn=False
+						aa_reps+=1
+					had_silent=False
 					if(codonAnalyzer.is_unambiguous_codon(q_codon) and codonAnalyzer.is_unambiguous_codon(s_codon)):
 						if(syn):
 							for cp in range(3):
 								if(s_codon[cp]!=q_codon[cp]):
 									num_syn+=1
+									had_silent=True
 						else:
 							for cp in range(3):
 								if(s_codon[cp]!=q_codon[cp]):
 									num_nsy+=1
 						#print "POST SYN/NSY counts : ",num_syn," and ",num_nsy
+						if(had_silent):
+							aa_slnt+=1
 				else:
 					#ANALYSIS FOR CODONS WITH any gap
 					if(q_codon.find("-")==(-1)):
@@ -482,17 +490,32 @@ class alignment:
 					pass
 				temp_index+=1
 		#fill in the map
-		char_map['synonymous_bsb']=num_syn
-		char_map['nonsynonymous_bsb']=num_nsy
+		char_map['synonymous base substitutions']=num_syn
+		char_map['nonsynonymous base substitutions']=num_nsy
 		if(num_syn!=0):
 			ns_ratio=float(num_nsy)/float(num_syn)
 		else:
 			ns_ratio=0
+		if(length_in_codons!=0):
+			char_map['replacement mutation freq%']=float(aa_reps)/float(length_in_codons)
+			char_map['silent mutation freq%']=float(aa_slnt)/float(length_in_codons)
+		else:
+			char_map['replacement mutation freq%']=0
+			char_map['silent mutation freq%']=0
+		if(aa_slnt!=0):
+			char_map['R:S ratio']=float(aa_reps)/float(aa_slnt)
+		else:
+			char_map['R:S ratio']=None
+
 		char_map['ns_rto']=ns_ratio
-		char_map['stp_cdn']=stp_cdn
+		char_map['Stop codons?']=stp_cdn
 		j_str=""
-		char_map['aminos']=j_str.join(amino_list)
-		char_map['codons']=codon_list
+		char_map['AA']=j_str.join(amino_list)
+		char_map['nucleotide read']=codon_list
+		char_map['length']=abs(int(self.q_start)-int(self.q_end))
+		char_map['silent mutations (codons)']=aa_slnt
+		char_map['replacement mutations (codons)']=aa_reps
+
 		return char_map
 
 
