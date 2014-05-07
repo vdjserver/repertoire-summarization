@@ -329,6 +329,7 @@ def returnVAlnAllCharMap(vInfo,imgtdb_obj):
 			newKey=k
 			newKey=newKey[0].upper()+newKey[1:]
 			new_map[newKey+ " (over V)"]=vCharMap[k]
+		new_map['V length (nucleotides)']=abs(vInfo['q. start']-vInfo['q. end'])
 		return new_map
 
 
@@ -370,17 +371,21 @@ def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap):
 				totCharMap[k]=vCharMap[k]+jCharMap[k]
 			else:
 				totCharMap[k]=str(vCharMap[k])+" & "+str(jCharMap[k])
-	if(vCharMap['Stop codons?'] or jCharMap['Stop codons?']):
+	if(vCharMap['Stop codons?']==None and jCharMap['Stop codons?']==None):
+		totCharMap['Stop codons?']=None
+	elif(vCharMap['Stop codons?']==True or jCharMap['Stop codons?']==True):
 		totCharMap['Stop codons?']=True
+	else:
+		totCharMap['Stop codons?']=False
 	
 	if("CDR3 AA (imgt)" in annMap):
 		starPos=annMap["CDR3 AA (imgt)"].find("*")
 		if(starPos!=(-1)):
-			totCharMap['cdr3_stp_cdn']=True
+			totCharMap['CDR3 Stop codon?']=True
 		else:
-			totCharMap['cdr3_stp_cdn']=False
+			totCharMap['CDR3 Stop codon?']=False
 	else:
-		totCharMap['cdr3_stp_cdn']=False
+		totCharMap['CDR3 Stop codon?']=False
 		#handle pct id , bsb_freq , indel_freq specially
 	totQ=getNumberBpInAlnStr(postCDR3AlnObj.q_aln)+getNumberBpInAlnStr(preCDR3Aln.q_aln)
 	totBS=totCharMap['base substitutions']
@@ -455,13 +460,13 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 	global characterization_queue_results
 	num_submitted_jobs=0
 	if(not(skip_char)):
-		#V seq characterization
+		#V seq characterization (OVER v) only
 		V_map=returnVAlnAllCharMap(vInfo,imgtdb_obj)
 		if(V_map is not None):
 			for k in V_map:
 				annMap[k]=V_map[k]
 
-		#whole seq characterization
+		#whole seq characterization (over V and J)
 		whole_char_map=returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap)
 		for w in whole_char_map:
 			#new_key=global_key_base+'whole_seq_'+w
@@ -699,23 +704,22 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None",log
 	"V gene (highest score)",
 	"D gene (highest score)",
 	"J gene (highest score)",
+	"CDR3 AA (imgt)",
+	"CDR3 AA length (imgt)",
+	"CDR3 AA length (kabat)",
+	"Stop codons? (over V and J)",
 	"Productive CDR3 rearrangement (T/F)",
-	"Homology% (over V and J)",
 	"Insertion count (over V and J)",
 	"Deletion count (over V and J)",
 	"Indel frequency (over V and J)",
-	"AA (over V and J)",
-	"AA (over V)",
-	"Base substitution freq% (over V and J)",
-	"Base substitution freq% (over V)",
-	"Base substitutions (over V and J)",
+	"Homology% (over V)",
 	"Base substitutions (over V)",
-	"CDR3 AA (imgt)",
-	"CDR3 AA (kabat)",
-	"CDR3 AA length (imgt)",
-	"CDR3 AA length (kabat)",
-	"Cdr3_stp_cdn (over V and J)",
-	"Deletion count (over V)",
+	"Length (over V)",
+	"Base substitution freq% (over V)",
+	"Replacement mutations (codons) (over V)",
+	"Silent mutations (codons) (over V)",
+	"Replacement mutation freq% (over V)",
+	"Silent mutation freq% (over V)",
 	"FR1 AA (imgt)",
 	"FR1 AA (kabat)",
 	"FR1 R:S ratio (imgt)",
@@ -906,30 +910,29 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None",log
 	"FR3 silent mutations (codons) (kabat)",
 	"FR3 synonymous base substitutions (imgt)",
 	"FR3 synonymous base substitutions (kabat)",
-	"Homology% (over V)",
+	"Homology% (over V and J)",
 	"Indel frequency (over V)",
 	"Insertion count (over V)",
 	"Length (over V and J)",
-	"Length (over V)",
 	"Mutations (over V and J)",
 	"Mutations (over V)",
 	"Nonsynonymous base substitutions (over V and J)",
 	"Nonsynonymous base substitutions (over V)",
-	"Ns_rto (over V and J)",
-	"Ns_rto (over V)",
+	"AA (over V and J)",
+	"AA (over V)",
 	"Nucleotide read (over V and J)",
 	"Nucleotide read (over V)",
 	"R:S ratio (over V and J)",
 	"R:S ratio (over V)",
 	"Replacement mutation freq% (over V and J)",
-	"Replacement mutation freq% (over V)",
 	"Replacement mutations (codons) (over V and J)",
-	"Replacement mutations (codons) (over V)",
+	"Base substitutions (over V and J)",
+	"CDR3 Stop codon? (over V and J)",
+	"Deletion count (over V)",
+	"CDR3 AA (kabat)",
 	"Silent mutation freq% (over V and J)",
-	"Silent mutation freq% (over V)",
 	"Silent mutations (codons) (over V and J)",
-	"Silent mutations (codons) (over V)",
-	"Stop codons? (over V and J)",
+	"Base substitution freq% (over V and J)",
 	"Stop codons? (over V)",
 	"Synonymous base substitutions (over V and J)",
 	"Synonymous base substitutions (over V)",
