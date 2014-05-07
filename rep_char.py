@@ -245,7 +245,8 @@ def getValnWholeSeqStopFlag(vInfo,dInfo,jInfo,imgtdb_obj,organism,annMap,seq_rec
 
 
 
-
+#compute alignment characterizations for pre/post CDR3
+#logically sum and return the characterization
 def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap):
 	global global_key_base
 	if(not(vInfo==None)):
