@@ -28,7 +28,7 @@ def downloadIMGTGENE_DB_and_LIGM_DB_and_index(imgtdb_obj):
 	imgtdb_obj.cacheIndex()
 
 
-#the main wrapper for downloading and preparing the database (except for parts with necessary human intervention)
+#the main wrapper for downloading and preparing the database (except for parts with necessary human intervention!)
 def downloadAndPrep(imgtdb_obj,makeblastdbbin,igblastnbin,kvMap,blastx_bin):
 	#download_ReferenceDirDataHMAndGeneTables(imgtdb_obj):
 	#analyze_download_dir_forVDJserver(imgtdb_obj.getBaseDir())
@@ -43,7 +43,8 @@ def downloadAndPrep(imgtdb_obj,makeblastdbbin,igblastnbin,kvMap,blastx_bin):
 #kabat PROCESSING 
 #run igblastn on V data against the IGBLAST-provided database 
 #run the kabat routines on the IGBLAST output to make the KABAT region lookup tables
-#run blastx with the J nucleotides as the input/query data using IMGT reference data as the 
+#run blastx with the J nucleotides as the input/query data using IMGT reference data
+#IMGTGENEDB-ReferenceSequences.fasta-AA-WithoutGaps-F+ORF+inframeP as the database
 def kabat_process(imgtdb_obj,igblastnbin,blastxbin,kvMap,makeblastdbbin):
 	#find  /home/data/DATABASE/01_22_2014/|grep -Pi 'ReferenceDirectorySet/.*_[A-Z]{2}_V\.fna$'
 	imgtdb_base=imgtdb_obj.getBaseDir()
