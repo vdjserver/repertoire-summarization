@@ -1320,7 +1320,7 @@ class imgt_db:
 				for desc in fna_map:
 					blast_desc=getIMGTNameFromRefDirSetDescriptor(desc)
 					blast_fna_map[blast_desc]=fna_map[desc]
-				blast_writer=open(target_fna,'a')
+				blast_writer=open(target_fna,'w')
 				num_descs=len(fna_map)
 				rec_num=0
 				for blast_desc in blast_fna_map:
@@ -1405,11 +1405,15 @@ class imgt_db:
 					print "Gene table",locus,"for organism",organism,"not found or force replace set to true...so downloading it...."
 					print "Downloading gene table",locus,"for organism",organism,"from URL=",regularURL," saving to",regularTablePath
 					downloadURLToLocalFileAssumingDirectoryExists(regularURL,regularTablePath)
+				else:
+					print "Gene table",locus,"for organism",organism," found and force replace set to False...so not downloading it...."
 				orphonTablePath=regularTablePath+".orphons.html"
 				if(not(os.path.exists(orphonTablePath)) or unconditionalForceReplace==True):
 					print "Orphon gene table",locus,"for organism",organism,"not found, so downloading it..."
 					print "Downloading orphon gene table",locus,"for organism",organism,"from URL=",orphonURL,"and saving to",orphonTablePath
 					downloadURLToLocalFileAssumingDirectoryExists(orphonURL,orphonTablePath)
+				else:
+					print "Orphon Gene table",orphonTablePath,"for organism",organism," found and force replace set to False...so not downloading it...."
 
 		
 	#download the GeneDB and LIGM-DB
@@ -1429,8 +1433,8 @@ class imgt_db:
 		else:
 			organisms=self.getOrganismList(True)
 			org_imgt_regex_map=dict()
-			org_imgt_regex_map['human']=['^homo\s*sapien']
-			org_imgt_regex_map['Mus_musculus']=['^mus\s+']
+			org_imgt_regex_map['human']='^homo\s*sapien'
+			org_imgt_regex_map['Mus_musculus']='^mus\s+'
 			genedb_map=read_fasta_file_into_map(base_fna)
 			for organism in organisms:
 				loci=get_loci_list()
@@ -1444,7 +1448,7 @@ class imgt_db:
 						org_name=pieces[2]
 						if(allele_name.startswith(locus)):
 							#okay it matches on the locus, now let's check on the organism
-							re_res=re.match(org_re, org_name,re.IGNORECASE)
+							re_res=re.match(org_re, org_name)
 							if(re_res):
 								#matched on the organism, so add it to the map!
 								org_loci_map[descriptor]=genedb_map[descriptor]
@@ -1516,6 +1520,7 @@ class imgt_db:
 		wgetScriptOutLog=wgetScriptPath+".log.out"
 		wgetScriptErrLog=wgetScriptPath+".log.err"
 		write_temp_bash_script(wgetCMD,wgetScriptPath)
+		print "Proceeding to download "+refDBURL+"GENE-DB/ and "+refDBURL+"/LIGM-DB/ ..."
 		execute_bash_script(wgetScriptPath,outPath=wgetScriptOutLog,errPath=wgetScriptErrLog)
 	
 

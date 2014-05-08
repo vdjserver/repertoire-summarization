@@ -30,7 +30,8 @@ def downloadIMGTGENE_DB_and_LIGM_DB_and_index(imgtdb_obj):
 
 #the main wrapper for downloading and preparing the database (except for parts with necessary human intervention)
 def downloadAndPrep(imgtdb_obj,makeblastdbbin,igblastnbin,kvMap,blastx_bin):
-	downloadIMGTGENE_DB_and_LIGM_DB_and_index(imgtdb_obj)
+	#downloadIMGTGENE_DB_and_LIGM_DB_and_index(imgtdb_obj)
+	imgtdb_obj.buildRefDirSetsFromGENEDB()
 	imgtdb_obj.prepareFASTAForBLASTFormatting()
 	imgtdb_obj.download_GeneTables()
 	analyze_download_dir_forVDJserver(imgtdb_obj.getBaseDir())
@@ -55,7 +56,7 @@ def kabat_process(imgtdb_obj,igblastnbin,blastxbin,kvMap,makeblastdbbin):
 		for st in stList:
 			kabat_dir=imgtdb_base+"/"+organism+"/ReferenceDirectorySet/KABAT/"
 			if(not os.path.exists(kabat_dir)):
-				os.mkdir()
+				os.mkdir(kabat_dir)
 			V_glob=imgtdb_base+"/"+organism+"/ReferenceDirectorySet/*_"+st+"_V.fna"
 			glob_res_v=glob.glob(V_glob)
 			if(len(glob_res_v)==1):
@@ -150,7 +151,7 @@ if (__name__=="__main__"):
 			printMap(kvMap)
 		else:
 			print "Error, map file ",mapPath," not found!"
-			sys.exit(0)
+			#sys.exit(0)
 		if(os.path.isdir(imgt_db_base)):
 			print "Error, directory",imgt_db_base," must not exist! Abort!"
 			#sys.exit(1)
@@ -160,7 +161,7 @@ if (__name__=="__main__"):
 		else:
 			os.makedirs(imgt_db_base)
 		imgtdb_obj=imgt_db(imgt_db_base)
-		#downloadAndPrep(imgtdb_obj,makeblastdb_bin,igblast_bin,kvMap,blastx_bin)
+		downloadAndPrep(imgtdb_obj,makeblastdb_bin,igblast_bin,kvMap,blastx_bin)
 
 
 

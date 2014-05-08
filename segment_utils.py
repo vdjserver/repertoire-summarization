@@ -183,6 +183,7 @@ def analyze_download_dir_forVDJserver(base_dir,countsMap=None,specifiedOrganism=
 				for fastaKey in fastaMap:
 					fastaMainMap[fastaKey]=fastaMap[fastaKey]
 			#print "done loading into main map..."
+			#printMap(fastaMainMap)
 			fastaListOfNames=getIMGTNameListFromFastaMap(fastaMainMap)
 			#print "FASTA LIST OF NAMES:"
 			fastaListOfNames.sort()
@@ -200,17 +201,17 @@ def analyze_download_dir_forVDJserver(base_dir,countsMap=None,specifiedOrganism=
 			clone_names_plain=html_data[1]
 			html_data=hierarchyTreeFromGenetableURL("file://"+geneTableHTMLFiles[1],locus,fastaAlleleList,locusHierarchyData)
 			locusHierarchyData=html_data[0]
-			print "GOT HIERARCHY FROM HD0 ORPH:"
-			prettyPrintTree(locusHierarchyData)
-			print "DONE SHOWING PRETTY PRINT GOT HIERARCHY FROM HD0 ORPH"
+			#print "GOT HIERARCHY FROM HD0 ORPH:"
+			#prettyPrintTree(locusHierarchyData)
+			#print "DONE SHOWING PRETTY PRINT GOT HIERARCHY FROM HD0 ORPH"
 			clone_names_orph=html_data[1]	
 			clone_names=merge_maps(clone_names_plain,clone_names_orph)
 			write_map_to_file(clone_names,geneTableHTMLFiles[0]+".clone_names.map")
-			print "GOT FASTA MAP KEY ALLELES :"
-			printList(fastaAlleleList)
-			print "GOT HIERARCHY:"
-			prettyPrintTree(locusHierarchyData)
-			print "DONE SHOWING PRETTY PRINT GOT HIERARCHY"
+			#print "GOT FASTA MAP KEY ALLELES :"
+			#printList(fastaAlleleList)
+			#print "GOT HIERARCHY:"
+			#prettyPrintTree(locusHierarchyData)
+			#print "DONE SHOWING PRETTY PRINT GOT HIERARCHY"
 			#print "SHOWING CLONE NAME MAP:"
 			#printMap(clone_names)
 			print "\n\n\n\n"
