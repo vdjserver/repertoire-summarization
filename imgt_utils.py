@@ -1285,7 +1285,7 @@ class imgt_db:
 	accession_start_stop_map=None
 	accession_dat_file_map=None
 	imgt_dat_rel_path="www.imgt.org/download/LIGM-DB/imgt.dat"
-	imgt_genedb_rel_path="www.imgt.org/download/GENE-DB/IMGTGENEDB-ReferenceSequences.fasta-nt-WithGaps-F+ORF+inframeP
+	imgt_genedb_rel_path="www.imgt.org/download/GENE-DB/IMGTGENEDB-ReferenceSequences.fasta-nt-WithGaps-F+ORF+inframeP"
 	imgt_dat_path=None
 	indexPath=None
 	ref_dir_set_desc_seqs_map=None
@@ -1747,7 +1747,7 @@ class imgt_db:
 			indexfile=filepath+self.db_idx_extension
 		print "Creating index file from ",filepath," ... writing index to ",indexfile
 		reader=open(filepath,'r')
-		acc_re=re.compile(r'^ID\s+([A-Z0-9]+)\s')
+		acc_re=re.compile(r'^ID\s+([A-Z0-9]+)[^A-Z0-9]+')
 		embl_tpa_re=re.compile(r'^DR\s+EMBL\-TPA;\s+([^\s]+)\.\s*$')
 		current_embl_tpa=None
 		current_accession=None
@@ -1757,9 +1757,9 @@ class imgt_db:
 		rec_num=0
 		flag=True
 		while(flag):
-			#line=line.strip()
 			line=reader.readline()
 			if(line):
+				#print "Got ",line.strip()
 				rs=re.search(acc_re,line)
 				es=re.search(embl_tpa_re,line)
 				if(rs):
@@ -1777,6 +1777,7 @@ class imgt_db:
 						#index_file.write(current_embl_tpa+"\t"+str(rec_start)+"\t"+str(rec_end)+"\n")
 						index_file.write(current_embl_tpa+"\t"+current_accession+"\n");
 					current_embl_tpa=None
+				#print "current accession = ",current_accession
 			else:
 				flag=False
 		index_file.close()	
