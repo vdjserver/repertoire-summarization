@@ -23,18 +23,18 @@ def download_ReferenceDirDataHMAndGeneTables(imgtdb_obj):
 
 
 def downloadIMGTGENE_DB_and_LIGM_DB_and_index(imgtdb_obj):
-	#imgtdb_obj.buildAndExecuteWGETDownloadScript()
+	imgtdb_obj.buildAndExecuteWGETDownloadScript()
 	imgtdb_obj.indexIMGTDatFile()
 	imgtdb_obj.cacheIndex()
 
 
 #the main wrapper for downloading and preparing the database (except for parts with necessary human intervention)
 def downloadAndPrep(imgtdb_obj,makeblastdbbin,igblastnbin,kvMap,blastx_bin):
-	#download_ReferenceDirDataHMAndGeneTables(imgtdb_obj):
-	#analyze_download_dir_forVDJserver(imgtdb_obj.getBaseDir())
-	#imgtdb_obj.prepareFASTAForBLASTFormatting()
-	#imgtdb_obj.blastFormatFNAInRefDirSetDirs(makeblastdbbin)
-	#downloadIMGTGENE_DB_and_LIGM_DB_and_index(imgtdb_obj)
+	downloadIMGTGENE_DB_and_LIGM_DB_and_index(imgtdb_obj)
+	imgtdb_obj.prepareFASTAForBLASTFormatting()
+	imgtdb_obj.download_GeneTables()
+	analyze_download_dir_forVDJserver(imgtdb_obj.getBaseDir())
+	imgtdb_obj.blastFormatFNAInRefDirSetDirs(makeblastdbbin)
 	kabat_process(imgtdb_obj,igblastnbin,blastx_bin,kvMap,makeblastdbbin)
 
 
