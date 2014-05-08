@@ -1285,6 +1285,7 @@ class imgt_db:
 	accession_start_stop_map=None
 	accession_dat_file_map=None
 	imgt_dat_rel_path="www.imgt.org/download/LIGM-DB/imgt.dat"
+	imgt_genedb_rel_path="www.imgt.org/download/GENE-DB/IMGTGENEDB-ReferenceSequences.fasta-nt-WithGaps-F+ORF+inframeP
 	imgt_dat_path=None
 	indexPath=None
 	ref_dir_set_desc_seqs_map=None
@@ -1329,7 +1330,7 @@ class imgt_db:
 				blast_writer.close()
 					
 				
-
+	#format the BLAST database!
 	def blastFormatFNAInRefDirSetDirs(self,makeblastdbbin):
 		organisms=self.getOrganismList()
 		for organism in organisms:
@@ -1370,8 +1371,9 @@ class imgt_db:
 	def getDirBase(self):
 		return self.getBaseDir()
 
-	#download gene tables and reference directory sets from imgt
-	def download_imgt_RefDirSeqs_AndGeneTables_HumanAndMouse(self,unconditionalForceReplace=False):
+
+	#download GENE tables only
+	def download_GeneTables(self,unconditionalForceReplace=False):
 		print "in download_imgt_RefDirSeqs_AndGeneTables_HumanAndMouse"
 		base=self.db_base
 		organisms=self.getOrganismList(True)
@@ -1402,6 +1404,62 @@ class imgt_db:
 					print "Orphon gene table",locus,"for organism",organism,"not found, so downloading it..."
 					print "Downloading orphon gene table",locus,"for organism",organism,"from URL=",orphonURL,"and saving to",orphonTablePath
 					downloadURLToLocalFileAssumingDirectoryExists(orphonURL,orphonTablePath)
+
+		
+	#download the GeneDB and LIGM-DB
+	def download_IMGT(self,unconditionalForceReplace=False):
+		self.buildAndExecuteWGETDownloadScript()
+
+
+
+	#build the files (used by VQUEST) to IgBLAST against 
+	#from the downloaded GENEDB files
+	def buildRefDirSetsFromGENEDB(self):
+		base_fna=self.getBaseDir()+"/"+self.imgt_genedb_rel_path
+		if(not(os.path.isfile(base_fna)) or not (os.path.exists(base_fna))):
+			gmm="ERROR, GENEDB file not found!  Has it been downloaded?!?!?"
+			print gmm
+			raise Exception(gmm)
+		else:
+			organisms=self.getOrganismList(True)
+			org_imgt_regex_map=dict()
+			org_imgt_regex_map['human']=['^homo\s*sapien']
+			org_imgt_regex_map['Mus_musculus']=['^mus\s+']
+			genedb_map=read_fasta_file_into_map(base_fna)
+			for organism in organisms:
+				loci=get_loci_list()
+				org_re=re.compile(org_imgt_regex_map[organism],re.IGNORECASE)
+				for locus in loci:
+					org_loci_map=dict()
+					#from the base_fna (GENEDB), get all the key/value pairs for this organism and locus
+					for descriptor in genedb_map:
+						pieces=descriptor.split("|")
+						allele_name=pieces[1]
+						org_name=pieces[2]
+						if(allele_name.startswith(locus)):
+							#okay it matches on the locus, now let's check on the organism
+							re_res=re.match(org_re, org_name,re.IGNORECASE)
+							if(re_res):
+								#matched on the organism, so add it to the map!
+								org_loci_map[descriptor]=genedb_map[descriptor]
+					
+			
+			
+
+
+	#download gene tables and reference directory sets from imgt
+	def download_imgt_RefDirSeqs_AndGeneTables_HumanAndMouse(self,unconditionalForceReplace=False):
+		self.download_GeneTables(unconditionalForceReplace)
+		base=self.db_base
+		organisms=self.getOrganismList(True)
+		print "To download for ",organisms
+		for organism in organisms:
+			#do all organisms
+			loci=get_loci_list()
+			print "To download for ",loci
+			for locus in loci:
+				#do all 17 groups
+				print "Downloading",locus,"for",organism,"at",formatNiceDateTimeStamp(),"..."
 				#download the reference directory
 				refDirBase=geneTablesBase=base+"/"+organism+"/ReferenceDirectorySet"
 				if(not(os.path.isdir(refDirBase))):
