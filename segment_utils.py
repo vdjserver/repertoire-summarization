@@ -148,6 +148,11 @@ def dicts(t): return {k: dicts(t[k]) for k in t}
 #and any specified organism and/or locus
 #scan the reference directory set FASTAs
 #and see what entries of them are in the gene tables (or not)
+#present a "side-by-side" diff showing any differences thus 
+#allowing user to best know how to "patch" the gene 
+#tables so that all fasta entries have a place!
+#Also, obtain clone name data
+#Finally, return all the hierarchy and clone data!
 def analyze_download_dir_forVDJserver(base_dir,countsMap=None,specifiedOrganism=None,specifiedLocus=None):
 	myDB=imgt_db(base_dir)
 	organisms=myDB.getOrganismList()
@@ -166,14 +171,19 @@ def analyze_download_dir_forVDJserver(base_dir,countsMap=None,specifiedOrganism=
 				if((not(locus==specifiedLocus)) or (not(organism==specifiedOrganism))):
 					continue
 			print "Analyzing for o=",organism," and l=",locus
+			###########################################
+			###########################################
+			# HERE , FIND THE CORRESPONDING HTML FILES FOR THE GENE TABLES
 			htmlGeneTablesGlob=base_dir+"/"+organism+"/GeneTables/*"+locus+"*.html"
 			geneTableHTMLFiles=glob.glob(htmlGeneTablesGlob)
-			#print "Got html files"
-			printList(geneTableHTMLFiles)
+			###########################################
+			###########################################
+			# HERE , FIND THE CORRESPONDING FNA FILES in the Reference Directory Set Data
 			fastaFilesGlob=base_dir+"/"+organism+"/ReferenceDirectorySet/*"+locus+"*.fna"
 			fastaFiles=glob.glob(fastaFilesGlob)
-			#print "got fasta files :"
-			printList(fastaFiles)
+			##################################################
+			##################################################
+			#HERE extract the IMGT-style names (e.g. IGHV4-1*02)				
 			fastaMainMap=dict()
 			for fastaFile in fastaFiles:
 				fastaString=readFileIntoString(fastaFile)
@@ -181,40 +191,34 @@ def analyze_download_dir_forVDJserver(base_dir,countsMap=None,specifiedOrganism=
 				fastaMap=read_fasta_into_map(fastaList)	
 				for fastaKey in fastaMap:
 					fastaMainMap[fastaKey]=fastaMap[fastaKey]
-			#print "done loading into main map..."
+
 			fastaListOfNames=getIMGTNameListFromFastaMap(fastaMainMap)
-			#print "FASTA LIST OF NAMES:"
 			fastaListOfNames.sort()
-			#printList(fastaListOfNames)
-			#print "got name list.... its length is",len(fastaListOfNames)
+			##################################################
+			##################################################
+			#HERE "allelify" the names (add "*01") if no allele information is on the name
+			#this is because the desired graphics/hierarchy requires an allele at the leaves of the hierarchy
+			#and because I've seen a few cases of names without alleles!!!! 
      			fastaAlleleList=allelifyList(fastaListOfNames)
-			#print "got allele list....it is"
-			#print "ALLELIFIED LIST:"
-			#printList(fastaAlleleList)
+			#################################################
+			#################################################
+			#HERE, actually load into a "tree" dict the hierachy structures
+			#also obtain the clone names from the HTML
+			#This is done for regular genes and for orphons
 			html_data=hierarchyTreeFromGenetableURL("file://"+geneTableHTMLFiles[0],locus,fastaAlleleList)
 			locusHierarchyData=html_data[0]
-			#print "GOT HIERARCHY FROM HD0:"
-			#prettyPrintTree(locusHierarchyData)
-			#print "DONE SHOWING PRETTY PRINT GOT HIERARCHY FROM HD0"
 			clone_names_plain=html_data[1]
 			html_data=hierarchyTreeFromGenetableURL("file://"+geneTableHTMLFiles[1],locus,fastaAlleleList,locusHierarchyData)
 			locusHierarchyData=html_data[0]
-			#print "GOT HIERARCHY FROM HD0 ORPH:"
-			#prettyPrintTree(locusHierarchyData)
-			#print "DONE SHOWING PRETTY PRINT GOT HIERARCHY FROM HD0 ORPH"
+			#################################################
+			#################################################
+			#HERE, aggregate all the clone data for subsequent return			
 			clone_names_orph=html_data[1]	
 			clone_names=merge_maps(clone_names_plain,clone_names_orph)
 			write_map_to_file(clone_names,geneTableHTMLFiles[0]+".clone_names.map")
-			#print "GOT FASTA MAP KEY ALLELES :"
-			#printList(fastaAlleleList)
-			#print "GOT HIERARCHY:"
-			#prettyPrintTree(locusHierarchyData)
-			#print "DONE SHOWING PRETTY PRINT GOT HIERARCHY"
-			#print "SHOWING CLONE NAME MAP:"
-			#printMap(clone_names)
-			#print "\n\n\n\n"
-			#from
-			#http://stackoverflow.com/questions/82831/how-do-i-check-if-a-file-exists-using-python
+			#################################################
+			#################################################
+			#apply patch data if found!			
 			patchPath=geneTableHTMLFiles[0]+".patch"
 			if(os.path.isfile(patchPath)):
 				print "Found a patch file (",patchPath,") ..."
@@ -226,12 +230,12 @@ def analyze_download_dir_forVDJserver(base_dir,countsMap=None,specifiedOrganism=
 				locusHierarchyData=patchlocusHierarchyData(locusHierarchyData,patchPath)
 				print "AFTER PATCHING, THE HIERARCHY IS NOW :"
 				prettyPrintTree(locusHierarchyData)
-				#print "THIS IS THE PRETTY PRINT FOR PATCHED ORG HIERARCHY DATA"
 				org_hierarchy[organism][locus]=locusHierarchyData
-				#prettyPrintTree(org_hierarchy)
-				#print "END SHOW PATCH"
 			else:
 				print "No patch file (",patchPath,") found, so no patching being performed....."
+			#################################################
+			#################################################
+			#extract the leaves/alleles from the tree/hierarchy structure and perform a "side-by-side" diff			
 			treeAlleles=get_list_of_alleles_appearing_in_tree(locusHierarchyData)
 			setSameStats=(set(fastaAlleleList) == set(treeAlleles))
 			print "For organism=",organism,"locus=",locus
@@ -241,6 +245,9 @@ def analyze_download_dir_forVDJserver(base_dir,countsMap=None,specifiedOrganism=
 				print "SAD even after patching the fasta/RefDirNames ARE different from the hierarchy allele names!!! :("
 			briefSetDiff(fastaAlleleList,treeAlleles,"fasta alleles "+organism+"_"+locus,"tree alleles "+organism+"_"+locus)			
 			extendedSortedSetDiff(fastaAlleleList,treeAlleles,"fasta alleles "+organism+"_"+locus,"tree alleles "+organism+"_"+locus)
+			#################################################
+			#################################################
+			#in the case that the sets aren't the same, here 
 			if(not(setSameStats)):
 				print "THIS IS THE PRETTY PRINT FOR LOCUS HIERARCHY DATA, o=",organism,"l=",locus
 				prettyPrintTree(locusHierarchyData)
