@@ -1308,7 +1308,12 @@ class imgt_db:
 			loci=get_loci_list()
 			for locus in loci:
 				rds_base=self.db_base+"/"+organism+"/ReferenceDirectorySet/"
-				source_html_fna=rds_base+locus+".html.fna"
+				source_html_glob_str=rds_base+locus+"*fna"
+				glob_res=glob.glob(source_html_glob_str)
+				if(len(glob_res)!=1):
+					no_file_msg="ERROR, failed to find files ",source_html_glob_str," for BLAST formatting preparation!"
+					raise Exception(no_file_msg)
+				source_html_fna=glob_res[0]
 				target_fna=rds_base+"/"+organism+"_"+locus[0:2]+"_"+locus[3]+".fna"
 				fna_map=read_fasta_file_into_map(source_html_fna)
 				blast_fna_map=dict()
@@ -1346,8 +1351,9 @@ class imgt_db:
 			#get downloaded organism!
 			thedir=self.db_base
 			org_list=list()
+			# http://stackoverflow.com/questions/141291/how-to-list-only-top-level-directories-in-python
 			total_list=[ name for name in os.listdir(thedir) if os.path.isdir(os.path.join(thedir, name)) ]
-			print "total_list is ",total_list
+			#print "total_list is ",total_list
 			search_and_avoid=["\.py","down","\.pkl","\.sh","\.zip"]
 			for tl in total_list:
 				tls=str(tl.strip())
@@ -1431,7 +1437,7 @@ class imgt_db:
 				org_re=re.compile(org_imgt_regex_map[organism],re.IGNORECASE)
 				for locus in loci:
 					org_loci_map=dict()
-					#from the base_fna (GENEDB), get all the key/value pairs for this organism and locus
+					#from the base_fna (GENEDB), gather all the key/value pairs for this organism and locus
 					for descriptor in genedb_map:
 						pieces=descriptor.split("|")
 						allele_name=pieces[1]
@@ -1442,6 +1448,15 @@ class imgt_db:
 							if(re_res):
 								#matched on the organism, so add it to the map!
 								org_loci_map[descriptor]=genedb_map[descriptor]
+					#write the gathered descriptor/sequence pairs to FASTA files
+					dest_dir=self.getBaseDir()+"/"+organism+"/ReferenceDirectorySet/"
+					dest_file=dest_dir+"/"+locus+".fna"
+					if(not(os.path.isdir(dest_dir))):
+						 os.makedirs(dest_dir)
+					writer=open(dest_file,'w')
+					for descriptor in org_loci_map:
+						writer.write(">"+descriptor.strip()+"\n"+org_loci_map[descriptor].strip()+"\n")
+					writer.close()
 					
 			
 			
