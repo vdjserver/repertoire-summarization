@@ -1320,7 +1320,7 @@ class imgt_db:
 				for desc in fna_map:
 					blast_desc=getIMGTNameFromRefDirSetDescriptor(desc)
 					blast_fna_map[blast_desc]=fna_map[desc]
-				blast_writer=open(target_fna,'w')
+				blast_writer=open(target_fna,'a')
 				num_descs=len(fna_map)
 				rec_num=0
 				for blast_desc in blast_fna_map:
@@ -1440,27 +1440,30 @@ class imgt_db:
 				loci=get_loci_list()
 				org_re=re.compile(org_imgt_regex_map[organism],re.IGNORECASE)
 				for locus in loci:
-					org_loci_map=dict()
-					#from the base_fna (GENEDB), gather all the key/value pairs for this organism and locus
-					for descriptor in genedb_map:
-						pieces=descriptor.split("|")
-						allele_name=pieces[1]
-						org_name=pieces[2]
-						if(allele_name.startswith(locus)):
-							#okay it matches on the locus, now let's check on the organism
-							re_res=re.match(org_re, org_name)
-							if(re_res):
-								#matched on the organism, so add it to the map!
-								org_loci_map[descriptor]=genedb_map[descriptor]
-					#write the gathered descriptor/sequence pairs to FASTA files
-					dest_dir=self.getBaseDir()+"/"+organism+"/ReferenceDirectorySet/"
-					dest_file=dest_dir+"/"+locus+".fna"
-					if(not(os.path.isdir(dest_dir))):
-						 os.makedirs(dest_dir)
-					writer=open(dest_file,'w')
-					for descriptor in org_loci_map:
-						writer.write(">"+descriptor.strip()+"\n"+org_loci_map[descriptor].strip()+"\n")
-					writer.close()
+					segments=get_segment_list()
+					for segment in segments:
+						#from the base_fna (GENEDB), gather all the key/value pairs for this organism and locus
+						org_loci_map=dict()
+						for descriptor in genedb_map:
+							pieces=descriptor.split("|")
+							allele_name=pieces[1]
+							org_name=pieces[2]
+							reg_name=pieces[4]
+							if(allele_name.startswith(locus) and reg_name==locus[3]+"-REGION"    ):
+								#okay it matches on the locus and region name, now let's check on the organism
+								re_res=re.match(org_re, org_name)
+								if(re_res):
+									#matched on the organism, so add it to the map!
+									org_loci_map[descriptor]=genedb_map[descriptor]
+						#write the gathered descriptor/sequence pairs to FASTA files
+						dest_dir=self.getBaseDir()+"/"+organism+"/ReferenceDirectorySet/"
+						dest_file=dest_dir+"/"+locus+".fna"
+						if(not(os.path.isdir(dest_dir))):
+							 os.makedirs(dest_dir)
+						writer=open(dest_file,'w')
+						for descriptor in org_loci_map:
+							writer.write(">"+descriptor.strip()+"\n"+org_loci_map[descriptor].strip()+"\n")
+						writer.close()
 					
 			
 			
