@@ -138,9 +138,16 @@ if (__name__=="__main__"):
 	parser.add_argument('igblast_bin',type=str,nargs=1,help="*full* path to the igblastn executable")
 	parser.add_argument('blastx_bin',type=str,nargs=1,help="*full* path to the blastx binary executable")
 	parser.add_argument('map_file',type=str,nargs=1,help="*full* path to the map file (tab-separated key-value pairs)")
+	parser.add_argument('-analyze_only',action='store_true',help="simply analyze the database comparing gene table records with FASTA reference directory records, showing before/after effect of patch files.")
 	args=args = parser.parse_args()
 	if(args):
 		imgt_db_base=extractAsItemOrFirstFromList(args.imgt_db_base)
+		analyze_flag=extractAsItemOrFirstFromList(args.analyze_only)
+		if(analyze_flag):
+			imgtdb_obj=imgt_db(imgt_db_base)
+			analyze_download_dir_forVDJserver(imgtdb_obj.getBaseDir())
+			sys.exit(0)
+		sys.exit(0)
 		makeblastdb_bin=extractAsItemOrFirstFromList(args.makeblastdb_bin)
 		igblast_bin=extractAsItemOrFirstFromList(args.igblast_bin)
 		blastx_bin=extractAsItemOrFirstFromList(args.blastx_bin)
