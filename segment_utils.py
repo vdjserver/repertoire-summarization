@@ -125,7 +125,7 @@ def hierarchyTreeFromGenetableURL(url,locus,listOfAllowableNames=None,existingHi
 								else:
 									my_hier[subgroup][gene_name][allele_name]
 							else:
-								print "NOTE : skipping the addition of ",allele_name," into the hierarchy cause it's not in the list of allowable alleles!"
+								print "NOTE : skipping the addition of ",allele_name," into the hierarchy cause it's not in the list of alleles from the Reference Fasta!"
 	return [my_hier,clone_names_map]
 	
 
