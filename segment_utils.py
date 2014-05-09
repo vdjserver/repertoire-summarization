@@ -218,11 +218,17 @@ def analyze_download_dir_forVDJserver(base_dir,countsMap=None,specifiedOrganism=
 			#from
 			#http://stackoverflow.com/questions/82831/how-do-i-check-if-a-file-exists-using-python
 			patchPath=geneTableHTMLFiles[0]+".patch"
+			foundPatchFile=False
 			if(os.path.isfile(patchPath)):
+				foundPatchFile=True
 				print "Found a patch file (",patchPath,") found, so now patching is being performed....."
+				print "\n\n############################################"
+				print "BEFORE PATCHING, THE HIERARCHY IS  :"
+				prettyPrintTree(locusHierarchyData)
 				locusHierarchyData=patchlocusHierarchyData(locusHierarchyData,patchPath)
-				print "AFTER PATCHING, THE HIERARCHY IS NOW :"
-				#prettyPrintTree(locusHierarchyData)
+				print "\n\n############################################"
+				print "AFTER PATCHING, THE HIERARCHY IS  :"
+				prettyPrintTree(locusHierarchyData)
 				#print "THIS IS THE PRETTY PRINT FOR PATCHED ORG HIERARCHY DATA"
 				org_hierarchy[organism][locus]=locusHierarchyData
 				#prettyPrintTree(org_hierarchy)
@@ -233,16 +239,20 @@ def analyze_download_dir_forVDJserver(base_dir,countsMap=None,specifiedOrganism=
 			setSameStats=(set(fastaAlleleList) == set(treeAlleles))
 			print "For organism=",organism,"locus=",locus
 			if setSameStats:
-				print "After patching, the fasta/RefDirNames ARE the same as the hierarchy allele names!!! :)"
+				print "The fasta/RefDirNames ARE the same as the hierarchy allele names!!! :)"
 			else:
-				print "SAD even after patching the fasta/RefDirNames ARE different from the hierarchy allele names!!! :("
+				print "The fasta/RefDirNames ARE different from the hierarchy allele names!!! :("
+				if(not(foundPatchFile)):
+					print "\n\n############################################"
+					print "The hierarchy is : "
+					prettyPrintTree(locusHierarchyData)
 			briefSetDiff(fastaAlleleList,treeAlleles,"fasta alleles "+organism+"_"+locus,"tree alleles "+organism+"_"+locus)			
 			extendedSortedSetDiff(fastaAlleleList,treeAlleles,"fasta alleles "+organism+"_"+locus,"tree alleles "+organism+"_"+locus)
-			print "THIS IS THE PRETTY PRINT FOR LOCUS HIERARCHY DATA, o=",organism,"l=",locus
-			prettyPrintTree(locusHierarchyData)
-			print "THIS IS THE PRETTY PRINT FOR ORG HIERARCHY DATA"
+			#print "THIS IS THE PRETTY PRINT FOR LOCUS HIERARCHY DATA, o=",organism,"l=",locus
+			#prettyPrintTree(locusHierarchyData)
+			#print "THIS IS THE PRETTY PRINT FOR ORG HIERARCHY DATA"
 			org_hierarchy[organism][locus]=locusHierarchyData
-			prettyPrintTree(org_hierarchy)
+			#prettyPrintTree(org_hierarchy)
 			clone_names_by_org[organism]=merge_maps(clone_names_by_org[organism],clone_names)
 			print "\n\n\n"
 	#prettyPrintTree(org_hierarchy)
