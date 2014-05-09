@@ -30,7 +30,7 @@ def downloadIMGTGENE_DB_and_LIGM_DB_and_index(imgtdb_obj):
 
 #the main wrapper for downloading and preparing the database (except for parts with necessary human intervention)
 def downloadAndPrep(imgtdb_obj,makeblastdbbin,igblastnbin,kvMap,blastx_bin):
-	#downloadIMGTGENE_DB_and_LIGM_DB_and_index(imgtdb_obj)
+	downloadIMGTGENE_DB_and_LIGM_DB_and_index(imgtdb_obj)
 	imgtdb_obj.buildRefDirSetsFromGENEDB()
 	imgtdb_obj.prepareFASTAForBLASTFormatting()
 	imgtdb_obj.download_GeneTables()
