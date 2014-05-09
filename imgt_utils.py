@@ -1639,7 +1639,7 @@ class imgt_db:
 			return self.ref_dir_set_desc_seqs_map[descriptor]
 		myloci=get_loci_list()
 		for locus in myloci:
-			html_fna_path=self.db_base+"/"+organism+"/ReferenceDirectorySet/"+locus+".html.fna"
+			html_fna_path=self.db_base+"/"+organism+"/ReferenceDirectorySet/"+locus+".fna"
 			fasta_recs=read_fasta_file_into_map(html_fna_path)
 			for fasta_desc in fasta_recs:
 				self.ref_dir_set_desc_seqs_map[fasta_desc]=fasta_recs[fasta_desc]
@@ -1690,7 +1690,7 @@ class imgt_db:
 		org_dir=self.db_base+"/"+org
 		to_be_returned=None
 		if(os.path.isdir(org_dir)):
-			fna_glob_str=org_dir+"/ReferenceDirectorySet/*.html.fna"
+			fna_glob_str=org_dir+"/ReferenceDirectorySet/*.fna"
 			fna_files=glob.glob(fna_glob_str)
 			for fna_file in fna_files:
 				fna_reader=open(fna_file,'r')
@@ -1700,10 +1700,11 @@ class imgt_db:
 						if(not(org in self.org_allele_name_desc_map)):
 							self.org_allele_name_desc_map[org]=dict()
 						pieces=descriptor.split("|")
-						descriptor_allele=pieces[1]
-						if(descriptor_allele.strip()==allele_name.strip()):
-							to_be_returned=descriptor.strip()
-						self.org_allele_name_desc_map[org][descriptor_allele.strip()]=descriptor.strip()
+						if(len(pieces)>1):
+							descriptor_allele=pieces[1]
+							if(descriptor_allele.strip()==allele_name.strip()):
+								to_be_returned=descriptor.strip()
+							self.org_allele_name_desc_map[org][descriptor_allele.strip()]=descriptor.strip()
 			if(not(to_be_returned==None)):
 				return to_be_returned
 			else:
