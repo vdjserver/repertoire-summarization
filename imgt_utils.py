@@ -639,7 +639,7 @@ def formRefDirURL(species,locus):
 	allowed['Danio+rerio']=1
 	allowed['Sus+scrofa']=1
 	allowed['Mus']=1
-	if(speces.upper().startswith("MUS")):
+	if(species.upper().startswith("MUS")):
 		species="Mus"
 	if((species in allowed) and (isLegitimateLoci(locus))):
 		#THESE URLS ARE FROM http://www.imgt.org/genedb/html/directlinks.html
