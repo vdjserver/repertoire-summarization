@@ -435,7 +435,7 @@ def getIMGTNameFromRefDirSetDescriptor(desc):
 def getIMGTNameListFromFastaMap(fm):
 	imgtList=list()
 	for k in fm:
-		imgt_name=getIMGTNameFromRefDirSetDescriptor
+		imgt_name=getIMGTNameFromRefDirSetDescriptor(k)
 		imgtList.append(imgt_name)
 	return imgtList
 
