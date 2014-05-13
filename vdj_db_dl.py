@@ -147,7 +147,6 @@ if (__name__=="__main__"):
 			imgtdb_obj=imgt_db(imgt_db_base)
 			analyze_download_dir_forVDJserver(imgtdb_obj.getBaseDir())
 			sys.exit(0)
-		sys.exit(0)
 		makeblastdb_bin=extractAsItemOrFirstFromList(args.makeblastdb_bin)
 		igblast_bin=extractAsItemOrFirstFromList(args.igblast_bin)
 		blastx_bin=extractAsItemOrFirstFromList(args.blastx_bin)
