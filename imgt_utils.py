@@ -638,6 +638,9 @@ def formRefDirURL(species,locus):
 	allowed['Macaca+mulatta']=1
 	allowed['Danio+rerio']=1
 	allowed['Sus+scrofa']=1
+	allowed['Mus']=1
+	if(speces.upper().startswith("MUS")):
+		species="Mus"
 	if((species in allowed) and (isLegitimateLoci(locus))):
 		#THESE URLS ARE FROM http://www.imgt.org/genedb/html/directlinks.html
 		#base+="IMGT_GENE-DB/GENElect?query=7.2+"+locus+"&species="+species
@@ -1674,7 +1677,7 @@ class imgt_db:
 			indexfile=filepath+self.db_idx_extension
 		print "Creating index file from ",filepath," ... writing index to ",indexfile
 		reader=open(filepath,'r')
-		acc_re=re.compile(r'^ID\s+([A-Z0-9]+)\s')
+		acc_re=re.compile(r'^ID\s+([A-Z0-9]+)[^A-Z0-9]+')
 		embl_tpa_re=re.compile(r'^DR\s+EMBL\-TPA;\s+([^\s]+)\.\s*$')
 		current_embl_tpa=None
 		current_accession=None
