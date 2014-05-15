@@ -704,41 +704,45 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None",log
 	"V gene (highest score)",
 	"J gene (highest score)",
 	"D gene (highest score)",
-	"CDR3 AA length (imgt)",
-	"CDR3 AA (imgt)",
-	"CDR3 AA length (kabat)",
+	"Homology% (over V)",
 	"Stop codons? (over V and J)",
 	"Productive CDR3 rearrangement (T/F)",
-	"Insertion count (over V and J)",
-	"Deletion count (over V and J)",
-	"Indel frequency (over V and J)",
-	"Homology% (over V)",
+	"Base substitution freq% (over V)",
 	"Base substitutions (over V)",
 	"Length (over V)",
-	"Base substitution freq% (over V)",
-	"Replacement mutations (codons) (over V)",
-	"Silent mutations (codons) (over V)",
 	"Replacement mutation freq% (over V)",
+	"Replacement mutations (codons) (over V)",
 	"Silent mutation freq% (over V)",
+	"Silent mutations (codons) (over V)",
+	"Indel frequency (over V and J)",
+	"Insertion count (over V and J)",
+	"Deletion count (over V and J)",
+	
 
 
 #########################
-
+	"CDR3 AA (imgt)",
+	"CDR3 AA length (imgt)",
 	"FR1 AA (imgt)",
-	"FR1 R:S ratio (imgt)",
-	"FR1 Stop codons? (imgt)",
 	"FR1 base substitution freq% (imgt)",
 	"FR1 base substitutions (imgt)",
-	"FR1 deletion count (imgt)",
-	"FR1 homology% (imgt)",
-	"FR1 indel frequency (imgt)",
-	"FR1 insertion count (imgt)",
-	"FR1 length (imgt)",
-	"FR1 nucleotide read (imgt)",
+	"FR1 length (imgt)",1
+	"FR1 R:S ratio (imgt)",
 	"FR1 replacement mutation freq% (imgt)",
 	"FR1 replacement mutations (codons) (imgt)",
 	"FR1 silent mutation freq% (imgt)",
 	"FR1 silent mutations (codons) (imgt)",
+	"FR1 indel frequency (imgt)",
+	"FR1 insertion count (imgt)",
+	"FR1 deletion count (imgt)",
+	#mirror FR1 in other regions
+	########################
+
+	
+
+
+
+
 	"CDR1 AA (imgt)",
 	"CDR1 R:S ratio (imgt)",
 	"CDR1 Stop codons? (imgt)",
@@ -802,6 +806,8 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None",log
 
 
 ###############
+	"CDR3 AA (kabat)",
+	"CDR3 AA length (kabat)",
 	"FR1 AA (kabat)",
 	"FR1 R:S ratio (kabat)",
 	"FR1 Stop codons? (kabat)",
@@ -900,7 +906,7 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None",log
 	"Base substitutions (over V and J)",
 	"CDR3 Stop codon? (over V and J)",
 	"Deletion count (over V)",
-	"CDR3 AA (kabat)",
+
 	"Silent mutation freq% (over V and J)",
 	"Silent mutations (codons) (over V and J)",
 	"Base substitution freq% (over V and J)",
@@ -913,6 +919,14 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None",log
 	"D gene tie",
 	"J gene hit/score list",
 	"J gene tie"
+
+
+###############################33
+#extra stuff "reject section"
+	"FR1 Stop codons? (imgt)",
+	"FR1 homology% (imgt)",
+	"FR1 nucleotide read (imgt)",
+
 	]
 
 	m[keys[0]]=rid
@@ -922,6 +936,7 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None",log
 	
 
 	if(rid==1):
+		#if read id is 1, write out column headers
 		for k in range(len(keys)):
 			if(k<len(keys)-1):
 				fHandle.write(keys[k]+"\t")
@@ -934,7 +949,11 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None",log
 		else:
 			sep=""
 		if(keys[k] in m):
-			fHandle.write(str(m[keys[k]])+sep)
+			if( ( keys[k].find("%")!=(-1)  or keys[k].upper().find("FREQ")!=(-1))    and type(m[keys[k]])==float):
+				#if the column header contains a % and the type is float, multiply by 100
+				fHandle.write(str( m[keys[k]]*100.00   )+sep)
+			else:
+				fHandle.write(str(m[keys[k]])+sep)
 		else:
 			fHandle.write(defaultValue+sep)
 	fHandle.write("\n")
