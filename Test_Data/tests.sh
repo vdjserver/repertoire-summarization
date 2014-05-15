@@ -9,7 +9,7 @@ echo "PYTHONPATH IS NOW : $PYTHONPATH"
 export IGDATA=$IGDATA
 echo "USING IGDATA $IGDATA"
 echo "USING VDJ_DB_ROOT $VDJ_DB_ROOT"
-for ORGANISM in Mus_musculus human ;
+for ORGANISM in human Mus_musculus ;
 do
 	echo "Now analyzing for organism=$ORGANISM" ;
 	if [ "$ORGANISM" == "Mus_musculus" ];
