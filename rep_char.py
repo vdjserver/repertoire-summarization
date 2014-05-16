@@ -730,7 +730,7 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None",log
 	for mode in modes:
 		keys_to_append.append("CDR3 AA ("+mode+")")
 		keys_to_append.append("CDR3 AA length ("+mode+")")
-		regions=getVRegionsList():
+		regions=getVRegionsList()
 		for region in regions:
 			keys_to_append.append(region+" base substitution freq% ("+mode+")")
 			keys_to_append.append(region+" base substitutions ("+mode+")")
@@ -766,11 +766,10 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None",log
 	keys_to_append.append("Base substitutions (over V and J)")
 	keys_to_append.append("CDR3 Stop codon? (over V and J)")
 	keys_to_append.append("Deletion count (over V)")
-
 	keys_to_append.append("Silent mutation freq% (over V and J)")
 	keys_to_append.append("Silent mutations (codons) (over V and J)")
 	keys_to_append.append("Base substitution freq% (over V and J)")
-	keys_to_append.append("Stop codons? (over V)",
+	keys_to_append.append("Stop codons? (over V)")
 	keys_to_append.append("Synonymous base substitutions (over V and J)")
 	keys_to_append.append("Synonymous base substitutions (over V)")
 	keys_to_append.append("V gene hit/score list")
