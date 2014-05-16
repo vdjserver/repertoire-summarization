@@ -697,7 +697,10 @@ def vSegmentRegionVDJAnalyse(read_result_obj,meta,organism,imgtdb_obj,read_rec):
 
 
 def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None",logHandle=None):
-	keys=[
+
+
+	#apapend intro data
+	keys_to_append=[
 
 	"Read sequence #",
 	"Read identifier",
@@ -716,222 +719,86 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None",log
 	"Silent mutations (codons) (over V)",
 	"Indel frequency (over V and J)",
 	"Insertion count (over V and J)",
-	"Deletion count (over V and J)",
-	
-
-
-#########################
-	"CDR3 AA (imgt)",
-	"CDR3 AA length (imgt)",
-	"FR1 AA (imgt)",
-	"FR1 base substitution freq% (imgt)",
-	"FR1 base substitutions (imgt)",
-	"FR1 length (imgt)",1
-	"FR1 R:S ratio (imgt)",
-	"FR1 replacement mutation freq% (imgt)",
-	"FR1 replacement mutations (codons) (imgt)",
-	"FR1 silent mutation freq% (imgt)",
-	"FR1 silent mutations (codons) (imgt)",
-	"FR1 indel frequency (imgt)",
-	"FR1 insertion count (imgt)",
-	"FR1 deletion count (imgt)",
-	#mirror FR1 in other regions
-	########################
-
+	"Deletion count (over V and J)"]
 	
 
 
 
-
-	"CDR1 AA (imgt)",
-	"CDR1 R:S ratio (imgt)",
-	"CDR1 Stop codons? (imgt)",
-	"CDR1 base substitution freq% (imgt)",
-	"CDR1 base substitutions (imgt)",
-	"CDR1 deletion count (imgt)",
-	"CDR1 homology% (imgt)",
-	"CDR1 indel frequency (imgt)",
-	"CDR1 insertion count (imgt)",
-	"CDR1 length (imgt)",
-	"CDR1 nucleotide read (imgt)",
-	"CDR1 replacement mutation freq% (imgt)",
-	"CDR1 replacement mutations (codons) (imgt)",
-	"CDR1 silent mutation freq% (imgt)",
-	"CDR1 silent mutations (codons) (imgt)",
-	"FR2 AA (imgt)",
-	"FR2 R:S ratio (imgt)",
-	"FR2 Stop codons? (imgt)",
-	"FR2 base substitution freq% (imgt)",
-	"FR2 base substitutions (imgt)",
-	"FR2 deletion count (imgt)",
-	"FR2 homology% (imgt)",
-	"FR2 indel frequency (imgt)",
-	"FR2 insertion count (imgt)",
-	"FR2 length (imgt)",
-	"FR2 nucleotide read (imgt)",
-	"FR2 replacement mutation freq% (imgt)",
-	"FR2 replacement mutations (codons) (imgt)",
-	"FR2 silent mutation freq% (imgt)",
-	"FR2 silent mutations (codons) (imgt)",
-	"CDR2 AA (imgt)",
-	"CDR2 R:S ratio (imgt)",
-	"CDR2 Stop codons? (imgt)",
-	"CDR2 base substitution freq% (imgt)",
-	"CDR2 base substitutions (imgt)",
-	"CDR2 deletion count (imgt)",
-	"CDR2 homology% (imgt)",
-	"CDR2 indel frequency (imgt)",
-	"CDR2 insertion count (imgt)",
-	"CDR2 length (imgt)",
-	"CDR2 nucleotide read (imgt)",
-	"CDR2 replacement mutation freq% (imgt)",
-	"CDR2 replacement mutations (codons) (imgt)",
-	"CDR2 silent mutation freq% (imgt)",
-	"CDR2 silent mutations (codons) (imgt)",
-	"FR3 AA (imgt)",
-	"FR3 R:S ratio (imgt)",
-	"FR3 Stop codons? (imgt)",
-	"FR3 base substitution freq% (imgt)",
-	"FR3 base substitutions (imgt)",
-	"FR3 deletion count (imgt)",
-	"FR3 homology% (imgt)",
-	"FR3 indel frequency (imgt)",
-	"FR3 insertion count (imgt)",
-	"FR3 length (imgt)",
-	"FR3 nucleotide read (imgt)",
-	"FR3 replacement mutation freq% (imgt)",
-	"FR3 replacement mutations (codons) (imgt)",
-	"FR3 silent mutation freq% (imgt)",
-	"FR3 silent mutations (codons) (imgt)",
+	#append IMGT/KABAT region data
+	modes=get_domain_modes()
+	modes.sort()
+	for mode in modes:
+		keys_to_append.append("CDR3 AA ("+mode+")")
+		keys_to_append.append("CDR3 AA length ("+mode+")")
+		regions=getVRegionsList():
+		for region in regions:
+			keys_to_append.append(region+" base substitution freq% ("+mode+")")
+			keys_to_append.append(region+" base substitutions ("+mode+")")
+			keys_to_append.append(region+" length ("+mode+")")
+			keys_to_append.append(region+" R:S ratio ("+mode+")")
+			keys_to_append.append(region+" replacement mutation freq% ("+mode+")")
+			keys_to_append.append(region+" replacement mutations (codons) ("+mode+")")
+			keys_to_append.append(region+" silent mutation freq% ("+mode+")")
+			keys_to_append.append(region+" silent mutations (codons) ("+mode+")")
+			keys_to_append.append(region+" indel frequency ("+mode+")")
+			keys_to_append.append(region+" insertion count ("+mode+")")
+			keys_to_append.append(region+" deletion count ("+mode+")")
 
 
-###############
-	"CDR3 AA (kabat)",
-	"CDR3 AA length (kabat)",
-	"FR1 AA (kabat)",
-	"FR1 R:S ratio (kabat)",
-	"FR1 Stop codons? (kabat)",
-	"FR1 base substitution freq% (kabat)",
-	"FR1 base substitutions (kabat)",
-	"FR1 deletion count (kabat)",
-	"FR1 homology% (kabat)",
-	"FR1 indel frequency (kabat)",
-	"FR1 insertion count (kabat)",
-	"FR1 length (kabat)",
-	"FR1 nucleotide read (kabat)",
-	"FR1 replacement mutation freq% (kabat)",
-	"FR1 replacement mutations (codons) (kabat)",
-	"FR1 silent mutation freq% (kabat)",
-	"FR1 silent mutations (codons) (kabat)",
-	"CDR1 AA (kabat)",
-	"CDR1 R:S ratio (kabat)",
-	"CDR1 Stop codons? (kabat)",
-	"CDR1 base substitution freq% (kabat)",
-	"CDR1 base substitutions (kabat)",
-	"CDR1 deletion count (kabat)",
-	"CDR1 homology% (kabat)",
-	"CDR1 indel frequency (kabat)",
-	"CDR1 insertion count (kabat)",
-	"CDR1 length (kabat)",
-	"CDR1 nucleotide read (kabat)",
-	"CDR1 replacement mutation freq% (kabat)",
-	"CDR1 replacement mutations (codons) (kabat)",
-	"CDR1 silent mutation freq% (kabat)",
-	"CDR1 silent mutations (codons) (kabat)",
-	"FR2 AA (kabat)",
-	"FR2 R:S ratio (kabat)",
-	"FR2 Stop codons? (kabat)",
-	"FR2 base substitution freq% (kabat)",
-	"FR2 base substitutions (kabat)",
-	"FR2 deletion count (kabat)",
-	"FR2 homology% (kabat)",
-	"FR2 indel frequency (kabat)",
-	"FR2 insertion count (kabat)",
-	"FR2 length (kabat)",
-	"FR2 nucleotide read (kabat)",
-	"FR2 replacement mutation freq% (kabat)",
-	"FR2 replacement mutations (codons) (kabat)",
-	"FR2 silent mutation freq% (kabat)",
-	"FR2 silent mutations (codons) (kabat)",
-	"CDR2 AA (kabat)",
-	"CDR2 R:S ratio (kabat)",
-	"CDR2 Stop codons? (kabat)",
-	"CDR2 base substitution freq% (kabat)",
-	"CDR2 base substitutions (kabat)",
-	"CDR2 deletion count (kabat)",
-	"CDR2 homology% (kabat)",
-	"CDR2 indel frequency (kabat)",
-	"CDR2 insertion count (kabat)",
-	"CDR2 length (kabat)",
-	"CDR2 nucleotide read (kabat)",
-	"CDR2 replacement mutation freq% (kabat)",
-	"CDR2 replacement mutations (codons) (kabat)",
-	"CDR2 silent mutation freq% (kabat)",
-	"CDR2 silent mutations (codons) (kabat)",
-	"FR3 AA (kabat)",
-	"FR3 R:S ratio (kabat)",
-	"FR3 Stop codons? (kabat)",
-	"FR3 base substitution freq% (kabat)",
-	"FR3 base substitutions (kabat)",
-	"FR3 deletion count (kabat)",
-	"FR3 homology% (kabat)",
-	"FR3 indel frequency (kabat)",
-	"FR3 insertion count (kabat)",
-	"FR3 length (kabat)",
-	"FR3 nucleotide read (kabat)",
-	"FR3 replacement mutation freq% (kabat)",
-	"FR3 replacement mutations (codons) (kabat)",
-	"FR3 silent mutation freq% (kabat)",
-	"FR3 silent mutations (codons) (kabat)",
-
-####################
 
 
-	"Homology% (over V and J)",
-	"Indel frequency (over V)",
-	"Insertion count (over V)",
-	"Length (over V and J)",
-	"Mutations (over V and J)",
-	"Mutations (over V)",
-	"Nonsynonymous base substitutions (over V and J)",
-	"Nonsynonymous base substitutions (over V)",
-	"AA (over V and J)",
-	"AA (over V)",
-	"Nucleotide read (over V and J)",
-	"Nucleotide read (over V)",
-	"R:S ratio (over V and J)",
-	"R:S ratio (over V)",
-	"Replacement mutation freq% (over V and J)",
-	"Replacement mutations (codons) (over V and J)",
-	"Base substitutions (over V and J)",
-	"CDR3 Stop codon? (over V and J)",
-	"Deletion count (over V)",
+	keys_to_append.append("Homology% (over V and J)")
+	keys_to_append.append("Indel frequency (over V)")
+	keys_to_append.append("Insertion count (over V)")
+	keys_to_append.append("Length (over V and J)")
+	keys_to_append.append("Mutations (over V and J)")
+	keys_to_append.append("Mutations (over V)")
+	keys_to_append.append("Nonsynonymous base substitutions (over V and J)")
+	keys_to_append.append("Nonsynonymous base substitutions (over V)")
+	keys_to_append.append("AA (over V and J)")
+	keys_to_append.append("AA (over V)")
+	keys_to_append.append("Nucleotide read (over V and J)")
+	keys_to_append.append("Nucleotide read (over V)")
+	keys_to_append.append("R:S ratio (over V and J)")
+	keys_to_append.append("R:S ratio (over V)")
+	keys_to_append.append("Replacement mutation freq% (over V and J)")
+	keys_to_append.append("Replacement mutations (codons) (over V and J)")
+	keys_to_append.append("Base substitutions (over V and J)")
+	keys_to_append.append("CDR3 Stop codon? (over V and J)")
+	keys_to_append.append("Deletion count (over V)")
 
-	"Silent mutation freq% (over V and J)",
-	"Silent mutations (codons) (over V and J)",
-	"Base substitution freq% (over V and J)",
-	"Stop codons? (over V)",
-	"Synonymous base substitutions (over V and J)",
-	"Synonymous base substitutions (over V)",
-	"V gene hit/score list",
-	"V gene tie",
-	"D gene hit/score list",
-	"D gene tie",
-	"J gene hit/score list",
-	"J gene tie"
+	keys_to_append.append("Silent mutation freq% (over V and J)")
+	keys_to_append.append("Silent mutations (codons) (over V and J)")
+	keys_to_append.append("Base substitution freq% (over V and J)")
+	keys_to_append.append("Stop codons? (over V)",
+	keys_to_append.append("Synonymous base substitutions (over V and J)")
+	keys_to_append.append("Synonymous base substitutions (over V)")
+	keys_to_append.append("V gene hit/score list")
+	keys_to_append.append("V gene tie")
+	keys_to_append.append("D gene hit/score list")
+	keys_to_append.append("D gene tie")
+	keys_to_append.append("J gene hit/score list")
+	keys_to_append.append("J gene tie")
 
 
 ###############################33
 #extra stuff "reject section"
-	"FR1 Stop codons? (imgt)",
-	"FR1 homology% (imgt)",
-	"FR1 nucleotide read (imgt)",
+#	"FR1 Stop codons? (imgt)",
+#	"FR1 homology% (imgt)",
+#	"FR1 nucleotide read (imgt)"
 
-	]
-
+	#use the keys in the to_append list and add them as keys
+	keys=list()
+	for ki in range(len(keys_to_append)):
+		keys.append(keys_to_append[ki])
+	#set the READ ID in the map
 	m[keys[0]]=rid
-	#keys=m.keys()
-	#keys.sort()
+
+	#now, append everything from the map passed in that hasn't been added
+	for map_key in m:
+		if(not(map_key in keys)):
+			keys.append(map_key)
+
 
 	
 
