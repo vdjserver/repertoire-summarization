@@ -58,7 +58,8 @@ do
 			SIM_D=${VDJ_DB_ROOT}/${ORGANISM}/ReferenceDirectorySet/${ORGANISM}_${SEQ_TYPE}_D.fna
 			SIM_V=${VDJ_DB_ROOT}/${ORGANISM}/ReferenceDirectorySet/${ORGANISM}_${SEQ_TYPE}_V.fna
 			SIM_J=${VDJ_DB_ROOT}/${ORGANISM}/ReferenceDirectorySet/${ORGANISM}_${SEQ_TYPE}_J.fna
-			../vdj_sim.py -num_seqs 50 -dfasta ${SIM_D} ${SIM_V} ${SIM_J} > ${SIM_DATA}
+			NUM_SIM=25
+			../vdj_sim.py -num_seqs ${NUM_SIM} -dfasta ${SIM_D} ${SIM_V} ${SIM_J} > ${SIM_DATA}
 			SIM_B_OUT=${SIM_DATA}.igblast.out
 			SIM_B_OUT_HR=${SIM_B_OUT}.human_readable.txt
 			echo "Running IgBLAST for sim data $SIM_DATA ..."
