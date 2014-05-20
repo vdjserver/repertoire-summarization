@@ -523,9 +523,11 @@ def get_segment_count_map_from_blast_output(blast_out,fasta_file_list):
 #use the LOOKUP tables in the database 
 #IMGT data use the imgt.dat
 def getADJCDR3EndFromJAllele(jallele,imgtdb_obj,org="human",mode="imgt"):
+	#print "in getADJCDR3EndFromJAllele. jallele=",jallele," org=",org,"mode=",mode
 	if(mode=="imgt"):
+		#print "mode=imgt"
 		jdescriptor=imgtdb_obj.extractDescriptorLine(jallele,org)
-		cdr3_end_raw=getCDR3EndFromJData(jallele,imgtdb_obj,org)
+		cdr3_end_raw=int(getCDR3EndFromJData(jallele,imgtdb_obj,org))
 		#print "Got a descriptor ",jdescriptor
 		#print "got a raw cdr3 end=",cdr3_end_raw
 		desc_pieces=jdescriptor.split("|")
@@ -540,10 +542,15 @@ def getADJCDR3EndFromJAllele(jallele,imgtdb_obj,org="human",mode="imgt"):
 		if(mr):
 			start=int(mr.group(1))
 			stop=int(mr.group(2))
-			if(start<=cdr3_end_raw and cdr3_end_raw<=stop):
-				return cdr3_end_raw-start+1
+			#print "got start=",start
+			#print "got stop=",stop
+			if(min(start,stop)<=cdr3_end_raw and cdr3_end_raw<=max(start,stop)):
+			#if(start<=cdr3_end_raw and cdr3_end_raw<=stop):
+				adjusted=cdr3_end_raw-min(start,stop)+1
+				#print "RETURNING VALID CDR3 END = "+str(adjusted)
+				return adjusted
 			else:
-				#out of range
+				#print "OUT OF RANGE????"
 				return (-1)
 		else:
 			print "FAILED TO MATCH ON INTERVAL REGEX!!!!\n"
