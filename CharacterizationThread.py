@@ -37,6 +37,7 @@ class CharacterizationThread(threading.Thread):
 					regionAlignment=getVDJServerRegionAlignmentFromLargerVAlignmentPyObj(read_result_obj,meta,organism,mode,region,imgtdb_obj,False,read_rec)
 					if(regionAlignment!=None):
 						s_start=regionAlignment.s_start
+						s_end=regionAlignment.s_end
 						refName=char_job_dict['refName']
 						firstFrame=getTheFrameForThisReferenceAtThisPosition(refName,organism,imgtdb_obj,s_start)
 						regionAlignment.setSFM(firstFrame)
@@ -59,6 +60,8 @@ class CharacterizationThread(threading.Thread):
 						annMap[key_base+region+'_qry_end']=regionAlignment.q_end
 						annMap[key_base+region+'_ref_aln']=regionAlignment.s_aln
 						annMap[key_base+region+'_frm_msk']=regionAlignment.s_frame_mask
+						annMap[key_base+region+'_ref_srt']=int(s_start)
+						annMap[key_base+region+'_ref_end']=int(s_end)
 						self.result=annMap
 				#print "to call CHAR_QUEUE task_done..."
 				self.result_queue.put(self.result)
