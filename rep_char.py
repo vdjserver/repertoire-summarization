@@ -565,6 +565,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 			#no annotation possible if V is empty!
 			pass
 
+	#here, get results from the jobx
 	if(num_submitted_jobs>0):
 		#print "CHAR_QUEUE pre-join...."
 		characterization_queue.join()
@@ -572,9 +573,93 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 		while(get_res<num_submitted_jobs):
 			temp_results=characterization_queue_results.get()
 			if(temp_results is not None):
+				#print "NOW LOOKING AT TEMP_RESULTS:"
+				#printMap(temp_results)
+				#sys.exit(0)
 				for temp_key in temp_results:
 					annMap[temp_key]=temp_results[temp_key]			
 			get_res+=1
+
+	#here, compute the region total BSB, REPLACEMENTS, SILENTS
+	for mode in mode_list:
+		bsb_reg_tot=0
+		rplcmt_reg_tot=0
+		silent_reg_tot=0
+		ref_reg_len_tot=0
+		ref_reg_len_cdn_tot=0
+		for region in getVRegionsList():
+			bsb_key=region+" base substitutions ("+mode+")"
+			ref_reg_srt_key=global_key_base+mode+"_"+region+"_ref_srt"
+			ref_reg_end_key=global_key_base+mode+"_"+region+"_ref_end"
+			rplcmt_key=region+" replacement mutations (codons) ("+mode+")"
+			silent_key=region+" silent mutations (codons) ("+mode+")"
+			#replacement/silent ref germline increment
+			if((ref_reg_srt_key in annMap) and (ref_reg_end_key in annMap)):
+				#base pairs length
+				ref_reg_len_tot=ref_reg_len_tot+(int(annMap[ref_reg_end_key])-int(annMap[ref_reg_srt_key])+1)
+				#codon length (first na, then divide by 3, then increment total)
+				temp_len_na=ref_reg_len_tot+(int(annMap[ref_reg_end_key])-int(annMap[ref_reg_srt_key])+1)
+				temp_len_codons=int(math.floor(float(temp_len_na)/float(3.0)))
+				ref_reg_len_cdn_tot+=temp_len_codons
+			else:
+				print "at least one of "+ref_reg_srt_key+" or "+ref_reg_end_key+" missing in "+read_rec.id
+			#BSB totals incrementing
+			if(bsb_key in annMap):
+				bsb_reg_tot+=annMap[bsb_key]
+			else:
+				print bsb_key+" not found for "+read_rec.id
+			#replacement totals incrementing
+			if(rplcmt_key in annMap):
+				rplcmt_reg_tot+=annMap[rplcmt_key]
+			else:
+				print rplcmt_key+" not found "+read_rec.id
+			#silent totals incrementing
+			if(silent_key in annMap):
+				silent_reg_tot+=annMap[silent_key]
+			else:
+				print silent_key+" not found for "+read_rec.id
+				
+		#having accumulated totals for the regions, compute mode values
+		#Base substitutions
+		sum_bsb_overregion_key_num="Total base substitutions over regions ("+mode+")"
+		sum_bsb_overregion_key_dnm="Total germline length (bp) over regions ("+mode+")"
+		annMap[sum_bsb_overregion_key_dnm]=ref_reg_len_tot
+		annMap[sum_bsb_overregion_key_num]=bsb_reg_tot
+		if(ref_reg_len_tot!=0):
+			
+			reg_bsb_tot=float(bsb_reg_tot)/float(ref_reg_len_tot)
+		else:
+			reg_bsb_tot=None
+		bsb_overregion_tot_key="Total base substitution freq(%) over regions ("+mode+")"
+		annMap[bsb_overregion_tot_key]=reg_bsb_tot
+		#Codon/AA replacements (and silents)
+		sum_repl_overregion_key_num="Total replacements (codon) over regions ("+mode+")"
+		sum_slnt_overregion_key_num="Total silent (codon) over regions ("+mode+")"
+		sum_gl_overregion_key_dnm="Total codons over regions ("+mode+")"
+		annMap[sum_repl_overregion_key_num]=rplcmt_reg_tot
+		annMap[sum_slnt_overregion_key_num]=silent_reg_tot
+		annMap[sum_gl_overregion_key_dnm]=ref_reg_len_cdn_tot
+		if(ref_reg_len_cdn_tot!=0):
+			rep_over_region=float(rplcmt_reg_tot)/float(ref_reg_len_cdn_tot)
+			silent_over_region=float(silent_reg_tot)/float(ref_reg_len_cdn_tot)
+		else:
+			rep_over_region=None
+			silent_over_region=None
+		rep_overregion_tot_key="Total replacement (codon) freq(%) over regions ("+mode+")"
+		annMap[rep_overregion_tot_key]=rep_over_region
+		silent_overregion_tot_key="Total silent (codon) freq(%) over regions ("+mode+")"
+		annMap[silent_overregion_tot_key]=silent_over_region
+		total_rs_key="Total R:S ratio over all regions ("+mode+")"
+		if(annMap[sum_slnt_overregion_key_num]!=0):
+			annMap[total_rs_key]=float(annMap[sum_slnt_overregion_key_num])/float(annMap[sum_slnt_overregion_key_num])
+		else:
+			annMap[total_rs_key]=None
+			
+
+	print "SHOWING MAP WITH OVER REGION TOTALS"
+	printMap(annMap)
+	print "\n\n\n"	
+
 	
 	annMap["Read identifier"]=read_rec.id
 	#getAlignmentString(read_result_obj,meta,query_record,imgtdb_obj,organism)
@@ -730,6 +815,16 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None",log
 	for mode in modes:
 		keys_to_append.append("CDR3 AA ("+mode+")")
 		keys_to_append.append("CDR3 AA length ("+mode+")")
+		#Base substition totals
+		keys_to_append.append("Total base substitution freq(%) over regions ("+mode+")") 	#a/b
+		keys_to_append.append("Total base substitutions over regions ("+mode+")") 		#a
+		keys_to_append.append("Total germline length (bp) over regions ("+mode+")") 		#b
+		keys_to_append.append("Total R:S ratio over all regions ("+mode+")") 			#c/e
+		keys_to_append.append("Total replacement (codon) freq(%) over regions ("+mode+")") 	#c/d
+		keys_to_append.append("Total replacements (codon) over regions ("+mode+")")		#c
+		#keys_to_append.append("Total codons over regions ("+mode+")")				#d,f
+		keys_to_append.append("Total silent (codon) freq(%) over regions ("+mode+")")		#e/f
+		keys_to_append.append("Total silent (codon) over regions ("+mode+")")			#e		
 		regions=getVRegionsList()
 		for region in regions:
 			keys_to_append.append(region+" base substitution freq% ("+mode+")")
