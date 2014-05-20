@@ -587,6 +587,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 		silent_reg_tot=0
 		ref_reg_len_tot=0
 		ref_reg_len_cdn_tot=0
+		temp_len_codons=0
 		for region in getVRegionsList():
 			bsb_key=region+" base substitutions ("+mode+")"
 			ref_reg_srt_key=global_key_base+mode+"_"+region+"_ref_srt"
@@ -596,28 +597,35 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 			#replacement/silent ref germline increment
 			if((ref_reg_srt_key in annMap) and (ref_reg_end_key in annMap)):
 				#base pairs length
-				ref_reg_len_tot=ref_reg_len_tot+(int(annMap[ref_reg_end_key])-int(annMap[ref_reg_srt_key])+1)
+				this_region_na_len=int(annMap[ref_reg_end_key])-int(annMap[ref_reg_srt_key])+1
+				ref_reg_len_tot=ref_reg_len_tot+(this_region_na_len)
 				#codon length (first na, then divide by 3, then increment total)
-				temp_len_na=ref_reg_len_tot+(int(annMap[ref_reg_end_key])-int(annMap[ref_reg_srt_key])+1)
-				temp_len_codons=int(math.floor(float(temp_len_na)/float(3.0)))
+				temp_len_codons=int(math.floor(float(this_region_na_len)/float(3.0)))
+				#print "temp_len_codons=",temp_len_codons,"mode=",mode,"region=",region,"read=",read_rec.id
+				#print "this_region_na_len=",this_region_na_len
 				ref_reg_len_cdn_tot+=temp_len_codons
+				#print "ref_reg_len_cdn_tot=",ref_reg_len_cdn_tot,"mode=",mode
 			else:
-				print "at least one of "+ref_reg_srt_key+" or "+ref_reg_end_key+" missing in "+read_rec.id
+				#print "at least one of "+ref_reg_srt_key+" or "+ref_reg_end_key+" missing in "+read_rec.id
+				pass
 			#BSB totals incrementing
 			if(bsb_key in annMap):
 				bsb_reg_tot+=annMap[bsb_key]
 			else:
-				print bsb_key+" not found for "+read_rec.id
+				#print bsb_key+" not found for "+read_rec.id
+				pass
 			#replacement totals incrementing
 			if(rplcmt_key in annMap):
 				rplcmt_reg_tot+=annMap[rplcmt_key]
 			else:
-				print rplcmt_key+" not found "+read_rec.id
+				#print rplcmt_key+" not found "+read_rec.id
+				pass
 			#silent totals incrementing
 			if(silent_key in annMap):
 				silent_reg_tot+=annMap[silent_key]
 			else:
-				print silent_key+" not found for "+read_rec.id
+				#print silent_key+" not found for "+read_rec.id
+				pass
 				
 		#having accumulated totals for the regions, compute mode values
 		#Base substitutions
@@ -639,6 +647,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 		annMap[sum_repl_overregion_key_num]=rplcmt_reg_tot
 		annMap[sum_slnt_overregion_key_num]=silent_reg_tot
 		annMap[sum_gl_overregion_key_dnm]=ref_reg_len_cdn_tot
+		#print "ref_reg_len_cdn_tot=",ref_reg_len_cdn_tot
 		if(ref_reg_len_cdn_tot!=0):
 			rep_over_region=float(rplcmt_reg_tot)/float(ref_reg_len_cdn_tot)
 			silent_over_region=float(silent_reg_tot)/float(ref_reg_len_cdn_tot)
@@ -651,14 +660,18 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 		annMap[silent_overregion_tot_key]=silent_over_region
 		total_rs_key="Total R:S ratio over all regions ("+mode+")"
 		if(annMap[sum_slnt_overregion_key_num]!=0):
-			annMap[total_rs_key]=float(annMap[sum_slnt_overregion_key_num])/float(annMap[sum_slnt_overregion_key_num])
+			#print "TOTAL R: RATIO HERE"
+			#print "NUM=",float(annMap[sum_repl_overregion_key_num]),"key=",sum_repl_overregion_key_num
+			#print "DNM=",float(annMap[sum_slnt_overregion_key_num]),"key=",sum_slnt_overregion_key_num
+			#print "RTO=",float(float(annMap[sum_repl_overregion_key_num])/float(annMap[sum_slnt_overregion_key_num])),"key=",total_rs_key
+			annMap[total_rs_key]=float(float(annMap[sum_repl_overregion_key_num])/float(annMap[sum_slnt_overregion_key_num]))
 		else:
 			annMap[total_rs_key]=None
 			
 
-	print "SHOWING MAP WITH OVER REGION TOTALS"
-	printMap(annMap)
-	print "\n\n\n"	
+	#print "SHOWING MAP WITH OVER REGION TOTALS"
+	#printMap(annMap)
+	#print "\n\n\n"	
 
 	
 	annMap["Read identifier"]=read_rec.id
