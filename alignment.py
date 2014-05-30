@@ -255,16 +255,16 @@ class alignment:
 	@staticmethod
 	def buildAlignmentWithBTOP(btop,q,s,debug=False,level=0):
 		aln=["","",""]
-		aln[0]=str("")
-		aln[1]=str("")
-		aln[2]=str("")
+		aln[0]=str("") #query
+		aln[1]=str("") #midline
+		aln[2]=str("") #subject
 		dm=re.search('^(\d+)[^0-9]',btop)
 		adm=re.search('^(\d+)$',btop)
 		if adm:
 			#BTOP is 100% digital
 			btopv=int(adm.group(1))
 			aln[0]=q
-			aln[1]=repeatString("|",btopv)
+			aln[1]=repeatString("|",btopv) #alignment match
 			aln[2]=s
 			return alignment(aln[0],aln[1])
 		elif dm:
@@ -273,7 +273,7 @@ class alignment:
 			size=int(digitString)
 			aln[0]=q[:size]
 			aln[2]=s[:size]
-			aln[1]=repeatString("|",size)
+			aln[1]=repeatString("|",size) #alignment match
 			rec=buildAlignmentWholeSeqs(btop[len(digitString):],q[(size-0):],s[(size-0):],debug,level+1)
 			aln[0]+=rec[0]
 			aln[1]+=rec[1]
@@ -285,7 +285,7 @@ class alignment:
 			firstLetter=firstTwoLetters.group(1)
 			secondLetter=firstTwoLetters.group(2)
 			aln[0]=firstLetter
-			aln[1]=str("X")
+			aln[1]=str("X") #alignment mismatch/gap
 			aln[2]=secondLetter
 			if(len(btop)>2):
 				rec=["","",""]
