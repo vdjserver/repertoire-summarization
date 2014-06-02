@@ -1714,6 +1714,34 @@ class imgt_db:
 
 
 
+	#from an IMGT descriptor (">sfsdf|sdklfdjsf|dklsfjlsf|....") extract the pices
+	def extractIMGTDescriptorPieces(self,dp):
+		if(dp[0]==">"):
+			new_desc=dp[1:]
+		else:
+			new_desc=dp
+		pieces=new_desc.split("|")
+		return pieces
+
+
+	#from IMGT descriptor pieces return an array of start/stop where start<=stop
+	def getStartStopFromIMGTDescPieces(self,desc_pieces):
+		#>M13911|IGHV1-NL1*01|Homo sapiens|P|V-REGION|125..420|296 nt|1| | | | |296+24=320| |rev-compl|
+		#>D87017|IGLJ5*02|Homo sapiens|ORF|J-REGION|11386..11423|38 nt|2| | | | |38+0=38| |rev-compl|
+		interval_piece=desc_pieces[5]
+		interval_re=re.compile('(\d+)\.+(\d+)')
+		search_res=re.search(interval_re,interval_piece)
+		if(search_res):
+			first=int(search_res.group(1))
+			second=int(search_res.group(2))
+			start=min(first,second)
+			end=max(first,second)
+			t=[start,end]
+			return t
+		else:
+			raise Exception("Error, from pieces "+str(desc_pieces)+" unable to retrieve start/stop!")
+
+
 
 
 	#fetch a record given position interval from the imgt.dat file
