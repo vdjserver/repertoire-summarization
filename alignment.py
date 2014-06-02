@@ -253,6 +253,8 @@ class alignment:
 
 	#build an alignment from a BTOP
 	#returns array of query, then match/midline, then subject based on btop alignment specification
+	#NOTE : in BTOP, when two characters are paired, the first character is the QUERY
+	#Thus the alignment 	3CG2 could represent : Q_ALN 'GATCAA' and S_ALN 'GATGAA'
 	@staticmethod
 	def buildAlignmentWithBTOP(btop,q,s,debug=False,level=0):
 		aln=["","",""]
