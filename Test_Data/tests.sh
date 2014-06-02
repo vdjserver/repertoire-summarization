@@ -9,7 +9,7 @@ echo "PYTHONPATH IS NOW : $PYTHONPATH"
 export IGDATA=$IGDATA
 echo "USING IGDATA $IGDATA"
 echo "USING VDJ_DB_ROOT $VDJ_DB_ROOT"
-for ORGANISM in Mus_musculus human ;
+for ORGANISM in human Mus_musculus ;
 do
 	echo "Now analyzing for organism=$ORGANISM" ;
 	if [ "$ORGANISM" == "Mus_musculus" ];
@@ -24,7 +24,7 @@ do
 		echo -e "\n\n\n\n\n******************************************"
 		QRY=$ORGANISM.$SEQ_TYPE.fna
 		echo "USING query file = $QRY "
-		for DCMODE in kabat imgt ; 
+		for DCMODE in imgt kabat ; 
 		do
 			if [ "$SEQ_TYPE" == "TR" ]; then
 				echo "SEQ_TYPE has the value 'TR'"
