@@ -1520,10 +1520,11 @@ class imgt_db:
 		uncomp_cmd="echo \"Now searching for .Z compressed files to uncompress ...\" ; for COMPRESSED in `find "+str(self.db_base)+"|grep -P '\.Z$'` ; do UNCOMPRESSED=`echo $COMPRESSED|sed -r \"s/\.Z//gi\"` ;    echo \"Found compressed file $COMPRESSED ... to uncompress it to $UNCOMPRESSED ...\" ; echo \"USING command uncompress -c $COMPRESSED > $UNCOMPRESSED\" ; uncompress -c $COMPRESSED > $UNCOMPRESSED ; done ;\n"
 		wgetCMD+=uncomp_cmd
 		wgetScriptPath=self.db_base+"/wgetscript.sh"
-		wgetScriptOutLog=wgetScriptPath+".log.out"
-		wgetScriptErrLog=wgetScriptPath+".log.err"
+		wgetScriptLogBase=wgetScriptPath+".log"
+		wgetScriptOutLog=wgetScriptLogBase+".out"
+		wgetScriptErrLog=wgetScriptLogBase+".err"
 		write_temp_bash_script(wgetCMD,wgetScriptPath)
-		print "Proceeding to download "+refDBURL+"GENE-DB/ and "+refDBURL+"/LIGM-DB/ ..."
+		print "Proceeding to download "+refDBURL+"GENE-DB/ and "+refDBURL+"/LIGM-DB/ ...  (see logs at "+wgetScriptLogBase+".*)"
 		execute_bash_script(wgetScriptPath,outPath=wgetScriptOutLog,errPath=wgetScriptErrLog)
 	
 
