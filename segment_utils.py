@@ -573,61 +573,62 @@ def getADJCDR3EndFromJAllele(jallele,imgtdb_obj,org="human",mode="imgt"):
 
 #use the IMGT dat FILE to find the CDR3 end for a JALLELE
 def getCDR3EndFromJData(allele,imgtdb_obj,org="human"):
-	#tmp_file_path="/dev/shm/"+re.sub(r'[^0-9\.a-zA-Z]','',allele)
-	#print "tpath is ",tmp_file_path
-	#writer=open(tmp_file_path,'w')
-	#writer.write(jdata)
-	#writer.close()
-	#from Bio import SeqIO
-	#records=SeqIO.parse(tmp_file_path,"imgt")
+	print "*********************************\nEntering getCDR3EndFromJData\n*******************************"
 	biopyrec=imgtdb_obj.getIMGTDatGivenAllele(allele,True,org)
 	records=[biopyrec]
 	reg_start=None
 	reg_end=None
-	for record in records:
-		feature_list=record.features
-		for feature in feature_list:
-			#print "got a feature : ",feature
-			ftype=feature.type
-			#print "the type is ",ftype	
-			qualifiers=feature.qualifiers
-			#print "qualifiers : ",qualifiers
-			if(ftype=="J-REGION"):
-				if("IMGT_allele" in qualifiers):
-					#print "found allele in qualifiers!"
-					#print "the value of the allele is ",qualifiers["IMGT_allele"]
-					allele_qualifier_list=qualifiers["IMGT_allele"]
-					actual_value=allele_qualifier_list[0]
-					#print "the actual is ",actual_value
-					if(actual_value==allele):
-						#print "THIS IS THE RIIIIIIIIIIIIIIIIIIIIIGHT ONE!"
-						#print "the start is ",feature.location.start
-						reg_start=int(re.sub(r'[^0-9]','',str(feature.location.start)))
-						#print "fetched is ",reg_start
-						reg_end=int(re.sub(r'[^0-9]','',str(feature.location.end)))
-	#records=SeqIO.parse(tmp_file_path,"imgt")
+	extracted_descriptor=imgtdb_obj.extractDescriptorLine(allele,org)
+	#print "The extracted descriptor from inputs ",allele," and ",org," is (extracted) : "+str(extracted_descriptor)
+	extracted_descriptor_pieces=imgtdb_obj.extractIMGTDescriptorPieces(extracted_descriptor)
+	extracted_descriptor_interval=imgtdb_obj.getStartStopFromIMGTDescPieces(extracted_descriptor_pieces)
+	reg_start=extracted_descriptor_interval[0]
+	reg_end=extracted_descriptor_interval[1]
+	#for record in records:
+	#	feature_list=record.features
+	#	for feature in feature_list:
+	#		print "got a feature : ",feature
+	#		ftype=feature.type
+	#		print "the type is ",ftype	
+	#		qualifiers=feature.qualifiers
+	#		print "qualifiers : ",qualifiers
+	#		if(ftype=="J-REGION"):
+	#			if("IMGT_allele" in qualifiers):
+	#				print "found allele in qualifiers!"
+	#				print "the value of the allele is ",qualifiers["IMGT_allele"]
+	#				allele_qualifier_list=qualifiers["IMGT_allele"]
+	#				actual_value=allele_qualifier_list[0]
+	#				print "the actual is ",actual_value
+	#				if(actual_value==allele):
+	#					print "THIS IS THE RIIIIIIIIIIIIIIIIIIIIIGHT ONE!"
+	#					print "the start is ",feature.location.start
+	#					reg_start=int(re.sub(r'[^0-9]','',str(feature.location.start)))
+	#					print "fetched is ",reg_start
+	#					reg_end=int(re.sub(r'[^0-9]','',str(feature.location.end)))
+	# records=SeqIO.parse(tmp_file_path,"imgt")
+	print "NOW PROCEEDING FOR REG_START==NONE TEST..."
 	if(not(reg_start==None)):
 		for record in records:
 			feature_list=record.features
 			for feature in feature_list:
-				#print "got a feature : ",feature
+				print "got a feature : ",feature
 				ftype=feature.type
-				#print "the type is ",ftype	
+				print "the type is ",ftype	
 				qualifiers=feature.qualifiers
-				#print "qualifiers : ",qualifiers
+				print "qualifiers : ",qualifiers
 				if(ftype=="J-TRP" or ftype=="J-PHE"):
 					c_start=int(re.sub(r'[^0-9]','',str(feature.location.start)))
 					c_end=int(re.sub(r'[^0-9]','',str(feature.location.end)))
-					#print "found a jtrp"
+					print "found a jtrp"
 					if(reg_start<=c_end and c_end<=reg_end):
 						#this is it!
-						#os.remove(tmp_file_path)
 						#subtract 3 becuase we want to ignore the TRP or PHE residue and look at the residue immediately preceding
 						return c_end-3
 	else:
-		#print "failed to get a start!"
+		print "failed to get a start!"
 		pass
 	#os.remove(tmp_file_path)
+	print "getCDR3EndFromJData returning 'None' for allele="+str(allele)+" and org="+str(org)
 	return None
 
 
