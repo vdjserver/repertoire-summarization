@@ -1,6 +1,8 @@
 #!/bin/bash -x 
 #VDJ_DB_ROOT=/home/data/DATABASE/04_22_2014
 #VDJ_DB_ROOT=/home/data/DATABASE/05_09_2104
+NUM_SIM=${1:-0}
+echo "Using NUM_SIM ${NUM_SIM}"
 VDJ_DB_ROOT=/home/data/DATABASE/06_02_2014
 IGDATA=/usr/local/igblast-1.3.0
 NEW_PYTHONPATH=/home/data/vdj_server/vdjml/python/
@@ -59,7 +61,6 @@ do
 			SIM_D=${VDJ_DB_ROOT}/${ORGANISM}/ReferenceDirectorySet/${ORGANISM}_${SEQ_TYPE}_D.fna
 			SIM_V=${VDJ_DB_ROOT}/${ORGANISM}/ReferenceDirectorySet/${ORGANISM}_${SEQ_TYPE}_V.fna
 			SIM_J=${VDJ_DB_ROOT}/${ORGANISM}/ReferenceDirectorySet/${ORGANISM}_${SEQ_TYPE}_J.fna
-			NUM_SIM=50
 			../vdj_sim.py -num_seqs ${NUM_SIM} -dfasta ${SIM_D} ${SIM_V} ${SIM_J} > ${SIM_DATA}
 			SIM_B_OUT=${SIM_DATA}.igblast.out
 			SIM_B_OUT_HR=${SIM_B_OUT}.human_readable.txt
@@ -73,7 +74,12 @@ do
 			SIM_RC_OUT=$SIM_B_OUT.rc_out.tsv
 			SIM_RC_OUT_LOG=${SIM_RC_OUT}.log
 			SIM_RC_OUT_ERR=${SIM_RC_OUT}.err
-			time ../rep_char.py -json_out $SIM_JSON -cdr3_hist_out $SIM_CDR3 $SIM_B_OUT $SIM_VDJML $SIM_RC_OUT $RC_DB ${SIM_DATA} $ORGANISM  1>$SIM_RC_OUT_LOG 2>$SIM_RC_OUT_ERR
+			if [ "$NUM_SIM" -eq "0" ] ;
+			then 
+				echo "Skipping rep_char on $SIM_B_OUT because the number of simulated sequences is $NUM_SIM" ;
+			else
+				time ../rep_char.py -json_out $SIM_JSON -cdr3_hist_out $SIM_CDR3 $SIM_B_OUT $SIM_VDJML $SIM_RC_OUT $RC_DB ${SIM_DATA} $ORGANISM  1>$SIM_RC_OUT_LOG 2>$SIM_RC_OUT_ERR
+			fi ;
 			if [ -f "$QRY" ]  ;
 			then
 
