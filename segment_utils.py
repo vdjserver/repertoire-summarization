@@ -534,34 +534,36 @@ def get_segment_count_map_from_blast_output(blast_out,fasta_file_list):
 #use the LOOKUP tables in the database 
 #IMGT data use the imgt.dat
 def getADJCDR3EndFromJAllele(jallele,imgtdb_obj,org="human",mode="imgt"):
-	#print "in getADJCDR3EndFromJAllele. jallele=",jallele," org=",org,"mode=",mode
+	print "in getADJCDR3EndFromJAllele. jallele=",jallele," org=",org,"mode=",mode
 	if(mode=="imgt"):
-		#print "mode=imgt"
+		print "mode=imgt"
 		jdescriptor=imgtdb_obj.extractDescriptorLine(jallele,org)
-		cdr3_end_raw=int(getCDR3EndFromJData(jallele,imgtdb_obj,org))
-		#print "Got a descriptor ",jdescriptor
-		#print "got a raw cdr3 end=",cdr3_end_raw
+		cdr3_end_raw=getCDR3EndFromJData(jallele,imgtdb_obj,org)
+		if(cdr3_end_raw==None):
+			return (-1)
+		cdr3_end_raw=int(cdr3_end_raw)
+		print "Got a descriptor ",jdescriptor
+		print "got a raw cdr3 end=",cdr3_end_raw
 		desc_pieces=jdescriptor.split("|")
 		if(desc_pieces[14]=="rev-compl"):
 			desc_pieces[5]=swapIMGTDescInterval(desc_pieces[5])
 			sep="|"
 			jdescriptor=sep.join(desc_pieces)
-		#print "got a corrected jdescriptor ",jdescriptor
+		print "got a corrected jdescriptor ",jdescriptor
 		interval_re=re.compile(r'(\d+)\.+(\d+)')
 		desc_range=desc_pieces[5]
 		mr=re.search(interval_re,desc_range)
 		if(mr):
 			start=int(mr.group(1))
 			stop=int(mr.group(2))
-			#print "got start=",start
-			#print "got stop=",stop
+			print "got start=",start
+			print "got stop=",stop
 			if(min(start,stop)<=cdr3_end_raw and cdr3_end_raw<=max(start,stop)):
-			#if(start<=cdr3_end_raw and cdr3_end_raw<=stop):
 				adjusted=cdr3_end_raw-min(start,stop)+1
-				#print "RETURNING VALID CDR3 END = "+str(adjusted)
+				print "RETURNING VALID CDR3 END = "+str(adjusted)
 				return adjusted
 			else:
-				#print "OUT OF RANGE????"
+				print "OUT OF RANGE????"
 				return (-1)
 		else:
 			print "FAILED TO MATCH ON INTERVAL REGEX!!!!\n"
