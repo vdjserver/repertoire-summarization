@@ -406,6 +406,7 @@ def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
 				remap[dm][currentJ]=ref_cdr3_end
 			else:
 				ref_cdr3_end=remap[dm][currentJ]
+			#print "For ",currentJ," the ref_cdr3_end is ",ref_cdr3_end,"!"
 			if(ref_cdr3_start!=(-1) and ref_cdr3_end!=(-1)):
 				vq_aln=vMap['query seq']
 				vs_aln=vMap['subject seq']
@@ -442,6 +443,7 @@ def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
 						cdr3_hist[dm+'_to']=qry_cdr3_end
 					else:
 						#messed up alignment presumably due to overlap! or in the RARE case where J aligns before V in the read!
+						#print "messed up alignment presumably due to overlap! or in the RARE case where J aligns before V in the read!"
 						pass
 				else:
 					#print "BADQRYMAP Failure to map to query for mode=",dm," V=",currentV," J=",currentJ," read=",vMap['query id'],"  REFSTART=",ref_cdr3_start,"QRYSTART=",qry_cdr3_start,"REFEND=",ref_cdr3_end,"QRYEND=",qry_cdr3_end

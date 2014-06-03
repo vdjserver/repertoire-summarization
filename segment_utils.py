@@ -124,7 +124,7 @@ def hierarchyTreeFromGenetableURL(url,locus,listOfAllowableNames=None,existingHi
 								else:
 									my_hier[subgroup][gene_name][allele_name]
 							else:
-								print "NOTE : skipping the addition of ",allele_name," into the hierarchy (url=",url," and locus=",locus,") cause it's not in the list of allowable alleles (RefDirSet Fasta)!"
+								print "NOTE : skipping the addition of ",allele_name," into the hierarchy  (url=",url," and locus=",locus,")  cause it's not in the list of alleles from the Reference Fasta!"
 	return [my_hier,clone_names_map]
 	
 
@@ -191,7 +191,8 @@ def analyze_download_dir_forVDJserver(base_dir,countsMap=None,specifiedOrganism=
 				fastaMap=read_fasta_into_map(fastaList)	
 				for fastaKey in fastaMap:
 					fastaMainMap[fastaKey]=fastaMap[fastaKey]
-
+			#print "done loading into main map..."
+			#printMap(fastaMainMap)
 			fastaListOfNames=getIMGTNameListFromFastaMap(fastaMainMap)
 			fastaListOfNames.sort()
 			##################################################
@@ -210,26 +211,35 @@ def analyze_download_dir_forVDJserver(base_dir,countsMap=None,specifiedOrganism=
 			clone_names_plain=html_data[1]
 			html_data=hierarchyTreeFromGenetableURL("file://"+geneTableHTMLFiles[1],locus,fastaAlleleList,locusHierarchyData)
 			locusHierarchyData=html_data[0]
-			#################################################
-			#################################################
-			#HERE, aggregate all the clone data for subsequent return			
+			#print "GOT HIERARCHY FROM HD0 ORPH:"
+			#prettyPrintTree(locusHierarchyData)
+			#print "DONE SHOWING PRETTY PRINT GOT HIERARCHY FROM HD0 ORPH"
 			clone_names_orph=html_data[1]	
 			clone_names=merge_maps(clone_names_plain,clone_names_orph)
 			write_map_to_file(clone_names,geneTableHTMLFiles[0]+".clone_names.map")
-			#################################################
-			#################################################
-			#apply patch data if found!			
+			#print "GOT FASTA MAP KEY ALLELES :"
+			#printList(fastaAlleleList)
+			#print "GOT HIERARCHY:"
+			#prettyPrintTree(locusHierarchyData)
+			#print "DONE SHOWING PRETTY PRINT GOT HIERARCHY"
+			#print "SHOWING CLONE NAME MAP:"
+			#printMap(clone_names)
+			print "\n\n\n\n"
+			#from
+			#http://stackoverflow.com/questions/82831/how-do-i-check-if-a-file-exists-using-python
 			patchPath=geneTableHTMLFiles[0]+".patch"
+			foundPatchFile=False
 			if(os.path.isfile(patchPath)):
-				print "Found a patch file (",patchPath,") ..."
+				foundPatchFile=True
+				print "Found a patch file (",patchPath,") found, so now patching is being performed....."
+				print "\n\n############################################"
+				print "BEFORE PATCHING, THE HIERARCHY IS  :"
 				prettyPrintTree(locusHierarchyData)
-				patchContents=readFileIntoString(patchPath)
-				print "The patch contents are : "
-				print "\n",patchContents,"\n"
-				print "... now patching is being performed....."
 				locusHierarchyData=patchlocusHierarchyData(locusHierarchyData,patchPath)
-				print "AFTER PATCHING, THE HIERARCHY IS NOW :"
+				print "\n\n############################################"
+				print "AFTER PATCHING, THE HIERARCHY IS  :"
 				prettyPrintTree(locusHierarchyData)
+				#print "THIS IS THE PRETTY PRINT FOR PATCHED ORG HIERARCHY DATA"
 				org_hierarchy[organism][locus]=locusHierarchyData
 			else:
 				print "No patch file (",patchPath,") found, so no patching being performed....."
@@ -240,18 +250,20 @@ def analyze_download_dir_forVDJserver(base_dir,countsMap=None,specifiedOrganism=
 			setSameStats=(set(fastaAlleleList) == set(treeAlleles))
 			print "For organism=",organism,"locus=",locus
 			if setSameStats:
-				print "After patching, the fasta/RefDirNames ARE the same as the hierarchy allele names!!! :)"
+				print "The fasta/RefDirNames ARE the same as the hierarchy allele names!!! :)"
 			else:
-				print "SAD even after patching the fasta/RefDirNames ARE different from the hierarchy allele names!!! :("
+				print "The fasta/RefDirNames ARE different from the hierarchy allele names!!! :("
+				if(not(foundPatchFile)):
+					print "\n\n############################################"
+					print "The hierarchy is : "
+					prettyPrintTree(locusHierarchyData)
 			briefSetDiff(fastaAlleleList,treeAlleles,"fasta alleles "+organism+"_"+locus,"tree alleles "+organism+"_"+locus)			
 			extendedSortedSetDiff(fastaAlleleList,treeAlleles,"fasta alleles "+organism+"_"+locus,"tree alleles "+organism+"_"+locus)
-			#################################################
-			#################################################
-			#in the case that the sets aren't the same, here 
-			if(not(setSameStats)):
-				print "THIS IS THE PRETTY PRINT FOR LOCUS HIERARCHY DATA, o=",organism,"l=",locus
-				prettyPrintTree(locusHierarchyData)
+			#print "THIS IS THE PRETTY PRINT FOR LOCUS HIERARCHY DATA, o=",organism,"l=",locus
+			#prettyPrintTree(locusHierarchyData)
+			#print "THIS IS THE PRETTY PRINT FOR ORG HIERARCHY DATA"
 			org_hierarchy[organism][locus]=locusHierarchyData
+			#prettyPrintTree(org_hierarchy)
 			clone_names_by_org[organism]=merge_maps(clone_names_by_org[organism],clone_names)
 			print "\n\n\n"
 	#prettyPrintTree(org_hierarchy)
@@ -522,9 +534,11 @@ def get_segment_count_map_from_blast_output(blast_out,fasta_file_list):
 #use the LOOKUP tables in the database 
 #IMGT data use the imgt.dat
 def getADJCDR3EndFromJAllele(jallele,imgtdb_obj,org="human",mode="imgt"):
+	#print "in getADJCDR3EndFromJAllele. jallele=",jallele," org=",org,"mode=",mode
 	if(mode=="imgt"):
+		#print "mode=imgt"
 		jdescriptor=imgtdb_obj.extractDescriptorLine(jallele,org)
-		cdr3_end_raw=getCDR3EndFromJData(jallele,imgtdb_obj,org)
+		cdr3_end_raw=int(getCDR3EndFromJData(jallele,imgtdb_obj,org))
 		#print "Got a descriptor ",jdescriptor
 		#print "got a raw cdr3 end=",cdr3_end_raw
 		desc_pieces=jdescriptor.split("|")
@@ -539,10 +553,15 @@ def getADJCDR3EndFromJAllele(jallele,imgtdb_obj,org="human",mode="imgt"):
 		if(mr):
 			start=int(mr.group(1))
 			stop=int(mr.group(2))
-			if(start<=cdr3_end_raw and cdr3_end_raw<=stop):
-				return cdr3_end_raw-start+1
+			#print "got start=",start
+			#print "got stop=",stop
+			if(min(start,stop)<=cdr3_end_raw and cdr3_end_raw<=max(start,stop)):
+			#if(start<=cdr3_end_raw and cdr3_end_raw<=stop):
+				adjusted=cdr3_end_raw-min(start,stop)+1
+				#print "RETURNING VALID CDR3 END = "+str(adjusted)
+				return adjusted
 			else:
-				#out of range
+				#print "OUT OF RANGE????"
 				return (-1)
 		else:
 			print "FAILED TO MATCH ON INTERVAL REGEX!!!!\n"
@@ -565,61 +584,62 @@ def getADJCDR3EndFromJAllele(jallele,imgtdb_obj,org="human",mode="imgt"):
 
 #use the IMGT dat FILE to find the CDR3 end for a JALLELE
 def getCDR3EndFromJData(allele,imgtdb_obj,org="human"):
-	#tmp_file_path="/dev/shm/"+re.sub(r'[^0-9\.a-zA-Z]','',allele)
-	#print "tpath is ",tmp_file_path
-	#writer=open(tmp_file_path,'w')
-	#writer.write(jdata)
-	#writer.close()
-	#from Bio import SeqIO
-	#records=SeqIO.parse(tmp_file_path,"imgt")
+	print "*********************************\nEntering getCDR3EndFromJData\n*******************************"
 	biopyrec=imgtdb_obj.getIMGTDatGivenAllele(allele,True,org)
 	records=[biopyrec]
 	reg_start=None
 	reg_end=None
-	for record in records:
-		feature_list=record.features
-		for feature in feature_list:
-			#print "got a feature : ",feature
-			ftype=feature.type
-			#print "the type is ",ftype	
-			qualifiers=feature.qualifiers
-			#print "qualifiers : ",qualifiers
-			if(ftype=="J-REGION"):
-				if("IMGT_allele" in qualifiers):
-					#print "found allele in qualifiers!"
-					#print "the value of the allele is ",qualifiers["IMGT_allele"]
-					allele_qualifier_list=qualifiers["IMGT_allele"]
-					actual_value=allele_qualifier_list[0]
-					#print "the actual is ",actual_value
-					if(actual_value==allele):
-						#print "THIS IS THE RIIIIIIIIIIIIIIIIIIIIIGHT ONE!"
-						#print "the start is ",feature.location.start
-						reg_start=int(re.sub(r'[^0-9]','',str(feature.location.start)))
-						#print "fetched is ",reg_start
-						reg_end=int(re.sub(r'[^0-9]','',str(feature.location.end)))
-	#records=SeqIO.parse(tmp_file_path,"imgt")
+	extracted_descriptor=imgtdb_obj.extractDescriptorLine(allele,org)
+	#print "The extracted descriptor from inputs ",allele," and ",org," is (extracted) : "+str(extracted_descriptor)
+	extracted_descriptor_pieces=imgtdb_obj.extractIMGTDescriptorPieces(extracted_descriptor)
+	extracted_descriptor_interval=imgtdb_obj.getStartStopFromIMGTDescPieces(extracted_descriptor_pieces)
+	reg_start=extracted_descriptor_interval[0]
+	reg_end=extracted_descriptor_interval[1]
+	#for record in records:
+	#	feature_list=record.features
+	#	for feature in feature_list:
+	#		print "got a feature : ",feature
+	#		ftype=feature.type
+	#		print "the type is ",ftype	
+	#		qualifiers=feature.qualifiers
+	#		print "qualifiers : ",qualifiers
+	#		if(ftype=="J-REGION"):
+	#			if("IMGT_allele" in qualifiers):
+	#				print "found allele in qualifiers!"
+	#				print "the value of the allele is ",qualifiers["IMGT_allele"]
+	#				allele_qualifier_list=qualifiers["IMGT_allele"]
+	#				actual_value=allele_qualifier_list[0]
+	#				print "the actual is ",actual_value
+	#				if(actual_value==allele):
+	#					print "THIS IS THE RIIIIIIIIIIIIIIIIIIIIIGHT ONE!"
+	#					print "the start is ",feature.location.start
+	#					reg_start=int(re.sub(r'[^0-9]','',str(feature.location.start)))
+	#					print "fetched is ",reg_start
+	#					reg_end=int(re.sub(r'[^0-9]','',str(feature.location.end)))
+	# records=SeqIO.parse(tmp_file_path,"imgt")
+	print "NOW PROCEEDING FOR REG_START==NONE TEST..."
 	if(not(reg_start==None)):
 		for record in records:
 			feature_list=record.features
 			for feature in feature_list:
-				#print "got a feature : ",feature
+				print "got a feature : ",feature
 				ftype=feature.type
-				#print "the type is ",ftype	
+				print "the type is ",ftype	
 				qualifiers=feature.qualifiers
-				#print "qualifiers : ",qualifiers
+				print "qualifiers : ",qualifiers
 				if(ftype=="J-TRP" or ftype=="J-PHE"):
 					c_start=int(re.sub(r'[^0-9]','',str(feature.location.start)))
 					c_end=int(re.sub(r'[^0-9]','',str(feature.location.end)))
-					#print "found a jtrp"
+					print "found a jtrp"
 					if(reg_start<=c_end and c_end<=reg_end):
 						#this is it!
-						#os.remove(tmp_file_path)
 						#subtract 3 becuase we want to ignore the TRP or PHE residue and look at the residue immediately preceding
 						return c_end-3
 	else:
-		#print "failed to get a start!"
+		print "failed to get a start!"
 		pass
 	#os.remove(tmp_file_path)
+	print "getCDR3EndFromJData returning 'None' for allele="+str(allele)+" and org="+str(org)
 	return None
 
 

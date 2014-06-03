@@ -1285,6 +1285,7 @@ class imgt_db:
 	accession_start_stop_map=None
 	accession_dat_file_map=None
 	imgt_dat_rel_path="www.imgt.org/download/LIGM-DB/imgt.dat"
+	imgt_genedb_rel_path="www.imgt.org/download/GENE-DB/IMGTGENEDB-ReferenceSequences.fasta-nt-WithGaps-F+ORF+inframeP"
 	imgt_dat_path=None
 	indexPath=None
 	ref_dir_set_desc_seqs_map=None
@@ -1307,7 +1308,12 @@ class imgt_db:
 			loci=get_loci_list()
 			for locus in loci:
 				rds_base=self.db_base+"/"+organism+"/ReferenceDirectorySet/"
-				source_html_fna=rds_base+locus+".html.fna"
+				source_html_glob_str=rds_base+locus+"*fna"
+				glob_res=glob.glob(source_html_glob_str)
+				if(len(glob_res)!=1):
+					no_file_msg="ERROR, failed to find files ",source_html_glob_str," for BLAST formatting preparation!"
+					raise Exception(no_file_msg)
+				source_html_fna=glob_res[0]
 				target_fna=rds_base+"/"+organism+"_"+locus[0:2]+"_"+locus[3]+".fna"
 				fna_map=read_fasta_file_into_map(source_html_fna)
 				blast_fna_map=dict()
@@ -1351,7 +1357,7 @@ class imgt_db:
 
 					
 				
-
+	#format the BLAST database!
 	def blastFormatFNAInRefDirSetDirs(self,makeblastdbbin):
 		organisms=self.getOrganismList()
 		for organism in organisms:
@@ -1374,8 +1380,9 @@ class imgt_db:
 			#get downloaded organism!
 			thedir=self.db_base
 			org_list=list()
+			# http://stackoverflow.com/questions/141291/how-to-list-only-top-level-directories-in-python
 			total_list=[ name for name in os.listdir(thedir) if os.path.isdir(os.path.join(thedir, name)) ]
-			print "total_list is ",total_list
+			#print "total_list is ",total_list
 			search_and_avoid=["\.py","down","\.pkl","\.sh","\.zip"]
 			for tl in total_list:
 				tls=str(tl.strip())
@@ -1399,8 +1406,9 @@ class imgt_db:
 	def getDirBase(self):
 		return self.getBaseDir()
 
-	#download gene tables and reference directory sets from imgt
-	def download_imgt_RefDirSeqs_AndGeneTables_HumanAndMouse(self,unconditionalForceReplace=False):
+
+	#download GENE tables only
+	def download_GeneTables(self,unconditionalForceReplace=False):
 		print "in download_imgt_RefDirSeqs_AndGeneTables_HumanAndMouse"
 		base=self.db_base
 		organisms=self.getOrganismList(True)
@@ -1426,11 +1434,83 @@ class imgt_db:
 					print "Gene table",locus,"for organism",organism,"not found or force replace set to true...so downloading it...."
 					print "Downloading gene table",locus,"for organism",organism,"from URL=",regularURL," saving to",regularTablePath
 					downloadURLToLocalFileAssumingDirectoryExists(regularURL,regularTablePath)
+				else:
+					print "Gene table",locus,"for organism",organism," found and force replace set to False...so not downloading it...."
 				orphonTablePath=regularTablePath+".orphons.html"
 				if(not(os.path.exists(orphonTablePath)) or unconditionalForceReplace==True):
 					print "Orphon gene table",locus,"for organism",organism,"not found, so downloading it..."
 					print "Downloading orphon gene table",locus,"for organism",organism,"from URL=",orphonURL,"and saving to",orphonTablePath
 					downloadURLToLocalFileAssumingDirectoryExists(orphonURL,orphonTablePath)
+				else:
+					print "Orphon Gene table",orphonTablePath,"for organism",organism," found and force replace set to False...so not downloading it...."
+
+		
+	#download the GeneDB and LIGM-DB
+	def download_IMGT(self,unconditionalForceReplace=False):
+		self.buildAndExecuteWGETDownloadScript()
+
+
+
+	#build the files (used by VQUEST) to IgBLAST against 
+	#from the downloaded GENEDB files
+	def buildRefDirSetsFromGENEDB(self):
+		base_fna=self.getBaseDir()+"/"+self.imgt_genedb_rel_path
+		if(not(os.path.isfile(base_fna)) or not (os.path.exists(base_fna))):
+			gmm="ERROR, GENEDB file not found!  Has it been downloaded?!?!?"
+			print gmm
+			raise Exception(gmm)
+		else:
+			organisms=self.getOrganismList(True)
+			org_imgt_regex_map=dict()
+			org_imgt_regex_map['human']='^homo\s*sapien'
+			org_imgt_regex_map['Mus_musculus']='^mus\s+'
+			genedb_map=read_fasta_file_into_map(base_fna)
+			for organism in organisms:
+				loci=get_loci_list()
+				org_re=re.compile(org_imgt_regex_map[organism],re.IGNORECASE)
+				for locus in loci:
+					segments=get_segment_list()
+					for segment in segments:
+						#from the base_fna (GENEDB), gather all the key/value pairs for this organism and locus
+						org_loci_map=dict()
+						for descriptor in genedb_map:
+							pieces=descriptor.split("|")
+							allele_name=pieces[1]
+							org_name=pieces[2]
+							reg_name=pieces[4]
+							if(allele_name.startswith(locus) and reg_name==locus[3]+"-REGION"    ):
+								#okay it matches on the locus and region name, now let's check on the organism
+								re_res=re.match(org_re, org_name)
+								if(re_res):
+									#matched on the organism, so add it to the map!
+									org_loci_map[descriptor]=genedb_map[descriptor]
+						#write the gathered descriptor/sequence pairs to FASTA files
+						dest_dir=self.getBaseDir()+"/"+organism+"/ReferenceDirectorySet/"
+						dest_file=dest_dir+"/"+locus+".fna"
+						if(not(os.path.isdir(dest_dir))):
+							 os.makedirs(dest_dir)
+						writer=open(dest_file,'w')
+						for descriptor in org_loci_map:
+							writer.write(">"+descriptor.strip()+"\n"+org_loci_map[descriptor].strip()+"\n")
+						writer.close()
+					
+			
+			
+
+
+	#download gene tables and reference directory sets from imgt
+	def download_imgt_RefDirSeqs_AndGeneTables_HumanAndMouse(self,unconditionalForceReplace=False):
+		self.download_GeneTables(unconditionalForceReplace)
+		base=self.db_base
+		organisms=self.getOrganismList(True)
+		print "To download for ",organisms
+		for organism in organisms:
+			#do all organisms
+			loci=get_loci_list()
+			print "To download for ",loci
+			for locus in loci:
+				#do all 17 groups
+				print "Downloading",locus,"for",organism,"at",formatNiceDateTimeStamp(),"..."
 				#download the reference directory
 				refDirBase=geneTablesBase=base+"/"+organism+"/ReferenceDirectorySet"
 				if(not(os.path.isdir(refDirBase))):
@@ -1469,9 +1549,11 @@ class imgt_db:
 		uncomp_cmd="echo \"Now searching for .Z compressed files to uncompress ...\" ; for COMPRESSED in `find "+str(self.db_base)+"|grep -P '\.Z$'` ; do UNCOMPRESSED=`echo $COMPRESSED|sed -r \"s/\.Z//gi\"` ;    echo \"Found compressed file $COMPRESSED ... to uncompress it to $UNCOMPRESSED ...\" ; echo \"USING command uncompress -c $COMPRESSED > $UNCOMPRESSED\" ; uncompress -c $COMPRESSED > $UNCOMPRESSED ; done ;\n"
 		wgetCMD+=uncomp_cmd
 		wgetScriptPath=self.db_base+"/wgetscript.sh"
-		wgetScriptOutLog=wgetScriptPath+".log.out"
-		wgetScriptErrLog=wgetScriptPath+".log.err"
+		wgetScriptLogBase=wgetScriptPath+".log"
+		wgetScriptOutLog=wgetScriptLogBase+".out"
+		wgetScriptErrLog=wgetScriptLogBase+".err"
 		write_temp_bash_script(wgetCMD,wgetScriptPath)
+		print "Proceeding to download "+refDBURL+"GENE-DB/ and "+refDBURL+"/LIGM-DB/ ...  (see logs at "+wgetScriptLogBase+".*)"
 		execute_bash_script(wgetScriptPath,outPath=wgetScriptOutLog,errPath=wgetScriptErrLog)
 	
 
@@ -1587,7 +1669,7 @@ class imgt_db:
 			return self.ref_dir_set_desc_seqs_map[descriptor]
 		myloci=get_loci_list()
 		for locus in myloci:
-			html_fna_path=self.db_base+"/"+organism+"/ReferenceDirectorySet/"+locus+".html.fna"
+			html_fna_path=self.db_base+"/"+organism+"/ReferenceDirectorySet/"+locus+".fna"
 			fasta_recs=read_fasta_file_into_map(html_fna_path)
 			for fasta_desc in fasta_recs:
 				self.ref_dir_set_desc_seqs_map[fasta_desc]=fasta_recs[fasta_desc]
@@ -1638,7 +1720,7 @@ class imgt_db:
 		org_dir=self.db_base+"/"+org
 		to_be_returned=None
 		if(os.path.isdir(org_dir)):
-			fna_glob_str=org_dir+"/ReferenceDirectorySet/*.html.fna"
+			fna_glob_str=org_dir+"/ReferenceDirectorySet/*.fna"
 			fna_files=glob.glob(fna_glob_str)
 			for fna_file in fna_files:
 				fna_reader=open(fna_file,'r')
@@ -1648,10 +1730,11 @@ class imgt_db:
 						if(not(org in self.org_allele_name_desc_map)):
 							self.org_allele_name_desc_map[org]=dict()
 						pieces=descriptor.split("|")
-						descriptor_allele=pieces[1]
-						if(descriptor_allele.strip()==allele_name.strip()):
-							to_be_returned=descriptor.strip()
-						self.org_allele_name_desc_map[org][descriptor_allele.strip()]=descriptor.strip()
+						if(len(pieces)>1):
+							descriptor_allele=pieces[1]
+							if(descriptor_allele.strip()==allele_name.strip()):
+								to_be_returned=descriptor.strip()
+							self.org_allele_name_desc_map[org][descriptor_allele.strip()]=descriptor.strip()
 			if(not(to_be_returned==None)):
 				return to_be_returned
 			else:
@@ -1659,6 +1742,34 @@ class imgt_db:
 		else:
 			raise Exception("Error, invalid organism="+str(org)+", its directory doesn't exist under"+str(db_base)+"!")
 
+
+
+	#from an IMGT descriptor (">sfsdf|sdklfdjsf|dklsfjlsf|....") extract the pices
+	def extractIMGTDescriptorPieces(self,dp):
+		if(dp[0]==">"):
+			new_desc=dp[1:]
+		else:
+			new_desc=dp
+		pieces=new_desc.split("|")
+		return pieces
+
+
+	#from IMGT descriptor pieces return an array of start/stop where start<=stop
+	def getStartStopFromIMGTDescPieces(self,desc_pieces):
+		#>M13911|IGHV1-NL1*01|Homo sapiens|P|V-REGION|125..420|296 nt|1| | | | |296+24=320| |rev-compl|
+		#>D87017|IGLJ5*02|Homo sapiens|ORF|J-REGION|11386..11423|38 nt|2| | | | |38+0=38| |rev-compl|
+		interval_piece=desc_pieces[5]
+		interval_re=re.compile('(\d+)\.+(\d+)')
+		search_res=re.search(interval_re,interval_piece)
+		if(search_res):
+			first=int(search_res.group(1))
+			second=int(search_res.group(2))
+			start=min(first,second)
+			end=max(first,second)
+			t=[start,end]
+			return t
+		else:
+			raise Exception("Error, from pieces "+str(desc_pieces)+" unable to retrieve start/stop!")
 
 
 
@@ -1703,7 +1814,7 @@ class imgt_db:
 			indexfile=filepath+self.db_idx_extension
 		print "Creating index file from ",filepath," ... writing index to ",indexfile
 		reader=open(filepath,'r')
-		acc_re=re.compile(r'^ID\s+([A-Z0-9]+)\s')
+		acc_re=re.compile(r'^ID\s+([A-Z0-9]+)[^A-Z0-9]+')
 		embl_tpa_re=re.compile(r'^DR\s+EMBL\-TPA;\s+([^\s]+)\.\s*$')
 		current_embl_tpa=None
 		current_accession=None
@@ -1713,9 +1824,9 @@ class imgt_db:
 		rec_num=0
 		flag=True
 		while(flag):
-			#line=line.strip()
 			line=reader.readline()
 			if(line):
+				#print "Got ",line.strip()
 				rs=re.search(acc_re,line)
 				es=re.search(embl_tpa_re,line)
 				if(rs):
@@ -1733,6 +1844,7 @@ class imgt_db:
 						#index_file.write(current_embl_tpa+"\t"+str(rec_start)+"\t"+str(rec_end)+"\n")
 						index_file.write(current_embl_tpa+"\t"+current_accession+"\n");
 					current_embl_tpa=None
+				#print "current accession = ",current_accession
 			else:
 				flag=False
 		index_file.close()	

@@ -10,7 +10,7 @@ taken as input and 4 distinct files are generated as outputs:
 1) CDR3 length histogram (in kabat and imgt modes),
 2) JSON-formatted hierachies of the IMGT alleles and 
 corresponding counts of segments in top combinations
-with agregrated counts, 3) read-level summary statistics
+with agregrated counts, 3) read-level summary statistics (TSV)
 , and 4 ) vdjml files of the parsed data.
 
 The rep_char.py script is designed to support the above 4 functions.
@@ -90,6 +90,89 @@ optional arguments:
   -skip_char            If this is set, then characterization besides
                         asignment and CDR3 length is skipped
  
+
+
+###########################################################
+# REPERTOIRE-CHARACTERIZATION REQUIRES A VDJ_DB DIRECTORY #
+###########################################################
+
+Required by rep_char.py (whose outputs are 1) VDJML files, 
+2) cdr3 length histogram(s), 3) TSV output files with huge 
+number of columns and 4) JSON-formatted segment counts is 
+the VDJ_DB_ROOT which is a directory with files and directories 
+placed and expected to be in an organized manner.
+
+In brief summary, the files/directories listed below are important
+and the uses and reasons for importance are listed too.
+
+*  PER organism a directory is expected under the root (you can see 
+Mus_musculus and human in the listing below)
+*  UNDER each organism is expected a directory "ReferenceDirectorySet" 
+is expected (containing FASTA files and auto-downloaded HTML/fasta 
+files and BLAST databases and domain-system region lookup data for 
+region start/stop data for IMGT and KABAT)
+*  UNDER each organism is expected a directory "GeneTables" 
+(containing auto-downloaded and parsed HTML files of gene table 
+[hierarchical] information which is parsed for creating .JSON 
+output files for the chart viewing for knowing the hierarchy 
+and how to zoom)
+*  UNDER the root is www.imgt.dat which contains under it the 
+file ./download/LIGM-DB/imgt.dat which is a large flat-file 
+which is parsed to find J CDR3 end information
+
+A "tree -d" listing is seen here showing an example :
+
+esalina2@eddiecomp:/home/data/DATABASE/04_22_2014$ tree -d `pwd`
+/home/data/DATABASE/04_22_2014
+├── human
+│   ├── GeneTables
+│   └── ReferenceDirectorySet
+│       ├── HUMAN_REF
+│       │   └── IMGT_HighV-QUEST_individual_files_folder
+│       ├── HUMAN_TR_V
+│       │   └── IMGT_HighV-QUEST_individual_files_folder
+│       └── KABAT
+├── Mus_musculus
+│   ├── GeneTables
+│   └── ReferenceDirectorySet
+│       ├── KABAT
+│       ├── MOUSE
+│       │   └── IMGT_HighV-QUEST_individual_files_folder
+│       └── MOUSE_TR_V
+│           └── IMGT_HighV-QUEST_individual_files_folder
+└── www.imgt.org
+    └── download
+        ├── GENE-DB
+        └── LIGM-DB
+
+
+
+
+###########################################################
+# REPERTOIRE-CHARACTERIZATION TEST DIRECTORY              #
+###########################################################
+
+Under the Test_Data director) lies a driver script and data to test 
+some core functionalities.
+
+The driver script is tests.sh.  Besides testing, it can be viewed
+to see some example calls/usages!
+Test data include : human.IG.fna, human.TR.fna (human IG and TR data)
+and Mus_musculus_IG.fna and  Mus_musculus_TR.fna (mouse IG and TR data).
+During the course of script execution IgBLAST is invoked on the data
+in both IMGT and KABAT domain modes.  Also, during the course of
+execution, the vdj_sim.py script uses the VDJ_DB files to 
+simulate VDJ recombination and somatic hypermutatation and
+these data files are also used as part of the tests.
+
+Tests generate VDJML files, characterization output files 
+(TSV-formatted), CDR3 length histograms, and JSON segment count
+data.  Output/error log files are also generated.
+
+
+
+
+
 
 -Eddie Salinas
 VDJ Server Team Member

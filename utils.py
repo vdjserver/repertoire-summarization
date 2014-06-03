@@ -559,7 +559,7 @@ def allelifyList(l):
 
 
 #read a fasta file into a map (descriptors as keys, sequences as values)
-def read_fasta_file_into_map(fasta_path,alwaysSeqToUpper=True,removeNonIUPAC=True):
+def read_fasta_file_into_map(fasta_path,alwaysSeqToUpper=True):
 	fasta_data=read_fasta(fasta_path,alwaysSeqToUpper)
 	fasta_map=read_fasta_into_map(fasta_data)
 	return fasta_map

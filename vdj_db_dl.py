@@ -21,21 +21,27 @@ def download_ReferenceDirDataHMAndGeneTables(imgtdb_obj):
 	#and gene tables
 	imgtdb_obj.download_imgt_RefDirSeqs_AndGeneTables_HumanAndMouse(True)
 
-
+#download FASTA and ANNOTATION data
 def downloadIMGTGENE_DB_and_LIGM_DB_and_index(imgtdb_obj):
-	#imgtdb_obj.buildAndExecuteWGETDownloadScript()
+	imgtdb_obj.buildAndExecuteWGETDownloadScript()
 	imgtdb_obj.indexIMGTDatFile()
 	imgtdb_obj.cacheIndex()
 
 
 #the main wrapper for downloading and preparing the database (except for parts with necessary human intervention!)
 def downloadAndPrep(imgtdb_obj,makeblastdbbin,igblastnbin,kvMap,blastx_bin):
-	#download_ReferenceDirDataHMAndGeneTables(imgtdb_obj):
-	#analyze_download_dir_forVDJserver(imgtdb_obj.getBaseDir())
+	#download fasta and annotation data
+	downloadIMGTGENE_DB_and_LIGM_DB_and_index(imgtdb_obj)
+	#partition the loci (ighv,ighd, etc)
+	imgtdb_obj.buildRefDirSetsFromGENEDB()
 	imgtdb_obj.prepareFASTAForBLASTFormatting()
+	#downloag the gene tables for the IMGT hierarchy
+	imgtdb_obj.download_GeneTables()
+	#compare sequences in FNA GL files and 
+	analyze_download_dir_forVDJserver(imgtdb_obj.getBaseDir())
 	imgtdb_obj.blastFormatFNAInRefDirSetDirs(makeblastdbbin)
-	#downloadIMGTGENE_DB_and_LIGM_DB_and_index(imgtdb_obj)
-	#kabat_process(imgtdb_obj,igblastnbin,blastx_bin,kvMap,makeblastdbbin)
+	#use IgBLAST and BLASTX to get region and CDR3 information
+	kabat_process(imgtdb_obj,igblastnbin,blastx_bin,kvMap,makeblastdbbin)
 
 
 
@@ -56,7 +62,7 @@ def kabat_process(imgtdb_obj,igblastnbin,blastxbin,kvMap,makeblastdbbin):
 		for st in stList:
 			kabat_dir=imgtdb_base+"/"+organism+"/ReferenceDirectorySet/KABAT/"
 			if(not os.path.exists(kabat_dir)):
-				os.mkdir()
+				os.mkdir(kabat_dir)
 			V_glob=imgtdb_base+"/"+organism+"/ReferenceDirectorySet/*_"+st+"_V.fna"
 			glob_res_v=glob.glob(V_glob)
 			if(len(glob_res_v)==1):
@@ -160,10 +166,10 @@ if (__name__=="__main__"):
 			sys.exit(0)
 		if(os.path.isdir(imgt_db_base)):
 			print "Error, directory",imgt_db_base," must not exist! Abort!"
-			#sys.exit(1)
+			sys.exit(1)
 		elif(os.path.exists(imgt_db_base)):
 			print "Error, directory",imgt_db_base," must be a non-existent directory!"
-			#sys.exit(1)
+			sys.exit(1)
 		else:
 			os.makedirs(imgt_db_base)
 		imgtdb_obj=imgt_db(imgt_db_base)
