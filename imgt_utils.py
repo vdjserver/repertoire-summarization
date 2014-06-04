@@ -1407,6 +1407,40 @@ class imgt_db:
 		return self.getBaseDir()
 
 
+
+
+	#get the alleles in the database (by segment, organism, and seq_type)
+	def getAlleles(self,segment="V",org="human",seq_type="IG"):
+		fastaPath=self.getDirBase()+"/"+org+"/ReferenceDirectorySet/"+org+"_"+seq_type+"_"+segment+".fna"
+		if(not(os.path.isfile(fastaPath))):
+			raise Exception("Error, fasta file "+fastaPath+" does not exists!  Is an invalid organism, seq type or segment used???")
+		fastaDict=read_fasta_file_into_map(fastaPath)
+		fastaKeys=fastaDict.keys()
+		fastaKeysList=list(fastaKeys)
+		return fastaKeysList
+
+	
+	#get a list of genes, withouth the alleles designation
+	def getGenes(self,alleles=None,segment="V",org="human",seq_type="IG"):
+		if(alleles==None):
+			alleles=self.getAlleles(segment,org,seq_type)
+		gene_set=set()
+		for allele in alleles:
+			if(looksLikeAlleleStr(allele)):
+				#good!
+				gene_name=deAllelifyName(allele)
+				if(not(gene_name in gene_set)):
+					gene_set.add(gene_name)
+			else:
+				#huh?
+				raise Exception("Error, the allele "+allele+" doesn't look allelic by name !")
+		gene_list=list(gene_set)
+		gene_list.sort()
+		return gene_list
+
+		
+
+
 	#download GENE tables only
 	def download_GeneTables(self,unconditionalForceReplace=False):
 		print "in download_imgt_RefDirSeqs_AndGeneTables_HumanAndMouse"
@@ -1647,6 +1681,82 @@ class imgt_db:
 		return imgtDAT
 
 
+	#given the allele name and organism, get the descriptor
+	def getIMGTDescriptor(self,allele_name,org):
+		locus=allele_name[0:4]
+		fasta_path=self.getDirBase()+"/"+org+"/ReferenceDirectorySet/"+locus+".fna"
+		fasta_dict=read_fasta_file_into_map(fasta_path)
+		desired_descriptor=None
+		for desc in fasta_dict:
+			desc_pieces=desc.split("|")
+			desc_allele=desc_pieces[1]
+			if(desc_allele==allele_name):
+				desired_descriptor=desc
+		return desired_descriptor
+
+	#get the IMGT region start and stop from IMGT given the allele_name, organism, and region
+	def getRegionStartStopFromIMGTDat(self,allele_name,org,region):
+		desired_descriptor=self.getIMGTDescriptor(allele_name,org)
+		if(not(desired_descriptor is None)):
+			imgt_dat_rec=self.getIMGTDatGivenAllele(allele_name,True,org)
+			start_stop=self.getStartStopFromIMGTDesc(desired_descriptor)
+			#print "The desired descriptor is ",desired_descriptor
+			reg_int=self.getRegionStartStopFromIMGTDatRecAndRange(imgt_dat_rec,True,start_stop[0],start_stop[1],region)
+			return reg_int
+
+	#given an interval range and an imgtdata record, fetch
+	#the start/stop of the specified region
+	def getRegionStartStopFromIMGTDatRecAndRange(self,imgt_dat,isBiopython,range_start,range_end,region_name):
+		if(not(isBiopython)):
+			lines=imgt_dat.split("\n")
+			reg_regex=re.compile("^FT\s+"+region_name+"[^\s]*\s+<?(\d+)\.+(\d+)>?\s*$")
+			for line in lines:
+				search_res=re.search(reg_regex,line)					
+				if(search_res):
+					start=min(int(search_res.group(1)),int(search_res.group(2)))
+					end=max(int(search_res.group(1)),int(search_res.group(2)))
+					if(range_start<=start and end<=range_end):
+						return [start,end]
+		else:
+			feature_list=imgt_dat.features
+			for feature in feature_list:
+				#print "got a feature : ",feature
+				ftype=feature.type
+				#print "the type is ",ftype	
+				qualifiers=feature.qualifiers
+				#print "qualifiers : ",qualifiers
+				location=feature.location
+				l_start=int(location.start)+1	#add 1 cause it's 0-based
+				l_end=int(location.end)+1	#add 1 cause it's 0-based
+				r_start=min(l_start,l_end)
+				r_end=max(l_start,l_end)
+				r_len=abs(r_start-r_end)
+				if(ftype.startswith(region_name)):
+					if(range_start-1<=r_start and r_end<=range_end+1):
+						ret_start=r_start-range_start+1
+						ret_end=ret_start+r_len-1
+						return [ret_start,ret_end]
+					else:
+						pass
+						#print "Though it's the right region it falls out of range .  The range is (",range_start,",",range_end,")"
+						#print "location : ",r_start,",",r_end
+						#print "Start test : ",range_start,"<=",r_start, "???"
+						#if(range_start<=r_start):
+						#	print "start test success"
+						#else:
+						#	print "start test fail"
+						#print "End test : ",r_end,"<=",range_end,"????"
+						#if(r_end<=range_end):
+						#	print "end test success"
+						#else:
+						#	print "end test fail"
+						
+				else:
+					#print "type ",ftype," isn't the desired region...."
+					pass
+		return [(-1),(-1)]			
+
+
 
 	#get start/stop from index given accession
 	def getStartStopFromIndexGivenAccession(self,a):
@@ -1754,6 +1864,12 @@ class imgt_db:
 		return pieces
 
 
+
+	#from IMGT descriptor return an array of start/stop where start<=stop
+	def getStartStopFromIMGTDesc(self,desc):
+		pieces=desc.split("|")
+		return self.getStartStopFromIMGTDescPieces(pieces)
+
 	#from IMGT descriptor pieces return an array of start/stop where start<=stop
 	def getStartStopFromIMGTDescPieces(self,desc_pieces):
 		#>M13911|IGHV1-NL1*01|Homo sapiens|P|V-REGION|125..420|296 nt|1| | | | |296+24=320| |rev-compl|
@@ -1805,6 +1921,8 @@ class imgt_db:
 				end=search_res.group(2)
 				return [start,end]
 		return None
+
+
 
 	#index the imgt.dat file
 	def indexIMGTDatFile(self,filepath=None,indexfile=None):
