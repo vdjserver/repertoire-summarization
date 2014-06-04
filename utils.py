@@ -689,9 +689,10 @@ def blast_db(query_path,db_arg,blast_output_path,xmlMode=True):
 	return blast_cmd
 
 
-#read a fasta file into a map
+#read fasta data into a map
 #with descriptors as keys
 #and squences as values
+#input has elements 0,2,4, etc. as descriptors, 1,3,5,...etc at sequences
 def read_fasta_into_map(fasta_data):
 	i=0
 	fasta_map=dict()
