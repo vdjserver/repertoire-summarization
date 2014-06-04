@@ -556,6 +556,12 @@ def allelifyList(l):
 	return goodlist
 
 
+#remove the *\d+ at the end of a string if it is present
+def deAllelifyName(allele):
+	alleleRe=re.compile('\*\d+$')
+	gene=re.sub(alleleRe,'',allele)
+	return gene
+
 
 
 #read a fasta file into a map (descriptors as keys, sequences as values)
