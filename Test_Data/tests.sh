@@ -3,7 +3,7 @@
 #VDJ_DB_ROOT=/home/data/DATABASE/05_09_2104
 NUM_SIM=${1:-0}
 echo "Using NUM_SIM ${NUM_SIM}"
-VDJ_DB_ROOT=/home/data/DATABASE/06_02_2014
+VDJ_DB_ROOT=/home/data/DATABASE/06_05_2014
 IGDATA=/usr/local/igblast-1.3.0
 NEW_PYTHONPATH=/home/data/vdj_server/vdjml/python/
 echo "Adding new PYTHON PATH $NEW_PYTHONPATH"
