@@ -751,7 +751,7 @@ def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human",m
 			if(organism in cdr3_adj_map):
 				if(allele in cdr3_adj_map[organism]["kabat"]):
 					return cdr3_adj_map[organism]["kabat"][allele]			
-			kabat_file=imgtdb_obj.getBaseDir()+"/"+organism+"/ReferenceDirectorySet/KABAT/Vlookup.tsv"
+			kabat_file=imgtdb_obj.getBaseDir()+"/"+organism+"/ReferenceDirectorySet/KABAT/Vlookup."+allele[0:2]+".tsv"
 			reader=open(kabat_file,'r')
 			for line in reader:
 				line=line.strip()
@@ -1642,7 +1642,7 @@ def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 	if((idx_num is None) or not(region in regions)):
 		print "ERROR, UNKNOWN REGION : ",region
 		sys.exit(0)
-	region_reader=open(lookupFile,'r')
+	region_reader=open(lookupPath,'r')
 	for line in region_reader:
 		line=line.strip()
 		line_pieces=line.split('\t')
@@ -1652,9 +1652,9 @@ def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 			col_num=1+idx_num*2
 			region_interval=[int(line_pieces[col_num]),int(line_pieces[col_num+1])]
 			reg_adj_map[refOrg][mode][refName][region]=region_interval
-			kabat_reader.close()
+			region_reader.close()
 			return reg_adj_map[refOrg][mode][refName][region]
-	kabat_reader.close()
+	region_reader.close()
 	print "ERROR, FAILED TO FIND "+mode.upper()+" REGION FOR REFERENCE NAMED "+refName+" in "+lookupFile
 	#return [(-1),(-1)]
 	sys.exit(0)	
