@@ -1700,7 +1700,7 @@ class imgt_db:
 		if(not(desired_descriptor is None)):
 			imgt_dat_rec=self.getIMGTDatGivenAllele(allele_name,True,org)
 			start_stop=self.getStartStopFromIMGTDesc(desired_descriptor)
-			#print "The desired descriptor is ",desired_descriptor
+			print "The desired descriptor is ",desired_descriptor
 			reg_int=self.getRegionStartStopFromIMGTDatRecAndRange(imgt_dat_rec,True,start_stop[0],start_stop[1],region)
 			return reg_int
 
@@ -1726,8 +1726,12 @@ class imgt_db:
 				qualifiers=feature.qualifiers
 				#print "qualifiers : ",qualifiers
 				location=feature.location
+				#print "location : ",location
 				l_start=int(location.start)+1	#add 1 cause it's 0-based
 				l_end=int(location.end)+1	#add 1 cause it's 0-based
+				strand=location.strand
+				#print "The strand is ",strand
+				#print "The l_start and l_end are : ",l_start," and ",l_end
 				r_start=min(l_start,l_end)
 				r_end=max(l_start,l_end)
 				r_len=abs(r_start-r_end)
@@ -1735,7 +1739,15 @@ class imgt_db:
 					if(range_start-1<=r_start and r_end<=range_end+1):
 						ret_start=r_start-range_start+1
 						ret_end=ret_start+r_len-1
-						return [ret_start,ret_end]
+						if(strand==1):
+							return [ret_start,ret_end]
+						else:
+							print "NEED RETURN REVERSE!"
+							range_len=abs(range_start-range_end)
+							new_start=range_len-ret_end+2
+							new_end=new_start+r_len-1
+							return [new_start,new_end]
+							#sys.exit(0)
 					else:
 						pass
 						#print "Though it's the right region it falls out of range .  The range is (",range_start,",",range_end,")"
