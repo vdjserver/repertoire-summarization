@@ -534,7 +534,7 @@ def get_segment_count_map_from_blast_output(blast_out,fasta_file_list):
 #use the LOOKUP tables in the database 
 #IMGT data use the imgt.dat
 def getADJCDR3EndFromJAllele(jallele,imgtdb_obj,org="human",mode="imgt"):
-	print "in getADJCDR3EndFromJAllele. jallele=",jallele," org=",org,"mode=",mode
+	#print "in getADJCDR3EndFromJAllele. jallele=",jallele," org=",org,"mode=",mode
 	if(mode=="imgt"):
 		print "mode=imgt"
 		jdescriptor=imgtdb_obj.extractDescriptorLine(jallele,org)
@@ -542,31 +542,31 @@ def getADJCDR3EndFromJAllele(jallele,imgtdb_obj,org="human",mode="imgt"):
 		if(cdr3_end_raw==None):
 			return (-1)
 		cdr3_end_raw=int(cdr3_end_raw)
-		print "Got a descriptor ",jdescriptor
-		print "got a raw cdr3 end=",cdr3_end_raw
+		#print "Got a descriptor ",jdescriptor
+		#print "got a raw cdr3 end=",cdr3_end_raw
 		desc_pieces=jdescriptor.split("|")
 		if(desc_pieces[14]=="rev-compl"):
 			desc_pieces[5]=swapIMGTDescInterval(desc_pieces[5])
 			sep="|"
 			jdescriptor=sep.join(desc_pieces)
-		print "got a corrected jdescriptor ",jdescriptor
+		#print "got a corrected jdescriptor ",jdescriptor
 		interval_re=re.compile(r'(\d+)\.+(\d+)')
 		desc_range=desc_pieces[5]
 		mr=re.search(interval_re,desc_range)
 		if(mr):
 			start=int(mr.group(1))
 			stop=int(mr.group(2))
-			print "got start=",start
-			print "got stop=",stop
+			#print "got start=",start
+			#print "got stop=",stop
 			if(min(start,stop)<=cdr3_end_raw and cdr3_end_raw<=max(start,stop)):
 				adjusted=cdr3_end_raw-min(start,stop)+1
-				print "RETURNING VALID CDR3 END = "+str(adjusted)
+				#print "RETURNING VALID CDR3 END = "+str(adjusted)
 				return adjusted
 			else:
-				print "OUT OF RANGE????"
+				#print "OUT OF RANGE????"
 				return (-1)
 		else:
-			print "FAILED TO MATCH ON INTERVAL REGEX!!!!\n"
+			#print "FAILED TO MATCH ON INTERVAL REGEX!!!!\n"
 			return None
 	elif(mode=="kabat"):
 		kabat_file=imgtdb_obj.getBaseDir()+"/"+org+"/ReferenceDirectorySet/KABAT/Jlookup.tsv"
@@ -586,7 +586,7 @@ def getADJCDR3EndFromJAllele(jallele,imgtdb_obj,org="human",mode="imgt"):
 
 #use the IMGT dat FILE to find the CDR3 end for a JALLELE
 def getCDR3EndFromJData(allele,imgtdb_obj,org="human"):
-	print "*********************************\nEntering getCDR3EndFromJData\n*******************************"
+	#print "*********************************\nEntering getCDR3EndFromJData\n*******************************"
 	biopyrec=imgtdb_obj.getIMGTDatGivenAllele(allele,True,org)
 	records=[biopyrec]
 	reg_start=None
@@ -619,20 +619,20 @@ def getCDR3EndFromJData(allele,imgtdb_obj,org="human"):
 	#					print "fetched is ",reg_start
 	#					reg_end=int(re.sub(r'[^0-9]','',str(feature.location.end)))
 	# records=SeqIO.parse(tmp_file_path,"imgt")
-	print "NOW PROCEEDING FOR REG_START==NONE TEST..."
+	#print "NOW PROCEEDING FOR REG_START==NONE TEST..."
 	if(not(reg_start==None)):
 		for record in records:
 			feature_list=record.features
 			for feature in feature_list:
-				print "got a feature : ",feature
+				#print "got a feature : ",feature
 				ftype=feature.type
-				print "the type is ",ftype	
+				#print "the type is ",ftype	
 				qualifiers=feature.qualifiers
-				print "qualifiers : ",qualifiers
+				#print "qualifiers : ",qualifiers
 				if(ftype=="J-TRP" or ftype=="J-PHE"):
 					c_start=int(re.sub(r'[^0-9]','',str(feature.location.start)))
 					c_end=int(re.sub(r'[^0-9]','',str(feature.location.end)))
-					print "found a jtrp"
+					#print "found a jtrp"
 					if(reg_start<=c_end and c_end<=reg_end):
 						#this is it!
 						#subtract 3 becuase we want to ignore the TRP or PHE residue and look at the residue immediately preceding
@@ -692,86 +692,93 @@ def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human",m
 	if(mode=="kabat" and alleleIsTR(allele)):
 		#no kabat for CDR3 for TR!
 		return (-1)
-	if(1==1):
-		if(mode=="imgt"):
-			#read the HIGH-VQUEST ANNOTATION
-			#print "need to handle IMGT mode for get CDR3 start"
-			if(organism in cdr3_adj_map):
-				if(allele in cdr3_adj_map[organism]["imgt"]):
-					return cdr3_adj_map[organism]["imgt"][allele]
-			else:
-				cdr3_adj_map[organism]=dict()
-			baseDir=getIMGTRegionBaseFolderForNONCDR3(allele,organism,imgtdb_obj)
-			fglobstr=baseDir+"/*"
-			imgt_files=glob.glob(fglobstr)
-			fileToUse=None
-			annotationStartLine=None
-			for imgt_file in imgt_files:
-				if(fileToUse==None):
-					reader=open(imgt_file,'r')
-					lineNum=0
-					for line in reader:
-						sline=line.strip()
-						if(sline==">"+allele.strip()):
-							fileToUse=imgt_file
-						if(sline.startswith("13. Annotation by IMGT/Automat") and not(fileToUse==None)):
-							annotationStartLine=lineNum
-						lineNum+=1
-			if(fileToUse==None):
-				#print "Found no file to use"
-				print "ERROR, could not find IMGT file to use for CDR3 annotation for ",allele," of organism ",organism,"!"
-				cdr3_adj_map[organism]["imgt"][allele]=(-1)
-				return  cdr3_adj_map[organism]["imgt"][allele]
-			else:
-				#print "Found file ",fileToUse,"to use to start at line=",annotationStartLine
-				pass
-			cdr3_reader=open(fileToUse,'r')
-			lineNum=0
-			cdr3_re=re.compile(r'^CDR3(\-IMGT)?\s+(\d+)[^0-9]+(\d+)',re.IGNORECASE)
-			cdr3_start=None
-			for line in cdr3_reader:
-				if(lineNum>annotationStartLine):
-					sline=line.strip()
-					search_result=re.search(cdr3_re,sline)
-					if(cdr3_start!=None):
-						#print "Looking at ",sline
-						pass
-					if(search_result):
-						#print "FOUND A CDR3 line: ",
-						leftInt=int(search_result.group(2))
-						rightInt=int(search_result.group(3))
-						cdr3_start=leftInt
-				lineNum+=1
-			if(cdr3_start==None):
-				cdr3_start=(-1)
-			cdr3_adj_map[organism]["imgt"][allele]=cdr3_start
+	if(organism in cdr3_adj_map):
+		if(allele in cdr3_adj_map[organism]["imgt"]):
 			return cdr3_adj_map[organism]["imgt"][allele]
-		elif(mode=="kabat"):
-			#print "need to handle KABAT mode for CDR3 start!"
-			if(organism in cdr3_adj_map):
-				if(allele in cdr3_adj_map[organism]["kabat"]):
-					return cdr3_adj_map[organism]["kabat"][allele]			
-			kabat_file=imgtdb_obj.getBaseDir()+"/"+organism+"/ReferenceDirectorySet/KABAT/Vlookup."+allele[0:2]+".tsv"
-			reader=open(kabat_file,'r')
-			for line in reader:
-				line=line.strip()
-				if(line.startswith(allele)):
-					pieces=line.split("\t")
-					cdr3_start=pieces[11]
-					cdr3_adj_map[organism]["kabat"][allele]=int(cdr3_start)
-			reader.close()
-			toReturn=None
-			if(allele in cdr3_adj_map[organism]["kabat"]):
-				toReturn=cdr3_adj_map[organism]["kabat"][allele]
-			else:
-				cdr3_adj_map[organism]["kabat"][allele]=(-1)
-				toReturn=cdr3_adj_map[organism]["kabat"][allele]				
-			#print "for kabat (",allele,"), to return ",toReturn
-			return toReturn
-		else:
-			print "NON EXISTENT MODE : ",mode
-			sys.exit(0)
+	else:
+		cdr3_adj_map[organism]=dict()
+	cdr3_int=getVRegionStartAndStopGivenRefData(allele,organism,imgtdb_obj,"CDR3",mode)
+	cdr3_adj_map[organism]["imgt"][allele]=cdr3_int[0]
+	return cdr3_int[0]
 
+	#if(mode=="imgt"):
+	#	#read the HIGH-VQUEST ANNOTATION
+	#	#print "need to handle IMGT mode for get CDR3 start"
+	#	if(organism in cdr3_adj_map):
+	#		if(allele in cdr3_adj_map[organism]["imgt"]):
+	#			return cdr3_adj_map[organism]["imgt"][allele]
+	#	else:
+	#		cdr3_adj_map[organism]=dict()
+	#	baseDir=getIMGTRegionBaseFolderForNONCDR3(allele,organism,imgtdb_obj)
+	#	fglobstr=baseDir+"/*"
+	#	imgt_files=glob.glob(fglobstr)
+	#	fileToUse=None
+	#	annotationStartLine=None
+	#	for imgt_file in imgt_files:
+	#		if(fileToUse==None):
+	#			reader=open(imgt_file,'r')
+	#			lineNum=0
+	#			for line in reader:
+	#				sline=line.strip()
+	#				if(sline==">"+allele.strip()):
+	#					fileToUse=imgt_file
+	#				if(sline.startswith("13. Annotation by IMGT/Automat") and not(fileToUse==None)):
+	#					annotationStartLine=lineNum
+	#				lineNum+=1
+	#	if(fileToUse==None):
+	#		#print "Found no file to use"
+	#		print "ERROR, could not find IMGT file to use for CDR3 annotation for ",allele," of organism ",organism,"!"
+	#		cdr3_adj_map[organism]["imgt"][allele]=(-1)
+	#		return  cdr3_adj_map[organism]["imgt"][allele]
+	#	else:
+	#		#print "Found file ",fileToUse,"to use to start at line=",annotationStartLine
+	#		pass
+	#	cdr3_reader=open(fileToUse,'r')
+	#	lineNum=0
+	#	cdr3_re=re.compile(r'^CDR3(\-IMGT)?\s+(\d+)[^0-9]+(\d+)',re.IGNORECASE)
+	#	cdr3_start=None
+	#	for line in cdr3_reader:
+	#		if(lineNum>annotationStartLine):
+	#			sline=line.strip()
+	#			search_result=re.search(cdr3_re,sline)
+	#			if(cdr3_start!=None):
+	#				#print "Looking at ",sline
+	#				pass
+	#			if(search_result):
+	#				#print "FOUND A CDR3 line: ",
+	#				leftInt=int(search_result.group(2))
+	#				rightInt=int(search_result.group(3))
+	#				cdr3_start=leftInt
+	#		lineNum+=1
+	#	if(cdr3_start==None):
+	#		cdr3_start=(-1)
+	#	cdr3_adj_map[organism]["imgt"][allele]=cdr3_start
+	#	return cdr3_adj_map[organism]["imgt"][allele]
+	#elif(mode=="kabat"):
+	#	#print "need to handle KABAT mode for CDR3 start!"
+	#	if(organism in cdr3_adj_map):
+	#		if(allele in cdr3_adj_map[organism]["kabat"]):
+	#			return cdr3_adj_map[organism]["kabat"][allele]			
+	#	kabat_file=imgtdb_obj.getBaseDir()+"/"+organism+"/ReferenceDirectorySet/KABAT/Vlookup."+allele[0:2]+".tsv"
+	#	reader=open(kabat_file,'r')
+	#	for line in reader:
+	#		line=line.strip()
+	#		if(line.startswith(allele)):
+	#			pieces=line.split("\t")
+	#			cdr3_start=pieces[11]
+	#			cdr3_adj_map[organism]["kabat"][allele]=int(cdr3_start)
+	#	reader.close()
+	#	toReturn=None
+	#	if(allele in cdr3_adj_map[organism]["kabat"]):
+	#		toReturn=cdr3_adj_map[organism]["kabat"][allele]
+	#	else:
+	#		cdr3_adj_map[organism]["kabat"][allele]=(-1)
+	#		toReturn=cdr3_adj_map[organism]["kabat"][allele]				
+	#	#print "for kabat (",allele,"), to return ",toReturn
+	#	return toReturn
+	#else:
+	#	print "NON EXISTENT MODE : ",mode
+	#	sys.exit(0)
 
 
 
@@ -1540,17 +1547,17 @@ def getTheFrameForThisReferenceAtThisPosition(refName,organism,imgtdb_obj,refPos
 			interval_r_next_start=int(interval_r_next[0])
 			interval_r_next_stop=int(interval_r_next[1])
 			if(
-				interval_r_start!=(-1) and 
+				#interval_r_start!=(-1) and 
 				interval_r_stop!=(-1) and 
-				interval_r_next_start!=(-1) and 
-				interval_r_next_stop!=(-1)
+				interval_r_next_start!=(-1)#  and
+				#interval_r_next_stop!=(-1)
 				):
 				return (refPos-interval_r_next_start)%3
 			else:
 				pass
 				#print "interval_r=",interval_r
 				#print "interval_r_next=",interval_r_next
-	eMsg="ERROR, COULD NOT FIND ANY FRAME POSITION AT ALL FOR "+refName+" with organism="+organism
+	eMsg="ERROR, COULD NOT FIND ANY FRAME POSITION AT ALL FOR "+refName+" with organism="+organism+"!"
 	print eMsg
 	raise Exception(eMsg+"\nIs frame data avaialble in the database?!?!? Consider Re-run but skipping annotation ('-skip_char')")
 	#raise Exception()
@@ -1606,7 +1613,7 @@ reg_adj_map["Mus_musculus"]["kabat"]=dict()
 reg_adj_map["Mus_musculus"]["imgt"]=dict()
 def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 	global reg_adj_map
-	regions=getVRegionsList()
+	regions=getVRegionsList(True)
 	if(refOrg in reg_adj_map):
 		if(mode in reg_adj_map[refOrg]):
 			if(refName in reg_adj_map[refOrg][mode]):
