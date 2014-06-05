@@ -31,16 +31,20 @@ def downloadIMGTGENE_DB_and_LIGM_DB_and_index(imgtdb_obj):
 #the main wrapper for downloading and preparing the database (except for parts with necessary human intervention!)
 def downloadAndPrep(imgtdb_obj,makeblastdbbin,igblastnbin,kvMap,blastx_bin):
 	#download fasta and annotation data
-	#downloadIMGTGENE_DB_and_LIGM_DB_and_index(imgtdb_obj)
+	downloadIMGTGENE_DB_and_LIGM_DB_and_index(imgtdb_obj)
+	
 	#partition the loci (ighv,ighd, etc)
-	#imgtdb_obj.buildRefDirSetsFromGENEDB()
-	#imgtdb_obj.prepareFASTAForBLASTFormatting()
+	imgtdb_obj.buildRefDirSetsFromGENEDB()
+	imgtdb_obj.prepareFASTAForBLASTFormatting()
+	
 	#downloag the gene tables for the IMGT hierarchy
-	#imgtdb_obj.download_GeneTables()
+	imgtdb_obj.download_GeneTables()
+
 	#compare sequences in FNA GL files and 
-	#analyze_download_dir_forVDJserver(imgtdb_obj.getBaseDir())
-	#imgtdb_obj.blastFormatFNAInRefDirSetDirs(makeblastdbbin)
+	analyze_download_dir_forVDJserver(imgtdb_obj.getBaseDir())
+
 	#use IgBLAST and BLASTX to get region and CDR3 information
+	imgtdb_obj.blastFormatFNAInRefDirSetDirs(makeblastdbbin)
 	domain_modes=get_domain_modes()
 	for mode in domain_modes:
 		print "Now processing for regions for mode="+mode
