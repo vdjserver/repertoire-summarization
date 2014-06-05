@@ -67,7 +67,7 @@ def writeKabatJCDR3End(k,o):
 	#print "numRecs is ",numRec
 
 
-def writeKabatRegionsFromIGBLASTKabatResult(k,o):
+def writeRegionsFromIGBLASTKabatResult(k,o):
 	reg_map=dict()
 	regions=["FWR1","CDR1","FWR2","CDR2","FWR3","CDR3"]
 	currentQuery=None
@@ -137,7 +137,7 @@ if (__name__=="__main__"):
 		out="/home/data/DATABASE/01_22_2014/"+org+"/ReferenceDirectorySet/KABAT_TR/Vlookup.tsv"
 		if(os.path.exists(igblast) and not os.path.exists(out)):
 			print "proceed on kabat V"
-			writeKabatRegionsFromIGBLASTKabatResult(igblast,out)
+			writeRegionsFromIGBLASTKabatResult(igblast,out)
 		xml="/home/data/DATABASE/01_22_2014/"+org+"/ReferenceDirectorySet/KABAT_TR/blastx.out.xml"
 		out="/home/data/DATABASE/01_22_2014/"+org+"/ReferenceDirectorySet/KABAT_TR/Jlookup.tsv"
 		if(os.path.exists(xml) and not os.path.exists(out)):
