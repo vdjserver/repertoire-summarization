@@ -68,6 +68,7 @@ def writeKabatJCDR3End(k,o):
 
 
 def writeRegionsFromIGBLASTKabatResult(k,o):
+	infile=k
 	reg_map=dict()
 	regions=["FWR1","CDR1","FWR2","CDR2","FWR3","CDR3"]
 	currentQuery=None
