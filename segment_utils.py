@@ -1630,92 +1630,34 @@ def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 		#organism not in there!
 		raise Exception("Unknown organism "+refOrg)
 	#first, form a path to a lookup.
-	#this depends on organis and mode
-	#for KABAT its a file
-	#for IMGT it st(<?arts as a directory but later becomes a file!
-	lookupFile=None
-	if(mode=="kabat"):
-		if(refOrg=="human"):
-			lookupFile=imgtdb_obj.getBaseDir()+"/human/ReferenceDirectorySet/KABAT/Vlookup.tsv"
-		elif(refOrg=="Mus_musculus"):
-			lookupFile=imgtdb_obj.getBaseDir()+"/Mus_musculus/ReferenceDirectorySet/KABAT/Vlookup.tsv"
-		else:
-			print "ERROR, UNKNOWN ORGANISM ",refOrg
-			sys.exit(0)
-	elif(mode=="imgt" or mode=="IMGT"):
-		if(refOrg=="human" or refOrg=="Mus_musculus"):
-			lookupFile=getIMGTRegionBaseFolderForNONCDR3(refName,refOrg,imgtdb_obj)
-		else:
-			print "ERROR, UNKNOWN ORGANISM ",refOrg
-			sys.exit(0)
-	else:
-		print "ERROR, undefined mode : ",mode
-	########################################
-	#now that a lookup is selected do an actual lookup!
-	#print "TO USE LOOKUP : ",lookupFile
-	if(mode=="kabat"):
-		idx_num=None
-		for i in range(len(regions)):
-			if(regions[i]==region):
-				idx_num=i
-		if((idx_num is None) or not(region in regions)):
-			print "ERROR, UNKNOWN REGION : ",region
-			sys.exit(0)
-		kabat_reader=open(lookupFile,'r')
-		for line in kabat_reader:
-			line=line.strip()
-			line_pieces=line.split('\t')
-			line_segment=line_pieces[0]
-			#print "looking at ",line
-			if(line_segment==refName):
-				col_num=1+idx_num*2
-				region_interval=[int(line_pieces[col_num]),int(line_pieces[col_num+1])]
-				reg_adj_map[refOrg]["kabat"][refName][region]=region_interval
-				kabat_reader.close()
-				return reg_adj_map[refOrg]["kabat"][refName][region]
-		kabat_reader.close()
-		print "ERROR, FAILED TO FIND KABAT REGION FOR REFERENCE NAMED "+refName+" in "+lookupFile
-		#return [(-1),(-1)]
+	#this depends on organism and mode
+	seq_type=refName[0:2]
+	lookupPath=imgtdb_obj.getBaseDir()+"/"+refOrg+"/ReferenceDirectorySet/"+mode.upper()+"/Vlookup."+seq_type+".tsv"
+	if(not(os.path.exists(lookupPath)) or not(os.path.isfile(lookupPath))):
+		raise Exception("Error, failed to find lookup file "+lookupPath+" for "+refName+" for organism = "+refOrg)
+	idx_num=None
+	for i in range(len(regions)):
+		if(regions[i]==region):
+			idx_num=i
+	if((idx_num is None) or not(region in regions)):
+		print "ERROR, UNKNOWN REGION : ",region
 		sys.exit(0)
-	elif(mode=="IMGT" or mode=="imgt"):
-		lookupBase=lookupFile
-		filesToScan=lookupBase+"/*"
-		filesToScan=glob.glob(filesToScan)
-		for current_file in filesToScan:
-			#print "Now to scan in "+current_file
-			current_file_refname=None
-			target_file_flag=False
-			passed_annotation_flag=False
-			imgt_reader=open(current_file,'r')
-			for line in imgt_reader:
-				line=line.strip()
-				if(line.startswith(">"+refName.strip())):
-					target_file_flag=True
-				if(line.startswith("13. Annotation")):
-					passed_annotation_flag=True
-				if(passed_annotation_flag and target_file_flag and (line.startswith(region+"-IMGT"))):
-					#print "Found target line "+line+" in file "+current_file
-					regRE=re.compile(r'(\-?IMGT)?\s+(<?)(\d+)[^0-9]+(\d+)(>?)\s*',re.IGNORECASE)
-					#note that this regex PROHIBITS the <,> signs
-					matchRes=re.search(regRE,line)
-					if(matchRes):
-						lt=matchRes.group(2)
-						gt=matchRes.group(5)
-						reg_start=matchRes.group(3)
-						if(lt=="<"):
-							reg_start=(-1)
-						reg_end=matchRes.group(4)
-						if(gt==">"):
-							reg_end=(-1)
-						if(reg_start==(-1) and reg_end!=(-1)):
-							reg_start=1
-						region_interval=[int(reg_start),int(reg_end)]
-						reg_adj_map[refOrg]["imgt"][refName][region]=region_interval
-						imgt_reader.close()
-						return reg_adj_map[refOrg]["imgt"][refName][region]
-			imgt_reader.close()
-		reg_adj_map[refOrg]["imgt"][refName][region]=[(-1),(-1)]
-		return reg_adj_map[refOrg]["imgt"][refName][region]
+	region_reader=open(lookupFile,'r')
+	for line in region_reader:
+		line=line.strip()
+		line_pieces=line.split('\t')
+		line_segment=line_pieces[0]
+		#print "looking at ",line
+		if(line_segment==refName):
+			col_num=1+idx_num*2
+			region_interval=[int(line_pieces[col_num]),int(line_pieces[col_num+1])]
+			reg_adj_map[refOrg][mode][refName][region]=region_interval
+			kabat_reader.close()
+			return reg_adj_map[refOrg][mode][refName][region]
+	kabat_reader.close()
+	print "ERROR, FAILED TO FIND "+mode.upper()+" REGION FOR REFERENCE NAMED "+refName+" in "+lookupFile
+	#return [(-1),(-1)]
+	sys.exit(0)	
 
 
 
