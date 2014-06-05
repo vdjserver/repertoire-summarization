@@ -31,18 +31,21 @@ def downloadIMGTGENE_DB_and_LIGM_DB_and_index(imgtdb_obj):
 #the main wrapper for downloading and preparing the database (except for parts with necessary human intervention!)
 def downloadAndPrep(imgtdb_obj,makeblastdbbin,igblastnbin,kvMap,blastx_bin):
 	#download fasta and annotation data
-	downloadIMGTGENE_DB_and_LIGM_DB_and_index(imgtdb_obj)
+	#downloadIMGTGENE_DB_and_LIGM_DB_and_index(imgtdb_obj)
 	#partition the loci (ighv,ighd, etc)
-	imgtdb_obj.buildRefDirSetsFromGENEDB()
-	imgtdb_obj.prepareFASTAForBLASTFormatting()
+	#imgtdb_obj.buildRefDirSetsFromGENEDB()
+	#imgtdb_obj.prepareFASTAForBLASTFormatting()
 	#downloag the gene tables for the IMGT hierarchy
-	imgtdb_obj.download_GeneTables()
+	#imgtdb_obj.download_GeneTables()
 	#compare sequences in FNA GL files and 
-	analyze_download_dir_forVDJserver(imgtdb_obj.getBaseDir())
-	imgtdb_obj.blastFormatFNAInRefDirSetDirs(makeblastdbbin)
+	#analyze_download_dir_forVDJserver(imgtdb_obj.getBaseDir())
+	#imgtdb_obj.blastFormatFNAInRefDirSetDirs(makeblastdbbin)
 	#use IgBLAST and BLASTX to get region and CDR3 information
-	mode_process(imgtdb_obj,igblastnbin,blastx_bin,kvMap,makeblastdbbin,"kabat")
-	mode_process(imgtdb_obj,igblastnbin,blastx_bin,kvMap,makeblastdbbin,"imgt")
+	domain_modes=get_domain_modes()
+	for mode in domain_modes:
+		print "Now processing for regions for mode="+mode
+		mode_process(imgtdb_obj,igblastnbin,blastx_bin,kvMap,makeblastdbbin,mode)
+
 
 
 
@@ -63,7 +66,7 @@ def mode_process(imgtdb_obj,igblastnbin,blastxbin,kvMap,makeblastdbbin,mode):
 		else:
 			raise Exception("Invalid mode selection '"+mode+"', should be either 'imgt' or 'kabat' (case-sensitive)")
 		for st in stList:
-			process_dir=imgtdb_base+"/"+organism+"/ReferenceDirectorySet/"+mode.upper+"/"
+			process_dir=imgtdb_base+"/"+organism+"/ReferenceDirectorySet/"+mode.upper()+"/"
 			if(not os.path.exists(process_dir)):
 				os.mkdir(process_dir)
 			V_glob=imgtdb_base+"/"+organism+"/ReferenceDirectorySet/*_"+st+"_V.fna"
@@ -76,10 +79,10 @@ def mode_process(imgtdb_obj,igblastnbin,blastxbin,kvMap,makeblastdbbin,mode):
 					db_base_key=None
 					aux_org=None
 					if(organism=="human"):
-						db_base_key="HUMAN_GL_IG_"
+						db_base_key="HUMAN_GL_"+st+"_"
 						aux_org="HUMAN"
 					elif(organism=="Mus_musculus"):
-						db_base_key="MOUSE_GL_IG_"
+						db_base_key="MOUSE_GL_"+st+"_"
 						aux_org="MOUSE"
 					else:
 						print "ERROR!  UNKNOWN ORGANISM '",organism,"' or system/code needs upgrade for this organism!"
@@ -96,7 +99,7 @@ def mode_process(imgtdb_obj,igblastnbin,blastxbin,kvMap,makeblastdbbin,mode):
 					igblast_cmd+=" -auxiliary_data "+kvMap[aux_org+"_AUX"]
 					igblast_cmd+=" -domain_system "+mode+" "
 					igblast_cmd+=" -outfmt '7 qseqid qgi qacc qaccver qlen sseqid sallseqid sgi sallgi sacc saccver sallacc slen qstart qend sstart send qseq sseq evalue bitscore score length pident nident mismatch positive gapopen gaps ppos frames qframe sframe btop'"
-					igblast_output=process_dir+"igblast."+mode+".out"
+					igblast_output=process_dir+"igblast."+mode+"."+st+".out"
 					igblast_cmd+=" -out "+igblast_output
 					print "Placing "+mode.upper()+" lookup data for ",organism," in directory ",process_dir,"...."
 					print "Running igblast command : ",igblast_cmd	
@@ -111,8 +114,8 @@ def mode_process(imgtdb_obj,igblastnbin,blastxbin,kvMap,makeblastdbbin,mode):
 							print "ERROR, it appears that IGBLAST ran but with errors!"
 							errStat=True
 						if(not(errStat)):
-							Vlookup=process_dir+"/Vlookup.tsv"
-							print "Now generating V lookup for ",organism," IG from igblast output ",igblast_output," and writing to ",Vlookup
+							Vlookup=process_dir+"/Vlookup."+st+".tsv"
+							print "Now generating V lookup for ",organism," "+st+" from igblast output ",igblast_output," and writing to ",Vlookup
 							writeRegionsFromIGBLASTKabatResult(igblast_output,Vlookup)
 					else:
 						#errStart==True ! :(
@@ -124,7 +127,7 @@ def mode_process(imgtdb_obj,igblastnbin,blastxbin,kvMap,makeblastdbbin,mode):
 				#file not found! :( or too many found :(
 				print "Error in GLOBBING for files for "+mode+" process!"
 				print "GLOB",V_glob," resulted in ",len(glob_res_v)," files found!"
-				print mode.upper+" V lookup not to be available!!!!"
+				print mode.upper()+" V lookup not to be available!!!!"
 			if(mode=="kabat" and st=="IG"):
 				#do J-CDR3 end with blastx for kabat IG
 				J_glob=imgtdb_base+"/"+organism+"/ReferenceDirectorySet/*_"+st+"_J.fna"
@@ -179,13 +182,13 @@ if (__name__=="__main__"):
 			printMap(kvMap)
 		else:
 			print "Error, map file ",mapPath," not found!"
-			sys.exit(0)
+			#sys.exit(0)
 		if(os.path.isdir(imgt_db_base)):
 			print "Error, directory",imgt_db_base," must not exist! Abort!"
-			sys.exit(1)
+			#sys.exit(1)
 		elif(os.path.exists(imgt_db_base)):
 			print "Error, directory",imgt_db_base," must be a non-existent directory!"
-			sys.exit(1)
+			#sys.exit(1)
 		else:
 			os.makedirs(imgt_db_base)
 		imgtdb_obj=imgt_db(imgt_db_base)
