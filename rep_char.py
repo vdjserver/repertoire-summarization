@@ -800,6 +800,7 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None",log
 	#apapend intro data
 	keys_to_append=[
 
+	#PART 1 EVERYBODY
 	"Read sequence #",
 	"Read identifier",
 	"V gene (highest score)",
@@ -820,8 +821,8 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None",log
 	"Deletion count (over V and J)"]
 	
 
-
-
+	
+	#PART 2 IMGT/KABAT
 	#append IMGT/KABAT region data
 	modes=get_domain_modes()
 	modes.sort()
@@ -854,7 +855,7 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None",log
 
 
 
-
+	
 	keys_to_append.append("Homology% (over V and J)")
 	keys_to_append.append("Indel frequency (over V)")
 	keys_to_append.append("Insertion count (over V)")
@@ -902,9 +903,9 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None",log
 	m[keys[0]]=rid
 
 	#now, append everything from the map passed in that hasn't been added
-	for map_key in m:
-		if(not(map_key in keys)):
-			keys.append(map_key)
+	#for map_key in m:
+	#	if(not(map_key in keys)):
+	#		keys.append(map_key)
 
 
 	
