@@ -87,27 +87,23 @@ def getHitInfo(read_result_obj,meta,alleleName,query_record=None,imgtdb_obj=None
 				#print "the hit name is ",hit_name
 				if(hit_name==alleleName):
 					#print "TARGET FOUND!"
-					match_range=gls_match.range_
-					#print "got a range : ",match_range
-					pos1=match_range.pos_1()
+					match_range=segment_match.gl_range()
+					#print "got a range : ",match_range," for GL in ",alleleName," for query=",read_result_obj.id()
+					pos1=match_range.pos1()
 					pose=pos1+match_range.length()
-					#print "retrieved ",pos1
-					#pprint(match_range)
-					#match_pos1=match_range.first_last_1
-					#print "p1=",match_pos1("pos1")
-					#match_len=match_range.length()
 					ret_map['s. start']=int(pos1)
 					ret_map['s. end']=int(pose)-1
 					#	1       59      90      148
-					query_range=segment_match.range()
-					query_start=query_range.pos_1()
+					query_range=segment_match.read_range()
+					query_start=query_range.pos1()
 					query_end=query_start+query_range.length()
 					ret_map['q. start']=query_start
 					ret_map['q. end']=query_end-1
 					btop=str(segment_match.btop())
 					ret_map['btop']=str(btop)
 					ret_map['subject ids']=alleleName
-					ret_map['is_inverted']=gls_match.inverted()
+					segment_match_metrics=segment_match.match_metrics()
+					ret_map['is_inverted']=segment_match_metrics.inverted()
 					ret_map['query id']=read_result_obj.id()
 					if(ret_map['is_inverted']):
 						ret_map['query id']="reversed|"+read_result_obj.id()
@@ -240,9 +236,10 @@ def getTypeNameScoreMap(read_result_obj,meta):
 		for gls_match in segment_match.germline_segments():
 			vdjml_look_seg_type=vdjml.segment_type(gls_match,meta)
 			#print "seg_type=",vdjml_look_seg_type
-			name=meta[gls_match.gl_segment_].name_
+			name=meta[gls_match.gl_segment()].name()
 			#print "The name is ",name
-			score=gls_match.score()
+			segment_match_metrics=segment_match.match_metrics()
+			score=segment_match_metrics.score()
 			#print "score=",score
 			if(vdjml_look_seg_type in t_map):
 				pass
