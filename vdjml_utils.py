@@ -82,7 +82,8 @@ def getHitInfo(read_result_obj,meta,alleleName,query_record=None,imgtdb_obj=None
 			for gls_match in segment_match.germline_segments():
 				#print "in inner most loop...."
 				#print "gls_match=",gls_match
-				hit_name=meta[gls_match.gl_segment_].name_
+				hit_name=meta[gls_match.gl_segment()].name()
+				# print meta[gls_match.gl_segment()].name()
 				#print "the hit name is ",hit_name
 				if(hit_name==alleleName):
 					#print "TARGET FOUND!"
@@ -291,8 +292,8 @@ def getTopVDJItems(read_result_obj,meta):
 				#print "META_TYPE",
 				vdjml_look_seg_type=vdjml.segment_type(gls_match,meta)
 				if(names[vdjml_look_seg_type]==None):
-					#print "USING ",meta[gls_match.gl_segment_].name_
-					names[vdjml_look_seg_type]=meta[gls_match.gl_segment_].name_
+					# print meta[gls_match.gl_segment()].name()
+					names[vdjml_look_seg_type]=meta[gls_match.gl_segment()].name()
 				else:
 					#print "SKIPPING ",meta[gls_match.gl_segment_].name_," fail on emptiness"
 					pass
