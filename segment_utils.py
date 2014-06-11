@@ -536,7 +536,7 @@ def get_segment_count_map_from_blast_output(blast_out,fasta_file_list):
 def getADJCDR3EndFromJAllele(jallele,imgtdb_obj,org="human",mode="imgt"):
 	#print "in getADJCDR3EndFromJAllele. jallele=",jallele," org=",org,"mode=",mode
 	if(mode=="imgt"):
-		print "mode=imgt"
+		#print "mode=imgt"
 		jdescriptor=imgtdb_obj.extractDescriptorLine(jallele,org)
 		cdr3_end_raw=getCDR3EndFromJData(jallele,imgtdb_obj,org)
 		if(cdr3_end_raw==None):
