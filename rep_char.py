@@ -952,10 +952,10 @@ def add_rep_char_args_to_parser(parser):
 	parser.add_argument('-cdr3_hist_out',type=str,nargs=1,default="/dev/stdout",help="output file for the CDR3 histogram of lengths (both kabat and imgt systems)")
 	parser.add_argument('-skip_char',action='store_true', default=False,help="If this is set, then characterization besides asignment and CDR3 length is skipped")
 	parser.add_argument('char_out',type=str,nargs=1,help="the path to the output TSV file of read-level repertoire characterization data")
-	parser.add_argument('vdj_db',type=str,nargs=1,help="path to the VDJ root REQUIRED")
+	parser.add_argument('vdj_db_root',type=str,nargs=1,help="path to the VDJ directory root REQUIRED")
 	parser.add_argument('qry_fasta',type=str,nargs=1,help="path to the input fasta file of query (Rep-Seq) data input to IgBLAST")
 	#parser.add_argument('-region_out'
-	parser.add_argument('db_organism',type=str,nargs=1,default="human",help="db organism",choices=["human","Mus_musculus"])
+	parser.add_argument('db_organism',type=str,nargs=1,default="human",help="the organism IgBLASTed against;must exist under vdj_db_root",choices=["human","Mus_musculus"])
 	return parser
 
 
@@ -968,11 +968,10 @@ if (__name__=="__main__"):
 	args = parser.parse_args()
 	if(args):
 		organism=extractAsItemOrFirstFromList(args.db_organism)
-		args.db_species=args.db_organism
 		mf=makeVDJMLDefaultMetaAndFactoryFromArgs(args)
 		meta=mf[0]
 		fact=mf[1]
-		imgtdb_obj=imgt_db(extractAsItemOrFirstFromList(args.vdj_db))
+		imgtdb_obj=imgt_db(extractAsItemOrFirstFromList(args.vdj_db_root))
 		#print "a fact is ",fact
 		#print "the file is ",args.igblast_in[0]
 		query_fasta=extractAsItemOrFirstFromList(args.qry_fasta)
@@ -993,8 +992,11 @@ if (__name__=="__main__"):
 		rrw = vdjml.Vdjml_writer(extractAsItemOrFirstFromList(args.vdjml_out), meta)
 		rep_char_out=extractAsItemOrFirstFromList(args.char_out)
 		fHandle=open(rep_char_out,'w')
-		logFile=rep_char_out+".log"
-		logHandle=open(logFile,'w')
+		if(False):
+			logFile=rep_char_out+".log"
+			logHandle=open(logFile,'w')
+		else:
+			logHandle=None
 		if(tot_reads==None):
 			every_read=100
 		else:
@@ -1047,7 +1049,8 @@ if (__name__=="__main__"):
 		fHandle.close()
 
 		#close log
-		logHandle.close()
+		if(logHandle is not None):
+			logHandle.close()
 
 		#write the CDR3 hist when non-dev-null
 		if(type(cdr3_hist_out_file)==list):
@@ -1062,7 +1065,7 @@ if (__name__=="__main__"):
 			segments_json_out=segments_json_out
 		if(not(segments_json_out=="/dev/null")):
 			print "Writing JSON segment counts output to ",segments_json_out,"..."
-			segment_counter.JSONIFYToFile(extractAsItemOrFirstFromList(args.vdj_db),organism,segments_json_out)
+			segment_counter.JSONIFYToFile(extractAsItemOrFirstFromList(args.vdj_db_root),organism,segments_json_out)
 			print "Writing JSON segment counts output complete!"
 
 	else:
