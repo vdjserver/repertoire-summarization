@@ -161,12 +161,12 @@ def mode_process(imgtdb_obj,igblastnbin,blastxbin,kvMap,makeblastdbbin,mode):
 
 
 if (__name__=="__main__"):
-	parser = argparse.ArgumentParser(description='Download IMGT reference data for VDJ Server. ')
+	parser = argparse.ArgumentParser(description='Download IMGT reference data for VDJ Server and set up VDJ_DB directory structure from it ')
 	parser.add_argument('imgt_db_base',type=str,nargs=1,help="path to a NON-existent directory where downloading will take place")
 	parser.add_argument('makeblastdb_bin',type=str,nargs=1,help="*full* path to the makeblastdb binary executable")
 	parser.add_argument('igblast_bin',type=str,nargs=1,help="*full* path to the igblastn executable")
 	parser.add_argument('blastx_bin',type=str,nargs=1,help="*full* path to the blastx binary executable")
-	parser.add_argument('map_file',type=str,nargs=1,help="*full* path to the map file (tab-separated key-value pairs)")
+	parser.add_argument('map_file',type=str,nargs=1,help="*full* path to the map file (tab-separated key-value pairs)  Required keys with example values are shown in the file 'dl_map' in the code repository.")
 	parser.add_argument('-analyze_only',action='store_true',help="simply analyze the database comparing gene table records with FASTA reference directory records, showing before/after effect of patch files.")
 	args=args = parser.parse_args()
 	if(args):
