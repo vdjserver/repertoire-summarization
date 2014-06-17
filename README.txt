@@ -28,9 +28,10 @@ files are being merged and read order too, order is important.  For
 To get help on any of the *.pyscripts run it as seen here, and 
 use the "-h" flag for "help"!  For the .sh scripts please open them and read the comments.
 
-NOTE : use of rep_char.py require that the python module "vdjml" be usable.
+NOTE : use of rep_char.py require that the python module "vdjml" be usable. Moreover
+version 0.0.12 is required.
 
-NOTE : rep_char.py expects to be able to find the file"vdjml_igblast_parse.py". 
+NOTE : rep_char.py expects to be able to find the file "vdjml_igblast_parse.py". 
 Successful finding may be achieved by using the PYTHONPATH
 
 esalina2@eddiecomp:/home/data/vdj_server/repertoire-summarization$ ./rep_char.py -h
@@ -41,12 +42,12 @@ esalina2@eddiecomp:/home/data/vdj_server/repertoire-summarization$ export PYTHON
 esalina2@eddiecomp:/home/data/vdj_server/repertoire-summarization$ ./rep_char.py -h
 usage: rep_char.py [-h] [-igblast_version IGBLAST_VERSION]
                    [-igblast_params IGBLAST_PARAMS]
-                   [-igblast_runid IGBLAST_RUNID] [-db_name DB_NAME]
-                   [-db_ver DB_VER] [-db_species {human,Mus_musculus}]
-                   [-db_uri DB_URI] [-igblast_dc {imgt,kabat}]
+                   [-igblast_runid IGBLAST_RUNID] [-igblast_uri IGBLAST_URI]
+                   [-db_name_igblast DB_NAME_IGBLAST] [-db_ver DB_VER]
+                   [-db_species_vdjml DB_SPECIES_VDJML] [-db_uri DB_URI]
                    [-json_out JSON_OUT] [-cdr3_hist_out CDR3_HIST_OUT]
                    [-skip_char]
-                   igblast_in vdjml_out char_out vdj_db qry_fasta
+                   igblast_in vdjml_out char_out vdj_db_root qry_fasta
                    {human,Mus_musculus}
 
 Parse IGBLAST output, write a VDJML output file. Generate read-level
@@ -60,41 +61,49 @@ positional arguments:
                         sallacc slen qstart qend sstart send qseq sseq evalue
                         bitscore score length pident nident mismatch positive
                         gapopen gaps ppos frames qframe sframe btop'
-  vdjml_out             the path to the output vdjml
+  vdjml_out             the path to the output vdjml XML
   char_out              the path to the output TSV file of read-level
                         repertoire characterization data
-  vdj_db                path to the VDJ root REQUIRED
+  vdj_db_root           path to the VDJ directory root REQUIRED
   qry_fasta             path to the input fasta file of query (Rep-Seq) data
                         input to IgBLAST
-  {human,Mus_musculus}  db organism
+  {human,Mus_musculus}  the organism IgBLASTed against;must exist under
+                        vdj_db_root
 
 optional arguments:
   -h, --help            show this help message and exit
   -igblast_version IGBLAST_VERSION
-                        the version of igblast used
+                        the version of igblast used placed in the VDJML output
   -igblast_params IGBLAST_PARAMS
-                        the parameters passed to igblast
+                        the parameters passed to igblast placed in the VDJML
+                        output
   -igblast_runid IGBLAST_RUNID
-                        the ID assigned to the run
-  -db_name DB_NAME      the name of the IgBLAST database
-  -db_ver DB_VER        a version string associated with the database
-  -db_species {human,Mus_musculus}
-                        db organism for VDJML output file(s)
-  -db_uri DB_URI        a URI associated with the database
-  -igblast_dc {imgt,kabat}
-                        the domain classification system used
+                        the ID assigned to the run placed in the VDJML output
+  -igblast_uri IGBLAST_URI
+                        a URI string for the IgBLAST aligner to be placed in
+                        the VDJML output
+  -db_name_igblast DB_NAME_IGBLAST
+                        the name of the IgBLAST database placed in the VDJML
+                        output
+  -db_ver DB_VER        a version string associated with the database placed
+                        in the VDJML output
+  -db_species_vdjml DB_SPECIES_VDJML
+                        db organism for VDJML output file(s) placed in the
+                        VDJML output
+  -db_uri DB_URI        a URI associated with the database placed in the VDJML
+                        output
   -json_out JSON_OUT    output file for the JSON segment count IMGT hierarchy
   -cdr3_hist_out CDR3_HIST_OUT
                         output file for the CDR3 histogram of lengths (both
                         kabat and imgt systems)
   -skip_char            If this is set, then characterization besides
                         asignment and CDR3 length is skipped
- 
 
 
-###########################################################
-# REPERTOIRE-CHARACTERIZATION REQUIRES A VDJ_DB DIRECTORY #
-###########################################################
+
+#####################################################################
+# REPERTOIRE-CHARACTERIZATION REQUIRES A VDJ_DB DIRECTORY STRUCTURE #
+#####################################################################
 
 Required by rep_char.py (whose outputs are 1) VDJML files, 
 2) cdr3 length histogram(s), 3) TSV output files with huge 
@@ -102,8 +111,11 @@ number of columns and 4) JSON-formatted segment counts is
 the VDJ_DB_ROOT which is a directory with files and directories 
 placed and expected to be in an organized manner.
 
-In brief summary, the files/directories listed below are important
-and the uses and reasons for importance are listed too.
+The program vdj_db_dl.py may be used to download required data/reference
+files from imgt and set up the VDJ_DB directory and structures.
+
+In brief summary, the files/directories required as well as their
+uses are listed below:
 
 *  PER organism a directory is expected under the root (you can see 
 Mus_musculus and human in the listing below)
@@ -117,33 +129,34 @@ region start/stop data for IMGT and KABAT)
 output files for the chart viewing for knowing the hierarchy 
 and how to zoom)
 *  UNDER the root is www.imgt.dat which contains under it the 
-file ./download/LIGM-DB/imgt.dat which is a large flat-file 
-which is parsed to find J CDR3 end information
+GENE-DB directory and LIGM-DB directory with files downloaded
+from imgt.org.
+*  UNDER each ReferenceDirectorySet directory are the IgBLAST-formatted
+databases as well as fasta files (of 17 loci) of Ig and TCR IMGT data.
+Also there are the IMGT and KABAT directories having region-delineation
+indices for the reference sequences (e.g. CDR1 start/stop positions).
 
 A "tree -d" listing is seen here showing an example :
 
-esalina2@eddiecomp:/home/data/DATABASE/04_22_2014$ tree -d `pwd`
-/home/data/DATABASE/04_22_2014
+esalina2@eddiecomp:/home/data/DATABASE/06_05_2014$ tree -d `pwd`
+/home/data/DATABASE/06_05_2014
 ├── human
 │   ├── GeneTables
 │   └── ReferenceDirectorySet
-│       ├── HUMAN_REF
-│       │   └── IMGT_HighV-QUEST_individual_files_folder
-│       ├── HUMAN_TR_V
-│       │   └── IMGT_HighV-QUEST_individual_files_folder
+│       ├── IMGT
 │       └── KABAT
 ├── Mus_musculus
 │   ├── GeneTables
 │   └── ReferenceDirectorySet
-│       ├── KABAT
-│       ├── MOUSE
-│       │   └── IMGT_HighV-QUEST_individual_files_folder
-│       └── MOUSE_TR_V
-│           └── IMGT_HighV-QUEST_individual_files_folder
+│       ├── IMGT
+│       └── KABAT
 └── www.imgt.org
     └── download
         ├── GENE-DB
         └── LIGM-DB
+
+14 directories
+
 
 
 
@@ -152,11 +165,12 @@ esalina2@eddiecomp:/home/data/DATABASE/04_22_2014$ tree -d `pwd`
 # REPERTOIRE-CHARACTERIZATION TEST DIRECTORY              #
 ###########################################################
 
-Under the Test_Data director) lies a driver script and data to test 
+Under the Test_Data directory lies a driver script and data to test 
 some core functionalities.
 
 The driver script is tests.sh.  Besides testing, it can be viewed
 to see some example calls/usages!
+
 Test data include : human.IG.fna, human.TR.fna (human IG and TR data)
 and Mus_musculus_IG.fna and  Mus_musculus_TR.fna (mouse IG and TR data).
 During the course of script execution IgBLAST is invoked on the data
