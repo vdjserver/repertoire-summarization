@@ -12,6 +12,8 @@ echo "PYTHONPATH IS NOW : $PYTHONPATH"
 export IGDATA=$IGDATA
 echo "USING IGDATA $IGDATA"
 echo "USING VDJ_DB_ROOT $VDJ_DB_ROOT"
+echo "START TIME"
+date
 for ORGANISM in human Mus_musculus ;
 do
 	echo "Now analyzing for organism=$ORGANISM" ;
@@ -105,6 +107,7 @@ do
 	done ;
 done ;
 
-
+echo "END TIME "
+date
 
 
