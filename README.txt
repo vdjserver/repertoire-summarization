@@ -141,7 +141,11 @@ output files for the chart viewing for knowing the hierarchy
 and how to zoom)
 *  UNDER the root is www.imgt.dat which contains under it the 
 GENE-DB directory and LIGM-DB directory with files downloaded
-from imgt.org.
+from imgt.org.  Files in those contain the reference IG and
+TCR reference sequence data, annotation data, as well as other 
+data.  See http://www.imgt.org/download/GENE-DB/README.txt and
+also http://www.imgt.org/download/LIGM-DB/README for further 
+information
 *  UNDER each ReferenceDirectorySet directory are the IgBLAST-formatted
 databases as well as fasta files (of 17 loci) of Ig and TCR IMGT data.
 Also there are the IMGT and KABAT directories having region-delineation
