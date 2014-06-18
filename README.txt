@@ -1,6 +1,6 @@
-#########################################################
-#README FOR repertoire-summarization SUITE of VDJ SERVER#
-#########################################################
+###########################################################
+# README FOR repertoire-summarization SUITE of VDJ SERVER #
+###########################################################
 
 The purpose of this suite of software tools is to generate 
 summary statistics of REP-SEQ data.
@@ -28,17 +28,6 @@ files are being merged and read order too, order is important.  For
 To get help on any of the *.pyscripts run it as seen here, and 
 use the "-h" flag for "help"!  For the .sh scripts please open them and read the comments.
 
-NOTE : use of rep_char.py require that the python module "vdjml" be usable. Moreover
-version 0.0.12 is required.
-
-NOTE : rep_char.py expects to be able to find the file "vdjml_igblast_parse.py". 
-Successful finding may be achieved by using the PYTHONPATH
-
-esalina2@eddiecomp:/home/data/vdj_server/repertoire-summarization$ ./rep_char.py -h
-Traceback (most recent call last):
-  File "./rep_char.py", line 4, in <module>
-    from vdjml_igblast_parse import scanOutputToVDJML,makeParserArgs,makeVDJMLDefaultMetaAndFactoryFromArgs
-esalina2@eddiecomp:/home/data/vdj_server/repertoire-summarization$ export PYTHONPATH=/home/data/vdj_server/vdjml/python/
 esalina2@eddiecomp:/home/data/vdj_server/repertoire-summarization$ ./rep_char.py -h
 usage: rep_char.py [-h] [-igblast_version IGBLAST_VERSION]
                    [-igblast_params IGBLAST_PARAMS]
@@ -101,6 +90,28 @@ optional arguments:
 
 
 
+
+#################################################################
+# REPERTOIRE-CHARACTERIZATION REQUIRES THE VDJML PYTHON MODULE. #
+#################################################################
+
+NOTE : use of rep_char.py require that the python module "vdjml" be usable. Moreover
+version 0.0.12 is required.
+
+NOTE : rep_char.py expects to be able to find the file "vdjml_igblast_parse.py". 
+Successful finding may be achieved by using the PYTHONPATH.  See the example here : 
+
+esalina2@eddiecomp:/home/data/vdj_server/repertoire-summarization$ ./rep_char.py -h
+Traceback (most recent call last):
+  File "./rep_char.py", line 4, in <module>
+    from vdjml_igblast_parse import scanOutputToVDJML,makeParserArgs,makeVDJMLDefaultMetaAndFactoryFromArgs
+
+esalina2@eddiecomp:/home/data/vdj_server/repertoire-summarization$ ls -alh /home/data/vdj_server/vdjml/python/vdjml_igblast_parse.py 
+-rwxrwxr-x 1 esalina2 esalina2 29K Jun 13 09:22 /home/data/vdj_server/vdjml/python/vdjml_igblast_parse.py
+
+esalina2@eddiecomp:/home/data/vdj_server/repertoire-summarization$ export PYTHONPATH=/home/data/vdj_server/vdjml/python/
+
+
 #####################################################################
 # REPERTOIRE-CHARACTERIZATION REQUIRES A VDJ_DB DIRECTORY STRUCTURE #
 #####################################################################
@@ -161,9 +172,9 @@ esalina2@eddiecomp:/home/data/DATABASE/06_05_2014$ tree -d `pwd`
 
 
 
-###########################################################
-# REPERTOIRE-CHARACTERIZATION TEST DIRECTORY              #
-###########################################################
+##############################################
+# REPERTOIRE-CHARACTERIZATION TEST DIRECTORY #
+##############################################
 
 Under the Test_Data directory lies a driver script and data to test 
 some core functionalities.
@@ -182,9 +193,6 @@ these data files are also used as part of the tests.
 Tests generate VDJML files, characterization output files 
 (TSV-formatted), CDR3 length histograms, and JSON segment count
 data.  Output/error log files are also generated.
-
-
-
 
 
 
