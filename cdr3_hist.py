@@ -10,7 +10,7 @@ from utils import read_fasta_file_into_map,biopythonTranslate,printMap,get_domai
 from igblast_utils import printNiceAlignment,buildAlignmentWholeSeqs,buildAlignmentWholeSeqsDirect
 import vdjml
 from vdjml_utils import getTopVDJItems,getHitInfo
-from vdjml_igblast_parse import rev_comp_dna
+from igblast_parse import rev_comp_dna
 import argparse
 
 

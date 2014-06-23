@@ -11,7 +11,7 @@ from segment_utils import IncrementMapWrapper,getVRegionsList,getRegionSpecifcCh
 from char_utils import getNumberBaseSubsFromBTOP,getNumberIndelsFromBTOP,getIndelMapFromBTOP
 from alignment import alignment
 from CharacterizationThread import CharacterizationThread
-from vdjml_igblast_parse import rev_comp_dna,getRegPosFromInvertedPos
+from igblast_parse import rev_comp_dna,getRegPosFromInvertedPos
 import re
 import Queue
 import threading

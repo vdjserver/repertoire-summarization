@@ -3,7 +3,7 @@
 from pprint import pprint
 from utils import printMap,repStr
 from segment_utils import getNAProductiveRearrangmentFlagFromVJHitLineData,getRegionAlignmentFromLargerVAlignment
-from vdjml_igblast_parse import extractJunctionRegionSeq,rev_comp_dna
+from igblast_parse import extractJunctionRegionSeq,rev_comp_dna
 from igblast_utils import buildAlignmentWholeSeqs
 import vdjml
 

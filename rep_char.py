@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import vdjml
-from vdjml_igblast_parse import scanOutputToVDJML,makeParserArgs,makeVDJMLDefaultMetaAndFactoryFromArgs
+from igblast_parse import scanOutputToVDJML,makeParserArgs,makeVDJMLDefaultMetaAndFactoryFromArgs,rev_comp_dna,getRegPosFromInvertedPos
 #from utils import printMap,get_domain_modes,biopythonTranslate,makeAllMapValuesVal,getNumberBpInAlnStr,repStr
 from utils import *
 from pprint import pprint
@@ -13,7 +13,7 @@ from segment_utils import IncrementMapWrapper,getVRegionsList,getRegionSpecifcCh
 from char_utils import getNumberBaseSubsFromBTOP,getNumberIndelsFromBTOP,getIndelMapFromBTOP
 from alignment import alignment
 from CharacterizationThread import CharacterizationThread
-from vdjml_igblast_parse import rev_comp_dna,getRegPosFromInvertedPos
+
 import re
 import Queue
 import threading
