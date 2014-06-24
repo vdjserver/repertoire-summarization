@@ -101,97 +101,6 @@ def readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,read_ann
 
 
 
-# get CDR3 spec char. but return q_pos of last_analyzed position and also limit to analysis greater than given char
-def getCDR3SpecifcCharacterization(s_aln,q_aln,frame_mask,q_aln_start,limit):
-	empty_map=getEmptyRegCharMap()
-	#the only keys are zero!
-	#print "s",s_aln
-	#print "q",q_aln
-	#print "f",frame_mask
-	#print "x",q_aln_start
-	#print "l",limit
-	q_pos=q_aln_start
-	temp=0
-	#while(temp<len(s_aln)):
-		
-	
-	
-	
-
-#add to the characterization map CDR3 region characterization
-#each vmap,dmap,jmap are the alignment infos as returned from getHitInfo
-def cdr3RegCharAnalysis(vMap,dMap,jMap,mode,cdr3_anal_map,organism,imgtdb_obj):
-	empty_map=getEmptyRegCharMap()
-	#first do input validation
-	if(vMap==None or jMap==None):
-		empty_map=makeAllMapValuesVal(empty_map,-1)
-		return empty_map
-	if(not(mode in cdr3_anal_map)):
-		empty_map=makeAllMapValuesVal(empty_map,-1)
-		return empty_map
-	elif(cdr3_anal_map[mode]==(-1)):
-		empty_map=makeAllMapValuesVal(empty_map,-1)
-		return empty_map
-	for m in [vMap,dMap,jMap]:
-		if('subject seq'  not in m):
-			empty_map=makeAllMapValuesVal(empty_map,-1)
-			return empty_map
-		elif('query seq' not in m):
-			empty_map=makeAllMapValuesVal(empty_map,-1)
-			return empty_map
-	#accumulate counts for V
-	max_v_anal=(-1)
-	max_d_anal=(-1)
-	q_cdr3_start=cdr3_anal_map[mode+'_from']
-	q_cdr3_end=cdr3_anal_map[mode+'_to']
-	v_s_aln=vMap['subject seq']
-	v_q_aln=vMap['query seq']
-	temp_v_pos=int(vMap['s. start'])
-	temp_v=0
-	temp_v_q_pos=int(vMap['q. start'])
-	VrefName=vMap['subject ids']
-	v_ref_cdr3_start=getAdjustedCDR3StartFromRefDirSetAllele(VrefName,imgtdb_obj,organism,mode)
-	frame_mask=list()
-	qry_cdr3_start_last_frame=(-1)
-	cdr3_q_start_for_return=(-1)
-	cdr3_s_aln=""
-	cdr3_q_aln=""
-	v_tot=0
-	v_same=0
-	#print "to enter while"
-	while(temp_v<len(v_s_aln)):
-		if(temp_v_pos>=v_ref_cdr3_start):
-			cdr3_s_aln+=v_s_aln[temp_v]
-			cdr3_q_aln+=v_q_aln[temp_v]
-			qry_cdr3_start_last_frame=getTheFrameForThisReferenceAtThisPosition(VrefName,organism,imgtdb_obj,temp_v_pos)
-			if(v_s_aln[temp_v]!="-" and v_q_aln[temp_v]!="-"):
-				v_tot+=1
-				if(v_s_aln[temp_v]==v_q_aln[temp_v]):
-					v_same+=1
-			frame_mask.append(qry_cdr3_start_last_frame)
-		if(v_q_aln[temp_v]!="-" and cdr3_q_start_for_return!=(-1)):
-			cdr3_q_start_for_return=temp_v_q_pos
-		if(v_q_aln[temp_v]!="-"):
-			temp_v_q_pos+=1
-		if(v_s_aln[temp_v]!="-"):
-			lastVPos=temp_v_pos
-			temp_v_pos+=1
-		temp_v+=1
-	#cdr3_v_char_map=getRegionSpecifcCharacterization(cdr3_s_aln,cdr3_q_aln,"CDR3",frame_mask,dMode)
-	#print "THE CDR3 ALN IN V is (q top, s bottom)"
-	#print cdr3_q_aln
-	#print frame_mask
-	#print "stop here"
-	#print "last q",temp_v_q_pos
-	getCDR3SpecifcCharacterization(cdr3_s_aln,cdr3_q_aln,frame_mask,temp_v_q_pos,(-1))
-	map_map=dict()
-	super_s=makeEmptyArrayOfStringsOfLen(jMap['q. end'])
-	#sys.exit(0)
-
-	sys.exit(0)
-
-
-
 
 
 def getValnWholeSeqStopFlag(vInfo,dInfo,jInfo,imgtdb_obj,organism,annMap,seq_rec):
@@ -350,9 +259,7 @@ def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap):
 	elif(preCDR3Aln==None and postCDR3AlnObj!=None):
 		return emptyMap
 
-	numN=postCDR3AlnObj.q_start-preCDR3Aln.q_end-1
-	NSub=repStr("N",numN)
-	NQry=repStr("N",numN)
+
 	vCharMap=preCDR3Aln.characterize()
 	#print "the vCharMap annotation map and alignment (for whole seq named ",vInfo['query id'],") is "
 	#printMap(vCharMap)
@@ -676,9 +583,8 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 
 	
 	annMap["Read identifier"]=read_rec.id
-	#getAlignmentString(read_result_obj,meta,query_record,imgtdb_obj,organism)
-	#analyze_combinations(read_result_obj,meta,organism,imgtdb_obj,read_rec,annMap)
-	#printMap(annMap,True)
+
+
 	t_map=getTypeNameScoreMap(read_result_obj,meta)
 	tie_map=getVDJTieMap(t_map,topVDJ)
 	segments=get_segment_list()
@@ -702,94 +608,12 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 
 
 
-def analyze_combinations(read_result_obj,meta,organism,imgtdb_obj,read_rec,read_ann_map):
-	segment_combinations=read_result_obj.segment_combinations()
-	for s in range(len(segment_combinations)):
-		#print "LOOKING AT COMBINATION # ",str(int(s+1))," of ",str(len(segment_combinations))," FOR READ ID=",read_result_obj.id()
-		segment_combination=segment_combinations[s]
-		analyzeRegionObjsFromSegmentCombo(segment_combination,meta,organism,imgtdb_obj,read_rec,read_ann_map)
-
-
-
-
-def analyzeRegionObjsFromSegmentCombo(segment_combo,meta,organism,imgtdb_obj,read_rec,read_ann_map):
-	global global_key_base
-	#print "got a segment combo : ",segment_combo
-	#print "regions is ",segment_combo.regions
-	#print "now calling....",
-	regions=segment_combo.regions()
-	#print "the type of regions is ",str(type(regions))
-	for region in regions:
-		#print "region???",region
-		#print "range : ",region.range_
-		#print region.range_.pos_0()
-		rgn_start=region.range_.pos_1() 
-		rgn_end=rgn_start+region.range_.length()-1
-		#print "start/end : ",rgn_start," and ",rgn_end
-		rgn_ns=int(str(region.num_system_))
-		#print "rgn_ns",rgn_ns
-		if(rgn_ns==1):
-			rgn_ns="imgt"
-		else:
-			rgn_ns="kabat"
-		#print "rgn_ns",rgn_ns
-		rgn_nm=meta[region.region_]
-		rgn_nm=re.sub(r'W','',rgn_nm)
-		lookup_key_base=global_key_base+rgn_ns+"_"+rgn_nm+"_"
-		lookup_qry_start=lookup_key_base+"qry_srt"
-		lookup_qry_end=lookup_key_base+"qry_end"
-		#print "using lookups ",lookup_qry_start," and ",lookup_qry_end
-		if((lookup_qry_start in read_ann_map) and (lookup_qry_end in read_ann_map)):
-			#print "found lookup!"
-			igblast_start=int(rgn_start)
-			igblast_end=int(rgn_end)
-			vdj_start=read_ann_map[lookup_qry_start]
-			vdj_end=read_ann_map[lookup_qry_end]
-			strt_match=(vdj_start==igblast_start)
-			end_match=(vdj_end==igblast_end)
-			#print "start and end matches : ",strt_match," and ",end_match
-			if(strt_match and end_match):
-				#print "total match!"
-				pass
-			else:
-				#print "at least one mismatch! igblast start/end : ",igblast_start," and ",igblast_end," vdj start/end     : ",vdj_start," and ",vdj_end," : query=",read_ann_map['read_name']," seg=",read_ann_map['top_V']," rgn=",rgn_nm," rrv : ",getVRegionStartAndStopGivenRefData(read_ann_map['top_V'],organism,imgtdb_obj,rgn_nm,rgn_ns)
-				pass
-		else:
-			#print "no lookup found for ",lookup_qry_start," and ",lookup_qry_end
-			pass
-
-
-
-		
 
 
 
 
 
 
-
-
-
-#using the PYVDJML, extract information from the IGBLAST-notated
-#regions (FR1, CDR1, etc) and compare them with VDJ-server lookedup values
-def vSegmentRegionVDJAnalyse(read_result_obj,meta,organism,imgtdb_obj,read_rec):
-	topVDJ=getTopVDJItems(read_result_obj,meta)
-	topV=topVDJ['V']
-	segment_combinations=read_result_obj.segment_combinations()
-	for s in range(len(segment_combinations)):
-		segment_combination=segment_combinations[s]
-		#print "Looking at combination #",str(s+1)
-		getRegionsObjsFromSegmentCombo(segment_combination)
-		#sc1 = vdjml.Segment_combination(scb)
-		#scb.add_region(name=reg_name,read_range=reg_interval,metric=mm)
-		#		scb.insert_region(vdjml.Num_system.kabat,vdjml.Gene_region_type.cdr2,reg_interval,mm)
-		#sc1.insert_region(
-		#                          vdjml.Num_system.imgt,
-		#                          vdjml.Gene_region_type.fr1,
-		#                          vdjml.Interval.first_last_1(1,54),
-		#                          vdjml.Match_metrics(100, 54)
-		#                          )
-		#	return read_result_obj
 
 
 
