@@ -58,6 +58,7 @@ class CodonAnalysis:
 			return False
 
 	#test for codon ambiguity
+	#by testing individual bases for ambiguity
 	def is_unambiguous_codon(self,c):
 		#if a list of bases
 		if(type(c)==list):
@@ -82,13 +83,16 @@ class CodonAnalysis:
 		codons=self.make_codons()
 		self.codon_amino_map=dict()
 		ascii_list=list()
+		#create an ASCII list
 		for a in range(33,122):
 			ascii_list.append(chr(a))
+		#for each possible ASCII triplet, register/save X as the default translation
 		for b1 in ascii_list:
 			for b2 in ascii_list:
 				for b3 in ascii_list:
 					codon=b1+b2+b3
 					self.codon_amino_map[codon]="X"
+		#now use valid codons to overwrite X
 		for codon in codons:
 			amino=str(biopythonTranslate(codon))
 			self.codon_amino_map[codon]=amino
@@ -111,19 +115,18 @@ class CodonAnalysis:
 		return self.codon_amino_map[codon]
 
 	def __init__(self):
-		#init ca map
 		self.init_ca_map()
-		#print "CA MAP"
-		#print self.codon_amino_map
 		self.init_ac_map()
-		#print "AC MAP"
-		#print self.amino_codon_map
-		#sys.exit(0)
 
 
 
+#make an instance of the analyzer
 codonAnalyzer=CodonAnalysis()
+
+#creat a lock for threading
 char_lock = threading.Lock()
+
+
 #class for two-seq alignment methods/tools/data
 class alignment:
 
@@ -311,11 +314,15 @@ class alignment:
 
 
 	@staticmethod
+	#return true or not if the passed is an inf
 	def isAnInf(a):
 		if(a==float("inf") or a==float("-inf")):
 			return True
+		else:
+			return False
 
 	@staticmethod
+	#of two values, return the one that's not infinite
 	def getNonInf(a,b):
 		if(alignment.isAnInf(a) and alignment.isAnInf(b)):
 			raise Exception("Can't get noninf from a=",a,"b=",b)
@@ -326,13 +333,16 @@ class alignment:
 				return b
 
 	#for each bp, get a mapping to position within the sequence
+	#the items in the list correspond to the positions of the bps
 	def getPosList(self,s="subject",leanLeft=True):
 		temp=0
 		pl=list()
+		#if the alignments are empty return empty!
 		if((self.s_aln is None) or (self.q_aln is None)):
 			return pl
 		if(len(self.s_aln)<=0 or len(self.q_aln)<=0):
 			return pl
+		#choose the correct sequence
 		if(s=="query"):
 			seq=self.q_aln
 			s_pos=self.q_start
@@ -554,6 +564,7 @@ class alignment:
 
 	#given an alignment, and a position of a sequence IN the alignment
 	#return the porition of the alignment whose bp are <= or >= that position in the alignment
+	#has been tested with the TEST method of this class
 	def getAlnAtAndCond(self,a_pos,st="query",cond="geq"):
 
 		if(not(st=="query")):
@@ -561,7 +572,7 @@ class alignment:
 		aln=["",""] #Q, then S
 		if(not(cond=="leq")):
 			cond="geq"		
-		#for request that would return the entire alignment reset the inputs
+		#reset the input to a valid value if necessary
 		if(st=="query" and a_pos<self.q_start and cond=="geq"):
 			a_pos=self.q_start
 		if(st=="query" and a_pos>self.q_end and cond=="leq"):
@@ -574,7 +585,7 @@ class alignment:
 
 		temp=0
 
-
+		#use inf values so that min/max return the numbers and not infs
 		min_s_pos=float("inf")
 		max_s_pos=float("-inf")
 		min_q_pos=float("inf")
@@ -586,7 +597,7 @@ class alignment:
 		q_char=""
 		while(temp<len(self.q_aln)):
 			used_flag=False
-			if(cond=="leq"):
+			if(cond=="leq"):#less than or equal to
 				if(st=="query"):
 					if(a_pos>=q_pos):
 						used_flag=True
@@ -597,7 +608,7 @@ class alignment:
 						aln[0]+=self.q_aln[temp]
 						aln[1]+=self.s_aln[temp]
 						used_flag=True
-			else:
+			else:#geq greater-than or equal to
 				if(st=="query"):
 					if(a_pos<=q_pos):
 						aln[0]+=self.q_aln[temp]
@@ -641,6 +652,7 @@ class alignment:
 			else:
 				max_s_pos=a_pos
 
+		#
 		if(self.isAnInf(max_q_pos)):
 			max_q_pos=self.getNonInf(max_q_pos,min_q_pos)
 		if(self.isAnInf(min_q_pos)):
@@ -649,8 +661,8 @@ class alignment:
 			max_s_pos=self.getNonInf(max_s_pos,min_s_pos)
 		if(self.isAnInf(min_s_pos)):
 			min_s_pos=self.getNonInf(max_s_pos,min_s_pos)
-			
 
+		#handle error/corner cases where alignment should be empty
 		if(min_s_pos>max_s_pos or min_q_pos>max_q_pos):
 			return alignment("","",0,0,0,0)			
 
@@ -732,7 +744,7 @@ class alignment:
 
 
 
-	#return a pretty print as a string
+	#return the alignment as a pretty print string
 	def getNiceString(self):
 		aln=["","",""]
 		aln[0]=str(self.q_aln)

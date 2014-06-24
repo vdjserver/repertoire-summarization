@@ -84,14 +84,8 @@ def annotatedCDR3(s_aln,q_aln,s_c,q_c,s_s,q_s):
 	return annotated
 	
 
-	
 
 
-def getOtherMode(m):
-	if(m=="imgt"):
-		return "kabat"
-	else:
-		return "imgt"
 
 
 #utility to reconstruct alignments from a BTOP and data map and add it to the 
