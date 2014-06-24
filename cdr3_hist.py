@@ -16,74 +16,6 @@ import argparse
 
 
 
-#how many deletions???
-def getNumDashInStr(s):
-	orig_len=len(s)
-	s_no_dash=re.sub(r'\-','',s)
-	nodash_len=len(s_no_dash)
-	return orig_len-nodash_len
-
-
-#from an alignment mark where CDR3 is with X
-#s_aln, q_aln are the alignment string
-#s_c q_c are the cdr3 starts for subject and query
-# s_s q_s are the subject and query alignment starts
-def annotatedCDR3(s_aln,q_aln,s_c,q_c,s_s,q_s):
-	#get CDR3 starts relative to the alignment starts
-	aln_rel_s=s_c-s_s
-	aln_rel_q=q_c-q_s
-	print "subject from is ",s_s
-	print "subject cdr3 is ",s_c
-	print "aln rel sub is ",aln_rel_s
-	print "query from is ",q_s
-	print "query CDR3 is ",q_c
-	print "aln rel q is ",aln_rel_q
-	#sys.exit(0)
-
-
-	#find position including gaps in the alignment for the SUBJECT STAR
-	#all this code is 1-based indices
-	#except for actually doing string comparison and string-printing which is 0-based
-	s_temp=0
-	if(s_aln[0]=="-"):
-		s_pos=0
-	else:
-		s_pos=1
-	while(s_pos<=aln_rel_s):
-		if(s_aln[s_temp]!="-"):
-			s_pos+=1
-		s_temp+=1
-	s_actual=s_temp
-	#0-based indices!
-	q_temp=0
-	if(q_aln[0]=="-"):
-		q_pos=0
-	else:
-		q_pos=1
-	while(q_pos<=aln_rel_q):
-		if(q_aln[q_temp]!="-"):
-			q_pos+=1
-		q_temp+=1
-	q_actual=q_temp 
-	#0-based indices
-	#if(q_actual!=s_actual):
-	#	print "***WARNING***"
-	annLines=["","","",""]
-	annLines[0]=repStr(" ",s_actual)
-	annLines[0]+="X"
-	annLines[1]=s_aln
-	annLines[2]=q_aln
-	annLines[3]=repStr(" ",q_actual)
-	annLines[3]+="X"
-	annotated=""
-	for i in range(len(annLines)):
-		#print annLines[i]
-		annotated+=str(i)+" : "+annLines[i]
-		if(i<len(annLines)-1):
-			annotated+="\n"
-	return annotated
-	
-
 
 
 
@@ -92,8 +24,6 @@ def annotatedCDR3(s_aln,q_aln,s_c,q_c,s_s,q_s):
 #data map and return the data map
 def addAlignmentsPreCDR3(dataMap,alleleName,imgtdb_obj,organism,query_record):
 	btop=dataMap['btop']
-	bopyname=str(query_record.id)
-	#print "the biopython name is ",bopyname
 	query_seq=str(query_record.seq)
 	if(dataMap['is_inverted']):
 		#print "inversion is necessary...."
@@ -116,8 +46,6 @@ def CDR3LengthAnalysisVDMLOBJ(read_result_obj,meta,organism,imgtdb_obj,query_rec
 	# 3) q. start and q. end and s. start and s. end
 	# 4) read inversion flags
 	#print "got into cdr3 hist wrapper"
-	read_name=read_result_obj.id()
-	#print "got read name ",read_name
 	segment_combinations=read_result_obj.segment_combinations()
 	#if(len(segment_combinations)
 	#print "the length is ",len(segment_combinations)
@@ -265,7 +193,6 @@ class histoMapClass:
 		mode_stream_list=list()
 		for mode in self.modes:
 			#print "Now JSONIFying for MODE=",mode
-			values_list=list()
 			min_val=self.gminVal()
 			max_val=self.gmaxVal()
 			#print "min and max are ",min_val,max_val
