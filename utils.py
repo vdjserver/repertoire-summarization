@@ -138,22 +138,21 @@ def makeAllMapValuesVal(m,v):
 
 #translate a sequence with BIOPYTHON
 #using IUPAC standards
-#NOTE that sequences are truncated so
-#that the length is %3=0
+#N-padded to achieve length of multiple of 3
+#biopython returns X for ambiguous, but the AA for non-ambiguous
 def biopythonTranslate(dna):
 	from Bio.Seq import Seq
 	from Bio.Alphabet import IUPAC
-	#coding_dna = Seq(dna, IUPAC.unambiguous_dna)
-	if(len(dna)>0 and len(dna)<3):
-		return "X"
-	elif(len(dna)==0):
-		return ""
-	mod_3=((len(dna))%3)
-	#print "mod3=",mod_3
-	if(mod_3!=0):
-		dna_good=dna[0:(len(dna)-mod_3)]
-		dna=dna_good
-		return biopythonTranslate(dna)
+	num_extraN=0
+	if(len(dna)==0):
+		num_extraN=3
+	elif(len(dna)%3!=0):
+		num_extraN=3-(len(dna)%3)
+	extraNs=("N"*num_extraN)
+	#print "nen=",num_extraN
+	#print "en=",extraNs
+	dna=dna+extraNs
+	#print "dna=",dna
 	coding_dna = Seq(dna, IUPAC.ambiguous_dna)
 	#print "coding_dna" ,  coding_dna
 	template_dna = coding_dna.reverse_complement()

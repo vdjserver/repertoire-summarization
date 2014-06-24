@@ -6,7 +6,8 @@ import re
 import threading
 
 
-
+#in a string find the number of dashes that may prefix the string
+#return 0, 1, etc.
 def getNumStartingDashes(s):
 	dre=re.compile(r'^(\-+)')
 	sr=re.search(dre,s)
@@ -17,7 +18,8 @@ def getNumStartingDashes(s):
 		return 0
 
 
-
+#class for routines for codon translation
+#and associated tasks
 class CodonAnalysis:
 	
 	#internal data
@@ -57,11 +59,13 @@ class CodonAnalysis:
 
 	#test for codon ambiguity
 	def is_unambiguous_codon(self,c):
+		#if a list of bases
 		if(type(c)==list):
 			for base in c:
 				ba=self.is_unambiguous_base(base)
 				if(not(ba)):
 					return False
+		#if a single string of 3 bases
 		elif(type(c)==str):
 			for bi in range(len(c)):
 				base=c[bi]
@@ -73,7 +77,7 @@ class CodonAnalysis:
 		return True
 
 
-	#initialize that codon->amino map
+	#initialize the codon->amino map
 	def init_ca_map(self):
 		codons=self.make_codons()
 		self.codon_amino_map=dict()
