@@ -11,6 +11,21 @@ def getNumberIndelsFromBTOP(btop):
 	return orig_btop_len-btop_len_no_gap
 
 
+
+
+
+def getRegPosFromInvertedPos(inv_pos, seq_len_in_bp):
+    '''
+    from a position in the inverted space, get the position in regular space
+    '''
+    fake_interval = [inv_pos, inv_pos]
+    reg_fake_interval = getRevCompInterval(fake_interval, seq_len_in_bp)
+    return reg_fake_interval[0]
+
+
+
+
+
 #find the number of base substitutions (does NOT include indels) from a BTOP
 def getNumberBaseSubsFromBTOP(btop):
 	#remove all digits
