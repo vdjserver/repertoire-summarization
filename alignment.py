@@ -123,8 +123,6 @@ class CodonAnalysis:
 #make an instance of the analyzer
 codonAnalyzer=CodonAnalysis()
 
-#creat a lock for threading
-char_lock = threading.Lock()
 
 
 #class for two-seq alignment methods/tools/data
@@ -195,7 +193,7 @@ class alignment:
 		#print "setsfm called with firstFrame==",firstFrame
 		if(len(self.s_aln)<=0):
 			#print "setsfm early return..."
-			self.s_mask=nfm
+			self.s_frame_mask=nfm
 			return
 		if(self.s_aln[temp]=="-"):
 			current-=1
@@ -251,7 +249,6 @@ class alignment:
 		else:
 			dashes=qreres.group(1)
 			num_dashes=len(dashes)
-			ns_start=self.s_start+num_dashes
 			return self.getAlnAtAndCond(sq_start,"subject","geq")
 		
 
@@ -593,8 +590,6 @@ class alignment:
 		used_flag=False	
 		s_pos=self.s_start
 		q_pos=self.q_start
-		s_char=""
-		q_char=""
 		while(temp<len(self.q_aln)):
 			used_flag=False
 			if(cond=="leq"):#less than or equal to
