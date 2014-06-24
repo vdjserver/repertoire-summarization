@@ -15,13 +15,11 @@ from Bio.Blast import NCBIXML
 def writeKabatJCDR3End(k,o):
 	reader=open(k,'r')
 	blast_records = NCBIXML.parse(reader)
-	numRec=0
 	heavy_re=re.compile(r'WG.G')
 	light_re=re.compile(r'FG.G')
 	cdr_map=dict()
 	writer=open(o,'w')
 	for record in blast_records:
-		numRec+=1
 		print "\n\n\n******************"
 		print "query : ",record.query
 		query_name=record.query
@@ -64,7 +62,7 @@ def writeKabatJCDR3End(k,o):
 			
 		#print "\n\n\n"
 	writer.close()
-	#print "numRecs is ",numRec
+
 
 
 def writeRegionsFromIGBLASTResult(k,o):
