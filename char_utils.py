@@ -13,7 +13,8 @@ def getNumberIndelsFromBTOP(btop):
 
 
 
-
+#given a position in inverted space and the sequence length in base pairs
+#return the position in regular (un-inverted) space
 def getRegPosFromInvertedPos(inv_pos, seq_len_in_bp):
     '''
     from a position in the inverted space, get the position in regular space
