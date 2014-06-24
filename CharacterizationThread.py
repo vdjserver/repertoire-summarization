@@ -8,15 +8,17 @@ from segment_utils import getTheFrameForThisReferenceAtThisPosition
 
 #thread class for parallel charactgerization of regions
 class CharacterizationThread(threading.Thread):
+
 	def clear_result(self):
 		self.result=None
-	def get_result(self):
-		return self.result
+
+
 	def __init__(self,queue,result_queue):
 		#print "IN INIT OF CharacterizationThread"
 		threading.Thread.__init__(self)
 		self.queue=queue
 		self.result_queue=result_queue
+
 	def run(self):
 		while(True):
 			try:
