@@ -52,66 +52,7 @@ def repeatString(s,n):
 
 
 
-#build an alignment printable string
-#from the query and subject, but include a MIDLINE
-def buildAlignmentWholeSeqsDirect(q,s):
-	aln=["","",""]
-	aln[0]=str(q)
-	aln[2]=str(s)
-	for b in range(len(aln[0])):
-		qbase=aln[0][b]
-		sbase=aln[2][b]
-		if(qbase=="-" or sbase=="-"):
-			aln[1]+=" "
-		elif(not(qbase==sbase)):
-			aln[1]+="X"
-		else:
-			aln[1]+="|"
-	aln[0]="QURY:"+aln[0]
-	aln[1]="MDLN:"+aln[1]
-	aln[2]="SBCT:"+aln[2]
-	return aln		
 
-
-#returns a string given query first, then subject
-def printNiceAlignment(q,s):
-	joiner="\n"
-	return joiner.join(buildAlignmentWholeSeqsDirect(q,s))
-
-
-
-
-#given a BTOP string build a dummy alignment, putting N
-#where sequence cannot be known without source data
-def buildDummyQAndSSeqsFromBTop(btop):
-	#query, then subject
-	q_s=["",""]
-	if(len(btop)<=0):
-		return q_s
-	else:
-		while(len(btop)>0):
-			adm=re.search('^(\d+)$',btop)
-			dm=re.search('^(\d+)[^0-9]',btop)
-			firstTwoLetters=re.search('^([a-z\\-])([a-z\\-])',btop,re.IGNORECASE)
-			if adm:
-				#all digital
-				q_s[0]+=repStr("N",int(adm.group(1)))
-				q_s[1]+=repStr("N",int(adm.group(1)))
-				return q_s
-			elif(dm):
-				#just starts with digits
-				q_s[0]+=repStr("N",int(dm.group(1)))
-				q_s[1]+=repStr("N",int(dm.group(1)))
-				num_digits=len(dm.group(1))
-				btop=btop[num_digits:]
-			else:
-				#2 characters!
-				q_s[0]+=firstTwoLetters.group(1)
-				q_s[1]+=firstTwoLetters.group(2)
-				btop=btop[2:]
-		return q_s
-			
-		
 
 
 
@@ -275,15 +216,6 @@ def doesPosInSeqAlignToGap(q_aln,s_aln,q_from,q_to,s_from,s_to,a_pos,st="query")
 
 
 
-#given a length l, make a list of that
-#length whose entries are empty strings
-def makeEmptyArrayOfStringsOfLen(l):
-	empty_str_arr=list()
-	#non-negative numbers only please!
-	l=max(0,l)
-	for i in range(l):
-		empty_str_arr.append("")
-	return empty_str_arr
 
 
 #given a length l, make a list of digits of
@@ -296,14 +228,7 @@ def makeEmptyArrayOfDigitsOfLen(l,d=0):
 		empty_dig_arr.append(d)
 	return empty_dig_arr
 
-#given a hash map, set all values
-# to a given value 
-def makeAllMapValuesVal(m,v):
-	if(m is not None):
-		for k in m:
-			m[k]=v
-	return m
-		
+
 
 
 #translate a sequence with BIOPYTHON
@@ -325,11 +250,11 @@ def biopythonTranslate(dna):
 	#print "dna=",dna
 	coding_dna = Seq(dna, IUPAC.ambiguous_dna)
 	#print "coding_dna" ,  coding_dna
-	template_dna = coding_dna.reverse_complement()
+	#template_dna = coding_dna.reverse_complement()
 	#print "template_dna" , template_dna
 	messenger_rna = coding_dna.transcribe()
 	#print "messenger_rna" , messenger_rna
-	back_transcripted=messenger_rna.back_transcribe()
+	#back_transcripted=messenger_rna.back_transcribe()
 	#print "back_transcripted" , back_transcripted
 	translation=messenger_rna.translate()
 	#print "translation ", translation
@@ -350,17 +275,6 @@ def isIntegral(s):
 
 
 
-def countFastaReads(fastaFile):
-	f=open(fastaFile,'r')
-	fc=0
-	for line in f:
-		if(line.startswith(">")):
-			fc+=1
-	f.close()
-	return fc
-
-
-
 
 def fileLineCount(f):
 	reader=open(f,'r')
@@ -371,24 +285,9 @@ def fileLineCount(f):
 	return line_count
 
 
-#using a map and key 
-#increment the value
-#init at 1 if no such key is in the map
-def counter_map_inc(counter_map,key):
-	if key in counter_map:
-		counter_map[key]+=1
-	else:
-		counter_map[key]=1
-	return counter_map
 
 
 
-#scan to see if a string contains an apostrophe
-def doesStringContainAnApostrophe(s):
-	if(re.search("'",s)):
-		return True
-	else:
-		return False
 
 
 #return TRUE if the first argument (a)
@@ -403,192 +302,7 @@ def a_subseq_of_b(a,b):
 
 
 
-#return true if the two sequences in an alignment are equal
-#allow exclusion of head/tail indels as an option (defaults to False)
-def isAlignmentFreeOfBothMutationsAndIndels(alignment,TryRemovalOfHeadAndTailDash=False):
-	if(alignment[0]==alignment[1]):
-		#query and subject are the same, return true
-		return True
-	else:
-		if(TryRemovalOfHeadAndTailDash and (removeHeadAndTailMultiDash(alignment[0])==removeHeadAndTailMultiDash(alignment[1]))):
-			#see if they're equal if head/tail indels are removed
-			return True
-		#nope!
-		return False
 
-
-
-#read multiple fasta files into a single map
-def readMultipleMapFilesIntoSingleMapWithGlob(g):
-	map_files=glob.glob(g)
-	total_map=dict()
-	for map_file in map_files:
-		single_map=read_map_from_file(map_file)
-		for key in single_map:
-			total_map[key]=single_map[key]
-	return total_map
-
-
-#given a subset list 'subset'
-#write data from the source (input)
-# that is in the subset to the output path
-def fastaSubset(inputFastaPath,subset,outputFastaPath):
-	#print "**************************************"
-	#print "FASTA SUBSET CALLED"
-	#print "FASTA=",inputFastaPath
-	q_set=read_fasta_file_into_map(inputFastaPath)
-	#for q in q_set:
-	#	print "q=",q," len =",len(q_set[q])
-	#print "len fasta =",len(q_set)
-	#print "SUBSET:",
-
-	#print "size of subset : ",len(subset)
-	q_set=read_fasta_file_into_map(inputFastaPath)
-	subset_writer=open(outputFastaPath,'w')
-	for item in subset:
-		#print "looking at item ",item," in subset to determine if it's in fasta...."
-		if item in q_set :
-			#print "it's in fasta...now writing it to ",outputFastaPath
-			subset_writer.write(">"+item+"\n")
-			subset_writer.write(q_set[item]+"\n")
-		else:
-			pass
-			#print "it's not in fasta!"
-		#print "\n\n"
-	subset_writer.close()
-
-
-#using NW alignment data
-#map unmapped items to a list
-#(this is for comparing IGBLAST and IMGT data)
-def nw_map_from_fastas(q_fasta_path,s_fasta_path,logPath,clone_names,alleleList,mappedPath,unmappedPath,resEq=True):
-	q_map=read_fasta_file_into_map(q_fasta_path)
-	db_map=read_fasta_file_into_map(s_fasta_path)
-	mapped_map=find_best_nw_from_maps_KeepPerfects(q_map,db_map,logPath,clone_names,alleleList,resEq)
-	mapped_writer=open(mappedPath,'w')
-	unmapped_writer=open(unmappedPath,'w')
-	#write the mapped file
-	write_map_to_file(mapped_map,mappedPath)
-	#write the unammped list
-	unmapped_list=list()
-	for item in q_map:
-		if(not(item in mapped_map)):
-			unmapped_list.append(item)
-	write_list_to_file(unmapped_list,unmappedPath)
-	
-
-#from the map/alignment data and clone list
-#find the alignments
-def find_best_nw_from_maps_KeepPerfects(q_map,db_map,logPath,clone_names_map,alleleList,resEq=True):
-	score_map_name=dict()
-	score_map_val=dict()
-	best_aln=dict()
-	#first, get the best scores
-	for q_desc in q_map:
-		#nw.global_align("CEELECANTH", "PELICAN", matrix="/home/esalina2/PAM250")
-		best_score=(-1)
-		gap_open=-5
-		gap_extend=-2
-		pam_path="/home/esalina2/PAM250"
-		for d_desc in db_map:
-			alignment=nw.global_align(q_map[q_desc],db_map[d_desc],matrix=pam_path)
-			score=nw.score_alignment(alignment[0],alignment[1],gap_open,gap_extend,matrix=pam_path)
-			#if(q_desc=="IGHD1-7*01"):
-				#print "qkey=",q_desc
-				#print "qval=",q_map[q_desc]
-				#print "dkey=",d_desc
-				#print "d_val=",db_map[d_desc]
-				#print "Now attempting a global alignment with :",q_map[q_desc]+", and "+db_map[d_desc]
-				#print "alignment=",alignment
-				#print "score=",score
-			if q_desc not in score_map_val:
-				score_map_val[q_desc]=score
-				score_map_name[q_desc]=d_desc
-				best_aln[q_desc]=alignment
-			else:
-				existing_score=score_map_val[q_desc]
-				if(existing_score<score):
-					best_aln[q_desc]=alignment
-					score_map_val[q_desc]=score
-					score_map_name[q_desc]=d_desc
-	good_map=dict()
-	for name in score_map_name:
-		names_eq=(score_map_name[name]==name)
-		seqs_eq=(q_map[name]==db_map[score_map_name[name]])
-		perfect_aln=isAlignmentFreeOfBothMutationsAndIndels(best_aln[name])
-		perfect_aln_except_for_head_tail_indel=isAlignmentFreeOfBothMutationsAndIndels(best_aln[name],True)
-		best_alignment_no_HTIndels=map(removeHeadAndTailMultiDash,best_aln[name])
-		aln_frac=float(len(best_alignment_no_HTIndels[0]))/float(min(len(q_map[name]),len(db_map[score_map_name[name]])))
-		try:
-			log=open(logPath,'a')
-			log.write("query("+name+")="+q_map[name]+"\n")
-			log.write("ref("+score_map_name[name]+")="+db_map[score_map_name[name]]+"\n")
-			log.write("clone info : ")
-			if(name in clone_names_map):
-				log.write(clone_names_map[name])
-			else:
-				log.write("no clone name!")
-			log.write("\n")
-			log.write(best_aln[name][0]+"\n"+best_aln[name][1]+"\n")
-			log.write("score="+str(score_map_val[name])+"\n")
-			if(seqs_eq or perfect_aln):
-				log.write("The sequences are equal or the alignment is perfect!")
-			else:
-				log.write("Either the sequences are unequal and the alignment is imperfect!")
-			inAllelListStatus=None
-			if(extractIMGTNameFromKey(score_map_name[name]) in alleleList):
-				inAllelListStatus=True
-			else:
-				inAllelListStatus=False
-			log.write("IMGT hit in allele list status : "+str(inAllelListStatus))
-			log.write("\n\n\n")
-			log.close()
-		except:
-			print "ERROR WRITING ALGINMENT LOG FILE ",logPath
-			print "Exception in user code:"
-			print '-'*60
-			traceback.print_exc(file=sys.stdout)
-			print '-'*60
-		if((seqs_eq or perfect_aln) and (extractIMGTNameFromKey(score_map_name[name]) in alleleList) ):
-			good_map[name]=extractIMGTNameFromKey(score_map_name[name])
-	return good_map
-
-
-
-
-#act as a wrapper getting a value
-#from a map with 0 as the default value
-#if the key is not in the map
-def counter_map_get(counter_map,key):
-	if key in counter_map:
-		return counter_map[key]
-	else:
-		return 0
-
-
-
-#wrapper to touch a file
-#see http://stackoverflow.com/questions/1158076/implement-touch-using-python
-def touch(fname, times=None):
-	try:
-		with file(fname, 'a'):
-			os.utime(fname, times)
-	except Exception:
-		print "Error in touching file",fname
-
-
-#given a file path attempt to find out if it does NOT exist
-#would be touchable and would be deletable
-def test_nonexistent_touchable_and_del(f):
-	if(os.path.exists(f)):
-		return False
-	touch(f)
-	if(not os.path.exists(f)):
-		return False	
-	os.remove(f)
-	if(os.path.exists(f)):
-		return False
-	return True
 
 
 
@@ -632,27 +346,6 @@ def get_segment_list():
 
 
 
-def blastFormatFNAInDir(d,blastformtexecpath):
-	fnas=glob.glob(d+"/*.fna")
-	for fna in fnas:
-		if(fna.find("_D")!=(-1)):
-			#needing parse_seqids seems to be needed for D segment
-			format_cmd=blastformtexecpath+" -parse_seqids -dbtype nucl -in "+fna
-		else:
-			# parse_seqids seems to be causing issues for V segment
-			format_cmd=blastformtexecpath+" -dbtype nucl -in "+fna
-		if(True):
-			format_cmd=blastformtexecpath+" -dbtype nucl -in "+fna
-		print "BLASTDB Formatting ",fna," with ",format_cmd
-		out_path=fna+".blastfmt.out"
-		err_path=fna+".blastfmt.err"
-		out_handle=open(out_path,'w')
-		err_handle=open(err_path,'w')
-		proc=subprocess.Popen(format_cmd,stdout=out_handle,stderr=err_handle,shell="/bin/bash")
-		ret_val=proc.wait()
-		out_handle.close()
-		err_handle.close()
-		
 
 
 
@@ -710,10 +403,6 @@ def allelifyList(l):
 	#printList(l)
 	goodlist=list()
 	for i in l:
-		#print "Examining ",i," in the list..."
-		#print "GOOD LIST IS CURRENTLY:"
-		#printList(goodlist)
-		alleleRegex=re.compile(r'\*\d+$')
 		if(not (looksLikeAlleleStr(i))):
 			#print "NEED TO ALLELIFY IT!"
 			goodlist.append(i+"*01")
@@ -813,12 +502,6 @@ def formatNiceDateTimeStamp():
 
 
 
-#remove any "-" (0 or more) from the head and tail of a string
-def removeHeadAndTailMultiDash(s):
-	s=re.sub(r'\-+$',"",s)
-	s=re.sub(r'^\-+',"",s)
-	return s
-
 
 
 #little utility to return the modes
@@ -850,18 +533,6 @@ def format_blast_db(fastaPath,dbtype="nucl",formatdbbin="/usr/local/bin/makeblas
 	return format_db_cmd
 
 
-#call NCBI blast
-def blast_db(query_path,db_arg,blast_output_path,xmlMode=True):
-	blast_cmd="/usr/local/bin/blastn -query "+query_path#+" -word_size 4"
-	if(xmlMode):
-		blast_cmd+=" -outfmt 5"
-	blast_cmd+=" -num_alignments 10 -num_descriptions 10 -max_target_seqs 10 -db "+db_arg+" -out "+blast_output_path
-	print "the blast cmd is ",blast_cmd
-	try:
-		call(blast_cmd.split(" "))
-	except Exception, e:
-		print "BLAST error({0})"+format( e.strerror)
-	return blast_cmd
 
 
 #read fasta data into a map
@@ -878,38 +549,10 @@ def read_fasta_into_map(fasta_data):
 	return fasta_map
 
 
-#given a 'plain' dict() (python primitive)
-#convert it to a default dict
-# see http://docs.python.org/2/library/collections.html#collections.defaultdict
-# see http://stackoverflow.com/questions/5900578/how-collections-defaultdict-work
-def convertToDefaultStringDict(m,s):
-	dd=defaultdict(s)
-	for k in m:
-		dd[k]=m[k]
-	return dd
 
 
 
-#given a directory hierarchy, unGZ files under it
-#(NOTE not functional)...
-def uncompressFilesUnderDir(d):
-	uncompRE=re.compile(r'\.(Z|gz)$')
-	for root, dirs, files in os.walk(d, topdown=False):
-		for f in files:
-			print "a file=",f
-			compressed_path=root+"/"+f
-			search_result=re.search(uncompRE,f)
-			if(search_result):
-				#print "it matches!"
-				compEx=search_result.group(1)
-				#print "matched on ",compEx
-				uncompressed_name=f[0:(len(f)-len(compEx)-1)]
-				print "the uncompressed name is ",uncompressed_name
-				uncompressed_path=root+"/"+uncompressed_name
-				print "the uncompressed path is",uncompressed_path
-			else:
-				#print "no match"
-				pass
+
 
 
 
@@ -927,17 +570,6 @@ def merge_maps(ma,mb):
 
 
 
-#write a list to a file with line numbers (0-based)
-def write_list_to_file(m,path,doSort=True):
-	writer=open(path,'w')
-	if(doSort):
-		b=list(m)
-		b.sort()
-	else:
-		b=m
-	for i in b:
-		writer.write(i+"\n")
-	writer.close()
 
 
 #wrapper to exectute a BASH script
@@ -969,21 +601,9 @@ def write_temp_bash_script(cmd_string,scriptFilePath=None):
 	except:
 		print "ERROR IN WRITING SCRIPT FILE ",scriptFilePath
 	return scriptFilePath	
-	
 
-#get the number of lines in a file
-def getNumberLinesInFile(p):
-	reader=open(p,'r')
-	lines=0
-	for line in reader:
-		lines+=1
-	return lines
 
-#alias for getNumberLinesInFile 
-#looking at the file as a list
-def getLengthOfListInFile(p):
-	mylist=read_list_from_file(p)
-	return len(mylist)
+
 
 
 #return the number of base pairs (throwing out "-")
@@ -1009,15 +629,6 @@ def write_map_to_file(m,path,doSort=True):
 	writer.close()
 
 
-#read a list of lines from a file into a list
-def read_list_from_file(path):
-	reader=open(path,'r')
-	file_list=list()
-	for line in reader:
-		line=line.strip()
-		file_list.append(line)
-	reader.close()	
-	return file_list
 
 #read a map from a file
 #formatted as tab-separated values
@@ -1057,6 +668,7 @@ def returnTimeStamp():
 	date_cmd="date"
 	date_cmd_args="+%m_%d_%Y_%H_%M_%S.%N"
 	date_result=subprocess.check_output([date_cmd,date_cmd_args])
+	return date_result
 
 
 #print a LIST to STDOUT
