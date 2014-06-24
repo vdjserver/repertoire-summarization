@@ -38,5 +38,5 @@ if (__name__=="__main__"):
 	parser=argparse.ArgumentParser(description='igblast/rep_char pipeline')
 	args=parser.parse_args()
 	igdata="/usr/local/igblast-1.3.0/"
-	fasta=
+	
 
