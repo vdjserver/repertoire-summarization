@@ -11,7 +11,6 @@ import re
 from utils import *
 import glob
 import json
-from igblast_utils import *
 from subprocess import call
 from Bio.Blast import NCBIXML
 import sys, traceback

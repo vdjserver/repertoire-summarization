@@ -8,7 +8,6 @@ import re
 import pprint
 from imgt_utils import get_loci_list,imgt_db
 import glob
-from igblast_utils import printNiceAlignment
 #from utils import biopythonTranslate
 from utils import *
 from alignment import alignment

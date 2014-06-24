@@ -29,6 +29,176 @@ def extractAsItemOrFirstFromList(t):
 
 
 
+#turn an alignment (in the form of an array)
+#into a printabel nice string
+def getNiceAlignment(aln):
+	a=str("")
+	for idx, val in enumerate(aln):
+		a+=val+"\n"
+	return a
+
+
+#repeat a string (s) n times
+def repeatString(s,n):
+	if(n<=0):
+		return ""
+	else:
+		r=str("")
+		for i in range(n):
+			r+=s
+		return r
+		
+
+
+
+
+#build an alignment printable string
+#from the query and subject, but include a MIDLINE
+def buildAlignmentWholeSeqsDirect(q,s):
+	aln=["","",""]
+	aln[0]=str(q)
+	aln[2]=str(s)
+	for b in range(len(aln[0])):
+		qbase=aln[0][b]
+		sbase=aln[2][b]
+		if(qbase=="-" or sbase=="-"):
+			aln[1]+=" "
+		elif(not(qbase==sbase)):
+			aln[1]+="X"
+		else:
+			aln[1]+="|"
+	aln[0]="QURY:"+aln[0]
+	aln[1]="MDLN:"+aln[1]
+	aln[2]="SBCT:"+aln[2]
+	return aln		
+
+
+#returns a string given query first, then subject
+def printNiceAlignment(q,s):
+	joiner="\n"
+	return joiner.join(buildAlignmentWholeSeqsDirect(q,s))
+
+
+
+
+#given a BTOP string build a dummy alignment, putting N
+#where sequence cannot be known without source data
+def buildDummyQAndSSeqsFromBTop(btop):
+	#query, then subject
+	q_s=["",""]
+	if(len(btop)<=0):
+		return q_s
+	else:
+		while(len(btop)>0):
+			adm=re.search('^(\d+)$',btop)
+			dm=re.search('^(\d+)[^0-9]',btop)
+			firstTwoLetters=re.search('^([a-z\\-])([a-z\\-])',btop,re.IGNORECASE)
+			if adm:
+				#all digital
+				q_s[0]+=repStr("N",int(adm.group(1)))
+				q_s[1]+=repStr("N",int(adm.group(1)))
+				return q_s
+			elif(dm):
+				#just starts with digits
+				q_s[0]+=repStr("N",int(dm.group(1)))
+				q_s[1]+=repStr("N",int(dm.group(1)))
+				num_digits=len(dm.group(1))
+				btop=btop[num_digits:]
+			else:
+				#2 characters!
+				q_s[0]+=firstTwoLetters.group(1)
+				q_s[1]+=firstTwoLetters.group(2)
+				btop=btop[2:]
+		return q_s
+			
+		
+
+
+
+
+#returns array of query, then match/midline, then subject based on btop alignment specification
+def buildAlignmentWholeSeqs(btop,q,s,debug=False,level=0):
+	if(debug):	
+		print repeatString("\t",level)+"At begging of call, btop=",btop,"q=",q,"s=",s
+	aln=["","",""]
+	aln[0]=str("")
+	aln[1]=str("")
+	aln[2]=str("")
+	if(debug):
+		print "now performing digital tests..."
+	dm=re.search('^(\d+)[^0-9]',btop)
+	adm=re.search('^(\d+)$',btop)
+	if adm:
+		#BTOP is 100% digital
+		if(debug):		
+			print repeatString("\t",level)+"matched all digital..."
+		btopv=int(adm.group(1))
+		aln[0]=q
+		aln[1]=repeatString("|",btopv)
+		aln[2]=s
+		if(debug):
+			print repeatString("\t",level)+"from all digital btop=",btop," returning : "
+			for x in range(len(aln)):
+				print repeatString("\t",level)+aln[x]
+		return aln
+	elif dm:
+		#BTOP only starts with digits...
+		if(debug):
+			print repeatString("\t",level)+"matched start digital..."
+		digitString=dm.group(1)
+		size=int(digitString)
+		aln[0]=q[:size]
+		aln[2]=s[:size]
+		aln[1]=repeatString("|",size)
+		if(debug):
+			print repeatString("\t",level)+"From little btop :",digitString," got "
+			for x in range(len(aln)):
+				print repeatString("\t",level)+aln[x]
+		rec=buildAlignmentWholeSeqs(btop[len(digitString):],q[(size-0):],s[(size-0):],debug,level+1)
+		aln[0]+=rec[0]
+		aln[1]+=rec[1]
+		aln[2]+=rec[2]
+		return aln
+	if(debug):
+		print "no digital tests passed...doing letter tests...."
+	firstTwoLetters=re.search('^([a-z\\-])([a-z\\-])',btop,re.IGNORECASE)
+	if firstTwoLetters:
+		#BTOP starts with a dash and a letter, a letter and a dash, or two letters
+		if(debug):
+			print "aligns first two letters..."
+		firstLetter=firstTwoLetters.group(1)
+		secondLetter=firstTwoLetters.group(2)
+		aln[0]=firstLetter
+		aln[1]=str("X")
+		aln[2]=secondLetter
+		if(debug):		
+			print "First-two letters alignment = \n"+getNiceAlignment(aln)
+		if(len(btop)>2):
+			rec=["","",""]
+			if(firstLetter=="-" or secondLetter=="-"):
+				if(firstLetter=="-"):
+					rec=buildAlignmentWholeSeqs(btop[2:],q,s[1:],debug,level+1)
+				elif(secondLetter=="-"):
+					rec=buildAlignmentWholeSeqs(btop[2:],q[1:],s,debug,level+1)
+			else:
+				 rec=buildAlignmentWholeSeqs(btop[2:],q[1:],s[1:],debug,level+1)
+			aln[0]+=rec[0]
+			aln[1]+=rec[1]
+			aln[2]+=rec[2]
+		else:
+			if(debug):
+				print "returning next-to-last aln"
+			return aln
+	if(debug):
+		print "returning last aln"
+	return aln
+
+
+
+
+
+
+
 
 #given an alignment, and a position of a sequence IN the alignment
 #return the porition of the alignment whose bp are <= or >= that position in the alignment
