@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-
+#code perhaps to later be used to combine igblast and repchar
 
 def makeIGBlastCmd(igdata,fasta,output):
 	cmd=igdata+"/bin/igblastn "

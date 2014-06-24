@@ -120,7 +120,7 @@ def mode_process(imgtdb_obj,igblastnbin,blastxbin,kvMap,makeblastdbbin,mode):
 						if(not(errStat)):
 							Vlookup=process_dir+"/Vlookup."+st+".tsv"
 							print "Now generating V lookup for ",organism," "+st+" from igblast output ",igblast_output," and writing to ",Vlookup
-							writeRegionsFromIGBLASTKabatResult(igblast_output,Vlookup)
+							writeRegionsFromIGBLASTResult(igblast_output,Vlookup)
 					else:
 						#errStart==True ! :(
 						pass					

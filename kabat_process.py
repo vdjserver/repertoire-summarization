@@ -67,7 +67,7 @@ def writeKabatJCDR3End(k,o):
 	#print "numRecs is ",numRec
 
 
-def writeRegionsFromIGBLASTKabatResult(k,o):
+def writeRegionsFromIGBLASTResult(k,o):
 	infile=k
 	reg_map=dict()
 	regions=["FWR1","CDR1","FWR2","CDR2","FWR3","CDR3"]
