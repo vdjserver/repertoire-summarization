@@ -404,9 +404,6 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 		if(characterization_thread_set==None):
 			num_cpus=multiprocessing.cpu_count()
 			num_threads=max(1,num_cpus)
-			#num_threads=1
-			#num_threads=10
-			#print "USING NUM_THREADS=",num_threads
 			characterization_thread_set=set()
 			for c in range(num_threads):
 				#print "ABOUT TO CALL CONST...."
@@ -422,9 +419,6 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 			for mode in mode_list:
 				if(not(mode=="kabat" and alleleIsTR(topVDJ[seg]))):
 					for region in getVRegionsList():
-						#print "Now to analyze region ",region," in mode",mode
-						#raInfo=getVDJServerRegionAlignmentFromLargerVAlignmentPyObj(read_result_obj,meta,organism,mode,region,imgtdb_obj,False,read_rec)
-						#regionAlignment=getVDJServerRegionAlignmentFromLargerVAlignmentPyObj(read_result_obj,meta,organism,mode,region,imgtdb_obj,False,read_rec)
 						key_base=global_key_base+mode+"_"
 						char_job_dict=dict()
 						char_job_dict['refName']=topVDJ[seg]
@@ -441,31 +435,6 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 						char_job_dict['noneSeg_flag']=noneSeg_flag
 						characterization_queue.put(char_job_dict)
 						num_submitted_jobs+=1
-						#print "JUST SUBMITTED A CHAR_QUEUE JOB :",char_job_dict
-						#if(regionAlignment!=None and not(noneSeg_flag)):
-						#	reg_ann_show_msg=False
-						#	#reg_ann_msg="characterization for region="+region+" mode="+mode+" for read="+read_rec.id
-						#	reg_ann_msg=None
-						#	reg_ann=regionAlignment.characterize(reg_ann_msg,reg_ann_show_msg)
-						#	#if(mode=="imgt" and read_rec.id=="FR3_STOP" and region=="FR3"):
-						#	#	print "got ann "
-						#	#	printMap(reg_ann)
-						#	#	print "The alignment nice : "
-						#	#	print regionAlignment.getNiceString()
-						#	#	sys.exit(0)
-						#	for key in reg_ann:
-						#		annMap[key_base+region+"_"+key]=reg_ann[key]
-						#	annMap[key_base+region+'_qry_aln']=regionAlignment.q_aln
-						#	annMap[key_base+region+'_qry_srt']=regionAlignment.q_start
-						#	annMap[key_base+region+'_qry_end']=regionAlignment.q_end
-						#	annMap[key_base+region+'_ref_aln']=regionAlignment.s_aln
-						#	annMap[key_base+region+'_frm_msk']=regionAlignment.s_frame_mask
-						#else:
-						#	#print raInfo
-						#	#reg_ann=getEmptyRegCharMap()
-						#	#for key in reg_ann:
-						#	#	annMap[key_base+region+"_"+key]=(-1)
-						#	pass
 				else:
 					#if mode=kabat and type is TR, then skip the regions!
 					pass
