@@ -11,11 +11,15 @@ from Bio.Blast import NCBIXML
 
 
 
-
+#scan blastx output
+#use motifs from http://www.bioinf.org.uk/abs/#cdrid
+#to identify CDR3 end for KABAT
 def writeKabatJCDR3End(k,o):
 	reader=open(k,'r')
 	blast_records = NCBIXML.parse(reader)
+	#regex for CDR3 for heavy chains
 	heavy_re=re.compile(r'WG.G')
+	#regex for CDR3 for light chains
 	light_re=re.compile(r'FG.G')
 	cdr_map=dict()
 	writer=open(o,'w')
@@ -38,6 +42,7 @@ def writeKabatJCDR3End(k,o):
 		query_trans=hsp.query
 		query_start=hsp.query_start
 		print "HSP",str(hsp),"\n"
+		#use the regex for the chain type
 		if(query_name.startswith("IGH")):
 			myre=heavy_re
 		else:

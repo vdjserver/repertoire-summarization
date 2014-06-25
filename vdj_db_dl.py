@@ -11,16 +11,6 @@ import os
 
 
 
-	
-
-
-
-
-def download_ReferenceDirDataHMAndGeneTables(imgtdb_obj):
-	#this will download the FASTAs
-	#and gene tables
-	imgtdb_obj.download_imgt_RefDirSeqs_AndGeneTables_HumanAndMouse(True)
-
 #download FASTA and ANNOTATION data
 def downloadIMGTGENE_DB_and_LIGM_DB_and_index(imgtdb_obj):
 	imgtdb_obj.buildAndExecuteWGETDownloadScript()
@@ -52,11 +42,14 @@ def downloadAndPrep(imgtdb_obj,makeblastdbbin,igblastnbin,kvMap,blastx_bin):
 
 
 
-
-
-
-
-
+#This routine basically scans the reference data files
+#then uses IgBLAST to IgBLAST them against the IgBLAST-provided
+#databases.  Once that is done, the region-delineation data is
+#extracted from the IgBLAST output and saved in the IMGT and KABAT directory (depending on the passed mode)
+#Also, if the mode is KABAT and the sequence type is IG, then
+#blastx is used and protein translations extracted from blastx output,
+#combined with CDR3-identifying motifs from 
+#http://www.bioinf.org.uk/abs/#cdrid are used to identify CDR3 ENDS for KABAT
 def mode_process(imgtdb_obj,igblastnbin,blastxbin,kvMap,makeblastdbbin,mode):
 	imgtdb_base=imgtdb_obj.getBaseDir()
 	organisms=imgtdb_obj.getOrganismList()
