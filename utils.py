@@ -460,7 +460,6 @@ def read_fasta_string(fasta_string,alwaysSeqToUpper=True,removeNonIUPAC=True):
 #elements 1,3,... become sequences
 def read_fasta(fasta_path,alwaysSeqToUpper=True):
 	data=list()
-	temp_seq=""
 	infile=open(fasta_path,'r')
 	for line in infile:
 		temp_line=line.strip()
