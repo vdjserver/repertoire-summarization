@@ -78,7 +78,7 @@ def getHitInfo(read_result_obj,meta,alleleName,query_record=None,imgtdb_obj=None
 	for segment_match in segment_matches:
 			#segment_match = read_result_obj[i]
 			#print "got a segment match, id=",i," from combination # ",str(int(s+1))
-			for gls_match in segment_match.germline_segments():
+			for gls_match in segment_match.gl_segments():
 				#print "in inner most loop...."
 				#print "gls_match=",gls_match
 				hit_name=meta[gls_match.gl_segment()].name()
@@ -195,7 +195,7 @@ def getTypeNameScoreMap(read_result_obj,meta):
 	#print "got segment_matches ",segment_matches
 	for segment_match in segment_matches:
 		#print "Looking at a segment_match ",segment_match
-		for gls_match in segment_match.germline_segments():
+		for gls_match in segment_match.gl_segments():
 			vdjml_look_seg_type=vdjml.segment_type(gls_match,meta)
 			#print "seg_type=",vdjml_look_seg_type
 			name=meta[gls_match.gl_segment()].name()
@@ -236,11 +236,8 @@ def getTopVDJItems(read_result_obj,meta):
 		for i in segment_combination.segments():
 			segment_match = read_result_obj[i]
 			#print "got a segment match, id=",i," from combination # ",str(int(s+1))
-			#seg_type=segTypes[seg_id]
-			#seg_type=segment_match.vdj
-			#seg_type=segment_match.vdj_
 			#print "the seg type is ",seg_type
-			for gls_match in segment_match.germline_segments():
+			for gls_match in segment_match.gl_segments():
 				#seg_type=gls_match.segment_type_
 				#print "in inner most loop...."
 				#print "gls_match=",gls_match
