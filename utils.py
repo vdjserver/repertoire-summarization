@@ -244,20 +244,10 @@ def biopythonTranslate(dna):
 	elif(len(dna)%3!=0):
 		num_extraN=3-(len(dna)%3)
 	extraNs=("N"*num_extraN)
-	#print "nen=",num_extraN
-	#print "en=",extraNs
 	dna=dna+extraNs
-	#print "dna=",dna
 	coding_dna = Seq(dna, IUPAC.ambiguous_dna)
-	#print "coding_dna" ,  coding_dna
-	#template_dna = coding_dna.reverse_complement()
-	#print "template_dna" , template_dna
 	messenger_rna = coding_dna.transcribe()
-	#print "messenger_rna" , messenger_rna
-	#back_transcripted=messenger_rna.back_transcribe()
-	#print "back_transcripted" , back_transcripted
 	translation=messenger_rna.translate()
-	#print "translation ", translation
 	return translation
 
 
