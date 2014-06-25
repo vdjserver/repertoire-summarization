@@ -135,7 +135,7 @@ def partitionIntoClassMaps(mainMap):
 
 
 
-#ae two classes recombination-compatible?
+#are two classes recombination-compatible?
 #if the first 3 characters are the same, then yes!
 #otherwise no!
 def compatibleForRecombination(c1,c2):
@@ -249,7 +249,6 @@ def vdj_sim(vFasta,dFasta,jFasta,selected_loci_classes,mut_lam,max_sim=float("in
 			descriptor+="|chain_type=light"
 		recomb['shm_seq']=dummySHM(recomb['seq'],0.5)
 		print descriptor+"\n"+recomb['shm_seq']
-		selected_segments=list()
 		seg_keys=['vKey','dKey','jKey']
 		for s in seg_keys:
 			if(s in recomb):
@@ -296,13 +295,6 @@ def locusClassIsHeavy(lc):
 
 
 
-#determine if a locus selection is heavy
-def locusIsHeavy(l):
-	heavy_loci=get_heavy_loci()
-	if(l in heavy_loci):
-		return True
-	else:
-		return False
 
 
 

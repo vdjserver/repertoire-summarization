@@ -92,7 +92,6 @@ def mode_process(imgtdb_obj,igblastnbin,blastxbin,kvMap,makeblastdbbin,mode):
 					for segment in get_segment_list():
 						newPart=" -germline_db_"+segment+" "+kvMap[db_base_key+segment]+" "
 						igblast_cmd+=newPart
-					aux_base=re.sub(r'GL_IG_','AUX',db_base_key)
 					igblast_cmd+=" -auxiliary_data "+kvMap[aux_org+"_AUX"]
 					igblast_cmd+=" -domain_system "+mode+" "
 					igblast_cmd+=" -outfmt '7 qseqid qgi qacc qaccver qlen sseqid sallseqid sgi sallgi sacc saccver sallacc slen qstart qend sstart send qseq sseq evalue bitscore score length pident nident mismatch positive gapopen gaps ppos frames qframe sframe btop'"
