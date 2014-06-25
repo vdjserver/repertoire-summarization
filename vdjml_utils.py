@@ -141,26 +141,6 @@ def getHitInfo(read_result_obj,meta,alleleName,query_record=None,imgtdb_obj=None
 
 
 
-#return either true or false, no N/A yet
-def getProductiveRearrangmentFlag(read_result_obj,meta,organism,imgtdb_obj):
-	topVDJ=getTopVDJItems(read_result_obj,meta)
-	productive_flag=False
-	top_V=topVDJ['V']
-	top_J=topVDJ['J']
-	if(top_V!=None and top_J!=None):
-		vHitInfo=getHitInfo(read_result_obj,meta,top_V)
-		jHitInfo=getHitInfo(read_result_obj,meta,top_J)
-		productive_flag=getNAProductiveRearrangmentFlagFromVJHitLineData(vHitInfo,jHitInfo,organism,imgtdb_obj)
-		if(productive_flag is None):
-			#there is no "N/A" yet!
-			return False
-		else:
-			return productive_flag
-	else:
-		#note, there is no "N/A" or "inconclusive" ....
-		return productive_flag
-
-
 
 
 #given a V segment alignment extract from it the sub-portion for a given
@@ -181,22 +161,6 @@ def getVDJServerRegionAlignmentFromLargerVAlignmentPyObj(read_result_obj,meta,or
 
 
 
-#from a segment combination, extract the region
-def getRegionsObjsFromSegmentCombo(segment_combo,meta,ann_map):
-	print "got a segment combo : ",segment_combo
-	print "regions is ",segment_combo.regions
-	print "now calling....",
-	regions=segment_combo.regions()
-	print "the type of regions is ",str(type(regions))
-	for region in regions:
-		#print "region???",region
-		print "range : ",region.range_
-		#print region.range_.pos_0()
-		rgn_start=region.range_.pos_1() 
-		rgn_end=rgn_start+region.range_.length()-1
-		print "start/end : ",rgn_start," and ",rgn_end
-		ann_map_key='vdj_server_ann_'
-		
 
 	
 #map VDJ to True or False indicating a tie or not in the scores
@@ -211,7 +175,6 @@ def getVDJTieMap(t_map,topVDJ):
 		for name in seg_map:
 			score=seg_map[name]
 			score_list.append(score)
-		score_set=set(score_list)
 		tie_map[seg]=False
 		if(topVDJ!=None):
 			if(seg in topVDJ):
@@ -258,7 +221,6 @@ def getTypeNameScoreMap(read_result_obj,meta):
 #VDJ combintion and add these it
 def getTopVDJItems(read_result_obj,meta):
 	#print "I want top hits from a read object!"
-	top_segs=dict()
 	names=dict()
 	segTypes=["V","D","J"]
 	for st in segTypes:
@@ -271,7 +233,6 @@ def getTopVDJItems(read_result_obj,meta):
 		#getRegionsObjsFromSegmentCombo(segment_combination,meta)
 		#print "The number of segments in this combination is ",len(segment_combination.segments())
 		#print "The ids of the segments are ",segment_combination.segments()
-		seg_id=0
 		for i in segment_combination.segments():
 			segment_match = read_result_obj[i]
 			#print "got a segment match, id=",i," from combination # ",str(int(s+1))
@@ -293,7 +254,6 @@ def getTopVDJItems(read_result_obj,meta):
 				else:
 					#print "SKIPPING ",meta[gls_match.gl_segment_].name_," fail on emptiness"
 					pass
-				seg_id+=1
 		#print "\n\n\n\n\n"
 	#print "Returning from TOP : "
 	#printMap(names)
