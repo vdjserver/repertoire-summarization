@@ -74,7 +74,7 @@ def hierarchyTreeFromGenetableURL(url,locus,listOfAllowableNames=None,existingHi
 					class_val_first=str(class_val[0])
 					#print "class_val_first is ",class_val_first
 					class_val_first_str=str(class_val_first)
-					if(class_val_first_str=="subgroup_middle_note"):
+					if(class_val_first_str=="subgroup_middle_note" or class_val_first_str=="subgroup_note"):
 						text = td.find(text=True)# + ';'
 						if text is None:
 							text="UNDEFINED_SUBGROUP;"
@@ -118,7 +118,7 @@ def hierarchyTreeFromGenetableURL(url,locus,listOfAllowableNames=None,existingHi
 							#	subgroup=gene_name
 							if(listOfAllowableNames==None or ((listOfAllowableNames!=None) and (allele_name in listOfAllowableNames))):
 								#print "proceeding with setting : gene_name="+gene_name+", allele_name="+allele_name+", and subgroup="+subgroup
-								if(subgroup==""):
+								if(subgroup=="" or (subgroup==gene_name and not(subgroup==""))):
 									my_hier[gene_name][allele_name]
 								else:
 									my_hier[subgroup][gene_name][allele_name]
@@ -175,6 +175,7 @@ def analyze_download_dir_forVDJserver(base_dir,countsMap=None,specifiedOrganism=
 			# HERE , FIND THE CORRESPONDING HTML FILES FOR THE GENE TABLES
 			htmlGeneTablesGlob=base_dir+"/"+organism+"/GeneTables/*"+locus+"*.html"
 			geneTableHTMLFiles=glob.glob(htmlGeneTablesGlob)
+			geneTableHTMLFiles.sort() #sort here so that the HTML file is first and the orphon file is second
 			###########################################
 			###########################################
 			# HERE , FIND THE CORRESPONDING FNA FILES in the Reference Directory Set Data
@@ -248,14 +249,28 @@ def analyze_download_dir_forVDJserver(base_dir,countsMap=None,specifiedOrganism=
 			treeAlleles=get_list_of_alleles_appearing_in_tree(locusHierarchyData)
 			setSameStats=(set(fastaAlleleList) == set(treeAlleles))
 			print "For organism=",organism,"locus=",locus
+			#################################################
+			#################################################
+			#based on the side-by-side diff result and based
+			#on the patching result, 
 			if setSameStats:
 				print "The fasta/RefDirNames ARE the same as the hierarchy allele names!!! :)"
+				if(foundPatchFile):
+					#no need to re-print the hierarchy cause it was printed before and after patching
+					pass
+				else:
+					#since no patch file was found, go ahead and print the hierarchy
+					print "\n\n############################################"
+					print "The hierarchy is : "
+					prettyPrintTree(locusHierarchyData)						
 			else:
 				print "The fasta/RefDirNames ARE different from the hierarchy allele names!!! :("
 				if(not(foundPatchFile)):
+					#since no patch file was found, AND the stats are bad, print the hierarchy to 
+					#help the user understand how to patch					
 					print "\n\n############################################"
 					print "The hierarchy is : "
-					prettyPrintTree(locusHierarchyData)
+					prettyPrintTree(locusHierarchyData)				
 			briefSetDiff(fastaAlleleList,treeAlleles,"fasta alleles "+organism+"_"+locus,"tree alleles "+organism+"_"+locus)			
 			extendedSortedSetDiff(fastaAlleleList,treeAlleles,"fasta alleles "+organism+"_"+locus,"tree alleles "+organism+"_"+locus)
 			#print "THIS IS THE PRETTY PRINT FOR LOCUS HIERARCHY DATA, o=",organism,"l=",locus
