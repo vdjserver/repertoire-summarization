@@ -25,6 +25,7 @@ class CodonAnalysis:
 	#internal data
 	codon_amino_map=None
 	amino_codon_map=None
+	unambiguous_codon_dict=dict()
 	bases=["A","C","G","T","a","c","g","t"]
 
 	#make a list of codons
@@ -60,22 +61,28 @@ class CodonAnalysis:
 	#test for codon ambiguity
 	#by testing individual bases for ambiguity
 	def is_unambiguous_codon(self,c):
+		if(c in self.unambiguous_codon_dict):
+			return self.unambiguous_codon_dict[c]
 		#if a list of bases
 		if(type(c)==list):
 			for base in c:
 				ba=self.is_unambiguous_base(base)
 				if(not(ba)):
-					return False
+					self.unambiguous_codon_dict[c]=False
+					return self.is_unambiguous_codon(c)
 		#if a single string of 3 bases
 		elif(type(c)==str):
 			for bi in range(len(c)):
 				base=c[bi]
 				ba=self.is_unambiguous_base(base)
 				if(not(ba)):
-					return False
+					self.unambiguous_codon_dict[c]=False
+					return self.is_unambiguous_codon(c)
 		else:
-			return False
-		return True
+			self.unambiguous_codon_dict[c]=False
+			return self.is_unambiguous_codon(c)
+		self.unambiguous_codon_dict[c]=True
+		return self.is_unambiguous_codon(c)
 
 
 	#initialize the codon->amino map

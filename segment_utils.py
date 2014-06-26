@@ -83,6 +83,7 @@ def hierarchyTreeFromGenetableURL(url,locus,listOfAllowableNames=None,existingHi
 						#print "GOT A SUBGROUP=",text
 						subgroup=str(text)
 						subgroup=removeTerminatingSemicolonIfItExists(subgroup)
+						subgroup=subgroup.strip()
 					elif(class_val_first_str=="gene_note"):
 						text = td.find(text=True)# + ';'
 						if text is None:
@@ -92,6 +93,7 @@ def hierarchyTreeFromGenetableURL(url,locus,listOfAllowableNames=None,existingHi
 						#print "GOT A GENE=",text
 						gene_name=str(text)
 						gene_name=removeTerminatingSemicolonIfItExists(gene_name)
+						gene_name=gene_name.strip()
 					elif(class_val_first_str=="col_note"):
 						if(col_note_num==12):
 							text=td.find(text=True)
@@ -109,6 +111,7 @@ def hierarchyTreeFromGenetableURL(url,locus,listOfAllowableNames=None,existingHi
 							if(not(alleleEndRegex.search(allele_name))):
 								#if there is no allele, make it allele *01
 								allele_name+="*01"
+							allele_name=allele_name.strip()
 							#SOMETIMES SUBGROUP ISN'T A COLUMN IN THE TABLE SO INHERIT IT FROM THE GENE NAME!
 							#if(subgroup==""):
 							#	print "Setting a blank subgroup to equal gene_name=",gene_name
@@ -119,8 +122,11 @@ def hierarchyTreeFromGenetableURL(url,locus,listOfAllowableNames=None,existingHi
 							if(listOfAllowableNames==None or ((listOfAllowableNames!=None) and (allele_name in listOfAllowableNames))):
 								#print "proceeding with setting : gene_name="+gene_name+", allele_name="+allele_name+", and subgroup="+subgroup
 								if(subgroup=="" or (subgroup==gene_name and not(subgroup==""))):
+									#if there is no subgroup or 
+									#its the same as the gene (and non-empty), then store this way
 									my_hier[gene_name][allele_name]
 								else:
+									#otherwise, store this way, using the complete path/resolution
 									my_hier[subgroup][gene_name][allele_name]
 							else:
 								print "NOTE : skipping the addition of ",allele_name," into the hierarchy  (url=",url," and locus=",locus,")  cause it's not in the list of alleles from the Reference Fasta!"
@@ -553,7 +559,7 @@ def getADJCDR3EndFromJAllele(jallele,imgtdb_obj,org="human",mode="imgt"):
 	#print "in getADJCDR3EndFromJAllele. jallele=",jallele," org=",org,"mode=",mode
 	global cdr3_end_lookup
 	if(org in cdr3_end_lookup):
-		if(jallele in cdr3_end_lookup):
+		if(jallele in cdr3_end_lookup[org]):
 			if(mode in cdr3_end_lookup[org][jallele]):
 				#the lookup is there!  use it!
 				return cdr3_end_lookup[org][jallele][mode]
@@ -574,7 +580,8 @@ def getADJCDR3EndFromJAllele(jallele,imgtdb_obj,org="human",mode="imgt"):
 		jdescriptor=imgtdb_obj.extractDescriptorLine(jallele,org)
 		cdr3_end_raw=getCDR3EndFromJData(jallele,imgtdb_obj,org)
 		if(cdr3_end_raw==None):
-			val_to_return=(-1)
+			cdr3_end_lookup[org][jallele][mode]=(-1)
+			return cdr3_end_lookup[org][jallele][mode]
 		cdr3_end_raw=int(cdr3_end_raw)
 		#print "Got a descriptor ",jdescriptor
 		#print "got a raw cdr3 end=",cdr3_end_raw
@@ -595,13 +602,14 @@ def getADJCDR3EndFromJAllele(jallele,imgtdb_obj,org="human",mode="imgt"):
 			if(min(start,stop)<=cdr3_end_raw and cdr3_end_raw<=max(start,stop)):
 				adjusted=cdr3_end_raw-min(start,stop)+1
 				#print "RETURNING VALID CDR3 END = "+str(adjusted)
-				val_to_return=adjusted
+				cdr3_end_lookup[org][jallele][mode]=adjusted
 			else:
 				#print "OUT OF RANGE????"
-				val_to_return=(-1)
+				cdr3_end_lookup[org][jallele][mode]=(-1)
 		else:
 			#print "FAILED TO MATCH ON INTERVAL REGEX!!!!\n"
-			val_to_return=(-1)
+			cdr3_end_lookup[org][jallele][mode]=(-1)
+		return cdr3_end_lookup[org][jallele][mode]
 	elif(mode=="kabat"):
 		kabat_file=imgtdb_obj.getBaseDir()+"/"+org+"/ReferenceDirectorySet/KABAT/Jlookup.tsv"
 		reader=open(kabat_file,'r')
