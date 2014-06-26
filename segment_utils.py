@@ -544,12 +544,15 @@ def getADJCDR3EndFromJAllele(jallele,imgtdb_obj,org="human",mode="imgt"):
 				return cdr3_end_lookup[org][jallele][mode]
 			else:
 				#the lookup ain't there, look it up , then cache it!
+				pass
 		else:
 			#add the allele if it ain't there
 			cdr3_end_lookup[org][jallele]=dict()		
 	else:
 		#add the organism if it ain't there
+		#add the jallele cause it won't be there either
 		cdr3_end_lookup[org]=dict()
+		cdr3_end_lookup[org][jallele]=dict()
 	val_to_return=(-1)
 	if(mode=="imgt"):
 		#print "mode=imgt"
