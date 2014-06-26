@@ -267,54 +267,7 @@ class alignment:
 	#Thus the alignment 	3CG2 could represent : Q_ALN 'GATCAA' and S_ALN 'GATGAA'
 	@staticmethod
 	def buildAlignmentWithBTOP(btop,q,s,debug=False,level=0):
-		aln=["","",""]
-		aln[0]=str("") #query
-		aln[1]=str("") #midline
-		aln[2]=str("") #subject
-		dm=re.search('^(\d+)[^0-9]',btop)
-		adm=re.search('^(\d+)$',btop)
-		if adm:
-			#BTOP is 100% digital
-			btopv=int(adm.group(1))
-			aln[0]=q
-			aln[1]=repeatString("|",btopv) #alignment match
-			aln[2]=s
-			return alignment(aln[0],aln[1])
-		elif dm:
-			#BTOP only starts with digits...
-			digitString=dm.group(1)
-			size=int(digitString)
-			aln[0]=q[:size]
-			aln[2]=s[:size]
-			aln[1]=repeatString("|",size) #alignment match
-			rec=buildAlignmentWholeSeqs(btop[len(digitString):],q[(size-0):],s[(size-0):],debug,level+1)
-			aln[0]+=rec[0]
-			aln[1]+=rec[1]
-			aln[2]+=rec[2]
-			return alignment(aln[0],aln[1])
-		firstTwoLetters=re.search('^([a-z\\-])([a-z\\-])',btop,re.IGNORECASE)
-		if firstTwoLetters:
-			#BTOP starts with a dash and a letter, a letter and a dash, or two letters
-			firstLetter=firstTwoLetters.group(1)
-			secondLetter=firstTwoLetters.group(2)
-			aln[0]=firstLetter
-			aln[1]=str("X") #alignment mismatch/gap
-			aln[2]=secondLetter
-			if(len(btop)>2):
-				rec=["","",""]
-				if(firstLetter=="-" or secondLetter=="-"):
-					if(firstLetter=="-"):
-						rec=buildAlignmentWholeSeqs(btop[2:],q,s[1:],debug,level+1)
-					elif(secondLetter=="-"):
-						rec=buildAlignmentWholeSeqs(btop[2:],q[1:],s,debug,level+1)
-				else:
-					 rec=buildAlignmentWholeSeqs(btop[2:],q[1:],s[1:],debug,level+1)
-				aln[0]+=rec[0]
-				aln[1]+=rec[1]
-				aln[2]+=rec[2]
-			else:
-				return alignment(aln[0],aln[1])
-		return alignment(aln[0],aln[1])
+		return buildAlignmentWholeSeqs(btop,q,s,debug,level)
 
 
 	@staticmethod

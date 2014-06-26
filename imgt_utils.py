@@ -4,7 +4,6 @@ from sets import Set
 import subprocess
 import urllib2
 from bs4 import BeautifulSoup
-import yaml
 from collections import defaultdict
 import pprint
 import re
@@ -13,11 +12,9 @@ import glob
 import json
 from subprocess import call
 from Bio.Blast import NCBIXML
-import sys, traceback
+import sys
+import traceback
 import pickle
-import ntpath
-#from utils import looksLikeAlleleStr
-from utils import *
 from Bio import SeqIO
 import glob
 
@@ -351,6 +348,7 @@ class imgt_db:
 	####################
 	#data members
 	org_allele_name_desc_map=None
+	org_allele_desc_gapless_map=None
 	db_base=None
 	db_idx_extension=".acc_idx"
 	accession_start_stop_map=None
@@ -832,19 +830,22 @@ class imgt_db:
 
 	#given a complete descriptor and organism, fetch the corresponding reference directory set sequence
 	def getRefDirSetFNAGivenCompleteDescriptor(self,descriptor,organism):
-		#print "in getRefDirSetFNAGivenCompleteDescriptor with desc='"+descriptor+"' org=",organism
+		#do a dict lookup to return the data if the routine has been used before
+		#NOTE that using the descriptor as the dict key addresses the ORGANISM not being used cause the descriptor contains the organism!
 		if(self.ref_dir_set_desc_seqs_map==None):
 			self.ref_dir_set_desc_seqs_map=dict()
 		if(descriptor in self.ref_dir_set_desc_seqs_map):
-			#print "using lookup in getRefDirSetFNAGivenCompleteDescriptor"
-			#sys.exit(0)
 			return self.ref_dir_set_desc_seqs_map[descriptor]
+
+
+		#if the routine hasn't been used before, load all the data!
 		myloci=get_loci_list()
+		print "loading upppers...."
 		for locus in myloci:
 			html_fna_path=self.db_base+"/"+organism+"/ReferenceDirectorySet/"+locus+".fna"
 			fasta_recs=read_fasta_file_into_map(html_fna_path)
 			for fasta_desc in fasta_recs:
-				self.ref_dir_set_desc_seqs_map[fasta_desc]=fasta_recs[fasta_desc]
+				self.ref_dir_set_desc_seqs_map[fasta_desc]=fasta_recs[fasta_desc].upper()
 		if(descriptor in self.ref_dir_set_desc_seqs_map):
 			return self.ref_dir_set_desc_seqs_map[descriptor]
 		else:
@@ -857,8 +858,22 @@ class imgt_db:
 		#use the descriptor to get the sequence
 		subject_sequence=self.getRefDirSetFNAGivenCompleteDescriptor(subject_descriptor,organism)
 		if(removeGaps):
+			if(self.org_allele_desc_gapless_map!=None):
+				if(allele_name in self.org_allele_desc_gapless_map):
+					if(organism in self.org_allele_desc_gapless_map[allele_name]):
+						return self.org_allele_desc_gapless_map[allele_name][organism]
+					else:
+						#do the lookup below then add it!
+						pass
+				else:
+					#allele_name not here yet....
+					self.org_allele_desc_gapless_map[allele_name]=dict()
+			else:
+				self.org_allele_desc_gapless_map=dict()
+				self.org_allele_desc_gapless_map[allele_name]=dict()
 			repPattern=re.compile(r'[^A-Za-z]')
 			subject_sequence=re.sub(repPattern,"",subject_sequence)
+			self.org_allele_desc_gapless_map[allele_name][organism]=subject_sequence
 		return subject_sequence
 
 

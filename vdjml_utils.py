@@ -68,6 +68,38 @@ def getJunctionRegionByname(read_result_obj,meta,junc_name,combID=0):
 
 
 
+
+
+def buildAlignmentWholeSeqsVDJML(btop,s):
+	vdjml_btop=vdjml.Btop(btop)
+	vdjml_aln=vdjml.sequence_match(vdjml_btop,gl_seq=s)
+	aln=list()
+	aln.append(vdjml_aln.seq_[0])
+	aln.append("")
+	aln.append(vdjml_aln.seq_[1])
+	return aln
+#        
+#           0123456789
+#           .....AA... read
+#           .....C-... germline
+#           012345 678
+#        
+#  	 b = vdjml.Btop('5ACA-3')
+#        s = vdjml.sequence_match(
+#                                b, 
+#                                gl_seq='gggggCggg'
+#                                )
+#        self.assertEqual(s.start_[0], 0)
+#        self.assertEqual(s.start_[1], 0)
+#        self.assertEqual(s.end_[0], 10)
+#        self.assertEqual(s.end_[1], 9)
+#        self.assertEqual(s.seq_[0], 'gggggAAggg')
+#        self.assertEqual(s.seq_[1], 'gggggC-ggg')
+
+
+
+
+
 #given a read object, meta object, and an allele name
 #known to ALREADY HIT to the read, find the following info
 #and put it in a dict 'q. start', 'q. end', 's. start', 's. end', 'query id', 'subject ids', & btop
@@ -92,7 +124,6 @@ def getHitInfo(read_result_obj,meta,alleleName,query_record=None,imgtdb_obj=None
 					pose=pos1+match_range.length()
 					ret_map['s. start']=int(pos1)
 					ret_map['s. end']=int(pose)-1
-					#	1       59      90      148
 					query_range=segment_match.read_range()
 					query_start=query_range.pos1()
 					query_end=query_start+query_range.length()
@@ -112,11 +143,12 @@ def getHitInfo(read_result_obj,meta,alleleName,query_record=None,imgtdb_obj=None
 						q_end_line=ret_map['q. end']
 						s_start_line=ret_map['s. start']
 						s_end_line=ret_map['s. end']
-						query_str=str(query_record.seq)
+						query_str=str(query_record.seq).upper()
 						if(ret_map['is_inverted']):
 							query_str=rev_comp_dna(query_str)
 						query_for_btop=query_str[q_start_line-1:q_end_line]
 						sbjct=imgtdb_obj.getRefDirSetFNASeqGivenOrgAndAllele(ret_map['subject ids'],organism)
+						#print "current got subject ",sbjct
 						sbjct_for_btop=sbjct[s_start_line-1:s_end_line]
 						#print "from map :"
 						#printMap(ret_map)
@@ -124,13 +156,20 @@ def getHitInfo(read_result_obj,meta,alleleName,query_record=None,imgtdb_obj=None
 						#print "from full sbjct=",sbjct
 						#print "got btop ready query=",query_for_btop," of len ",len(query_for_btop)
 						#print "got btop ready sbjct=",sbjct_for_btop," of len ",len(sbjct_for_btop)
-						q_m_s=buildAlignmentWholeSeqs(btop,query_for_btop,sbjct_for_btop)
+						#q_m_s=buildAlignmentWholeSeqs(btop,query_for_btop,sbjct_for_btop)
+						q_m_s_vdjml=buildAlignmentWholeSeqsVDJML(btop,sbjct_for_btop)
 						#print q_s[0]
 						#print q_s[1]
 						#print q_s[2]
 						#sys.exit(0)
-						ret_map['query seq']=q_m_s[0]
-						ret_map['subject seq']=q_m_s[2]
+						#print "VDJML : \n",q_m_s_vdjml,"\n"
+						#print "CURRENT : \n",q_m_s,"\n"
+						#assert q_m_s_vdjml[0]==q_m_s[0]	#assert VDJML-generated is same as currently is
+						#assert q_m_s_vdjml[2]==q_m_s[2]
+
+						
+						ret_map['query seq']=q_m_s_vdjml[0]   #query string/alignment
+						ret_map['subject seq']=q_m_s_vdjml[2] #subject string/alignment
 					return ret_map
 				else:
 					#print "skipping ",hit_name
@@ -139,6 +178,43 @@ def getHitInfo(read_result_obj,meta,alleleName,query_record=None,imgtdb_obj=None
 	#printMap(ret_map)
 	return ret_map
 
+#is 'b' falling between 'a' and 'c'???
+def between(a,b,c,exclu=True):
+	if(exclu):
+		if(a<b and b<c):
+			return True
+		else:
+			return False
+	else:
+		if(a<=b and b<=c):
+			return True
+		else:
+			return False
+	
+
+
+def getRegionAlignmentFromVDJML(read_result_obj,org,mode,region_name,imgtdb_obj,v_hit_info):
+	valid_regions=getVRegionsList()
+	if(not(region_name in valid_regions)):
+		print region_name," is an invalid region!!!!"
+		return None
+	sub_name=v_hit_info['subject ids']
+	ref_region_interval=getVRegionStartAndStopGivenRefData(sub_name,org,imgtdb_obj,region_name,mode)
+	reg_region_len=abs(ref_region_interval[0]-ref_region_interval[1])
+	ref_region_transcript_start=getVRegionStartAndStopGivenRefData(sub_name,org,imgtdb_obj,region_name,"imgt")[0]
+	if(ref_region_interval[0]==(-1) or ref_region_interval[1]==(-1)):
+		#print "Can't get region info, start or stop of ref region is neg 1...."
+		return None	
+	sub_aln_strt=v_hit_info['s. start']
+	sub_aln_ends=v_hit_info['s. end']
+	if(between(sub_aln_strt,ref_region_interval[0],sub_aln_end) or between(sub_aln_strt,ref_region_interval[1],sub_aln_end)):
+		#good!  some part of the region falls within the subject alignment!
+		rel_reg_strt=ref_region_interval[0]-sub_aln_strt
+		rel_reg_strt=max(0,rel_reg_strt)
+		rel_reg_ends=min(rel_reg_strt+reg_region_len,sub_aln_ends-sub_aln_strt)
+	else:
+		#no part of the region falls within the subject alignment
+		return None
 
 
 
@@ -153,6 +229,7 @@ def getVDJServerRegionAlignmentFromLargerVAlignmentPyObj(read_result_obj,meta,or
 		if(topV!=None):
 			v_info=getHitInfo(read_result_obj,meta,topV,read_rec,imgtdb_obj,org)
 			raInfo=getRegionAlignmentFromLargerVAlignment(v_info,org,mode,region_name,imgtdb_obj,wholeOnly)
+			
 			return raInfo
 		else:
 			return None

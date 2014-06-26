@@ -52,11 +52,6 @@ def repeatString(s,n):
 
 
 
-
-
-
-
-
 #returns array of query, then match/midline, then subject based on btop alignment specification
 def buildAlignmentWholeSeqs(btop,q,s,debug=False,level=0):
 	if(debug):	

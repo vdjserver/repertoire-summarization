@@ -3,15 +3,16 @@
 ###########################################################
 
 The purpose of this suite of software tools is to generate 
-summary statistics of REP-SEQ data.
+analysis and summary statistics of Ig-Seq data.
 
 IGBLAST output files (using a certain output format) are 
 taken as input and 4 distinct files are generated as outputs:
 1) CDR3 length histogram (in kabat and imgt modes),
 2) JSON-formatted hierachies of the IMGT alleles and 
-corresponding counts of segments in top combinations
-with agregrated counts, 3) read-level summary statistics (TSV)
-, and 4 ) vdjml files of the parsed data.
+   corresponding counts of segments in top combinations
+with agregrated counts, 
+3) read-level summary statistics (TSV) , and 
+4) vdjml files of the parsed data.
 
 The rep_char.py script is designed to support the above 4 functions.
 
@@ -19,7 +20,8 @@ If run over several igblast outputs that should subsequently be
 merged the following scripts can be used to logicaly merge outputs:
 1) cdr3_hist.py can logically merge CDR3 length histogram data,
 2) json_seg_merge.py can be used to logically merge JSON count data,
-3) vdjml_merge.py can be used to merge VDJML files, and 4) merge_tables.py
+3) vdjml_merge.py can be used to merge VDJML files, and 
+4) merge_tables.py
 can be used to merge TSV tables.  NOTE : For 1 and #2, since counts 
 are being merged, input order is not important.  For #3 and #4, since 
 files are being merged and read order too, order is important.  For
@@ -110,6 +112,54 @@ esalina2@eddiecomp:/home/data/vdj_server/repertoire-summarization$ ls -alh /home
 -rwxrwxr-x 1 esalina2 esalina2 29K Jun 13 09:22 /home/data/vdj_server/vdjml/python/vdjml_igblast_parse.py
 
 esalina2@eddiecomp:/home/data/vdj_server/repertoire-summarization$ export PYTHONPATH=/home/data/vdj_server/vdjml/python/
+
+
+
+##################################################################
+# REPERTOIRE-CHARACTERIZATION REQUIRES ADDITIONAL PYTHON MODULES #
+##################################################################
+
+
+
+from Bio.Alphabet import IUPAC
+from Bio.Blast import NCBIXML
+from Bio import SeqIO
+from Bio.Seq import Seq
+from bs4 import BeautifulSoup
+
+
+from collections import defaultdict
+from datetime import datetime
+
+
+from os.path import basename
+from pprint import pprint
+from sets import Set
+from subprocess import call
+from subprocess import Popen
+import argparse
+import glob
+import json
+import math
+import multiprocessing
+import ntpath
+import numpy
+import os
+import pickle
+import pprint
+import pprint, pickle
+import Queue
+import random
+import re
+import subprocess
+import sys
+import sys, traceback
+import threading
+import time
+import traceback,sys
+import urllib2
+import yaml
+
 
 
 #####################################################################

@@ -734,12 +734,20 @@ def getRegionAlignmentFromLargerVAlignment(sub_info_map,org,mode,region_name,img
 		#print "Can't get region info, start or stop of ref region is neg 1...."
 		return None
 	else:
-		region_frame_start=(ref_region_interval[0]-ref_region_transcript_start)%3
-		#print "ref_region_interval : ",ref_region_interval
-		#print "ref_region_transcript_start : ",ref_region_transcript_start
-		#print "region_frame_start : ",region_frame_start
-		aln_obj=alignment(sub_info_map['query seq'],sub_info_map['subject seq'],sub_info_map['q. start'],sub_info_map['q. end'],sub_info_map['s. start'],sub_info_map['s. end'])
+		#create an alignment from the whole V
+		aln_obj=alignment(
+			sub_info_map['query seq'],
+			sub_info_map['subject seq'],
+			sub_info_map['q. start'],
+			sub_info_map['q. end'],
+			sub_info_map['s. start'],
+			sub_info_map['s. end']
+			)
+		#extract a sub-alignment
 		region_aln=aln_obj.getSubAlnInc(ref_region_interval[0],ref_region_interval[1],"subject")
+		#aquire frame information
+		region_frame_start=(ref_region_interval[0]-ref_region_transcript_start)%3
+		#use/set the frame information in the alignment object
 		region_aln.setSFM(region_frame_start)
 		return region_aln
 
