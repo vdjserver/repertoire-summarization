@@ -74,27 +74,10 @@ def buildAlignmentWholeSeqsVDJML(btop,s):
 	vdjml_btop=vdjml.Btop(btop)
 	vdjml_aln=vdjml.sequence_match(vdjml_btop,gl_seq=s)
 	aln=list()
-	aln.append(vdjml_aln.seq_[0])
+	aln.append(vdjml_aln.seq_[0])	#QUERY
 	aln.append("")
-	aln.append(vdjml_aln.seq_[1])
+	aln.append(vdjml_aln.seq_[1])	#SUBJECT
 	return aln
-#        
-#           0123456789
-#           .....AA... read
-#           .....C-... germline
-#           012345 678
-#        
-#  	 b = vdjml.Btop('5ACA-3')
-#        s = vdjml.sequence_match(
-#                                b, 
-#                                gl_seq='gggggCggg'
-#                                )
-#        self.assertEqual(s.start_[0], 0)
-#        self.assertEqual(s.start_[1], 0)
-#        self.assertEqual(s.end_[0], 10)
-#        self.assertEqual(s.end_[1], 9)
-#        self.assertEqual(s.seq_[0], 'gggggAAggg')
-#        self.assertEqual(s.seq_[1], 'gggggC-ggg')
 
 
 
@@ -148,26 +131,8 @@ def getHitInfo(read_result_obj,meta,alleleName,query_record=None,imgtdb_obj=None
 							query_str=rev_comp_dna(query_str)
 						query_for_btop=query_str[q_start_line-1:q_end_line]
 						sbjct=imgtdb_obj.getRefDirSetFNASeqGivenOrgAndAllele(ret_map['subject ids'],organism)
-						#print "current got subject ",sbjct
 						sbjct_for_btop=sbjct[s_start_line-1:s_end_line]
-						#print "from map :"
-						#printMap(ret_map)
-						#print "from full query=",query_str
-						#print "from full sbjct=",sbjct
-						#print "got btop ready query=",query_for_btop," of len ",len(query_for_btop)
-						#print "got btop ready sbjct=",sbjct_for_btop," of len ",len(sbjct_for_btop)
-						#q_m_s=buildAlignmentWholeSeqs(btop,query_for_btop,sbjct_for_btop)
 						q_m_s_vdjml=buildAlignmentWholeSeqsVDJML(btop,sbjct_for_btop)
-						#print q_s[0]
-						#print q_s[1]
-						#print q_s[2]
-						#sys.exit(0)
-						#print "VDJML : \n",q_m_s_vdjml,"\n"
-						#print "CURRENT : \n",q_m_s,"\n"
-						#assert q_m_s_vdjml[0]==q_m_s[0]	#assert VDJML-generated is same as currently is
-						#assert q_m_s_vdjml[2]==q_m_s[2]
-
-						
 						ret_map['query seq']=q_m_s_vdjml[0]   #query string/alignment
 						ret_map['subject seq']=q_m_s_vdjml[2] #subject string/alignment
 					return ret_map
@@ -177,6 +142,8 @@ def getHitInfo(read_result_obj,meta,alleleName,query_record=None,imgtdb_obj=None
 	#print "For ",alleleName," the map is :"
 	#printMap(ret_map)
 	return ret_map
+
+
 
 #is 'b' falling between 'a' and 'c'???
 def between(a,b,c,exclu=True):
@@ -207,15 +174,52 @@ def getRegionAlignmentFromVDJML(read_result_obj,org,mode,region_name,imgtdb_obj,
 		return None	
 	sub_aln_strt=v_hit_info['s. start']
 	sub_aln_ends=v_hit_info['s. end']
-	if(between(sub_aln_strt,ref_region_interval[0],sub_aln_end) or between(sub_aln_strt,ref_region_interval[1],sub_aln_end)):
+	sub_aln_len=abs(sub_aln_ends-sub_aln_strt)
+	if(
+		between(sub_aln_strt,ref_region_interval[0],sub_aln_end) #region start is inside the sub-alignment
+		or 
+		between(sub_aln_strt,ref_region_interval[1],sub_aln_end) #region end is within the sub-alignment
+		or
+		(between(ref_region_interval[0],sub_aln_strt,ref_region_interval[1]) and between(ref_region_interval[0],sub_aln_ends,ref_region_interval[1]))
+			#this last condition is for the sub-alignment being wholly-contained within the region.  In this case, the sub-alignment is SMALL!
+		):
 		#good!  some part of the region falls within the subject alignment!
-		rel_reg_strt=ref_region_interval[0]-sub_aln_strt
-		rel_reg_strt=max(0,rel_reg_strt)
-		rel_reg_ends=min(rel_reg_strt+reg_region_len,sub_aln_ends-sub_aln_strt)
+		rel_reg_strt=(ref_region_interval[0]-sub_aln_strt)-1 #do the subtraction of 1, because vdjml uses 0-based offsets
+		rel_reg_strt=max(0,rel_reg_strt) 
+		#take the max here because the rel_reg_strt might be negative.  this is in case the region is partially covered in the alignment
+		#at this point rel_reg_strt is in the space of the sub-alignment.  it's index is 0-based with respect to the sub-alignment in the reference.
+		rel_reg_ends=rel_reg_strt+reg_region_len
+		#now, get the reg end to also be in the sub_alignment space
+		rel_reg_ends=min(sub_aln_len,rel_reg_ends)
+		#use min here to make sure it doesn't go off the end of the sub-alignment!
+		VDJML_aln=buildAlignmentWholeSeqsVDJML(v_hit_info['btop'],v_hit_info['subject seq'])
+		vdjmlBTOP=vdjml.Btop(v_hit_info['btop'])
+		s = vdjml.sequence_match(
+			vdjmlBTOP,
+			gl_start=rel_reg_strt,
+			gl_end=rel_reg_ends,
+			gl_seq=v_hit_info['subject seq']
+			)
+		subaln_reg_qry_strt=s.start_[0]	
+		subaln_reg_ref_strt=s.start_[1]
+		subaln_reg_qry_end=s.end_[0]
+		subaln_reg_ref_end=s.end_[1]
+		subaln_reg_query=s.seq_[0]
+		subaln_reg_ref=s.seq_[1]
+		reg_aln_obj=alignment(
+			subaln_reg_query,
+			subaln_reg_ref,
+			subaln_reg_qry_strt,
+			subaln_reg_qry_end,
+			subaln_reg_ref_strt,
+			subaln_reg_ref_end
+			)
+		#aquire frame information
+		reg_strt_frame=getTheFrameForThisReferenceAtThisPosition(v_hit_info['subject ids'],org,imgtdb_obj,
+		
 	else:
 		#no part of the region falls within the subject alignment
 		return None
-
 
 
 
