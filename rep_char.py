@@ -404,6 +404,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 		if(characterization_thread_set==None):
 			num_cpus=multiprocessing.cpu_count()
 			num_threads=max(1,num_cpus)
+			#num_threads=1
 			characterization_thread_set=set()
 			for c in range(num_threads):
 				#print "ABOUT TO CALL CONST...."
