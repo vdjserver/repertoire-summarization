@@ -840,7 +840,6 @@ class imgt_db:
 
 		#if the routine hasn't been used before, load all the data!
 		myloci=get_loci_list()
-		print "loading upppers...."
 		for locus in myloci:
 			html_fna_path=self.db_base+"/"+organism+"/ReferenceDirectorySet/"+locus+".fna"
 			fasta_recs=read_fasta_file_into_map(html_fna_path)
