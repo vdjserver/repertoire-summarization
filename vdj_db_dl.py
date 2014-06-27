@@ -171,20 +171,20 @@ if (__name__=="__main__"):
 		makeblastdb_bin=extractAsItemOrFirstFromList(args.makeblastdb_bin)
 		igblast_bin=extractAsItemOrFirstFromList(args.igblast_bin)
 		blastx_bin=extractAsItemOrFirstFromList(args.blastx_bin)
-		print "using base ",imgt_db_base
+		print "using VDJ_DB_ROOT ",imgt_db_base
 		mapPath=extractAsItemOrFirstFromList(args.map_file)
 		if(os.path.exists(mapPath)):
 			kvMap=read_map_from_file(mapPath)
 			printMap(kvMap)
 		else:
 			print "Error, map file ",mapPath," not found!"
-			#sys.exit(0)
+			sys.exit(0)
 		if(os.path.isdir(imgt_db_base)):
 			print "Error, directory",imgt_db_base," must not exist! Abort!"
-			#sys.exit(1)
+			sys.exit(1)
 		elif(os.path.exists(imgt_db_base)):
 			print "Error, directory",imgt_db_base," must be a non-existent directory!"
-			#sys.exit(1)
+			sys.exit(1)
 		else:
 			os.makedirs(imgt_db_base)
 		imgtdb_obj=imgt_db(imgt_db_base)
