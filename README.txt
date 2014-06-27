@@ -120,6 +120,19 @@ esalina2@eddiecomp:/home/data/vdj_server/repertoire-summarization$ export PYTHON
 ##################################################################
 
 
+TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+INSERT NOTES ABOUT REQUIRED MODULES HERE
+INSERT NOTES ABOUT REQUIRED MODULES HERE
+INSERT NOTES ABOUT REQUIRED MODULES HERE
+INSERT NOTES ABOUT REQUIRED MODULES HERE
+INSERT NOTES ABOUT REQUIRED MODULES HERE
+INSERT NOTES ABOUT REQUIRED MODULES HERE
+INSERT NOTES ABOUT REQUIRED MODULES HERE
+INSERT NOTES ABOUT REQUIRED MODULES HERE
+
+
 
 from Bio.Alphabet import IUPAC
 from Bio.Blast import NCBIXML
@@ -166,42 +179,88 @@ import yaml
 # REPERTOIRE-CHARACTERIZATION REQUIRES A VDJ_DB DIRECTORY STRUCTURE #
 #####################################################################
 
-Required by rep_char.py (whose outputs are 1) VDJML files, 
-2) cdr3 length histogram(s), 3) TSV output files with huge 
-number of columns and 4) JSON-formatted segment counts is 
-the VDJ_DB_ROOT which is a directory with files and directories 
-placed and expected to be in an organized manner.
+Required by rep_char.py is the VDJ_DB_ROOT which is a directory with
+files and directories downloaded/created and expected to be in an organized manner.
 
 The program vdj_db_dl.py may be used to download required data/reference
-files from imgt and set up the VDJ_DB directory and structures.
+files from www.imgt.org and set up the VDJ_DB directory and structures.
+This program uses the downloaded data to generate other required files
+in the VDJ_DB_ROOT.
 
-In brief summary, the files/directories required as well as their
-uses are listed below:
+The expected structure of the VDJ_DB_ROOT is described below.
 
-*  PER organism a directory is expected under the root (you can see 
-Mus_musculus and human in the listing below)
-*  UNDER each organism is expected a directory "ReferenceDirectorySet" 
-is expected (containing FASTA files and auto-downloaded HTML/fasta 
-files and BLAST databases and domain-system region lookup data for 
-region start/stop data for IMGT and KABAT)
-*  UNDER each organism is expected a directory "GeneTables" 
-(containing auto-downloaded and parsed HTML files of gene table 
-[hierarchical] information which is parsed for creating .JSON 
-output files for the chart viewing for knowing the hierarchy 
-and how to zoom)
 *  UNDER the root is www.imgt.dat which contains under it the 
 GENE-DB directory and LIGM-DB directory with files downloaded
 from imgt.org.  Files in those contain the reference IG and
 TCR reference sequence data, annotation data, as well as other 
 data.  See http://www.imgt.org/download/GENE-DB/README.txt and
 also http://www.imgt.org/download/LIGM-DB/README for further 
-information
-*  UNDER each ReferenceDirectorySet directory are the IgBLAST-formatted
-databases as well as fasta files (of 17 loci) of Ig and TCR IMGT data.
-Also there are the IMGT and KABAT directories having region-delineation
-indices for the reference sequences (e.g. CDR1 start/stop positions).
+information.  
 
-A "tree -d" listing is seen here showing an example :
+*  UNDER the www.imgt.org/download/GENE-DB directory is a file of
+importance named IMGTGENEDB-ReferenceSequences.fasta-nt-WithoutGaps-F+ORF+allP.
+It is from this file that the reference sequences are extracted.
+Similarly, under the www.imgt.org/download/LIGM-DB directory is the
+file imgt.dat.  It is from this file that annotation information
+(such as J-segment IMGT-CDR3 end information) is extracted.
+
+*  PER each organism a corresponding directory is expected under 
+the root (you can see Mus_musculus and human in the listing below)
+
+*  UNDER each organism directory is expected a directory "ReferenceDirectorySet" 
+
+*  UNDER each "ReferenceDirectorySet" directory there are expected to be
+17 fasta files of the form "LOCUS.fna" where "LOCUS" is ranges
+over the 17 TR/IG loci : IGHV,IGKV,IGLV,IGHD,IGHJ,IGKJ,IGLJ,
+TRAV,TRAJ,TRBV,TRBD,TRBJ,TRDV,TRDD,TRDJ,TRGV,TRGJ.  These files
+can be created by the vdj_db_dl script and their contents represent
+the fasta reference data from the loci for the organism.  The contents
+come from IMGTGENEDB-ReferenceSequences.fasta-nt-WithoutGaps-F+ORF+allP.
+Extractions are made by matching on the organism, the locus, and also
+the region type "V-REGION", "D-REGION", and "J-REGION".  NOTE
+that the "Mus_musculus" directory contains "Mus musculus" and several
+"Mus spretus" sequences ; this is because organism matching here is
+based on "Mus".
+
+*  UNDER each ReferenceDirectorySet directory are FNA files that have
+any IMGT-gaps (".") removed and grouped by V, D, and J and are named
+as ORGANISM_SEQTYPE_SEGMENT.fna. This way there are two V files
+(for IG and TR), two D files, and two J files.  For these files are 
+IgBLAST-formatted.  These are the primary databases used
+by IgBLAST/VDJServer for germline inference.
+
+*  UNDER each "ReferenceDirectorySet" directory are IMGT and KABAT
+directories that contain lookup data for region start/stop data
+for the corresponding schemes.  The lookup files are Vlooup.tsv
+and Jlookup.tsv for the V and J segments respectively.  They are
+tab-separated values files.  In the Vlookup.tsv file the allele name 
+is in the first column and then the start/stop (1-based; not 0-based)
+indices for the region FR1, CDR1, FR2, CDR2, FR3, and CDR3 regions.  
+A value of -1 should appear when the start/stop value is not defined 
+in the sequence (for example for CDR3 end for regions that are
+not in the sequence ; for example shortened sequences not covering 
+FR1 the first region).  For the Jlookup.tsv file only the allele
+name is in the first column and the CDR3 end in the other. BOTH
+files have 1-based indices that are in the space of the reference
+sequences in the FNA files in the "ReferenceDirectorySet" directory.
+
+*  UNDER each organism is expected a directory "GeneTables" 
+(containing auto-downloaded and parsed HTML files of gene table 
+[hierarchical] information.  The files are of the form LOCUS.html
+and LOCUS.html.orphons.html.  The two files are downloaded from
+imgt.org using the URLs 
+http://www.imgt.org/IMGTrepertoire/index.php?section=LocusGenes&repertoire=genetable&species=SPECIES&group=LOCUS
+http://www.imgt.org/IMGTrepertoire/index.php?section=LocusGenes&repertoire=genetable&species=SPECIES&group=LOCUS&orphon
+respectively.  This way 34 html files are downloaded altogether.
+These files are parsed and used for creating JSON-formatted 
+hierarchies (using LOCI, subgroups, genes, and alleles) 
+of segment counts.
+
+*  OPTIONALLY ACCOMPANYING the LOCUS.html file sare LOCUS.html.patch files.  
+The use and format of these files are described in the vdj_db_dl readme section 
+in further detail.
+
+A "tree -d" listing is seen here showing an example VDJ_DB and sub-directories:
 
 esalina2@eddiecomp:/home/data/DATABASE/06_05_2014$ tree -d `pwd`
 /home/data/DATABASE/06_05_2014
