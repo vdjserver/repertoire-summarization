@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
+from alignment import alignment
 from pprint import pprint
 from utils import *
-from segment_utils import getNAProductiveRearrangmentFlagFromVJHitLineData,getRegionAlignmentFromLargerVAlignment
+from segment_utils import getNAProductiveRearrangmentFlagFromVJHitLineData,getRegionAlignmentFromLargerVAlignment,getVRegionsList,getVRegionStartAndStopGivenRefData
 from igblast_parse import extractJunctionRegionSeq,rev_comp_dna
 import vdjml
 
@@ -175,25 +176,31 @@ def getRegionAlignmentFromVDJML(read_result_obj,org,mode,region_name,imgtdb_obj,
 	sub_aln_strt=v_hit_info['s. start']
 	sub_aln_ends=v_hit_info['s. end']
 	sub_aln_len=abs(sub_aln_ends-sub_aln_strt)
+	#first condition  : region start is inside the sub-alignment
+	#second condition : region end is within the sub-alignment
+	#third  condition : this last condition is for the sub-alignment being wholly-contained within the region.  In this case, the sub-alignment is SMALL!
 	if(
-		between(sub_aln_strt,ref_region_interval[0],sub_aln_end) #region start is inside the sub-alignment
+		between(sub_aln_strt,ref_region_interval[0],sub_aln_ends) 
 		or 
-		between(sub_aln_strt,ref_region_interval[1],sub_aln_end) #region end is within the sub-alignment
+		between(sub_aln_strt,ref_region_interval[1],sub_aln_ends) 
 		or
 		(between(ref_region_interval[0],sub_aln_strt,ref_region_interval[1]) and between(ref_region_interval[0],sub_aln_ends,ref_region_interval[1]))
-			#this last condition is for the sub-alignment being wholly-contained within the region.  In this case, the sub-alignment is SMALL!
 		):
 		#good!  some part of the region falls within the subject alignment!
 		rel_reg_strt=(ref_region_interval[0]-sub_aln_strt)-1 #do the subtraction of 1, because vdjml uses 0-based offsets
 		rel_reg_strt=max(0,rel_reg_strt) 
 		#take the max here because the rel_reg_strt might be negative.  this is in case the region is partially covered in the alignment
 		#at this point rel_reg_strt is in the space of the sub-alignment.  it's index is 0-based with respect to the sub-alignment in the reference.
-		rel_reg_ends=rel_reg_strt+reg_region_len
+		rel_reg_ends=rel_reg_strt+reg_region_len+1
 		#now, get the reg end to also be in the sub_alignment space
-		rel_reg_ends=min(sub_aln_len,rel_reg_ends)
+		rel_reg_ends=min(rel_reg_ends,sub_aln_len+1)
 		#use min here to make sure it doesn't go off the end of the sub-alignment!
 		VDJML_aln=buildAlignmentWholeSeqsVDJML(v_hit_info['btop'],v_hit_info['subject seq'])
 		vdjmlBTOP=vdjml.Btop(v_hit_info['btop'])
+		print "REGION : ",region_name
+		print "BTOP sub start and end : ",v_hit_info['s. start']," and ",v_hit_info['s. end']
+		print "Rel reg start=",rel_reg_strt
+		print "Rel reg ends =",rel_reg_ends
 		s = vdjml.sequence_match(
 			vdjmlBTOP,
 			gl_start=rel_reg_strt,
@@ -215,7 +222,12 @@ def getRegionAlignmentFromVDJML(read_result_obj,org,mode,region_name,imgtdb_obj,
 			subaln_reg_ref_end
 			)
 		#aquire frame information
-		reg_strt_frame=getTheFrameForThisReferenceAtThisPosition(v_hit_info['subject ids'],org,imgtdb_obj,
+		#region_frame_start=(ref_region_interval[0]-ref_region_transcript_start)%3
+		region_frame_start=0		
+		reg_aln_obj.setSFM(region_frame_start)
+		print "A VDJML REGION : ",
+		print reg_aln_obj.getNiceString()
+		return reg_aln_obj
 		
 	else:
 		#no part of the region falls within the subject alignment
@@ -233,7 +245,10 @@ def getVDJServerRegionAlignmentFromLargerVAlignmentPyObj(read_result_obj,meta,or
 		if(topV!=None):
 			v_info=getHitInfo(read_result_obj,meta,topV,read_rec,imgtdb_obj,org)
 			raInfo=getRegionAlignmentFromLargerVAlignment(v_info,org,mode,region_name,imgtdb_obj,wholeOnly)
-			
+			#oldAlnString=raInfo.getNiceString()
+			#print ">"+v_info['subject ids']+"\n"+imgtdb_obj.getRefDirSetFNASeqGivenOrgAndAllele(v_info['subject ids'],org)+"\n\n"
+			#print "\n",oldAlnString
+			#raInfoVDJML=getRegionAlignmentFromVDJML(read_result_obj,org,mode,region_name,imgtdb_obj,v_info)
 			return raInfo
 		else:
 			return None
@@ -268,7 +283,7 @@ def getVDJTieMap(t_map,topVDJ):
 
 
 
-#return a map assiigning BLAST scores to germline segment hits
+#return a map assigning BLAST scores to germline segment hits
 def getTypeNameScoreMap(read_result_obj,meta):
 	t_map=dict()
 	#print "in getHitsAndScores"
