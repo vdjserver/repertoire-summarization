@@ -239,6 +239,10 @@ def analyze_download_dir_forVDJserver(base_dir,countsMap=None,specifiedOrganism=
 				foundPatchFile=True
 				print "Found a patch file (",patchPath,") found, so now patching is being performed....."
 				print "\n\n############################################"
+				print "PATCH FILE CONTENTS : "
+				print readFileIntoString(patchPath)
+				print "\n"
+				print "\n\n############################################"
 				print "BEFORE PATCHING, THE HIERARCHY IS  :"
 				prettyPrintTree(locusHierarchyData)
 				locusHierarchyData=patchlocusHierarchyData(locusHierarchyData,patchPath)
