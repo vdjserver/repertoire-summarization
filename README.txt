@@ -187,9 +187,10 @@ files from www.imgt.org and set up the VDJ_DB directory and structures.
 This program uses the downloaded data to generate other required files
 in the VDJ_DB_ROOT.
 
-The expected structure of the VDJ_DB_ROOT is described below.
+The expected structure of the VDJ_DB_ROOT is described in the
+following bullets(stars) below.
 
-*  UNDER the root is www.imgt.dat which contains under it the 
+•  UNDER the root is www.imgt.dat which contains under it the 
 GENE-DB directory and LIGM-DB directory with files downloaded
 from imgt.org.  Files in those contain the reference IG and
 TCR reference sequence data, annotation data, as well as other 
@@ -197,19 +198,19 @@ data.  See http://www.imgt.org/download/GENE-DB/README.txt and
 also http://www.imgt.org/download/LIGM-DB/README for further 
 information.  
 
-*  UNDER the www.imgt.org/download/GENE-DB directory is a file of
+•  UNDER the www.imgt.org/download/GENE-DB directory is a file of
 importance named IMGTGENEDB-ReferenceSequences.fasta-nt-WithoutGaps-F+ORF+allP.
 It is from this file that the reference sequences are extracted.
 Similarly, under the www.imgt.org/download/LIGM-DB directory is the
 file imgt.dat.  It is from this file that annotation information
 (such as J-segment IMGT-CDR3 end information) is extracted.
 
-*  PER each organism a corresponding directory is expected under 
+•  PER each organism a corresponding directory is expected under 
 the root (you can see Mus_musculus and human in the listing below)
 
-*  UNDER each organism directory is expected a directory "ReferenceDirectorySet" 
+•  UNDER each organism directory is expected a directory "ReferenceDirectorySet" 
 
-*  UNDER each "ReferenceDirectorySet" directory there are expected to be
+•  UNDER each "ReferenceDirectorySet" directory there are expected to be
 17 fasta files of the form "LOCUS.fna" where "LOCUS" is ranges
 over the 17 TR/IG loci : IGHV,IGKV,IGLV,IGHD,IGHJ,IGKJ,IGLJ,
 TRAV,TRAJ,TRBV,TRBD,TRBJ,TRDV,TRDD,TRDJ,TRGV,TRGJ.  These files
@@ -222,14 +223,14 @@ that the "Mus_musculus" directory contains "Mus musculus" and several
 "Mus spretus" sequences ; this is because organism matching here is
 based on "Mus".
 
-*  UNDER each ReferenceDirectorySet directory are FNA files that have
+•  UNDER each ReferenceDirectorySet directory are FNA files that have
 any IMGT-gaps (".") removed and grouped by V, D, and J and are named
 as ORGANISM_SEQTYPE_SEGMENT.fna. This way there are two V files
-(for IG and TR), two D files, and two J files.  For these files are 
+(for IG and TR), two D files, and two J files.  Each of these files are 
 IgBLAST-formatted.  These are the primary databases used
 by IgBLAST/VDJServer for germline inference.
 
-*  UNDER each "ReferenceDirectorySet" directory are IMGT and KABAT
+•  UNDER each "ReferenceDirectorySet" directory are IMGT and KABAT
 directories that contain lookup data for region start/stop data
 for the corresponding schemes.  The lookup files are Vlooup.tsv
 and Jlookup.tsv for the V and J segments respectively.  They are
@@ -243,8 +244,9 @@ FR1 the first region).  For the Jlookup.tsv file only the allele
 name is in the first column and the CDR3 end in the other. BOTH
 files have 1-based indices that are in the space of the reference
 sequences in the FNA files in the "ReferenceDirectorySet" directory.
+The creation of these files is further discussed in the vdj_db_dl README.
 
-*  UNDER each organism is expected a directory "GeneTables" 
+•  UNDER each organism is expected a directory "GeneTables" 
 (containing auto-downloaded and parsed HTML files of gene table 
 [hierarchical] information.  The files are of the form LOCUS.html
 and LOCUS.html.orphons.html.  The two files are downloaded from
@@ -256,7 +258,7 @@ These files are parsed and used for creating JSON-formatted
 hierarchies (using LOCI, subgroups, genes, and alleles) 
 of segment counts.
 
-*  OPTIONALLY ACCOMPANYING the LOCUS.html file sare LOCUS.html.patch files.  
+•  OPTIONALLY ACCOMPANYING the LOCUS.html file sare LOCUS.html.patch files.  
 The use and format of these files are described in the vdj_db_dl readme section 
 in further detail.
 
