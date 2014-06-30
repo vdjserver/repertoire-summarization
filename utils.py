@@ -672,13 +672,15 @@ def extendedSortedSetDiff(a,b,a_title,b_title):
 	blank=""
 	print a_title,"\tD\t",b_title
 	for a_i in a:
-		#coveredInA.append(a_i)
 		if(a_i in b):
+			#this is the intersection
 			print a_i,"\t\t\t",a_i
 		else:
+			#this is what is in a but NOT in b
 			print a_i,"\t<\t\t",blank
 	for b_i in b:
 		if(not(b_i in a)):
+			#this is what is in b, but NOT in a
 			print blank,"\t>\t",b_i
 
 
