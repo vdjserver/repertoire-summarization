@@ -1,6 +1,4 @@
 #!/bin/bash -x 
-#VDJ_DB_ROOT=/home/data/DATABASE/04_22_2014
-#VDJ_DB_ROOT=/home/data/DATABASE/05_09_2104
 NUM_SIM=${1:-0}
 echo "Using NUM_SIM ${NUM_SIM}"
 VDJ_DB_ROOT=/home/data/DATABASE/06_27_2014
