@@ -174,6 +174,11 @@ def mode_process(imgtdb_obj,igblastnbin,blastxbin,kvMap,makeblastdbbin,mode):
 						blastx_xml_out=process_dir+"/blastx.out.xml"
 						blastxcmd=blastxbin+"   -max_target_seqs  1   -query "+queryFile+" -outfmt 5 -db "+blastx_fna_db+" -out "+blastx_xml_out
 						print "Now to run blastx with command ",blastxcmd
+						blastx_bash_script=process_dir+"/blastx_kabat.sh"
+						blastx_bash_script_out=blastx_bash_script+".out"
+						blastx_bash_script_err=blastx_bash_script+".err"
+						write_temp_bash_script(blastxcmd,blastx_bash_script)
+						execute_bash_script(blastx_bash_script,blastx_bash_script_out,blastx_bash_script_err)
 						runCmdButGetNoStdOutOrStdErr(blastxcmd)
 						Jlookup=process_dir+"/Jlookup.tsv"
 						print "\nWriting Jlookup to ",Jlookup,"\n\n"
