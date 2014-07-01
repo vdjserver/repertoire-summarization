@@ -88,34 +88,68 @@ def mode_process(imgtdb_obj,igblastnbin,blastxbin,kvMap,makeblastdbbin,mode):
 						igblast_seq_type="Ig"
 					else:
 						igblast_seq_type="TCR"
-					igblast_cmd=igblastnbin+" -query "+queryFile+" -ig_seqtype "+igblast_seq_type+" "					
+					igblast_query_and_seq_type=" -query "+queryFile+" -ig_seqtype "+igblast_seq_type+" "
+					igblast_cmd=igblastnbin+igblast_query_and_seq_type
+					igblast_db_params=" "
 					for segment in get_segment_list():
 						newPart=" -germline_db_"+segment+" "+kvMap[db_base_key+segment]+" "
-						igblast_cmd+=newPart
-					igblast_cmd+=" -auxiliary_data "+kvMap[aux_org+"_AUX"]
-					igblast_cmd+=" -domain_system "+mode+" "
-					igblast_cmd+=" -outfmt '7 qseqid qgi qacc qaccver qlen sseqid sallseqid sgi sallgi sacc saccver sallacc slen qstart qend sstart send qseq sseq evalue bitscore score length pident nident mismatch positive gapopen gaps ppos frames qframe sframe btop'"
-					igblast_output=process_dir+"igblast."+mode+"."+st+".out"
-					igblast_cmd+=" -out "+igblast_output
+						igblast_db_params+=newPart
+					igblast_cmd+=igblast_db_params
+					aux_param=" -auxiliary_data "+kvMap[aux_org+"_AUX"]
+					igblast_cmd+=aux_param
+					domain_param=" -domain_system "+mode+" "
+					igblast_cmd+=domain_param
+					if(organism=="human"):
+						igblast_org_param_val="human"
+					elif(organism=="Mus_musculus"):
+						igblast_org_param_val="mouse"
+					org_param=" -organism "+igblast_org_param_val+" "
+					igblast_cmd+=org_param
+					outfmt_parse_param=" -outfmt '7 qseqid qgi qacc qaccver qlen sseqid sallseqid sgi sallgi sacc saccver sallacc slen qstart qend sstart send qseq sseq evalue bitscore score length pident nident mismatch positive gapopen gaps ppos frames qframe sframe btop'"
+					igblast_cmd+=outfmt_parse_param
+					igblast_output_parse=process_dir+"igblast."+mode+"."+st+".out"
+					igblast_out_param=" -out "+igblast_output_parse
+					igblast_cmd+=igblast_out_param
 					print "Placing "+mode.upper()+" lookup data for ",organism," in directory ",process_dir,"...."
-					print "Running igblast command : ",igblast_cmd	
-					runCmdButGetNoStdOutOrStdErr(igblast_cmd)
 					errStat=False
-					if(not(os.path.exists(igblast_output))):
+					temp_bash_for_parse=process_dir+"/igblast_parse_"+st+".sh"
+					temp_bash_for_parse_err=temp_bash_for_parse+".err"
+					temp_bash_for_parse_out=temp_bash_for_parse+".out"
+					IGDATA_var=kvMap['IGDATA']
+					export_ig_data_cmd="export IGDATA="+IGDATA_var
+					bash_cmd=export_ig_data_cmd+"\n"+igblast_cmd+"\n"
+					#igblast for parsing
+					write_temp_bash_script(bash_cmd,temp_bash_for_parse)
+					execute_bash_script(temp_bash_for_parse,temp_bash_for_parse_out,temp_bash_for_parse_err)
+					#igblast for human reading
+					hr_out_file=igblast_output_parse+".human_readable.out"
+					outfmt_parse_param=" -show_translation "
+					igblast_out_param=" -out "+hr_out_file+" "
+					igblast_hr_cmd=igblastnbin
+					igblast_hr_cmd+=igblast_query_and_seq_type
+					igblast_hr_cmd+=org_param
+					igblast_hr_cmd+=igblast_out_param
+					igblast_hr_cmd+=aux_param
+					igblast_hr_cmd+=domain_param
+					igblast_hr_cmd+=igblast_db_params
+					igbhast_hr_script=temp_bash_for_parse+".human_readable.sh"
+					igbhast_hr_script_err=igbhast_hr_script+".err"
+					igbhast_hr_script_out=igbhast_hr_script+".out"
+					hr_bash_cmd=export_ig_data_cmd+"\n"+igblast_hr_cmd
+					write_temp_bash_script(hr_bash_cmd,igbhast_hr_script)
+					execute_bash_script(igbhast_hr_script,igbhast_hr_script_out,igbhast_hr_script_err)
+					if(not(os.path.exists(igblast_output_parse))):
 						print "ERROR, it appears that IGBLAST did not run!?"
 						errStat=True
 					if(not(errStat)):
-						igbLineCount=fileLineCount(igblast_output)
+						igbLineCount=fileLineCount(igblast_output_parse)
 						if(igbLineCount<100):
 							print "ERROR, it appears that IGBLAST ran but with errors!"
 							errStat=True
-						if(not(errStat)):
+						else:
 							Vlookup=process_dir+"/Vlookup."+st+".tsv"
-							print "Now generating V lookup for ",organism," "+st+" from igblast output ",igblast_output," and writing to ",Vlookup
-							writeRegionsFromIGBLASTResult(igblast_output,Vlookup)
-					else:
-						#errStart==True ! :(
-						pass					
+							print "Now generating V lookup for ",organism," "+st+" from igblast output ",igblast_output_parse," and writing to ",Vlookup
+							writeRegionsFromIGBLASTResult(igblast_output_parse,Vlookup)					
 				else:
 					raise Exception("file ",queryFile," not found! for IGBLASTING for "+mode.upper()+"!")
 				
