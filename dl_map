@@ -12,3 +12,4 @@ MOUSE_GL_TR_D	/usr/local/igblast-1.3.0/internal_data/mouse/mouse_TR_D
 MOUSE_GL_TR_J	/usr/local/igblast-1.3.0/internal_data/mouse/mouse_TR_J
 HUMAN_AUX	/usr/local/igblast-1.3.0/optional_file/human_gl.aux
 MOUSE_AUX	/usr/local/igblast-1.3.0/optional_file/mouse_gl.aux
+IGDATA	/usr/local/igblast-1.3.0/
