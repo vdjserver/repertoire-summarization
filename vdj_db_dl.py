@@ -131,6 +131,7 @@ def mode_process(imgtdb_obj,igblastnbin,blastxbin,kvMap,makeblastdbbin,mode):
 					igblast_hr_cmd+=igblast_out_param
 					igblast_hr_cmd+=aux_param
 					igblast_hr_cmd+=domain_param
+					igblast_hr_cmd+=outfmt_parse_param
 					igblast_hr_cmd+=igblast_db_params
 					igbhast_hr_script=temp_bash_for_parse+".human_readable.sh"
 					igbhast_hr_script_err=igbhast_hr_script+".err"
