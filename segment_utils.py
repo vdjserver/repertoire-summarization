@@ -97,10 +97,8 @@ def hierarchyTreeFromGenetableURL(url,locus,listOfAllowableNames=None,existingHi
 					elif(class_val_first_str=="col_note"):
 						if(col_note_num==12):
 							text=td.find(text=True)
-							#print "col_note_num =",col_note_num,"and text=",text
 							if(text is not None):
 								clone_names_map[allele_name]=re.sub(r'\s+','',text)
-								#print "clone_names_map[",allele_name,"] =",clone_names_map[allele_name]
 						col_note_num+=1
 					elif(class_val_first_str=="allele_note"):
 						text = td.find(text=True)# + ';'
@@ -112,13 +110,6 @@ def hierarchyTreeFromGenetableURL(url,locus,listOfAllowableNames=None,existingHi
 								#if there is no allele, make it allele *01
 								allele_name+="*01"
 							allele_name=allele_name.strip()
-							#SOMETIMES SUBGROUP ISN'T A COLUMN IN THE TABLE SO INHERIT IT FROM THE GENE NAME!
-							#if(subgroup==""):
-							#	print "Setting a blank subgroup to equal gene_name=",gene_name
-							#	subgroup=gene_name
-							#elif(not(gene_name.startswith(subgroup))):
-							#	print "Setting an old subgroup to equal gene_name=",gene_name
-							#	subgroup=gene_name
 							if(listOfAllowableNames==None or ((listOfAllowableNames!=None) and (allele_name in listOfAllowableNames))):
 								#print "proceeding with setting : gene_name="+gene_name+", allele_name="+allele_name+", and subgroup="+subgroup
 								if(subgroup=="" or (subgroup==gene_name and not(subgroup==""))):
