@@ -112,13 +112,14 @@ def hierarchyTreeFromGenetableURL(url,locus,listOfAllowableNames=None,existingHi
 							allele_name=allele_name.strip()
 							if(listOfAllowableNames==None or ((listOfAllowableNames!=None) and (allele_name in listOfAllowableNames))):
 								#print "proceeding with setting : gene_name="+gene_name+", allele_name="+allele_name+", and subgroup="+subgroup
-								if(subgroup=="" or (subgroup==gene_name and not(subgroup==""))):
+								if(subgroup==""):
 									#if there is no subgroup or 
-									#its the same as the gene (and non-empty), then store this way
-									my_hier[gene_name][allele_name]
+									#store this way
+									my_hier [gene_name][allele_name]
 								else:
 									#otherwise, store this way, using the complete path/resolution
 									my_hier[subgroup][gene_name][allele_name]
+							
 							else:
 								print "NOTE : skipping the addition of ",allele_name," into the hierarchy  (url=",url," and locus=",locus,")  cause it's not in the list of alleles from the Reference Fasta!"
 	return [my_hier,clone_names_map]
