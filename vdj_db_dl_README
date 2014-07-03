@@ -1,0 +1,69 @@
+
+#################
+# dl_map README #
+#################
+
+An example dl_map file is below.  Note that the format is a
+tab-separated values format with keys in the first column
+and values in the second column.
+
+HUMAN_GL_IG_V	/usr/local/igblast-1.3.0/database_IG/human_gl_V
+HUMAN_GL_IG_D	/usr/local/igblast-1.3.0/database_IG/human_gl_D
+HUMAN_GL_IG_J	/usr/local/igblast-1.3.0/database_IG/human_gl_J
+HUMAN_GL_TR_V	/usr/local/igblast-1.3.0/database_TR/human/human_TR_V
+HUMAN_GL_TR_D	/usr/local/igblast-1.3.0/database_TR/human/human_TR_D.fna
+HUMAN_GL_TR_J	/usr/local/igblast-1.3.0/database_TR/human/human_TR_J.fna
+MOUSE_GL_IG_V	/usr/local/igblast-1.3.0/internal_data/mouse/mouse_V
+MOUSE_GL_IG_D	/usr/local/igblast-1.3.0/internal_data/mouse/mouse_D
+MOUSE_GL_IG_J	/usr/local/igblast-1.3.0/internal_data/mouse/mouse_J
+MOUSE_GL_TR_V	/usr/local/igblast-1.3.0/internal_data/mouse/mouse_TR_V
+MOUSE_GL_TR_D	/usr/local/igblast-1.3.0/internal_data/mouse/mouse_TR_D
+MOUSE_GL_TR_J	/usr/local/igblast-1.3.0/internal_data/mouse/mouse_TR_J
+HUMAN_AUX	/usr/local/igblast-1.3.0/optional_file/human_gl.aux
+MOUSE_AUX	/usr/local/igblast-1.3.0/optional_file/mouse_gl.aux
+IGDATA	/usr/local/igblast-1.3.0/
+
+
+######################################
+# dl_map README Entries Descriptions #
+######################################
+
+• These keys and values are used to point to IgBLAST IG VDJ databases for human
+
+HUMAN_GL_IG_V	/usr/local/igblast-1.3.0/database_IG/human_gl_V
+HUMAN_GL_IG_D	/usr/local/igblast-1.3.0/database_IG/human_gl_D
+HUMAN_GL_IG_J	/usr/local/igblast-1.3.0/database_IG/human_gl_J
+
+• These keys and values are used to point to IgBLAST TR VDJ databases for human
+
+HUMAN_GL_TR_V	/usr/local/igblast-1.3.0/database_TR/human/human_TR_V
+HUMAN_GL_TR_D	/usr/local/igblast-1.3.0/database_TR/human/human_TR_D.fna
+HUMAN_GL_TR_J	/usr/local/igblast-1.3.0/database_TR/human/human_TR_J.fna
+
+• These keys and values are used to point to IgBLAST IG VDJ databases for mouse
+
+MOUSE_GL_IG_V	/usr/local/igblast-1.3.0/internal_data/mouse/mouse_V
+MOUSE_GL_IG_D	/usr/local/igblast-1.3.0/internal_data/mouse/mouse_D
+MOUSE_GL_IG_J	/usr/local/igblast-1.3.0/internal_data/mouse/mouse_J
+
+• These keys and values are used to point to IgBLAST TR VDJ databases for mouse
+
+MOUSE_GL_TR_V	/usr/local/igblast-1.3.0/internal_data/mouse/mouse_TR_V
+MOUSE_GL_TR_D	/usr/local/igblast-1.3.0/internal_data/mouse/mouse_TR_D
+MOUSE_GL_TR_J	/usr/local/igblast-1.3.0/internal_data/mouse/mouse_TR_J
+
+• These keys and values are used to point to human and mouse auxiliary files (used by IgBLAST)
+
+HUMAN_AUX	/usr/local/igblast-1.3.0/optional_file/human_gl.aux
+MOUSE_AUX	/usr/local/igblast-1.3.0/optional_file/mouse_gl.aux
+
+• This key is used to set the IGDATA environment variable when IgBLASTn is run for proper lookup of region data
+
+IGDATA	/usr/local/igblast-1.3.0/
+
+Note that the directory referred to IGDATA should have under it the optional_file and internal_data directories.
+
+
+
+
+
