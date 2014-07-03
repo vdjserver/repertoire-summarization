@@ -119,6 +119,14 @@ esalina2@eddiecomp:/home/data/vdj_server/repertoire-summarization$ export PYTHON
 # REPERTOIRE-CHARACTERIZATION REQUIRES ADDITIONAL PYTHON MODULES #
 ##################################################################
 
+The following python modules are required:
+
+argparse
+threading
+multiprocessing
+pprint
+time
+
 
 TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
 TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
