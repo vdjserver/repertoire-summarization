@@ -193,7 +193,7 @@ def mode_process(imgtdb_obj,igblastnbin,blastxbin,kvMap,makeblastdbbin,mode):
 
 
 if (__name__=="__main__"):
-	parser = argparse.ArgumentParser(description='Download IMGT reference data for VDJ Server and set up VDJ_DB directory structure from it  . NOTE that makeblastdb executable and the igblastn executable should be coupled.  For example, they should refer to the same two executables that were extracted/build from a single source/binary downloaded archive from NCBI (e.g. /usr/local/igblast-1.3.0/bin/igblastn and /usr/local/igblast-1.3.0/bin/makeblastdb that came from ncbi-igblast-1.3.0-src.tar.gz)')
+	parser = argparse.ArgumentParser(description='Download IMGT reference data for VDJ Server and set up VDJ_DB directory structure from it  . NOTE that makeblastdb executable and the igblastn executable should be coupled.  For example, they should refer to the same two executables that were extracted/build from a single source/binary downloaded archive from NCBI (e.g. /usr/local/igblast-1.3.0/bin/igblastn and /usr/local/igblast-1.3.0/bin/makeblastdb that came from ncbi-igblast-1.3.0-src.tar.gz).  Note that IgBLAST 1.3 is required.')
 
 	parser.add_argument('imgt_db_base',type=str,nargs=1,help="path to a NON-existent directory where downloading will take place")
 	parser.add_argument('makeblastdb_bin',type=str,nargs=1,help="*full* path to the makeblastdb binary executable")
