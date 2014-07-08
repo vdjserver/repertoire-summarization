@@ -1,8 +1,8 @@
-README for tests.
+README for tests
 
 ###############################################
 
-4 test files:
+4 test files
 
 1)human.IG.fna
 2)human.TR.fna
@@ -10,7 +10,8 @@ README for tests.
 4)Mus_musculus.TR.fna
 
 of data are available for testing purposes.  The tests.sh script calls rep_char and IgBLAST
-to IgBLAST the data and then run rep_char on the IgBLAST results.
+to IgBLAST the data and then run rep_char on the IgBLAST results.  In addition vdj_sim.py
+can create simulated test data files.  Run "tests.sh" with an argument (e.g. 1000 ; to create 1000 simluated reads (both organisms and seq types IG and TR).
 
 ##############################################
 

@@ -111,6 +111,35 @@ AFTER PATCHING, THE HIERARCHY IS  :
 # ANALYSIS MODE ONLY #
 ######################
 
+Analysis mode does several things.
+
+1) it examines reference data sequences (by allele name),
+2) it parses downloaded IMGT gene tables for user examination of resulting hierarchies
+3) it applies patches showing the before/after effects of patch files.
+
+Users are encouraged to run vdj_db_dl.py with analysis mode to find instances where
+IMGT reference alleles exist in the reference database BUT do not exist in the
+gene tables and to create patch files for use so that patched Gene Tables
+can be updated ("patched") to accomodate (usually missing) entries/spots for reference/database sequences.
+
+When, run the analysis-only mode will highlight alleles existing in the reference directory database and
+not in the Gene Table.  Such highlights are as seen below:
+
+#####################################################################
+item IGLJ5*01  is in  fasta alleles Mus_musculus_IGLJ but not in tree alleles Mus_musculus_IGLJ
+fasta alleles Mus_musculus_IGLJ 	D	tree alleles Mus_musculus_IGLJ
+IGLJ1*01 			IGLJ1*01
+IGLJ2*01 			IGLJ2*01
+IGLJ3*01 			IGLJ3*01
+IGLJ3P*01 			IGLJ3P*01
+IGLJ4*01 			IGLJ4*01
+IGLJ4*01 			IGLJ4*01
+IGLJ5*01 	<	
+#####################################################################	
+
+The "<" pointing to IGLJ5*01 under the "fasta alleles Mus_musculus_IGLJ" indicates that the user
+should create a patch file to add IGLJ5*01 to the gene table hiearchy/tree.
+
 
 
 

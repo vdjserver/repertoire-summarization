@@ -37,6 +37,3 @@ execution has succeded without errors.  See the *.tsv file for read-characteriza
 data, CDR3 length/histogram data, the *.json files for segment/hit count data, and
 the *.vdjml files for VDJML output.
 
-
-
-
