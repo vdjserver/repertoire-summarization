@@ -65,6 +65,53 @@ IGDATA	/usr/local/igblast-1.3.0/
 
 Note that the directory referred to IGDATA should have under it the optional_file and internal_data directories.
 
+#####################
+# LOCUS PATCH FILES #
+#####################
+
+One may dynamically configure the GeneTables with patch files.  The
+gene tables represent a hierarchical "n-ary" tree-like structure organizing the alleles.
+
+To modify a GeneTable locus, the patch file LOCUS.html.patch is searched for.
+For example, to modify the TRBJ locus for human, the file ROOT/human/GeneTables/TRBJ.html.patch
+(note the pattern ROOT/ORGANISM/GeneTables/LOCUS.html.patch) is searched for.
+
+The patch files consist of lines of tab-separted values of text.
+The first value should be either "add" or "del" to either add or subtract
+a hierarchy node.  The following values indicate from the locus root
+the complete lineage to the node to be added(deleted).
+
+For example, the patch file IGLJ.html.patch has the contents :
+add	IGLJ5	IGLJ5*01
+
+with 3-tab separated values saying to add under the IGLJ5 child of the IGLJ root of the organism
+an allele named IGLJ5*01
+
+To see the effect in more concrete terms, the "before and after" of the patch
+is seen here :
+
+BEFORE PATCHING, THE HIERARCHY IS  :
+{'IGLJ1': {'IGLJ1*01': {}},
+ 'IGLJ2': {'IGLJ2*01': {}},
+ 'IGLJ3': {'IGLJ3*01': {}},
+ 'IGLJ3P': {'IGLJ3P*01': {}},
+ 'IGLJ4': {'IGLJ4*01': {}}}
+
+AFTER PATCHING, THE HIERARCHY IS  :
+{'IGLJ1': {'IGLJ1*01': {}},
+ 'IGLJ2': {'IGLJ2*01': {}},
+ 'IGLJ3': {'IGLJ3*01': {}},
+ 'IGLJ3P': {'IGLJ3P*01': {}},
+ 'IGLJ4': {'IGLJ4*01': {}},
+ 'IGLJ5': {'IGLJ5*01': {}}}
+
+
+
+######################
+# ANALYSIS MODE ONLY #
+######################
+
+
 
 
 

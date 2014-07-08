@@ -3,11 +3,11 @@
 ###########################################################
 
 The purpose of this suite of software tools is to generate 
-analysis and summary statistics of Ig-Seq data.
+analysis and summary statistics of "Ig-Seq" "Rep-Seq" data.
 
 IGBLAST output files (using a certain output format) are 
 taken as input and 4 distinct files are generated as outputs:
-1) CDR3 length histogram (in kabat and imgt modes),
+1) CDR3 length histogram data file (in kabat and imgt modes) "cdr3_hist.out",
 2) JSON-formatted hierachies of the IMGT alleles and 
    corresponding counts of segments in top combinations
 with agregrated counts, 
@@ -24,13 +24,15 @@ merged the following scripts can be used to logicaly merge outputs:
 4) merge_tables.py
 can be used to merge TSV tables.  NOTE : For 1 and #2, since counts 
 are being merged, input order is not important.  For #3 and #4, since 
-files are being merged and read order too, order is important.  For
-#3 and #4 the input order is used in the output.
+files are being merged and read order too, input order is important.  For
+#3 and #4 the input order is used in the output order.
 
-To get help on any of the *.pyscripts run it as seen here, and 
-use the "-h" flag for "help"!  For the .sh scripts please open them and read the comments.
+To get help on any of the *.py scripts run it as seen here, and 
+use the "-h" flag for "help"!  For the .sh scripts please open them and read the comments and examine 
+the environment variables set there too.
 
-esalina2@eddiecomp:/home/data/vdj_server/repertoire-summarization$ ./rep_char.py -h
+Example rep_char help/usage is listed here :
+
 usage: rep_char.py [-h] [-igblast_version IGBLAST_VERSION]
                    [-igblast_params IGBLAST_PARAMS]
                    [-igblast_runid IGBLAST_RUNID] [-igblast_uri IGBLAST_URI]
@@ -119,68 +121,11 @@ esalina2@eddiecomp:/home/data/vdj_server/repertoire-summarization$ export PYTHON
 # REPERTOIRE-CHARACTERIZATION REQUIRES ADDITIONAL PYTHON MODULES #
 ##################################################################
 
-The following python modules are required:
+The following python modules are required (and tested with the 
+following versions) :
 
-argparse
-threading
-multiprocessing
-pprint
-time
-
-
-TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
-TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
-TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
-INSERT NOTES ABOUT REQUIRED MODULES HERE
-INSERT NOTES ABOUT REQUIRED MODULES HERE
-INSERT NOTES ABOUT REQUIRED MODULES HERE
-INSERT NOTES ABOUT REQUIRED MODULES HERE
-INSERT NOTES ABOUT REQUIRED MODULES HERE
-INSERT NOTES ABOUT REQUIRED MODULES HERE
-INSERT NOTES ABOUT REQUIRED MODULES HERE
-INSERT NOTES ABOUT REQUIRED MODULES HERE
-
-
-
-from Bio.Alphabet import IUPAC
-from Bio.Blast import NCBIXML
-from Bio import SeqIO
-from Bio.Seq import Seq
-from bs4 import BeautifulSoup
-
-
-from collections import defaultdict
-from datetime import datetime
-
-
-from os.path import basename
-from pprint import pprint
-from sets import Set
-from subprocess import call
-from subprocess import Popen
-import argparse
-import glob
-import json
-import math
-import multiprocessing
-import ntpath
-import numpy
-import os
-import pickle
-import pprint
-import pprint, pickle
-import Queue
-import random
-import re
-import subprocess
-import sys
-import sys, traceback
-import threading
-import time
-import traceback,sys
-import urllib2
-import yaml
-
+Bioptyon v1.63
+BeautifulSoup4 v4.3.2
 
 
 #####################################################################
@@ -266,7 +211,7 @@ These files are parsed and used for creating JSON-formatted
 hierarchies (using LOCI, subgroups, genes, and alleles) 
 of segment counts.
 
-•  OPTIONALLY ACCOMPANYING the LOCUS.html file sare LOCUS.html.patch files.  
+•  OPTIONALLY ACCOMPANYING the LOCUS.html file sare LOCUS.html.patch files (where "LOCUS" is one of the 17 loci : "IGHV", "IGKV", etc.) 
 The use and format of these files are described in the vdj_db_dl readme section 
 in further detail.
 
