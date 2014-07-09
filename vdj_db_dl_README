@@ -71,6 +71,7 @@ Note that the directory referred to IGDATA should have under it the optional_fil
 
 One may dynamically configure the GeneTables with patch files.  The
 gene tables represent a hierarchical "n-ary" tree-like structure organizing the alleles.
+They are defined by IMGT.
 
 To modify a GeneTable locus, the patch file LOCUS.html.patch is searched for.
 For example, to modify the TRBJ locus for human, the file ROOT/human/GeneTables/TRBJ.html.patch
