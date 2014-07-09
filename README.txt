@@ -8,9 +8,8 @@ analysis and summary statistics of "Ig-Seq" "Rep-Seq" data.
 IGBLAST output files (using a certain output format) are 
 taken as input and 4 distinct files are generated as outputs:
 1) CDR3 length histogram data file (in kabat and imgt modes) "cdr3_hist.out",
-2) JSON-formatted hierachies of the IMGT alleles and 
-   corresponding counts of segments in top combinations
-with agregrated counts, 
+2) JSON-formatted hierachies (mapped by IMGT Gene Tables) of the IMGT alleles and 
+   corresponding counts of segments in top combinations with agregrated counts, 
 3) read-level summary statistics (TSV) , and 
 4) vdjml files of the parsed data.
 
@@ -209,7 +208,9 @@ http://www.imgt.org/IMGTrepertoire/index.php?section=LocusGenes&repertoire=genet
 respectively.  This way 34 html files are downloaded altogether.
 These files are parsed and used for creating JSON-formatted 
 hierarchies (using LOCI, subgroups, genes, and alleles) 
-of segment counts.
+of segment counts.  The parsing extracts the GeneTables
+as defined by IMGT and and the hierarchy defined is thus
+defined by IMGT via the parsing.
 
 •  OPTIONALLY ACCOMPANYING the LOCUS.html file sare LOCUS.html.patch files (where "LOCUS" is one of the 17 loci : "IGHV", "IGKV", etc.) 
 The use and format of these files are described in the vdj_db_dl readme section 
