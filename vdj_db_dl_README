@@ -106,7 +106,6 @@ AFTER PATCHING, THE HIERARCHY IS  :
  'IGLJ5': {'IGLJ5*01': {}}}
 
 
-
 ######################
 # ANALYSIS MODE ONLY #
 ######################
@@ -137,7 +136,7 @@ IGLJ4*01 			IGLJ4*01
 IGLJ5*01 	<	
 #####################################################################	
 
-The "<" pointing to IGLJ5*01 under the "fasta alleles Mus_musculus_IGLJ" indicates that the user
+The "<" pointing to IGLJ5*01 under the "fasta alleles Mus_musculus_IGLJ" column indicates that the user
 should create a patch file to add IGLJ5*01 to the gene table hiearchy/tree.
 
 
