@@ -566,7 +566,7 @@ class imgt_db:
 			organisms=self.getOrganismList(True)
 			org_imgt_regex_map=dict()
 			org_imgt_regex_map['human']='^homo\s*sapien'
-			org_imgt_regex_map['Mus_musculus']='^mus\s+'
+			org_imgt_regex_map['Mus_musculus']='^mus\smusculus'
 			genedb_map=read_fasta_file_into_map(base_fna)
 			for organism in organisms:
 				loci=get_loci_list()
