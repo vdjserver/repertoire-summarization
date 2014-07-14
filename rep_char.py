@@ -245,7 +245,8 @@ def returnVAlnAllCharMap(vInfo,imgtdb_obj):
 
 
 
-
+#return characterization for V and J (EXCLUDING CDR3 REGION)
+#if CDR3 is unknown, just return an empty map! :(
 def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap):
 	global global_key_base
 	cdr3_surround_aln=getPrePostCDR3AlnObjs(vInfo,jInfo,imgtdb_obj,organism,annMap)
@@ -370,6 +371,8 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 	if(not(skip_char)):
 		#V seq characterization (OVER v) only
 		V_map=returnVAlnAllCharMap(vInfo,imgtdb_obj)
+		#print "A V_MAP\n"
+		#printMap(V_map)
 		if(V_map is not None):
 			for k in V_map:
 				annMap[k]=V_map[k]

@@ -461,6 +461,8 @@ class alignment:
 					else:
 						syn=False
 						aa_reps+=1
+						if(self.q_base_pos_LookUp is not None):
+							#print "FOUND A NON-SILENT MUTATION "+s_amino+" -> "+q_amino+" at read position ",self.q_base_pos_LookUp[temp_index]
 					had_silent=False
 					if(codonAnalyzer.is_unambiguous_codon(q_codon) and codonAnalyzer.is_unambiguous_codon(s_codon)):
 						if(syn):
@@ -475,6 +477,8 @@ class alignment:
 						#print "POST SYN/NSY counts : ",num_syn," and ",num_nsy
 						if(had_silent):
 							aa_slnt+=1
+							if(self.q_base_pos_LookUp is not None):
+								#print "FOUND A SILENT MUTATION "+s_amino+" -> "+q_amino+" at read position ",self.q_base_pos_LookUp[temp_index]
 				else:
 					#ANALYSIS FOR CODONS WITH any gap
 					if(q_codon.find("-")==(-1)):
