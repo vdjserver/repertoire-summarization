@@ -145,7 +145,11 @@ class alignment:
 	s_frame_mask=None
 	global codonAnalyzer
 	valid_bases=codonAnalyzer.bases
+	q_base_pos_LookUp=None
 	
+
+
+
 
 	#constructor
 	def __init__(self,Cq_aln,Cs_aln,Cq_start=None,Cq_end=None,Cs_start=None,Cs_end=None,Cs_frame_mask=None):
@@ -156,8 +160,35 @@ class alignment:
 		self.q_start=Cq_start
 		self.q_end=Cq_end
 		self.s_frame_mask=Cs_frame_mask
+		self.setQBasePosLookUp()
 
 
+
+	#the q_base_pos_LookUp array takes an index into the 
+	#alignment string and returns a base position.  Leans RIGHT
+	#in the gap
+	def setQBasePosLookUp(self):
+		computedNumBases=self.q_start-self.q_end+1
+		countedNumBases=getNumberBpInAlnStr(self.q_aln)
+		if(countedNumBases!=computedNumBases):
+			#inconsistency!
+			pass
+		basePos=self.q_start
+		for alnI in range(len(self.q_aln)):
+			if(self.q_base_pos_LookUp==None):
+				self.q_base_pos_LookUp=list()
+			self.q_base_pos_LookUp.append(basePos)
+			if(self.q_aln[alnI]=="-"):
+				#no increment
+				pass
+			else:
+				basePos+=1
+
+
+
+
+
+		
 
 
 
@@ -637,6 +668,7 @@ class alignment:
 		g_s_to=29
 		test_aln=alignment(g_q_aln,g_s_aln,g_q_from,g_q_to,g_s_from,g_s_to)
 		test_aln.setSFM()
+		print "Query Base Map : ",test_aln.q_base_pos_LookUp
 		print "biggap test : "
 		print test_aln.getNiceString()
 		t_q_aln="GATT-CATA-TACA"
@@ -653,7 +685,7 @@ class alignment:
 		print "First non-gap both is "
 		sub_aln_no_gap.setSFM()
 		print sub_aln_no_gap.getNiceString()
-		testGOL=False
+		testGOL=True
 		if(testGOL):
 			for c in range(t_q_from-2,t_q_to+2):
 				print "\n"
@@ -662,38 +694,46 @@ class alignment:
 				belowc=test_aln.getAlnAtAndCond(c,"query","leq")
 				print "ORIGINAL\n"+test_aln.getNiceString()
 				print test_aln.characterize()
+				print "QBM : ",test_aln.q_base_pos_LookUp
 				print "MODA >=",c
 				print abovec.getNiceString()
 				print abovec.characterize()
 				print abovec.getPosList()
+				print "QBM : ",abovec.q_base_pos_LookUp
 				print "MODB <=",c
 				print belowc.getNiceString()
 				print belowc.characterize()
 				print belowc.getPosList()
+				print "QBM : ",belowc.q_base_pos_LookUp
 			for c in range(t_s_from-2,t_s_to+2):
 				print "\n"
 				print "c subject=",c
 				abovec=test_aln.getAlnAtAndCond(c,"subject","geq")
 				belowc=test_aln.getAlnAtAndCond(c,"subject","leq")
 				print "ORIGINAL\n"+test_aln.getNiceString()
+				print "QBM : ",test_aln.q_base_pos_LookUp
 				print "MODA >=",c
 				print abovec.getNiceString()
 				print abovec.characterize()
 				print abovec.getPosList()
+				print "QBM : ",abovec.q_base_pos_LookUp
 				print "MODB <=",c
 				print belowc.getNiceString()
 				print belowc.characterize()
 				print belowc.getPosList()
+				print "QBM : ",belowc.q_base_pos_LookUp
 		for s in range(10):
 			start=int(random.random()*50)
 			end=start+int(random.random()*10)
 			#start=27;end=29
 			print "\n\n\n"
 			print "ORIGINAL\n"+test_aln.getNiceString()
+			print "QBM : ",test_aln.q_base_pos_LookUp
 			print "Try start=",start," end=",end
 			sub_aln=test_aln.getSubAlnInc(start,end,"query")
 			sub_aln.setSFM()
 			print sub_aln.getNiceString()
+			print "QBM:",sub_aln.q_base_pos_LookUp
 
 
 
