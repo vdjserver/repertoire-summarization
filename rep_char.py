@@ -221,7 +221,7 @@ def getPrePostCDR3AlnObjs(vInfo,jInfo,imgtdb_obj,organism,annMap):
 
 	
 #return the char map for the V alignment
-def returnVAlnAllCharMap(vInfo,imgtdb_obj):
+def returnVAlnAllCharMap(vInfo,imgtdb_obj,read_result_obj=None):
 	global global_key_base
 	emptyMap=getEmptyRegCharMap()
 	if(vInfo==None):
@@ -234,6 +234,10 @@ def returnVAlnAllCharMap(vInfo,imgtdb_obj):
 		return emptyMap
 	else:
 		vCharMap=vAlnObj.characterize()
+		if(read_result_obj is not None):
+			aa_mut_list=vAlnObj.AA_mut_list
+			seg_match_name=vInfo['subject ids']
+			addAAMuts(read_result_obj,aa_mut_list,target_seg_match_name)
 		new_map=dict()
 		for k in vCharMap:
 			newKey=k
