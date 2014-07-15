@@ -146,6 +146,7 @@ class alignment:
 	global codonAnalyzer
 	valid_bases=codonAnalyzer.bases
 	q_base_pos_LookUp=None
+	AA_mut_list=None
 	
 
 
@@ -352,6 +353,7 @@ class alignment:
 	#ins, del, bsb, syn/non-sym, stp
 	def characterize(self,charMsg=None,showAln=False):
 		global codonAnalyzer
+		self.AA_mut_list=list()
 		char_map=dict()
 		num_ins=0
 		num_del=0
@@ -463,6 +465,7 @@ class alignment:
 						aa_reps+=1
 						if(self.q_base_pos_LookUp is not None):
 							#print "FOUND A NON-SILENT MUTATION "+s_amino+" -> "+q_amino+" at read position ",self.q_base_pos_LookUp[temp_index]
+							self.AA_mut_list.append(s_amino+str(int(self.q_base_pos_LookUp[temp_index]))+q_amino)
 					had_silent=False
 					if(codonAnalyzer.is_unambiguous_codon(q_codon) and codonAnalyzer.is_unambiguous_codon(s_codon)):
 						if(syn):
@@ -479,6 +482,7 @@ class alignment:
 							aa_slnt+=1
 							if(self.q_base_pos_LookUp is not None):
 								#print "FOUND A SILENT MUTATION "+s_amino+" -> "+q_amino+" at read position ",self.q_base_pos_LookUp[temp_index]
+								self.AA_mut_list.append(s_amino+str(int(self.q_base_pos_LookUp[temp_index]))+q_amino)
 				else:
 					#ANALYSIS FOR CODONS WITH any gap
 					if(q_codon.find("-")==(-1)):
