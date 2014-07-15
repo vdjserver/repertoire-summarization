@@ -35,6 +35,22 @@ def getAlignmentString(read_result_obj,meta,query_record=None,imgtdb_obj=None,or
 
 
 
+
+#given a list of X123Y (where X and Y are amino acid single-letter codes)
+#and given a segment match name, scan a VDJML object and where the segment
+#match name is found, insert the AA
+#NOTE that the positions are relative to the read
+def addAAMuts(read_result_obj,aa_mut_list,target_seg_match_name):
+	segment_matches=read_result_obj.segment_matches()
+	for segment_match in segment_matches:
+		for gls_match in segment_match.gl_segments():
+			hit_name=meta[gls_match.gl_segment()].name()
+			print "Considering to add ",aa_mut_list," to ",hit_name
+			if(hit_name==target_seg_match_name):
+				print "found it..."
+			else:
+				print "nope, this ain't it!"
+
 #given a junction pyObject and the sequence return an alignment object
 def makeJuncAlignmentObjFromJuncRegion(jregObj,jseq):
 	rgn_start=jregObj.range_.pos_1() 
