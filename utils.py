@@ -553,7 +553,18 @@ def merge_maps(ma,mb):
 	return mc
 
 
-
+#from X123Y extract a list of 3 items : (X,123,Y)
+def getMutList(mut):
+	mut_re=re.compile('^\s*([A-Z\*])(\d+)([A-Z\*])\s*$',re.IGNORECASE)
+	search_res=re.search(mut_re,mut)
+	if(search_res):
+		ret_list=list()
+		for g in range(3):
+			ret_list.append(search_res.group(g+1))
+		return ret_list
+	else:
+		#error!
+		return ["","",""]
 
 
 #wrapper to exectute a BASH script
