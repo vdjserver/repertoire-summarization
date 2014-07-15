@@ -7,7 +7,8 @@ from utils import *
 from pprint import pprint
 from imgt_utils import imgt_db
 from cdr3_hist import CDR3LengthAnalysisVDMLOBJ,histoMapClass
-from vdjml_utils import getTopVDJItems,getHitInfo,getVDJServerRegionAlignmentFromLargerVAlignmentPyObj,getAlignmentString,getTypeNameScoreMap,getVDJTieMap
+#from vdjml_utils import getTopVDJItems,getHitInfo,getVDJServerRegionAlignmentFromLargerVAlignmentPyObj,getAlignmentString,getTypeNameScoreMap,getVDJTieMap
+from vdjml_utils import *
 from Bio import SeqIO
 from segment_utils import IncrementMapWrapper,getVRegionsList,getEmptyRegCharMap,getAdjustedCDR3StartFromRefDirSetAllele,getTheFrameForThisReferenceAtThisPosition,getVRegionStartAndStopGivenRefData,getADJCDR3EndFromJAllele,alleleIsTR
 from char_utils import getNumberBaseSubsFromBTOP,getNumberIndelsFromBTOP,getIndelMapFromBTOP
@@ -221,7 +222,7 @@ def getPrePostCDR3AlnObjs(vInfo,jInfo,imgtdb_obj,organism,annMap):
 
 	
 #return the char map for the V alignment
-def returnVAlnAllCharMap(vInfo,imgtdb_obj,read_result_obj=None):
+def returnVAlnAllCharMap(vInfo,imgtdb_obj,read_result_obj=None,meta=None):
 	global global_key_base
 	emptyMap=getEmptyRegCharMap()
 	if(vInfo==None):
@@ -234,10 +235,12 @@ def returnVAlnAllCharMap(vInfo,imgtdb_obj,read_result_obj=None):
 		return emptyMap
 	else:
 		vCharMap=vAlnObj.characterize()
-		if(read_result_obj is not None):
+		if((read_result_obj is not None) and (meta is not None)):
 			aa_mut_list=vAlnObj.AA_mut_list
-			seg_match_name=vInfo['subject ids']
-			addAAMuts(read_result_obj,aa_mut_list,target_seg_match_name)
+			target_seg_match_name=vInfo['subject ids']
+			print "Adding muts at ",read_result_obj.id()
+			addAAMuts(read_result_obj,aa_mut_list,target_seg_match_name,meta)
+			showAAMuts(read_result_obj)
 		new_map=dict()
 		for k in vCharMap:
 			newKey=k
@@ -374,6 +377,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 	num_submitted_jobs=0
 	if(not(skip_char)):
 		#V seq characterization (OVER v) only
+		#V_map=returnVAlnAllCharMap(vInfo,imgtdb_obj,read_result_obj,meta)
 		V_map=returnVAlnAllCharMap(vInfo,imgtdb_obj)
 		#print "A V_MAP\n"
 		#printMap(V_map)

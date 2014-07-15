@@ -36,11 +36,25 @@ def getAlignmentString(read_result_obj,meta,query_record=None,imgtdb_obj=None,or
 
 
 
+
+
+#given a read result, just print to the screen AA mut entires in the object
+def showAAMuts(read_result_obj):
+	segment_matches=read_result_obj.segment_matches()
+	for segment_match in segment_matches:
+		aa_subs=segment_match.aa_substitutions()
+		num_subs=0
+		for aa_sub in aa_subs:
+			print "GOT A SUB!!!!!!"
+			num_subs+=1
+		print "FOUND ",num_subs," subs!"
+
+
 #given a list of X123Y (where X and Y are amino acid single-letter codes)
 #and given a segment match name, scan a VDJML object and where the segment
 #match name is found, insert the AA
 #NOTE that the positions are relative to the read
-def addAAMuts(read_result_obj,aa_mut_list,target_seg_match_name):
+def addAAMuts(read_result_obj,aa_mut_list,target_seg_match_name,meta):
 	segment_matches=read_result_obj.segment_matches()
 	for segment_match in segment_matches:
 		for gls_match in segment_match.gl_segments():
@@ -48,6 +62,18 @@ def addAAMuts(read_result_obj,aa_mut_list,target_seg_match_name):
 			print "Considering to add ",aa_mut_list," to ",hit_name
 			if(hit_name==target_seg_match_name):
 				print "found it..."
+				#__init__(_object*, unsigned int read_pos0, std::string read_aa, std::string gl_aa)
+				for AA_mut in aa_mut_list:
+					aa_parts=getMutList(AA_mut)
+					aa_from=aa_parts[0]
+					aa_pos=aa_parts[1]
+					aa_to=aa_parts[2]
+					print "got ",aa_parts
+					if(not(aa_to=="X")):
+						myAASub=vdjml.Aa_substitution(int(aa_pos)-1,aa_to,aa_from)
+						print "adding here...."
+						segment_match.insert(myAASub)
+						showAAMuts(read_result_obj)
 			else:
 				print "nope, this ain't it!"
 
