@@ -69,9 +69,15 @@ Note that the directory referred to IGDATA should have under it the optional_fil
 # LOCUS PATCH FILES #
 #####################
 
-One may dynamically configure the GeneTables with patch files.  The
-gene tables represent a hierarchical "n-ary" tree-like structure organizing the alleles.
+The gene tables represent a hierarchical "n-ary" tree-like structure organizing the alleles.
 They are defined by IMGT.
+
+For whatever reason, the GeneTables downloaded from IMGT may not include
+all the alleles in the Reference Directory sets.  In such cases, an allele
+may therefor be "unplaceable" onto the hierarchy of the Gene Tables.  This
+way, in some sense, the gene tables are "incomplete".
+
+For such reasons, one may dynamically configure the GeneTables with patch files.  
 
 To modify a GeneTable locus, the patch file LOCUS.html.patch is searched for.
 For example, to modify the TRBJ locus for human, the file ROOT/human/GeneTables/TRBJ.html.patch
@@ -138,7 +144,7 @@ IGLJ5*01 	<
 #####################################################################	
 
 The "<" pointing to IGLJ5*01 under the "fasta alleles Mus_musculus_IGLJ" column indicates that the user
-should create a patch file to add IGLJ5*01 to the gene table hiearchy/tree.
+should (*strongly consider*) the creation a patch file to add IGLJ5*01 to the gene table hiearchy/tree.
 
 
 
