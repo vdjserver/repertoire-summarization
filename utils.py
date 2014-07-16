@@ -820,6 +820,32 @@ def uncompressZFile(path,uncompressInPlace=False):
 		
 		
 
+def getVersionInfo(ver_type="desc"):
+	import sys
+	release_info_path="release_info"
+	if(os.path.exists(release_info_path)):
+		#good, it's found!
+		pass
+	else:
+		print "please run release.pl to generate release_info executable!"
+		sys.exit()
+	release_cmd=["./release_info"]
+	release_arg=[]
+	if(ver_type=="desc"):
+		pass
+	else:
+		release_arg.append("hash")
+	release_list=release_cmd+release_arg
+	output = Popen(release_list, stdout=subprocess.PIPE).communicate()[0]
+	#print "the output = ",output
+	if(output==None or len(output)==0):
+		print "It appears that there is an error retrieving the version...."
+		print "release_info output is '"+output+"' !"
+		sys.exit(1)
+	else:
+		return output.strip()
+	
+
 
 
 def test():
@@ -848,4 +874,6 @@ def test():
 
 if (__name__=="__main__"):
 	import sys
-	test()
+	print getVersionInfo()
+	print getVersionInfo("hash")
+	#test()
