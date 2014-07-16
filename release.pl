@@ -4,6 +4,7 @@
 
 #dynamically generate a C program (with a baked hash or tag)
 #and compile it for release
+#see here http://stackoverflow.com/questions/3442874/in-git-how-can-i-write-the-current-commit-hash-to-a-file-in-the-same-commit
 #include <stdio.h>
 #int main(int numargs,char** args)
 #	{
