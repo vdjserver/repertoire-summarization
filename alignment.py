@@ -166,7 +166,7 @@ class alignment:
 
 
 	#the q_base_pos_LookUp array takes an index into the 
-	#alignment string and returns a base position.  Leans RIGHT
+	#alignment string and returns a base position for the query.  Leans RIGHT
 	#in the gap
 	def setQBasePosLookUp(self):
 		computedNumBases=self.q_start-self.q_end+1
@@ -381,7 +381,7 @@ class alignment:
 				num_del+=1
 			elif(self.q_aln[i]!=self.s_aln[i]):
 				if(self.q_aln[i] in self.valid_bases and self.s_aln[i] in self.valid_bases  ):
-					#make sure that the base is unambiguous
+					#make sure  that the base is unambiguous
 					num_bsb+=1
 		num_indels=num_ins+num_del
 		if(tot_num_base_to_base_alns>0):
