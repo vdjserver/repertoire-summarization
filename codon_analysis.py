@@ -43,7 +43,7 @@ class codonCounter:
 			line_num+=1
 
 
-	#see if valid on CDR1 regin
+	#see if valid on the region
 	def validate_region(region_info,num_aa_min,num_amino_max,allowGaps=False):
 		q_aa=cdr1_info['q_aminos'])
 		if(num_aa_min<=len(q_aa) and len(q_aa)<=num_amino_max):
@@ -53,6 +53,7 @@ class codonCounter:
 				#add code for gap pre-examination
 				sys.exit(0)
 		else:
+			#too short or too long!
 			return False
 
 
