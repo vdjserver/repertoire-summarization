@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 
 from utils import *
+from alignment import *
 
 
-
+#make an instance of the analyzer
+global codonAnalyzer
 
 #class for codon counting
 #currently for IGHV4 only
@@ -15,6 +17,7 @@ class codonCounter:
 	chothia=list()
 	gap_chothia=list()
 	region_chothia=list()
+
 
 	#init
 	def __init__(self,pos_file_path):
@@ -39,6 +42,30 @@ class codonCounter:
 				self.region_chothia.append(region[5])
 			line_num+=1
 
+
+	#see if valid on CDR1 regin
+	def validate_region(region_info,num_aa_min,num_amino_max,allowGaps=False):
+		q_aa=cdr1_info['q_aminos'])
+		if(num_aa_min<=len(q_aa) and len(q_aa)<=num_amino_max):
+			if(allowGaps):
+				return True
+			else:
+				#add code for gap pre-examination
+				sys.exit(0)
+		else:
+			return False
+
+
+	#given the information on the 3 regions, verify
+	#that the alignment is suitable for acquisition of mutation counts
+	def validate_regions(cdr1_info,fr2_info,fr3_info):
+		return False		
+
+
+	#from the 3 regions, aquire a mutation map
+	#POS->AA_MUT_COUNT
+	def acquire_mutation_map(cdr1_info,fr2_info,fr3_info):
+		return None
 	
 
 
