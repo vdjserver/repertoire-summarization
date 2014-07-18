@@ -454,7 +454,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 			#no annotation possible if V is empty!
 			pass
 
-	#here, get results from the jobx
+	#here, get results from the job, putting them in the annMap
 	if(num_submitted_jobs>0):
 		#print "CHAR_QUEUE pre-join...."
 		characterization_queue.join()
@@ -470,6 +470,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 			get_res+=1
 
 	#here, compute the region total BSB, REPLACEMENTS, SILENTS
+	#retrieve the mode/region results from the annMap
 	for mode in mode_list:
 		bsb_reg_tot=0
 		rplcmt_reg_tot=0
