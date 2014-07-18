@@ -30,6 +30,7 @@ class CharacterizationThread(threading.Thread):
 				organism=char_job_dict['organism']
 				mode=char_job_dict['mode']
 				region=char_job_dict['region']
+				refName=char_job_dict['refName']
 				imgtdb_obj=char_job_dict['imgtdb_obj']
 				read_rec=char_job_dict['read_rec']
 				key_base=char_job_dict['key_base']
@@ -40,7 +41,16 @@ class CharacterizationThread(threading.Thread):
 					if(regionAlignment!=None):
 						s_start=regionAlignment.s_start
 						s_end=regionAlignment.s_end
-						refName=char_job_dict['refName']
+						#ref_region_interval=getVRegionStartAndStopGivenRefData(sub_name,org,imgtdb_obj,region_name,mode)
+						ref_region_interval=getVRegionStartAndStopGivenRefData(refName,organism,imgtdb_obj,region,mode)
+						largerVInfo=getHitInfo(read_result_obj,meta,refName,None,imgtdb_obj,organism)
+						partialFlag=None
+						if(s_start>=largerVInfo['s. start'] and s_end<=largerVInfo['s. end']):
+							#full region!
+							partialFlag=False
+						else:
+							#partial region
+							partialFlag=True
 						firstFrame=getTheFrameForThisReferenceAtThisPosition(refName,organism,imgtdb_obj,s_start)
 						regionAlignment.setSFM(firstFrame)
 						reg_ann_show_msg=False
@@ -64,6 +74,7 @@ class CharacterizationThread(threading.Thread):
 						annMap[key_base+region+'_frm_msk']=regionAlignment.s_frame_mask
 						annMap[key_base+region+'_ref_srt']=int(s_start)
 						annMap[key_base+region+'_ref_end']=int(s_end)
+						#annMap[key_base+region+'_partial']=partialFlag
 						self.result=annMap
 				#print "to call CHAR_QUEUE task_done..."
 				self.result_queue.put(self.result)
