@@ -11,6 +11,7 @@ export IGDATA=$IGDATA
 echo "USING IGDATA $IGDATA"
 echo "USING VDJ_DB_ROOT $VDJ_DB_ROOT"
 echo "START TIME"
+IGBLAST_GLOBAL_PARAMS=" -penalty -1 "
 date
 for ORGANISM in human Mus_musculus ;
 do
@@ -65,9 +66,9 @@ do
 			SIM_B_OUT=${SIM_DATA}.igblast.out
 			SIM_B_OUT_HR=${SIM_B_OUT}.human_readable.txt
 			echo "Running IgBLAST for sim data $SIM_DATA ..."
-			time $IGBLAST_EXEC  -num_threads 6   -domain_system $DCMODE  -query ${SIM_DATA} -germline_db_V $DB_V -germline_db_D $DB_D -germline_db_J $DB_J  -ig_seqtype $IGB_SEQ_FLAG -auxiliary_data $AUX_PATH -outfmt '7 qseqid qgi qacc qaccver qlen sseqid sallseqid sgi sallgi sacc saccver sallacc slen qstart qend sstart send qseq sseq evalue bitscore score length pident nident mismatch positive gapopen gaps ppos frames qframe sframe btop' > $SIM_B_OUT
+			time $IGBLAST_EXEC $IGBLAST_GLOBAL_PARAMS   -num_threads 6   -domain_system $DCMODE  -query ${SIM_DATA} -germline_db_V $DB_V -germline_db_D $DB_D -germline_db_J $DB_J  -ig_seqtype $IGB_SEQ_FLAG -auxiliary_data $AUX_PATH -outfmt '7 qseqid qgi qacc qaccver qlen sseqid sallseqid sgi sallgi sacc saccver sallacc slen qstart qend sstart send qseq sseq evalue bitscore score length pident nident mismatch positive gapopen gaps ppos frames qframe sframe btop' > $SIM_B_OUT
 			echo "Now in human-readable form..."
-			time $IGBLAST_EXEC  -num_threads 6   -domain_system $DCMODE  -query ${SIM_DATA} -germline_db_V $DB_V -germline_db_D $DB_D -germline_db_J $DB_J  -ig_seqtype $IGB_SEQ_FLAG -auxiliary_data $AUX_PATH  -show_translation   > $SIM_B_OUT_HR
+			time $IGBLAST_EXEC  $IGBLAST_GLOBAL_PARAMS  -num_threads 6   -domain_system $DCMODE  -query ${SIM_DATA} -germline_db_V $DB_V -germline_db_D $DB_D -germline_db_J $DB_J  -ig_seqtype $IGB_SEQ_FLAG -auxiliary_data $AUX_PATH  -show_translation   > $SIM_B_OUT_HR
 			SIM_JSON=$SIM_B_OUT.json
 			SIM_CDR3=$SIM_B_OUT.cdr3_hist.tsv
 			SIM_VDJML=$SIM_B_OUT.vdjml
@@ -87,11 +88,11 @@ do
 				echo "FOUND $QRY" ;
 				echo "Starting IgBLAST with outfmt 7 at "
 				date
-				time $IGBLAST_EXEC  -num_threads 6   -domain_system $DCMODE  -query $QRY -germline_db_V $DB_V -germline_db_D $DB_D -germline_db_J $DB_J  -ig_seqtype $IGB_SEQ_FLAG -auxiliary_data $AUX_PATH -outfmt '7 qseqid qgi qacc qaccver qlen sseqid sallseqid sgi sallgi sacc saccver sallacc slen qstart qend sstart send qseq sseq evalue bitscore score length pident nident mismatch positive gapopen gaps ppos frames qframe sframe btop'  >$OUTPUT
+				time $IGBLAST_EXEC  $IGBLAST_GLOBAL_PARAMS   -num_threads 6   -domain_system $DCMODE  -query $QRY -germline_db_V $DB_V -germline_db_D $DB_D -germline_db_J $DB_J  -ig_seqtype $IGB_SEQ_FLAG -auxiliary_data $AUX_PATH -outfmt '7 qseqid qgi qacc qaccver qlen sseqid sallseqid sgi sallgi sacc saccver sallacc slen qstart qend sstart send qseq sseq evalue bitscore score length pident nident mismatch positive gapopen gaps ppos frames qframe sframe btop'  >$OUTPUT
 				echo "IgBLAST with outfmt 7 finished at "
 				date
 				time echo "Now running IgBLAST for human-readable output ..."
-				$IGBLAST_EXEC -domain_system $DCMODE  -query $QRY -germline_db_V $DB_V -germline_db_D $DB_D -germline_db_J $DB_J  -ig_seqtype $IGB_SEQ_FLAG -auxiliary_data $AUX_PATH -show_translation >$OUTPUT_HUMAN 
+				$IGBLAST_EXEC  $IGBLAST_GLOBAL_PARAMS  -domain_system $DCMODE  -query $QRY -germline_db_V $DB_V -germline_db_D $DB_D -germline_db_J $DB_J  -ig_seqtype $IGB_SEQ_FLAG -auxiliary_data $AUX_PATH -show_translation >$OUTPUT_HUMAN 
 				echo "IgBLAST for human-readable output finished."
 				date
 				echo "Now running repertoire characterization ..."
