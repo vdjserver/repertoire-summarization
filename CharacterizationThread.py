@@ -2,9 +2,9 @@
 
 import multiprocessing
 import threading
-from vdjml_utils import getVDJServerRegionAlignmentFromLargerVAlignmentPyObj
+from vdjml_utils import getVDJServerRegionAlignmentFromLargerVAlignmentPyObj,getHitInfo
 from alignment import alignment
-from segment_utils import getTheFrameForThisReferenceAtThisPosition
+from segment_utils import getTheFrameForThisReferenceAtThisPosition,getVRegionStartAndStopGivenRefData
 
 #thread class for parallel charactgerization of regions
 class CharacterizationThread(threading.Thread):
@@ -13,11 +13,12 @@ class CharacterizationThread(threading.Thread):
 		self.result=None
 
 
-	def __init__(self,queue,result_queue):
+	def __init__(self,queue,result_queue,alignment_output_queue):
 		#print "IN INIT OF CharacterizationThread"
 		threading.Thread.__init__(self)
 		self.queue=queue
 		self.result_queue=result_queue
+		self.alignment_output_queue=alignment_output_queue
 
 	def run(self):
 		while(True):
@@ -36,21 +37,27 @@ class CharacterizationThread(threading.Thread):
 				key_base=char_job_dict['key_base']
 				region=char_job_dict['region']
 				noneSeg_flag=char_job_dict['noneSeg_flag']
+				readName=char_job_dict['read_name']
+				regionAlignment=None
 				if(not(noneSeg_flag)):
 					regionAlignment=getVDJServerRegionAlignmentFromLargerVAlignmentPyObj(read_result_obj,meta,organism,mode,region,imgtdb_obj,False,read_rec)
 					if(regionAlignment!=None):
+						regionAlignment.setName(region+"_"+mode+"_"+readName)
 						s_start=regionAlignment.s_start
 						s_end=regionAlignment.s_end
-						#ref_region_interval=getVRegionStartAndStopGivenRefData(sub_name,org,imgtdb_obj,region_name,mode)
 						ref_region_interval=getVRegionStartAndStopGivenRefData(refName,organism,imgtdb_obj,region,mode)
 						largerVInfo=getHitInfo(read_result_obj,meta,refName,None,imgtdb_obj,organism)
 						partialFlag=None
-						if(s_start>=largerVInfo['s. start'] and s_end<=largerVInfo['s. end']):
+						if(region=="CDR1" and mode=="imgt" and readName=="HQE6ANJ01CDRHB_RS_testing_incompleteCDR1"):
+							print "larger v info=",largerVInfo,"\n\n\n"
+						if(s_start<=ref_region_interval[0] and s_end>=ref_region_interval[1]):
 							#full region!
 							partialFlag=False
 						else:
 							#partial region
 							partialFlag=True
+						if(not(partialFlag)):
+							regionAlignment.setCompleteRegion(True)
 						firstFrame=getTheFrameForThisReferenceAtThisPosition(refName,organism,imgtdb_obj,s_start)
 						regionAlignment.setSFM(firstFrame)
 						reg_ann_show_msg=False
@@ -78,6 +85,7 @@ class CharacterizationThread(threading.Thread):
 						self.result=annMap
 				#print "to call CHAR_QUEUE task_done..."
 				self.result_queue.put(self.result)
+				self.alignment_output_queue.put(regionAlignment)
 				self.queue.task_done()
 				#print "called CHAR_QUEUE task_done..."
 			except:

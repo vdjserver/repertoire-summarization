@@ -15,7 +15,7 @@ from char_utils import getNumberBaseSubsFromBTOP,getNumberIndelsFromBTOP,getInde
 from alignment import alignment
 from CharacterizationThread import CharacterizationThread
 from char_utils import getRegPosFromInvertedPos
-
+from codon_analysis import *
 import re
 import Queue
 import threading
@@ -25,6 +25,7 @@ import math
 
 
 global_key_base="vdj_server_ann_"
+myCodonCounter=codonCounter("/home/data/vdj_server/repertoire-summarization/codon_data/codon_pos_IGHV4")
 
 
 
@@ -327,6 +328,7 @@ def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap):
 #characterization_queue=multiprocessing.JoinableQueue()
 characterization_queue=Queue.Queue()
 characterization_queue_results=Queue.Queue()
+alignment_output_queue=Queue.Queue()
 characterization_thread_set=None
 			
 #given a read object, meta data, organism and database data and the read record and CDR3 data
@@ -374,6 +376,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 	global characterization_thread_set
 	global characterization_queue
 	global characterization_queue_results
+	global alignment_output_queue
 	num_submitted_jobs=0
 	if(not(skip_char)):
 		#V seq characterization (OVER v) only
@@ -419,7 +422,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 			characterization_thread_set=set()
 			for c in range(num_threads):
 				#print "ABOUT TO CALL CONST...."
-				temp_thread=CharacterizationThread(characterization_queue,characterization_queue_results)
+				temp_thread=CharacterizationThread(characterization_queue,characterization_queue_results,alignment_output_queue)
 				#print "RETURNED FROM CONSTRUCTOR"
 				temp_thread.setDaemon(True)
 				#sys.exit(0)
@@ -445,6 +448,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 						char_job_dict['key_base']=key_base
 						char_job_dict['region']=region
 						char_job_dict['noneSeg_flag']=noneSeg_flag
+						char_job_dict['read_name']=read_rec.id
 						characterization_queue.put(char_job_dict)
 						num_submitted_jobs+=1
 				else:
@@ -468,6 +472,22 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 				for temp_key in temp_results:
 					annMap[temp_key]=temp_results[temp_key]			
 			get_res+=1
+
+
+	#perform codon mutation counting	
+	global myCodonCounter
+	get_res=0
+	while(get_res<num_submitted_jobs):
+		region_alignment=alignment_output_queue.get()
+		if(region_alignment is not None):
+			print "\n"
+			print read_rec.id
+			print region_alignment.getNiceString()
+			print "Complete status =",region_alignment.getCompleteRegion()
+		get_res+=1
+	
+	
+
 
 	#here, compute the region total BSB, REPLACEMENTS, SILENTS
 	#retrieve the mode/region results from the annMap

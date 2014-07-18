@@ -147,6 +147,8 @@ class alignment:
 	valid_bases=codonAnalyzer.bases
 	q_base_pos_LookUp=None
 	AA_mut_list=None
+	alignment_name=None
+	complete_region=False
 	
 
 
@@ -162,6 +164,23 @@ class alignment:
 		self.q_end=Cq_end
 		self.s_frame_mask=Cs_frame_mask
 		self.setQBasePosLookUp()
+
+
+	#setter for alignment name
+	def setName(self,newName):
+		self.alignment_name=newName
+
+	#getter for alignment name
+	def getName(self):
+		return self.alignment_name
+
+	#setter for complete region
+	def setCompleteRegion(self,crStatus=False):
+		self.complete_region=crStatus
+
+	#getter for complete region
+	def getCompleteRegion(self):
+		return self.complete_region
 
 
 
@@ -764,7 +783,7 @@ class alignment:
 		aln[0]="QURY:"+aln[0]
 		aln[1]="MDLN:"+aln[1]
 		aln[2]="SBCT:"+aln[2]
-		s_final="ALIGNMENT. Q_FROM="+str(self.q_start)+ " Q_TO="+str(self.q_end)+" S_FROM="+str(self.s_start)+" S_TO="+str(self.s_end)
+		s_final="ALIGNMENT "+self.getName()+".\n Q_FROM="+str(self.q_start)+ " Q_TO="+str(self.q_end)+" S_FROM="+str(self.s_start)+" S_TO="+str(self.s_end)
 		newLine="\n"
 		s_final+="\n"+newLine.join(aln)
 		if(self.s_frame_mask is not None):

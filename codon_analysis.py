@@ -17,10 +17,10 @@ class codonCounter:
 	chothia=list()
 	gap_chothia=list()
 	region_chothia=list()
-
+	allowGaps=False
 
 	#init
-	def __init__(self,pos_file_path):
+	def __init__(self,pos_file_path,init_allowGaps=False):
 		#currently reads a TSV
 		#6 fields
 		#gap order	KABAT	REGION_KABAT	CHOTHIA	gap order	REGION_CHOTHIA
@@ -38,20 +38,25 @@ class codonCounter:
 				self.kabat.append(pieces[1])
 				self.region_kabat.append(pieces[2])
 				self.chothia.append(pieces[3])
-				self.gap_chothia.append(region[4])
-				self.region_chothia.append(region[5])
+				self.gap_chothia.append(pieces[4])
+				self.region_chothia.append(pieces[5])
 			line_num+=1
 		reader.close()
+		self.allowGaps=init_allowGaps
 
 
-	#see if valid on the region
+	#see if valid on the region ; making sure it's of a valid length
 	def validate_region(region_info,num_aa_min,num_amino_max,allowGaps=False):
+		#first verify if the region is complete.
+		region_complete=True
+		if(not(region_complete)):
+			return False
 		q_aa=cdr1_info['q_aminos']
 		if(num_aa_min<=len(q_aa) and len(q_aa)<=num_amino_max):
-			if(allowGaps):
+			if(not(self.allowGaps)):
 				return True
 			else:
-				#add code for gap pre-examination
+				#add code for gapfull pre-examination
 				sys.exit(0)
 		else:
 			#too short or too long!
