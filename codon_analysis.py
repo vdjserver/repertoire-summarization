@@ -37,15 +37,16 @@ class codonCounter:
 				self.gap_kabat.append(pieces[0])
 				self.kabat.append(pieces[1])
 				self.region_kabat.append(pieces[2])
-				self.chothia.append(region[3])
+				self.chothia.append(pieces[3])
 				self.gap_chothia.append(region[4])
 				self.region_chothia.append(region[5])
 			line_num+=1
+		reader.close()
 
 
 	#see if valid on the region
 	def validate_region(region_info,num_aa_min,num_amino_max,allowGaps=False):
-		q_aa=cdr1_info['q_aminos'])
+		q_aa=cdr1_info['q_aminos']
 		if(num_aa_min<=len(q_aa) and len(q_aa)<=num_amino_max):
 			if(allowGaps):
 				return True
