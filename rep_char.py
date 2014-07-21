@@ -474,18 +474,39 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 			get_res+=1
 
 
-	#perform codon mutation counting	
-	global myCodonCounter
-	get_res=0
-	while(get_res<num_submitted_jobs):
-		region_alignment=alignment_output_queue.get()
-		if(region_alignment is not None):
-			print "\n"
-			print read_rec.id
-			print region_alignment.getNiceString()
-			print "Complete status =",region_alignment.getCompleteRegion()
-		get_res+=1
-	
+	#perform codon mutation counting for IGHV4
+	if(vInfo is not None):
+		if('subject ids' in vInfo):
+			if(vInfo['subject ids'].startswith("IGHV4")):
+				#IGHV4, test regions for completeness and length
+				global myCodonCounter
+				get_res=0
+				kabat_CDR1=None
+				kabat_FR2=None
+				kabat_CDR2=None
+				hybrid_FR3=None
+				while(get_res<num_submitted_jobs):
+					region_alignment=alignment_output_queue.get()
+					if(region_alignment is not None):
+						print "\n"
+						print "THE ALIGNMENT NAME '"+region_alignment.getName()+"'"
+						print read_rec.id
+						print region_alignment.getNiceString()
+						if(region_alignment.getName().startswith("CDR1_kabat")):
+							kabat_CDR1=region_alignment
+						elif(region_alignment.getName().startswith("FR2_kabat")):
+							kabat_FR2=region_alignment
+						elif(region_alignment.getName().startswith("CDR2_kabat")):
+							kabat_CDR2=region_alignment
+						else:
+							pass
+					get_res+=1
+			else:
+				print read_rec.id+" isn't an IGHV4 hit!"
+		else:
+			print read_rec.id+" has not subject ids!"
+	else:
+		print read_rec.id+" has no vinfo"
 	
 
 
