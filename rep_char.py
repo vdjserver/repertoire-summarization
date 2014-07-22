@@ -502,11 +502,11 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 						else:
 							pass
 					get_res+=1
-				shouldFilterByIndel=shouldFilterByIndels(vInfo,dInfo,jInfo)
+				shouldFilterByIndel=shouldFilterOutByIndels(vInfo,dInfo,jInfo)
 				if(shouldFilterByIndel):
-					print read_rec.id+" filtered by indels!"
-				else
-					print read_rec.id+" needs completeness testing..."
+					print "NOTE "+read_rec.id+" filtered out by indels!"
+				else:
+					print "NOTE "+read_rec.id+" needs completeness testing..."
 			else:
 				print read_rec.id+" isn't an IGHV4 hit!"
 		else:
