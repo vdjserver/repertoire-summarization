@@ -11,9 +11,17 @@ export IGDATA=$IGDATA
 echo "USING IGDATA $IGDATA"
 echo "USING VDJ_DB_ROOT $VDJ_DB_ROOT"
 echo "START TIME"
-IGBLAST_GLOBAL_PARAMS=" -penalty -1 "
+#IGBLAST_GLOBAL_PARAMS=" -penalty -1 "
 date
-for ORGANISM in human Mus_musculus ;
+#http://unix.stackexchange.com/questions/56837/how-to-test-if-a-variable-is-defined-at-all-in-bash-prior-to-version-4-2-with-th
+if [ -n "${ORGANISM_SET+1}" ]; then
+  #echo "foobar is defined"
+  echo "Using (environmental) organism set ${ORGANISM_SET}"
+else
+  #echo "foobar is not defined"
+  ORGANISM_SET="human Mus_musculus"
+fi
+for ORGANISM in $ORGANISM_SET ;
 do
 	echo "Now analyzing for organism=$ORGANISM" ;
 	if [ "$ORGANISM" == "Mus_musculus" ];
