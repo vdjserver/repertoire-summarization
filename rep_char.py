@@ -475,6 +475,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 
 
 	#perform codon mutation counting for IGHV4
+	eligibleForScoring=False
 	if(vInfo is not None):
 		if('subject ids' in vInfo):
 			if(vInfo['subject ids'].startswith("IGHV4")):
@@ -501,6 +502,11 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 						else:
 							pass
 					get_res+=1
+				shouldFilterByIndel=shouldFilterByIndels(vInfo,dInfo,jInfo)
+				if(shouldFilterByIndel):
+					print read_rec.id+" filtered by indels!"
+				else
+					print read_rec.id+" needs completeness testing..."
 			else:
 				print read_rec.id+" isn't an IGHV4 hit!"
 		else:
