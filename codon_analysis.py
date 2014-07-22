@@ -124,8 +124,8 @@ def getNumberIndelsFromBTOP(info):
 
 #given v,d,j info maps return True if the seq should be 
 #skipped due to indels
-def shouldFilterByIndels(vInfo,dInfo,jInfo):
-	if(getNumberIndelsFromBTOP(vInfo)==0 and getNumberIndelsFromBTOP(jInfo)==0 and getNumberIndelsFromBTOP(dInfo)<=0)
+def shouldFilterOutByIndels(vInfo,dInfo,jInfo):
+	if(getNumberIndelsFromBTOP(vInfo)==0 and getNumberIndelsFromBTOP(jInfo)==0 and getNumberIndelsFromBTOP(dInfo)<=0):
 		shouldFilter=False
 	else:
 		shouldFilter=True
