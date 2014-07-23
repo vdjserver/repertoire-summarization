@@ -113,9 +113,12 @@ def getJunctionRegionByname(read_result_obj,meta,junc_name,combID=0):
 
 
 
-def buildAlignmentWholeSeqsVDJML(btop,s):
+def buildAlignmentWholeSeqsVDJML(btop,s,isRead=False):
 	vdjml_btop=vdjml.Btop(btop)
-	vdjml_aln=vdjml.sequence_match(vdjml_btop,gl_seq=s)
+	if(not(isRead)):
+		vdjml_aln=vdjml.sequence_match(vdjml_btop,gl_seq=s)
+	else:
+		vdjml_aln=vdjml.sequence_match(vdjml_btop,read_seq=s)		
 	aln=list()
 	aln.append(vdjml_aln.seq_[0])	#QUERY
 	aln.append("")
@@ -173,9 +176,7 @@ def getHitInfo(read_result_obj,meta,alleleName,query_record=None,imgtdb_obj=None
 						if(ret_map['is_inverted']):
 							query_str=rev_comp_dna(query_str)
 						query_for_btop=query_str[q_start_line-1:q_end_line]
-						sbjct=imgtdb_obj.getRefDirSetFNASeqGivenOrgAndAllele(ret_map['subject ids'],organism)
-						sbjct_for_btop=sbjct[s_start_line-1:s_end_line]
-						q_m_s_vdjml=buildAlignmentWholeSeqsVDJML(btop,sbjct_for_btop)
+						q_m_s_vdjml=buildAlignmentWholeSeqsVDJML(btop,query_for_btop,True)
 						ret_map['query seq']=q_m_s_vdjml[0]   #query string/alignment
 						ret_map['subject seq']=q_m_s_vdjml[2] #subject string/alignment
 					return ret_map
