@@ -5,10 +5,11 @@ import re
 
 #find the number '-' in a btop
 def getNumberIndelsFromBTOP(btop):
-	orig_btop_len=len(btop)
-	btop=re.sub(r'\-','',btop)
-	btop_len_no_gap=len(btop)
-	return orig_btop_len-btop_len_no_gap
+	num_indels=0
+	for btop_char in btop:
+		if(btop_char=="-"):
+			num_indels+=1
+	return num_indels
 
 
 
