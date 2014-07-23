@@ -16,11 +16,11 @@ date
 #http://unix.stackexchange.com/questions/56837/how-to-test-if-a-variable-is-defined-at-all-in-bash-prior-to-version-4-2-with-th
 if [ -n "${ORGANISM_SET+1}" ]; then
   #echo "foobar is defined"
-  echo "Using (environmental) organism set ${ORGANISM_SET}"
+  echo "Using (environmental) organism set ${ORGANISM_SET}" ;
 else
   #echo "foobar is not defined"
-  ORGANISM_SET="human Mus_musculus"
-fi
+  ORGANISM_SET="human Mus_musculus" ;
+fi ;
 for ORGANISM in $ORGANISM_SET ;
 do
 	echo "Now analyzing for organism=$ORGANISM" ;
@@ -31,7 +31,14 @@ do
 		AUX_PATH=$IGDATA/optional_file/human_gl.aux ;
 	fi ;
 	BLAST_DB_ORG_ROOT=$VDJ_DB_ROOT/$ORGANISM/ReferenceDirectorySet/${ORGANISM}_
-	for SEQ_TYPE in IG TR ; 
+	if [ -n "${SEQ_TYPE_SET+1}" ]; then
+		#it's defined
+		echo "Using (environmental) SEQ_TYPE_SET '${SEQ_TYPE_SET}'"
+	else
+		#undefined
+		SEQ_TYPE_SET="IG TR"
+	fi ;
+	for SEQ_TYPE in $SEQ_TYPE_SET ; 
 	do
 		echo -e "\n\n\n\n\n******************************************"
 		QRY=$ORGANISM.$SEQ_TYPE.fna
