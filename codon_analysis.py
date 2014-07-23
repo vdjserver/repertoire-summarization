@@ -2,7 +2,8 @@
 
 from utils import *
 from alignment import *
-
+from char_utils import *
+from segment_utils import getVRegionStartAndStopGivenRefData
 
 #make an instance of the analyzer
 global codonAnalyzer
@@ -46,21 +47,25 @@ class codonCounter:
 
 
 	#see if valid on the region ; making sure it's of a valid length
-	def validate_region(region_info,num_aa_min,num_amino_max):
+	def validate_region(self,region_info,num_aa_min,num_amino_max):
 		#first verify if the region is complete.
-		region_complete=True
-		if(not(region_complete)):
-			return False
-		q_aa=cdr1_info['q_aminos']
+		#region_complete=True
+		#if(not(region_complete)):
+		#	return False
+		q_aa=region_info.getCharMap()['AA']
+		print "got ",q_aa
 		if(num_aa_min<=len(q_aa) and len(q_aa)<=num_amino_max):
 			if(self.allowGaps):
 				#unimplemented
 				#add code for gapfull pre-examination
+				print "unimp"
 				sys.exit(0)
 			else:
-				pass
+				#print "TODO!"
+				return True
 		else:
 			#too short or too long!
+			print "len=",len(q_aa),"too short or too long"
 			return False
 
 
@@ -74,23 +79,48 @@ class codonCounter:
 		elif(reg_name=="CDR2"):
 			return [16]
 		elif(reg_name=="FWR3" or reg_name=="FR3"):
-			return [32]
+			#return [30,31,32]
+			return [30]
 		else:
 			#invalid region
 			print "INVALID REGION PASSED "+reg_name
 			sys.exit(0)
 
 
-	#given the information on the 3 regions, verify
+	
+
+
+
+	#given the information on the 4 regions (CDR1,FR2,CDR2,FR3), verify
 	#that the alignment is suitable for acquisition of mutation counts
-	def validate_regions(cdr1_info,fr2_info,fr3_info):
-		return False		
+	def validate_regions_for_completenessLength(self,cdr1_info,fr2_info,cdr2_info,fr3_info):
+		region_infos=list()
+		region_infos.append(cdr1_info)
+		region_infos.append(fr2_info)
+		region_infos.append(cdr2_info)
+		region_infos.append(fr3_info)
+		regions_to_analyze=["CDR1","FR2","CDR2","FR3"]
+		valid_flags=list()
+		valid_on_all=True
+		for ri in range(len(regions_to_analyze)):
+			valid_lens=self.getRegionValidLengths(regions_to_analyze[ri])
+			valid_flag=self.validate_region(region_infos[ri],min(valid_lens),max(valid_lens))
+			valid_flags.append(valid_flag)
+			if(not(valid_flag)):
+				valid_on_all=False
+		return valid_on_all
+		
+
+	
 
 
 	#from the 3 regions, aquire a mutation map
 	#POS->AA_MUT_COUNT
 	def acquire_mutation_map(cdr1_info,fr2_info,fr3_info):
 		return None
+
+
+
 	
 #given an IGHV4 allele (for human), return a hybrid
 #interval with FR3 start in KABAT and FR3 end in IMGT
@@ -106,18 +136,51 @@ def getHumanHybridInterval(imgtdb_obj,ighv4allelename):
 		return hybrid_interval
 
 
+
+#return a hybrid alignment
+def extractHybridAlignment(vInfo,imgtdb_obj):
+	v_qry_aln=vInfo['query seq']
+	v_sbc_aln=vInfo['subject seq']
+	q_from=int(vInfo['q. start'])
+	q_to=int(vInfo['q. end'])
+	s_from=int(vInfo['s. start'])
+	s_to=int(vInfo['s. end'])
+	v_aln=alignment(v_qry_aln,v_sbc_aln,q_from,q_to,s_from,s_to)
+	hybrid_interval=getHumanHybridInterval(imgtdb_obj,vInfo['subject ids'])
+	if(len(hybrid_interval)==2):
+		if(hybrid_interval[0]!=(-1) and hybrid_interval[1]!=(-1)):
+			hybrid_region_aln=v_aln.getSubAlnInc(hybrid_interval[0],hybrid_interval[1],"subject")
+			init_frame=0 #since no gaps assume first bp has frame 0
+			hybrid_region_aln.setSFM(init_frame)
+			hybrid_region_aln.setName("KABAT.IMGT_hybrid_FR3")
+			hybrid_region_aln.characterize()
+			return hybrid_region_aln
+		else:
+			return None
+	else:
+		return None
+
+
+
+
+
+
 #get indel count from an info map
 #return n>=0 if a btop found
 #return -1 if no info or no btop found
-def getNumberIndelsFromBTOP(info):
+def getNumberIndelsFromBTOPInInfo(info):
 	if(not(info==None)):
 		if('btop' in info):
 			btop=info['btop']
+			print "EXTRACTED btop=",btop
 			indel_count=getNumberIndelsFromBTOP(btop)
+			#print "the count is ",indel_count
 			return indel_count
 		else:
+			"no btop avail"
 			return -1
 	else:
+		print "is none"
 		return -1
 
 
@@ -125,7 +188,10 @@ def getNumberIndelsFromBTOP(info):
 #given v,d,j info maps return True if the seq should be 
 #skipped due to indels
 def shouldFilterOutByIndels(vInfo,dInfo,jInfo):
-	if(getNumberIndelsFromBTOP(vInfo)==0 and getNumberIndelsFromBTOP(jInfo)==0 and getNumberIndelsFromBTOP(dInfo)<=0):
+	#print "gap v val=",getNumberIndelsFromBTOPInInfo(vInfo)
+	#print "gap d val=",getNumberIndelsFromBTOPInInfo(dInfo)
+	#print "gap j val=",getNumberIndelsFromBTOPInInfo(jInfo)
+	if(getNumberIndelsFromBTOPInInfo(vInfo)==0 and getNumberIndelsFromBTOPInInfo(jInfo)==0 and getNumberIndelsFromBTOPInInfo(dInfo)<=0):
 		shouldFilter=False
 	else:
 		shouldFilter=True
