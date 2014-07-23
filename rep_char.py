@@ -507,6 +507,16 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 					print "NOTE "+read_rec.id+" filtered out by indels!"
 				else:
 					print "NOTE "+read_rec.id+" needs completeness testing..."
+				hybrid_aln=extractHybridAlignment(vInfo,imgtdb_obj)
+				if(hybrid_aln==None):
+					print "couldn't get a hybrid!"
+				else:
+					print "The hybrid aln is "
+					print hybrid_aln.getNiceString()
+					#myCodonCounter.validate_regions_for_completenessLength(self,cdr1_info,fr2_info,cdr2_info,fr3_info)
+					completeRegionsFlag=myCodonCounter.validate_regions_for_completenessLength(kabat_CDR1,kabat_FR2,kabat_CDR2,hybrid_aln)
+					print "The complete regions flag is",completeRegionsFlag
+				#validate_regions_for_completenessLength(cdr1_info,fr2_info,cdr3_info,fr3_info):
 			else:
 				print read_rec.id+" isn't an IGHV4 hit!"
 		else:
