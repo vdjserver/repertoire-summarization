@@ -149,6 +149,7 @@ class alignment:
 	AA_mut_list=None
 	alignment_name=None
 	complete_region=False
+	public_char_map=None
 	
 
 
@@ -552,12 +553,13 @@ class alignment:
 		char_map['length']=abs(int(self.q_start)-int(self.q_end))+1
 		char_map['silent mutations (codons)']=aa_slnt
 		char_map['replacement mutations (codons)']=aa_reps
-
+		self.public_char_map=char_map
 		return char_map
 
 
 	
-
+	def getCharMap(self):
+		return self.public_char_map
 
 
 	#extract a subalignment given start/stop IS INCLUSIVE! [A,B] (not (A,B)!)
