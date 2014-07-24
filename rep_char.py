@@ -516,6 +516,11 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 					#myCodonCounter.validate_regions_for_completenessLength(self,cdr1_info,fr2_info,cdr2_info,fr3_info)
 					completeRegionsFlag=myCodonCounter.validate_regions_for_completenessLength(kabat_CDR1,kabat_FR2,kabat_CDR2,hybrid_aln)
 					print "The complete regions flag is",completeRegionsFlag
+					if(completeRegionsFlag):
+						mutation_map=myCodonCounter.acquire_mutation_map(kabat_CDR1,kabat_FR2,kabat_CDR2,hybrid_aln)
+						print "THE MUTATION MAP IS ",mutation_map
+					else:
+						print "INCOMPLETE so no mutation counting!"
 				#validate_regions_for_completenessLength(cdr1_info,fr2_info,cdr3_info,fr3_info):
 			else:
 				print read_rec.id+" isn't an IGHV4 hit!"
