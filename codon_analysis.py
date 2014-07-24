@@ -111,17 +111,82 @@ class codonCounter:
 		return valid_on_all
 		
 
-	
+	#given a region name and length, return the numbering
+	def acquireNumberingMap(self,reg_name,reg_len):
+		numbering=list()
+		letters=["A","B","C"]
+		l_pos=0
+		if(reg_name=="CDR1"):
+			for p in range(31,36):
+				numbering.append(p)
+			for m in range(6,8):
+				if(reg_len>=m):
+					numbering.append("35"+letters[l_pos])
+					l_pos+=1
+			return numbering
+		elif(reg_name=="FR2" or reg_name=="FWR2"):
+			for p in range(36,50):
+				numbering.append(p)
+			return numbering
+		elif(reg_name=="CDR2"):
+			for p in range(50,53):
+				numbering.append(p)
+			for m in range(17,20):
+				if(reg_len>=m):
+					numbering.append("52"+letters[l_pos])
+					l_pos+=1
+			for p in range(53,66):
+				numbering.append(p)
+			return numbering
+		elif(reg_name=="FR3" or reg_name=="FWR3"):
+			for p in range(66,83):
+				numbering.append(p)
+			for m in range(27,30):
+				if(reg_len>=m):
+					numbering.append("82"+letters[l_pos])
+					l_pos+=1
+			p=83
+			while(len(numbering)!=reg_len):
+				numbering.append(p)
+				p+=1
+			return numbering
+		else:
+			#invalid/unknown region!
+			print "Error, unknown region ",reg_name,"!"
+			sys.exit(0)
+			
 
 
 	#from the 3 regions, aquire a mutation map
-	#POS->AA_MUT_COUNT
-	def acquire_mutation_map(cdr1_info,fr2_info,fr3_info):
-		return None
+	def acquire_mutation_map(self,cdr1_info,fr2_info,cdr2_info,fr3_info):
+		reg_names=["CDR1","FR2","CDR2","FR3"]
+		reg_infos=[cdr1_info,fr2_info,cdr2_info,fr3_info]
+		AA_map=list()
+		codon_map=list()
+		for r in range(len(reg_names)):
+			reg_info_map=reg_infos[r].getCharMap()
+			numbering_list=self.acquireNumberingMap(reg_names[r],len(reg_info_map['AA']))
+			q_codons=reg_info_map['nucleotide read']
+			s_codons=reg_info_map['subject_read']
+			q_aminos=reg_info_map['AA']
+			s_aminos=reg_info_map['AA_ref']
+			for ci in range(len(q_codons)):
+				if(s_codons[ci]!=q_codons[ci]):
+					#mark a mutation in the numbering system
+					numbered_pos=numbering_list[ci]
+					aaP=s_aminos[ci]+str(numbered_pos)+q_aminos[ci]
+					cdP=s_codons[ci]+str(numbered_pos)+q_codons[ci]
+					AA_map.append(aaP)
+					codon_map.append(cdP)
+				else:
+					pass
+		overall_map=dict()
+		overall_map['codons']=codon_map
+		overall_map['aminos']=AA_map
+		return overall_map
+			
 
 
-
-	
 #given an IGHV4 allele (for human), return a hybrid
 #interval with FR3 start in KABAT and FR3 end in IMGT
 def getHumanHybridInterval(imgtdb_obj,ighv4allelename):
