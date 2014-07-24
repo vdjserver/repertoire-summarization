@@ -559,6 +559,8 @@ class alignment:
 
 	
 	def getCharMap(self):
+		if(self.public_char_map==None):
+			self.characterize()
 		return self.public_char_map
 
 
