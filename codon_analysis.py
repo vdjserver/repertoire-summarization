@@ -230,7 +230,7 @@ def extractHybridAlignment(vInfo,imgtdb_obj):
 			hybrid_region_aln=v_aln.getSubAlnInc(hybrid_interval[0],hybrid_interval[1],"subject")
 			init_frame=0 #since no gaps assume first bp has frame 0
 			hybrid_region_aln.setSFM(init_frame)
-			hybrid_region_aln.setName("KABAT.IMGT_hybrid_FR3")
+			hybrid_region_aln.setName("KABAT.IMGT_hybrid_FR3_"+str(vInfo['query id']))
 			hybrid_region_aln.characterize()
 			return hybrid_region_aln
 		else:
@@ -285,6 +285,23 @@ def annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted
 	mutation_map['aminos']=list()
 	mutation_map['codons']=list()
 	eligibleForScoring=False
+	while(get_res<num_submitted_jobs):
+		region_alignment=alignment_output_queue.get()
+		if(region_alignment is not None):
+			#print "\n"
+			#print "THE ALIGNMENT NAME '"+region_alignment.getName()+"'"
+			#print read_rec.id
+			#print region_alignment.getNiceString()
+			if(region_alignment.getName().startswith("CDR1_kabat")):
+				kabat_CDR1=region_alignment
+			elif(region_alignment.getName().startswith("FR2_kabat")):
+				kabat_FR2=region_alignment
+			elif(region_alignment.getName().startswith("CDR2_kabat")):
+				kabat_CDR2=region_alignment
+			else:
+				pass
+		get_res+=1
+
 	if(vInfo is not None):
 		#got V hit
 		if('subject ids' in vInfo):
@@ -297,22 +314,6 @@ def annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted
 				kabat_FR2=None
 				kabat_CDR2=None
 				hybrid_FR3=None
-				while(get_res<num_submitted_jobs):
-					region_alignment=alignment_output_queue.get()
-					if(region_alignment is not None):
-						#print "\n"
-						#print "THE ALIGNMENT NAME '"+region_alignment.getName()+"'"
-						#print read_rec.id
-						#print region_alignment.getNiceString()
-						if(region_alignment.getName().startswith("CDR1_kabat")):
-							kabat_CDR1=region_alignment
-						elif(region_alignment.getName().startswith("FR2_kabat")):
-							kabat_FR2=region_alignment
-						elif(region_alignment.getName().startswith("CDR2_kabat")):
-							kabat_CDR2=region_alignment
-						else:
-							pass
-					get_res+=1
 				shouldFilterByIndel=shouldFilterOutByIndels(vInfo,dInfo,jInfo)
 				print "For read=",vInfo['query id']," the shouldFilterByIndel is ",shouldFilterByIndel
 				if(shouldFilterByIndel):
@@ -326,11 +327,7 @@ def annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted
 						#print "couldn't get a hybrid!"
 						filterNote="Failure in hybrid alignment"
 					else:
-						#print "The hybrid aln is "
-						#print hybrid_aln.getNiceString()
-						#myCodonCounter.validate_regions_for_completenessLength(self,cdr1_info,fr2_info,cdr2_info,fr3_info)
 						completeRegionsFlag=myCodonCounter.validate_regions_for_completenessLength(kabat_CDR1,kabat_FR2,kabat_CDR2,hybrid_aln)
-						#print "The complete regions flag is",completeRegionsFlag
 						if(completeRegionsFlag):
 							filterNote="OK"
 							mutation_map=myCodonCounter.acquire_mutation_map(kabat_CDR1,kabat_FR2,kabat_CDR2,hybrid_aln)
