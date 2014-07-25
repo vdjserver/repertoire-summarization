@@ -20,6 +20,8 @@ class codonCounter:
 	region_chothia=list()
 	allowGaps=False
 	numberingMapCache=None
+	internalAnalyzer=None
+
 
 	#init
 	def __init__(self,pos_file_path,init_allowGaps=False):
@@ -45,6 +47,8 @@ class codonCounter:
 			line_num+=1
 		reader.close()
 		self.allowGaps=init_allowGaps
+		self.internalAnalyzer=CodonAnalysis()
+
 
 
 	#see if valid on the region ; making sure it's of a valid length
@@ -54,15 +58,20 @@ class codonCounter:
 		#if(not(region_complete)):
 		#	return False
 		q_aa=region_info.getCharMap()['AA']
-		#print "got ",q_aa
-		if(num_aa_min<=len(q_aa) and len(q_aa)<=num_amino_max):
+		q_codons=region_info.getCharMap()['nucleotide read']
+		s_aa=region_info.getCharMap()['AA_ref']
+		s_codonds=region_info.getCharMap()['subject_read']
+		join_str=""
+		q_bp=
+		if(len(q_aa)!=len(s_aa)):
+			return False
+		if(num_aa_min<=len(q_aa) and len(q_aa)<=num_amino_max)):
 			if(self.allowGaps):
 				#unimplemented
 				#add code for gapfull pre-examination
 				print "unimp"
 				sys.exit(0)
 			else:
-				#print "TODO!"
 				return True
 		else:
 			#too short or too long!
@@ -285,6 +294,11 @@ def annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted
 	mutation_map['aminos']=list()
 	mutation_map['codons']=list()
 	eligibleForScoring=False
+	get_res=0
+	kabat_CDR1=None
+	kabat_FR2=None
+	kabat_CDR2=None
+	hybrid_FR3=None
 	while(get_res<num_submitted_jobs):
 		region_alignment=alignment_output_queue.get()
 		if(region_alignment is not None):
@@ -310,10 +324,6 @@ def annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted
 				#V hit found to be IGHV4
 				#IGHV4, test regions for completeness and length
 				get_res=0
-				kabat_CDR1=None
-				kabat_FR2=None
-				kabat_CDR2=None
-				hybrid_FR3=None
 				shouldFilterByIndel=shouldFilterOutByIndels(vInfo,dInfo,jInfo)
 				print "For read=",vInfo['query id']," the shouldFilterByIndel is ",shouldFilterByIndel
 				if(shouldFilterByIndel):
