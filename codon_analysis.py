@@ -59,7 +59,7 @@ class codonCounter:
 					pass
 				else:
 					rbp+=bp
-		return bp
+		return rbp
 
 
 
