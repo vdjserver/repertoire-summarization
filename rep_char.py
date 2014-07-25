@@ -474,7 +474,15 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 			get_res+=1
 
 	#get mutation map
-	annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted_jobs,imgtdb_obj,myCodonCounter)
+	mut_map_info=annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted_jobs,imgtdb_obj,myCodonCounter)
+	qualifNote=mut_map_info[0]
+	maps=mut_map_info[1]
+	amino_map=maps['aminos']
+	codon_map=maps['codons']
+	annMap["AGS Q Note"]=qualifNote
+	annMap["AGS Codon Muts"]=codon_map
+	annMap["AGS Amino Muts"]=amino_map
+
 
 	#here, compute the region total BSB, REPLACEMENTS, SILENTS
 	#retrieve the mode/region results from the annMap
@@ -701,6 +709,10 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None",log
 	keys_to_append.append("D gene tie")
 	keys_to_append.append("J gene hit/score list")
 	keys_to_append.append("J gene tie")
+	keys_to_append.append("AGS Q Note")
+	keys_to_append.append("AGS Codon Muts")
+	keys_to_append.append("AGS Amino Muts")
+
 
 
 ###############################33
