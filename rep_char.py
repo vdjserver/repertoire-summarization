@@ -473,63 +473,8 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 					annMap[temp_key]=temp_results[temp_key]			
 			get_res+=1
 
-
-	#perform codon mutation counting for IGHV4
-	eligibleForScoring=False
-	if(vInfo is not None):
-		if('subject ids' in vInfo):
-			if(vInfo['subject ids'].startswith("IGHV4")):
-				#IGHV4, test regions for completeness and length
-				global myCodonCounter
-				get_res=0
-				kabat_CDR1=None
-				kabat_FR2=None
-				kabat_CDR2=None
-				hybrid_FR3=None
-				while(get_res<num_submitted_jobs):
-					region_alignment=alignment_output_queue.get()
-					if(region_alignment is not None):
-						print "\n"
-						print "THE ALIGNMENT NAME '"+region_alignment.getName()+"'"
-						print read_rec.id
-						print region_alignment.getNiceString()
-						if(region_alignment.getName().startswith("CDR1_kabat")):
-							kabat_CDR1=region_alignment
-						elif(region_alignment.getName().startswith("FR2_kabat")):
-							kabat_FR2=region_alignment
-						elif(region_alignment.getName().startswith("CDR2_kabat")):
-							kabat_CDR2=region_alignment
-						else:
-							pass
-					get_res+=1
-				shouldFilterByIndel=shouldFilterOutByIndels(vInfo,dInfo,jInfo)
-				if(shouldFilterByIndel):
-					print "NOTE "+read_rec.id+" filtered out by indels!"
-				else:
-					print "NOTE "+read_rec.id+" needs completeness testing..."
-				hybrid_aln=extractHybridAlignment(vInfo,imgtdb_obj)
-				if(hybrid_aln==None):
-					print "couldn't get a hybrid!"
-				else:
-					print "The hybrid aln is "
-					print hybrid_aln.getNiceString()
-					#myCodonCounter.validate_regions_for_completenessLength(self,cdr1_info,fr2_info,cdr2_info,fr3_info)
-					completeRegionsFlag=myCodonCounter.validate_regions_for_completenessLength(kabat_CDR1,kabat_FR2,kabat_CDR2,hybrid_aln)
-					print "The complete regions flag is",completeRegionsFlag
-					if(completeRegionsFlag):
-						mutation_map=myCodonCounter.acquire_mutation_map(kabat_CDR1,kabat_FR2,kabat_CDR2,hybrid_aln)
-						print "THE MUTATION MAP IS ",mutation_map
-					else:
-						print "INCOMPLETE so no mutation counting!"
-				#validate_regions_for_completenessLength(cdr1_info,fr2_info,cdr3_info,fr3_info):
-			else:
-				print read_rec.id+" isn't an IGHV4 hit!"
-		else:
-			print read_rec.id+" has not subject ids!"
-	else:
-		print read_rec.id+" has no vinfo"
-	
-
+	#get mutation map
+	annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted_jobs,imgtdb_obj,myCodonCounter)
 
 	#here, compute the region total BSB, REPLACEMENTS, SILENTS
 	#retrieve the mode/region results from the annMap
