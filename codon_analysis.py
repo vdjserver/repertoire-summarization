@@ -51,6 +51,19 @@ class codonCounter:
 
 
 
+	def getBPFromCodonList(self,codon_list,removeGaps=False):
+		rbp=""
+		for codon in codon_list:
+			for bp in codon:
+				if(bp=="-" and removeGaps):
+					pass
+				else:
+					rbp+=bp
+		return bp
+
+
+
+
 	#see if valid on the region ; making sure it's of a valid length
 	def validate_region(self,region_info,num_aa_min,num_amino_max):
 		#first verify if the region is complete.
@@ -60,12 +73,19 @@ class codonCounter:
 		q_aa=region_info.getCharMap()['AA']
 		q_codons=region_info.getCharMap()['nucleotide read']
 		s_aa=region_info.getCharMap()['AA_ref']
-		s_codonds=region_info.getCharMap()['subject_read']
+		s_codons=region_info.getCharMap()['subject_read']
 		join_str=""
-		q_bp=
+		q_bp=self.getBPFromCodonList(q_codons)
+		s_bp=self.getBPFromCodonList(s_codons)
+		actual_q_aa=self.getBPFromCodonList(q_aa)
+		actual_s_aa=self.getBPFromCodonList(s_aa)
+		if(len(q_bp)!=len(s_bp) and not(self.allowGaps)):
+			return False
+		if(len(actual_q_aa)!=len(actual_s_aa)):
+			return False
 		if(len(q_aa)!=len(s_aa)):
 			return False
-		if(num_aa_min<=len(q_aa) and len(q_aa)<=num_amino_max)):
+		if(num_aa_min<=len(q_aa) and len(q_aa)<=num_amino_max and len(actual_q_aa)==len(q_aa)):
 			if(self.allowGaps):
 				#unimplemented
 				#add code for gapfull pre-examination
@@ -348,7 +368,7 @@ def annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted
 				#validate_regions_for_completenessLength(cdr1_info,fr2_info,cdr3_info,fr3_info):
 			else:
 				#print read_rec.id+" isn't an IGHV4 hit!"
-				print "Not an IGHV4 hit"
+				filterNote="Not an IGHV4 hit"
 		else:
 			#print read_rec.id+" has not subject ids!"
 			filterNote="No name found for hit"
