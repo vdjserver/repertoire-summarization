@@ -385,10 +385,7 @@ class alignment:
 		aa_slnt=0
 		length_in_codons=0
 
-		#if(not(charMsg==None)):
-		#	print charMsg
-		#if(showAln):
-		#	print self.getNiceString()
+
 
 		#do counts that are independent of codons/translations (bsb, indels, and their frequencies)
 		tot_num_base_to_base_alns=0
