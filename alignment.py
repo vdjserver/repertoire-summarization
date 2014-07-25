@@ -117,6 +117,8 @@ class CodonAnalysis:
 		for codon in codons:
 			amino=str(biopythonTranslate(codon))
 			self.codon_amino_map[codon]=amino
+			if(self.valid_aminos==None):
+				self.valid_aminos=set()
 			self.valid_aminos.add(amino)
 	
 	#initialize the amino->codons map!
