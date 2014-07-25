@@ -19,6 +19,7 @@ class codonCounter:
 	gap_chothia=list()
 	region_chothia=list()
 	allowGaps=False
+	numberingMapCache=None
 
 	#init
 	def __init__(self,pos_file_path,init_allowGaps=False):
@@ -53,7 +54,7 @@ class codonCounter:
 		#if(not(region_complete)):
 		#	return False
 		q_aa=region_info.getCharMap()['AA']
-		print "got ",q_aa
+		#print "got ",q_aa
 		if(num_aa_min<=len(q_aa) and len(q_aa)<=num_amino_max):
 			if(self.allowGaps):
 				#unimplemented
@@ -65,7 +66,7 @@ class codonCounter:
 				return True
 		else:
 			#too short or too long!
-			print "len=",len(q_aa),"too short or too long"
+			#print "len=",len(q_aa),"too short or too long"
 			return False
 
 
@@ -79,8 +80,8 @@ class codonCounter:
 		elif(reg_name=="CDR2"):
 			return [16]
 		elif(reg_name=="FWR3" or reg_name=="FR3"):
-			#return [30,31,32]
-			return [30]
+			#27 if none of 82A,82B,82C are present ; 28 if 82A is present, 29 if 82A and 82B are present, and 30 if 82A,82B,and 83C are present
+			return [27,28,29,30]
 		else:
 			#invalid region
 			print "INVALID REGION PASSED "+reg_name
@@ -103,8 +104,8 @@ class codonCounter:
 		valid_flags=list()
 		valid_on_all=True
 		for ri in range(len(regions_to_analyze)):
-			valid_lens=self.getRegionValidLengths(regions_to_analyze[ri])
-			valid_flag=self.validate_region(region_infos[ri],min(valid_lens),max(valid_lens))
+			valid_lengths=self.getRegionValidLengths(regions_to_analyze[ri])
+			valid_flag=self.validate_region(region_infos[ri],min(valid_lengths),max(valid_lengths))
 			valid_flags.append(valid_flag)
 			if(not(valid_flag)):
 				valid_on_all=False
@@ -113,6 +114,10 @@ class codonCounter:
 
 	#given a region name and length, return the numbering
 	def acquireNumberingMap(self,reg_name,reg_len):
+		if(self.numberingMapCache==None):
+			self.numberingMapCache=dict()
+		if(reg_name+str(reg_len) in self.numberingMapCache):
+			return self.numberingMapCache[reg_name+str(reg_len)]
 		numbering=list()
 		letters=["A","B","C"]
 		l_pos=0
@@ -120,24 +125,23 @@ class codonCounter:
 			for p in range(31,36):
 				numbering.append(p)
 			for m in range(6,8):
+				#lengths of 6,7
 				if(reg_len>=m):
 					numbering.append("35"+letters[l_pos])
 					l_pos+=1
-			return numbering
 		elif(reg_name=="FR2" or reg_name=="FWR2"):
 			for p in range(36,50):
 				numbering.append(p)
-			return numbering
 		elif(reg_name=="CDR2"):
 			for p in range(50,53):
 				numbering.append(p)
 			for m in range(17,20):
+				#lengths of 17,18,29
 				if(reg_len>=m):
 					numbering.append("52"+letters[l_pos])
 					l_pos+=1
 			for p in range(53,66):
 				numbering.append(p)
-			return numbering
 		elif(reg_name=="FR3" or reg_name=="FWR3"):
 			for p in range(66,83):
 				numbering.append(p)
@@ -149,11 +153,12 @@ class codonCounter:
 			while(len(numbering)!=reg_len):
 				numbering.append(p)
 				p+=1
-			return numbering
 		else:
 			#invalid/unknown region!
 			print "Error, unknown region ",reg_name,"!"
 			sys.exit(0)
+		self.numberingMapCache[reg_name+str(reg_len)]=numbering
+		return self.numberingMapCache[reg_name+str(reg_len)]
 			
 
 
@@ -170,6 +175,12 @@ class codonCounter:
 			s_codons=reg_info_map['subject_read']
 			q_aminos=reg_info_map['AA']
 			s_aminos=reg_info_map['AA_ref']
+			#print "\n\n\n"+reg_names[r]
+			#print "Q=",q_codons," TRX=",q_aminos
+			#print "q AA len=",len(q_aminos)," q codon len=",len(q_codons)
+			#print "S=",s_codons," TRX=",s_aminos
+			#print "s AA len=",len(s_aminos)," s codon len=",len(s_codons)
+			#print "The numbering : ",numbering_list
 			for ci in range(len(q_codons)):
 				if(s_codons[ci]!=q_codons[ci]):
 					#mark a mutation in the numbering system
@@ -237,15 +248,15 @@ def getNumberIndelsFromBTOPInInfo(info):
 	if(not(info==None)):
 		if('btop' in info):
 			btop=info['btop']
-			print "EXTRACTED btop=",btop
+			#print "EXTRACTED btop=",btop
 			indel_count=getNumberIndelsFromBTOP(btop)
 			#print "the count is ",indel_count
 			return indel_count
 		else:
-			"no btop avail"
+			#"no btop avail"
 			return -1
 	else:
-		print "is none"
+		#print "is none"
 		return -1
 
 
@@ -262,6 +273,78 @@ def shouldFilterOutByIndels(vInfo,dInfo,jInfo):
 		shouldFilter=True
 	return shouldFilter
 
+
+
+def annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted_jobs,imgtdb_obj,myCodonCounter):
+	#perform codon mutation counting for IGHV4
+	filterNote=""
+	mutation_map=dict()
+	mutation_map['aminos']=list()
+	mutation_map['codons']=list()
+	eligibleForScoring=False
+	if(vInfo is not None):
+		#got V hit
+		if('subject ids' in vInfo):
+			#found subject in it
+			if(vInfo['subject ids'].startswith("IGHV4")):
+				#V hit found to be IGHV4
+				#IGHV4, test regions for completeness and length
+				get_res=0
+				kabat_CDR1=None
+				kabat_FR2=None
+				kabat_CDR2=None
+				hybrid_FR3=None
+				while(get_res<num_submitted_jobs):
+					region_alignment=alignment_output_queue.get()
+					if(region_alignment is not None):
+						#print "\n"
+						#print "THE ALIGNMENT NAME '"+region_alignment.getName()+"'"
+						#print read_rec.id
+						#print region_alignment.getNiceString()
+						if(region_alignment.getName().startswith("CDR1_kabat")):
+							kabat_CDR1=region_alignment
+						elif(region_alignment.getName().startswith("FR2_kabat")):
+							kabat_FR2=region_alignment
+						elif(region_alignment.getName().startswith("CDR2_kabat")):
+							kabat_CDR2=region_alignment
+						else:
+							pass
+					get_res+=1
+				shouldFilterByIndel=shouldFilterOutByIndels(vInfo,dInfo,jInfo)
+				if(shouldFilterByIndel):
+					#print "NOTE "+read_rec.id+" filtered out by indels!"
+					filterNote="Had Indels!"
+					pass
+				else:
+					#print "NOTE "+read_rec.id+" needs completeness testing..."
+					hybrid_aln=extractHybridAlignment(vInfo,imgtdb_obj)
+					if(hybrid_aln==None):
+						#print "couldn't get a hybrid!"
+						filterNote="Failure in hybrid alignment"
+					else:
+						#print "The hybrid aln is "
+						#print hybrid_aln.getNiceString()
+						#myCodonCounter.validate_regions_for_completenessLength(self,cdr1_info,fr2_info,cdr2_info,fr3_info)
+						completeRegionsFlag=myCodonCounter.validate_regions_for_completenessLength(kabat_CDR1,kabat_FR2,kabat_CDR2,hybrid_aln)
+						#print "The complete regions flag is",completeRegionsFlag
+						if(completeRegionsFlag):
+							filterNote="OK"
+							mutation_map=myCodonCounter.acquire_mutation_map(kabat_CDR1,kabat_FR2,kabat_CDR2,hybrid_aln)
+							#print "THE MUTATION MAP IS ",mutation_map
+						else:
+							#print "INCOMPLETE so no mutation counting!"
+							filterNote="Incomplete regions"
+				#validate_regions_for_completenessLength(cdr1_info,fr2_info,cdr3_info,fr3_info):
+			else:
+				#print read_rec.id+" isn't an IGHV4 hit!"
+				print "Not an IGHV4 hit"
+		else:
+			#print read_rec.id+" has not subject ids!"
+			filterNote="No name found for hit"
+	else:
+		#print read_rec.id+" has no vinfo"
+		filterNote="NoVHit"
+	return [filterNote,mutation_map]
 
 
 
