@@ -27,6 +27,18 @@ class CodonAnalysis:
 	amino_codon_map=None
 	unambiguous_codon_dict=dict()
 	bases=["A","C","G","T","a","c","g","t"]
+	valid_aminos=None
+
+	def is_unambiguous_amino(self,aa_res):
+		if(aa_res in self.valid_aminos):
+			return True
+		if(not(type(aa_res)==str)):
+			return False
+		if(aa_res.upper() in self.valid_aminos):
+			return True
+		else:
+			return False
+
 
 	#make a list of codons
 	def make_codons(self):
@@ -57,6 +69,8 @@ class CodonAnalysis:
 			return True
 		else:
 			return False
+
+
 
 	#test for codon ambiguity
 	#by testing individual bases for ambiguity
@@ -103,7 +117,7 @@ class CodonAnalysis:
 		for codon in codons:
 			amino=str(biopythonTranslate(codon))
 			self.codon_amino_map[codon]=amino
-
+			self.valid_aminos.add(amino)
 	
 	#initialize the amino->codons map!
 	def init_ac_map(self):
@@ -322,8 +336,8 @@ class alignment:
 		return buildAlignmentWholeSeqs(btop,q,s,debug,level)
 
 
-	@staticmethod
 	#return true or not if the passed is an inf
+	@staticmethod
 	def isAnInf(a):
 		if(a==float("inf") or a==float("-inf")):
 			return True
