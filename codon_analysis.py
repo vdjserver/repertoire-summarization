@@ -162,14 +162,7 @@ class codonCounter:
 			for p in range(36,50):
 				numbering.append(p)
 		elif(reg_name=="CDR2"):
-			for p in range(50,53):
-				numbering.append(p)
-			for m in range(17,20):
-				#lengths of 17,18,29
-				if(reg_len>=m):
-					numbering.append("52"+letters[l_pos])
-					l_pos+=1
-			for p in range(53,66):
+			for p in range(50,67):
 				numbering.append(p)
 		elif(reg_name=="FR3" or reg_name=="FWR3"):
 			for p in range(66,83):
