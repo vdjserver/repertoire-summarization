@@ -326,7 +326,6 @@ def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
 				remap[dm][currentJ]=ref_cdr3_end
 			else:
 				ref_cdr3_end=remap[dm][currentJ]
-			#print "For ",currentJ," the ref_cdr3_end is ",ref_cdr3_end,"!"
 			if(ref_cdr3_start!=(-1) and ref_cdr3_end!=(-1)):
 				vq_aln=vMap['query seq']
 				vs_aln=vMap['subject seq']
@@ -354,6 +353,10 @@ def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
 					if(qry_cdr3_start<=qry_cdr3_end):
 						#good
 						cdr3_len=qry_cdr3_end-qry_cdr3_start+1
+						#print "mode=",dm,"read=",vMap['query id']
+						#print "For ",currentV," the ref_cdr3_bgn is ",ref_cdr3_start,"!"
+						#print "For ",currentJ," the ref_cdr3_end is ",ref_cdr3_end,"!"
+						#print "read start and end are ",qry_cdr3_start," and ",qry_cdr3_end,"\n\n\n\n"
 						cdr3_hist[dm]=cdr3_len
 						cdr3_hist[dm+'_from']=qry_cdr3_start
 						cdr3_hist[dm+'_to']=qry_cdr3_end

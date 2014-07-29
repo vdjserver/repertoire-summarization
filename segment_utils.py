@@ -697,12 +697,21 @@ def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human",m
 		#no kabat for CDR3 for TR!
 		return (-1)
 	if(organism in cdr3_adj_map):
-		if(allele in cdr3_adj_map[organism]["imgt"]):
-			return cdr3_adj_map[organism]["imgt"][allele]
+		if(mode in cdr3_adj_map[organism]):
+			#mode in the dict
+			if(allele in cdr3_adj_map[organism][mode]):
+				return cdr3_adj_map[organism][mode][allele]
+			else:
+				#do the actual looking up below!
+				pass
+		else:
+			#mode not in the dict
+			cdr3_ajd_map[organism][mode]=dict()
 	else:
 		cdr3_adj_map[organism]=dict()
+		cdr3_adj_map[organism][mode]=dict()
 	cdr3_int=getVRegionStartAndStopGivenRefData(allele,organism,imgtdb_obj,"CDR3",mode)
-	cdr3_adj_map[organism]["imgt"][allele]=cdr3_int[0]
+	cdr3_adj_map[organism][mode][allele]=cdr3_int[0]
 	return cdr3_int[0]
 
 
@@ -928,6 +937,8 @@ def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 	#this depends on organism and mode
 	seq_type=refName[0:2]
 	lookupPath=imgtdb_obj.getBaseDir()+"/"+refOrg+"/ReferenceDirectorySet/"+mode.upper()+"/Vlookup."+seq_type+".tsv"
+	if(region=="CDR3"):
+		print "lookuppath=",lookupPath
 	if(not(os.path.exists(lookupPath)) or not(os.path.isfile(lookupPath))):
 		raise Exception("Error, failed to find lookup file "+lookupPath+" for "+refName+" for organism = "+refOrg)
 	idx_num=None
