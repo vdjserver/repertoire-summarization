@@ -107,7 +107,7 @@ class codonCounter:
 		elif(reg_name=="FR2" or reg_name=="FWR2"):
 			return [14]
 		elif(reg_name=="CDR2"):
-			return [16]
+			return [16]   #all IGHV4 sequences have length=16 for CDR2 (52A,52B,52C are NOT used in IGHV4 ; 50-65 (inclusive) are used)
 		elif(reg_name=="FWR3" or reg_name=="FR3"):
 			#27 if none of 82A,82B,82C are present ; 28 if 82A is present, 29 if 82A and 82B are present, and 30 if 82A,82B,and 83C are present
 			return [27,28,29,30]
