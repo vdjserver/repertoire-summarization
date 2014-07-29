@@ -78,15 +78,6 @@ class codonCounter:
 		s_bp=self.getBPFromCodonList(s_codons)
 		actual_q_aa=self.getBPFromCodonList(q_aa)
 		actual_s_aa=self.getBPFromCodonList(s_aa)
-		if(region_info.getName().find("HZ8R54Q01A8PZP")!=(-1) or  region_info.getName().find("HZ8R54Q02JC6XY")!=(-1)):
-			print region_info.getNiceString()
-			print "q_aa=",q_aa,"len=",len(q_aa)
-			print "s_aa=",s_aa,"len=",len(s_aa)
-			print "s_codons=",s_codons,"len=",len(s_codons)
-			print "q_bp=",q_bp,"len=",len(q_bp)
-			print "s_bp=",s_bp,"len=",len(s_bp)
-			print "actual_q_a=",actual_q_aa,"len=",len(actual_q_aa)
-			print "actual_s_a=",actual_s_aa,"len=",len(actual_s_aa)
 		if(len(q_bp)!=len(s_bp) and not(self.allowGaps)):
 			return False
 		if(len(actual_q_aa)!=len(actual_s_aa)):
@@ -199,14 +190,14 @@ class codonCounter:
 			s_codons=reg_info_map['subject_read']
 			q_aminos=reg_info_map['AA']
 			s_aminos=reg_info_map['AA_ref']
-			print "\n\n\n"+reg_names[r]
-			print reg_infos[r].getName()
-			print reg_infos[r].getNiceString()
-			print "Q=",q_codons," TRX=",q_aminos
-			print "q AA len=",len(q_aminos)," q codon len=",len(q_codons)
-			print "S=",s_codons," TRX=",s_aminos
-			print "s AA len=",len(s_aminos)," s codon len=",len(s_codons)
-			print "The numbering : ",numbering_list
+			#print "\n\n\n"+reg_names[r]
+			#print reg_infos[r].getName()
+			#print reg_infos[r].getNiceString()
+			#print "Q=",q_codons," TRX=",q_aminos
+			#print "q AA len=",len(q_aminos)," q codon len=",len(q_codons)
+			#print "S=",s_codons," TRX=",s_aminos
+			#print "s AA len=",len(s_aminos)," s codon len=",len(s_codons)
+			#print "The numbering : ",numbering_list
 			for ci in range(len(q_codons)):
 				if(s_codons[ci]!=q_codons[ci]):
 					#mark a mutation in the numbering system
@@ -340,7 +331,7 @@ def annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted
 				#IGHV4, test regions for completeness and length
 				get_res=0
 				shouldFilterByIndel=shouldFilterOutByIndels(vInfo,dInfo,jInfo)
-				print "For read=",vInfo['query id']," the shouldFilterByIndel is ",shouldFilterByIndel
+				#print "For read=",vInfo['query id']," the shouldFilterByIndel is ",shouldFilterByIndel
 				if(shouldFilterByIndel):
 					#print "NOTE "+read_rec.id+" filtered out by indels!"
 					filterNote="Had Indels!"
@@ -356,7 +347,7 @@ def annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted
 						if(completeRegionsFlag):
 							filterNote="OK"
 							mutation_map=myCodonCounter.acquire_mutation_map(kabat_CDR1,kabat_FR2,kabat_CDR2,hybrid_aln)
-							print "THE MUTATION MAP for ",vInfo['query id']," IS ",mutation_map
+							#print "THE MUTATION MAP for ",vInfo['query id']," IS ",mutation_map
 						else:
 							#print "INCOMPLETE so no mutation counting!"
 							filterNote="Incomplete regions"

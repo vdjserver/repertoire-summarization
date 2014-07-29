@@ -48,8 +48,6 @@ class CharacterizationThread(threading.Thread):
 						ref_region_interval=getVRegionStartAndStopGivenRefData(refName,organism,imgtdb_obj,region,mode)
 						largerVInfo=getHitInfo(read_result_obj,meta,refName,None,imgtdb_obj,organism)
 						partialFlag=None
-						if(region=="CDR1" and mode=="imgt" and readName=="HQE6ANJ01CDRHB_RS_testing_incompleteCDR1"):
-							print "larger v info=",largerVInfo,"\n\n\n"
 						if(s_start<=ref_region_interval[0] and s_end>=ref_region_interval[1]):
 							#full region!
 							partialFlag=False
