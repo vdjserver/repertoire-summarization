@@ -66,10 +66,9 @@ class codonCounter:
 
 	#see if valid on the region ; making sure it's of a valid length
 	def validate_region(self,region_info,num_aa_min,num_amino_max):
-		#first verify if the region is complete.
-		#region_complete=True
-		#if(not(region_complete)):
-		#	return False
+		if(self.allowGaps):
+			#unimp!
+			sys.exit(0)
 		q_aa=region_info.getCharMap()['AA']
 		q_codons=region_info.getCharMap()['nucleotide read']
 		s_aa=region_info.getCharMap()['AA_ref']
@@ -79,6 +78,15 @@ class codonCounter:
 		s_bp=self.getBPFromCodonList(s_codons)
 		actual_q_aa=self.getBPFromCodonList(q_aa)
 		actual_s_aa=self.getBPFromCodonList(s_aa)
+		if(region_info.getName().find("HZ8R54Q01A8PZP")!=(-1) or  region_info.getName().find("HZ8R54Q02JC6XY")!=(-1)):
+			print region_info.getNiceString()
+			print "q_aa=",q_aa,"len=",len(q_aa)
+			print "s_aa=",s_aa,"len=",len(s_aa)
+			print "s_codons=",s_codons,"len=",len(s_codons)
+			print "q_bp=",q_bp,"len=",len(q_bp)
+			print "s_bp=",s_bp,"len=",len(s_bp)
+			print "actual_q_a=",actual_q_aa,"len=",len(actual_q_aa)
+			print "actual_s_a=",actual_s_aa,"len=",len(actual_s_aa)
 		if(len(q_bp)!=len(s_bp) and not(self.allowGaps)):
 			return False
 		if(len(actual_q_aa)!=len(actual_s_aa)):
@@ -86,13 +94,7 @@ class codonCounter:
 		if(len(q_aa)!=len(s_aa)):
 			return False
 		if(num_aa_min<=len(q_aa) and len(q_aa)<=num_amino_max and len(actual_q_aa)==len(q_aa)):
-			if(self.allowGaps):
-				#unimplemented
-				#add code for gapfull pre-examination
-				print "unimp"
-				sys.exit(0)
-			else:
-				return True
+			return True
 		else:
 			#too short or too long!
 			#print "len=",len(q_aa),"too short or too long"
