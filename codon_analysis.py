@@ -46,6 +46,7 @@ class codonCounter:
 					self.kabat_chothia_trans[kabat_num.upper().strip()]=chothia_num.upper().strip()
 
 
+	#perform KABAT->CHOTHIA numbering translation
 	def kabatToChothia(self,pos):
 		proper_key=pos.upper().strip()
 		if(proper_key in self.kabat_chothia_trans)
@@ -246,7 +247,7 @@ class codonCounter:
 			for ci in range(len(q_codons)):
 				if(s_codons[ci]!=q_codons[ci]):
 					#mark a mutation in the numbering system
-					numbered_pos=numbering_list[ci]
+					numbered_pos=self.kabatToChothia(numbering_list[ci])
 					aaP=s_aminos[ci]+str(numbered_pos)+q_aminos[ci]
 					cdP=s_codons[ci]+str(numbered_pos)+q_codons[ci]
 					AA_map.append(aaP)
