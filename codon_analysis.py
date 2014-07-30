@@ -21,6 +21,49 @@ class codonCounter:
 	allowGaps=False
 	numberingMapCache=None
 	internalAnalyzer=None
+	kabat_chothia_trans=None
+
+
+
+	#load kabat->chotia translation
+	def initKabatChotiaTrans(self,tableFilePath):
+		self.kabat_chothia_trans=dict()
+		
+		if(not(os.path.exists(tableFilePath))):
+			sys.exit("ERROR, FAILED TO FIND FILE",tableFilePath," of codon numbering data!")
+		with open(tableFilePath, 'r') as f:
+			data=f.read()
+		codon_pos_re=re.compile('^\d+[A-Z]$',re.IGNORECASE)
+		lines=data.split('\n')
+		for line_num in range(len(lines)):
+			if(line_num!=0):
+				pieces=lines[line_num].split('\t')
+				kabat_num=pieces[1]
+				chothia_num=pieces[3]
+				codon_pos_result_kab=codon_pos_re.search(kabat_num)
+				codon_pos_result_cht=codon_pos_re.search(kabat_num)
+				if(codon_pos_result_kab and codon_pos_result_cht):
+					self.kabat_chothia_trans[kabat_num.upper().strip()]=chothia_num.upper().strip()
+
+
+	def kabatToChothia(self,pos):
+		proper_key=pos.upper().strip()
+		if(proper_key in self.kabat_chothia_trans)
+			return self.kabat_chothia_trans[proper_key]
+		else:
+			return "X"
+		
+	
+
+
+	def computePathToCodonTableFile(self):
+		#path to script
+		ownScriptPath=sys.argv[0]
+		#its dir
+		containingDir=os.path.dirname(ownScriptPath)
+		#get relative path to codon data
+		tableFilePath=containingDir+"/codon_data/codon_pos_IGHV4"
+		return tableFilePath
 
 
 	#init
@@ -48,6 +91,8 @@ class codonCounter:
 		reader.close()
 		self.allowGaps=init_allowGaps
 		self.internalAnalyzer=CodonAnalysis()
+		tableFilePath=self.computePathToCodonTableFile()
+		self.initKabatChotiaTrans(tableFilePath)
 
 
 
