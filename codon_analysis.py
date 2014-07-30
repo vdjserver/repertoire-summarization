@@ -22,6 +22,55 @@ class codonCounter:
 	numberingMapCache=None
 	internalAnalyzer=None
 	kabat_chothia_trans=None
+	queriesWithRM=0
+	sampleRepMuts=IncrementMapWrapper()
+	ags6RepMuts=IncrementMapWrapper()
+	sampleRepNucMuts=IncrementMapWrapper()
+	NMORepNucMuts=IncrementMapWrapper()
+
+
+	def generateSampleAGSSum(self,):
+		ags_score=self.computeAGS()
+		summ_str="AGS Score\t"+str(ags_score)
+			
+
+	def computeNMO(self):
+		return (self.computeSampNMOTot()/self.queriesWithRM)*100
+
+
+
+	def computeSampNMOTot(self):
+		sampNMOTot=0
+		for num in NMORepNucMuts.get_map():
+			sampNMOTot+=1
+		return sampNMOTot
+
+
+	def computeSampTotRM(self):
+		sampTot=0
+		for num in sampleRepMuts.get_map():
+			sampTot+=sampleRepMuts[num]
+		return sampTot
+
+
+	def computeAGS6TotRM(self):
+		sampAGSTot=0
+		for num ags6RepMuts.get_map():
+			agsTot+=ags6RepMuts[num]
+		return sampAGSTot		
+
+
+	def computeAGS(self):
+		#sample total of RM
+		sampTot=self.computeSampTotRM()
+		#AGS total of RM
+		sampAGSTot=self.computeAGS6TotRM()
+		pct_ags6=(sampAGSTot/sampTot)*100
+		ags_score=(pct_ags6-1.6*6)/0.9
+		return ags_score
+		#1) AGS6 score   (     RMAGS6  -   1.6     ) /  
+		#2) AGS6 RM COUNT
+		#3) TOT RM COUNT
 
 
 
@@ -74,6 +123,7 @@ class codonCounter:
 		#currently reads a TSV
 		#6 fields
 		#gap order	KABAT	REGION_KABAT	CHOTHIA	gap order	REGION_CHOTHIA
+		self.queriesWithRM=0
 		reader=open(pos_file_path,'r')
 		line_num=1
 		for line in reader:
@@ -150,8 +200,8 @@ class codonCounter:
 		elif(reg_name=="CDR2"):
 			return [16]   #all IGHV4 sequences have length=16 for CDR2 (52A,52B,52C are NOT used in IGHV4 ; 50-65 (inclusive) are used)
 		elif(reg_name=="FWR3" or reg_name=="FR3"):
-			#27 if none of 82A,82B,82C are present ; 28 if 82A is present, 29 if 82A and 82B are present, and 30 if 82A,82B,and 83C are present
-			return [27,28,29,30]
+			#30 AND 82A,82B,and 83C are always present
+			return [30]
 		else:
 			#invalid region
 			print "INVALID REGION PASSED "+reg_name
@@ -165,6 +215,8 @@ class codonCounter:
 	#given the information on the 4 regions (CDR1,FR2,CDR2,FR3), verify
 	#that the alignment is suitable for acquisition of mutation counts
 	def validate_regions_for_completenessLength(self,cdr1_info,fr2_info,cdr2_info,fr3_info):
+		#truncation check (equals multiple of 3 check)
+		#check for valid length (given is mult of 3)
 		region_infos=list()
 		region_infos.append(cdr1_info)
 		region_infos.append(fr2_info)
@@ -208,14 +260,10 @@ class codonCounter:
 		elif(reg_name=="FR3" or reg_name=="FWR3"):
 			for p in range(66,83):
 				numbering.append(p)
-			for m in range(27,30):
-				if(reg_len>=m):
-					numbering.append("82"+letters[l_pos])
-					l_pos+=1
-			p=83
-			while(len(numbering)!=reg_len):
+			for l in range(len(letters)):
+				numbering.append("82"+str(letters[l]))
+			for p in range(83,93):
 				numbering.append(p)
-				p+=1
 		else:
 			#invalid/unknown region!
 			print "Error, unknown region ",reg_name,"!"
@@ -231,6 +279,7 @@ class codonCounter:
 		reg_infos=[cdr1_info,fr2_info,cdr2_info,fr3_info]
 		AA_map=list()
 		codon_map=list()
+		thisReadHadAtLeastOneRM=False
 		for r in range(len(reg_names)):
 			reg_info_map=reg_infos[r].getCharMap()
 			numbering_list=self.acquireNumberingMap(reg_names[r],len(reg_info_map['AA']))
@@ -250,12 +299,29 @@ class codonCounter:
 				if(s_codons[ci]!=q_codons[ci]):
 					#mark a mutation in the numbering system
 					numbered_pos=self.kabatToChothia(numbering_list[ci])
+					ags6_nums=["31B","40","56","57","81","89"]
+					nmo_nums=["36","39","45","46","50","59","61","65","67","70","86","90"]
 					aaP=s_aminos[ci]+str(numbered_pos)+q_aminos[ci]
 					cdP=s_codons[ci]+str(numbered_pos)+q_codons[ci]
+					if(s_aminos[ci]!=q_aminos[ci]):
+						thisReadHadAtLeastOneRM=True
+						sampleRepMuts.increment(numbered_pos)
+						for bp in range(3):
+							qbp=q_aminos[ci][bp]
+							sbp=s_aminos[ci][bp]
+							if(qbp!=sbp):
+								sampleRepNucMuts.increment(numbered_pos)
+								if(numbered_pos in nmo_nums):
+									NMORepNucMuts.increment(numbered_pos)
+						if(numbered_pos in ags6_nums):
+							ags6RepMuts.increment(numbered_pos)
+					mutationCounter.
 					AA_map.append(aaP)
 					codon_map.append(cdP)
 				else:
 					pass
+		if(thisReadHadAtLeastOneRM):
+			self.queriesWithRM+=1
 		overall_map=dict()
 		overall_map['codons']=codon_map
 		overall_map['aminos']=AA_map
@@ -376,7 +442,6 @@ def annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted
 			#found subject in it
 			if(vInfo['subject ids'].startswith("IGHV4")):
 				#V hit found to be IGHV4
-				#IGHV4, test regions for completeness and length
 				get_res=0
 				shouldFilterByIndel=shouldFilterOutByIndels(vInfo,dInfo,jInfo)
 				#print "For read=",vInfo['query id']," the shouldFilterByIndel is ",shouldFilterByIndel
@@ -385,12 +450,15 @@ def annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted
 					filterNote="Had Indels!"
 					pass
 				else:
+					STOP NEW FILTER GOES HERE (new per william)
+					cdr3 in frame and cdr3 has no stop codon new filter GOES HERE (new per william)
 					#print "NOTE "+read_rec.id+" needs completeness testing..."
 					hybrid_aln=extractHybridAlignment(vInfo,imgtdb_obj)
 					if(hybrid_aln==None):
 						#print "couldn't get a hybrid!"
 						filterNote="Failure in hybrid alignment"
 					else:
+						#IGHV4, test regions for completeness and length
 						completeRegionsFlag=myCodonCounter.validate_regions_for_completenessLength(kabat_CDR1,kabat_FR2,kabat_CDR2,hybrid_aln)
 						if(completeRegionsFlag):
 							filterNote="OK"
