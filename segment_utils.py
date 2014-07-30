@@ -937,8 +937,6 @@ def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 	#this depends on organism and mode
 	seq_type=refName[0:2]
 	lookupPath=imgtdb_obj.getBaseDir()+"/"+refOrg+"/ReferenceDirectorySet/"+mode.upper()+"/Vlookup."+seq_type+".tsv"
-	if(region=="CDR3"):
-		print "lookuppath=",lookupPath
 	if(not(os.path.exists(lookupPath)) or not(os.path.isfile(lookupPath))):
 		raise Exception("Error, failed to find lookup file "+lookupPath+" for "+refName+" for organism = "+refOrg)
 	idx_num=None
