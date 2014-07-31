@@ -849,6 +849,30 @@ def ofLeftmostJNucleotideNotAligningToJGetItsFrameAssumingJunctionSegmentOverlap
 
 
 
+def getTheFrameForThisJReferenceAtThisPosition(refJName,organism,imgtdb_obj,refPos):
+	ref_cdr3_end=getADJCDR3EndFromJAllele(refJName,imgtdb_obj,organism,"imgt")
+	if(ref_cdr3_end==(-1)):
+		return None
+	else:
+		#ref_cdr3_end in in FRAME #2 because it represents the last BP of the codon immediately before W or F of CDR3 end.
+		if(refPos==ref_cdr3_end):
+			return 2
+		else:
+			if(refPos<ref_cdr3_end):
+				diff=ref_cdr3_end-refPos
+				neg_diff=(-1)*(diff)
+				frame=((neg_diff)-1)%3
+				return frame
+			else:
+				diff=refPos-ref_cdr3_end
+				frame=(diff-1)%3
+				return frame
+				
+		
+
+
+
+
 #at the indicated position find the frame by using the
 #imgt delineation/region starts as a "base" or "frame of reference"
 def getTheFrameForThisReferenceAtThisPosition(refName,organism,imgtdb_obj,refPos):
