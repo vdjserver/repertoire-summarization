@@ -410,6 +410,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 					annMap[prodRearrangeKey]=False
 			else:
 				#annMap[prodRearrangeKey]="N/A"
+				
 				pass
 
 		#regions characterization FR1, FR2, FR3, CDR1, CDR2 (imgt and kabat)
@@ -474,7 +475,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 			get_res+=1
 
 	#get mutation map
-	mut_map_info=annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted_jobs,imgtdb_obj,myCodonCounter)
+	mut_map_info=annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted_jobs,imgtdb_obj,myCodonCounter,organism,read_rec)
 	qualifNote=mut_map_info[0]
 	maps=mut_map_info[1]
 	amino_map=maps['aminos']
@@ -608,7 +609,26 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 
 
 
-
+def prodRearrangmentVJ(vInfo,jInfo,imgtdb_obj,organism):
+	if(vInfo==None or jInfo==None):
+		return  False
+	query_max_v=vInfo['q. end']
+	query_min_j=jInfo['q. start']
+	if(query_max_v>=query_min_j):
+		#junction ovrelap or J comes before V
+		query_max_j=jInfo['q. end']
+		query_min_v=vInfo['q. start']
+		if(query_max_j<=query_min_v):
+			#J aligns before V! Nooooooooo!
+			return False
+		else:
+			pass	
+	else:
+		v_end_aln=vInfo['s. end']
+		v_end_frm=getTheFrameForThisReferenceAtThisPosition(vInfor['subject ids'],organism,imgtdb_obj,v_end_aln)
+		sys.exit(0)
+		
+	
 
 
 
@@ -776,7 +796,7 @@ def add_rep_char_args_to_parser(parser):
 	parser.description+=' Generate read-level repertoire-characterization data.'
 	parser.add_argument('-json_out',type=str,nargs=1,default="/dev/stdout",help="output file for the JSON segment count IMGT hierarchy")
 	parser.add_argument('-cdr3_hist_out',type=str,nargs=1,default="/dev/stdout",help="output file for the CDR3 histogram of lengths (both kabat and imgt systems)")
-	parser.add_argument('-skip_char',action='store_true', default=False,help="If this is set, then characterization besides asignment and CDR3 length is skipped")
+	parser.add_argument('-skip_char',action='store_true', default=False,help="If this is set, then characterization besides germline segment assignment and CDR3 length is skipped")
 	parser.add_argument('char_out',type=str,nargs=1,help="the path to the output TSV file of read-level repertoire characterization data")
 	parser.add_argument('vdj_db_root',type=str,nargs=1,help="path to the VDJ directory root REQUIRED")
 	parser.add_argument('qry_fasta',type=str,nargs=1,help="path to the input fasta file of query (Rep-Seq) data input to IgBLAST")
