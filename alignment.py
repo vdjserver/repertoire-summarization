@@ -115,7 +115,8 @@ class CodonAnalysis:
 					self.codon_amino_map[codon]="X"
 		#now use valid codons to overwrite X
 		for codon in codons:
-			amino=str(biopythonTranslate(codon))
+			#print "init with ",codon
+			amino=str(biopythonTranslate(codon.upper()))
 			self.codon_amino_map[codon]=amino
 			if(self.valid_aminos==None):
 				self.valid_aminos=set()
@@ -133,7 +134,23 @@ class CodonAnalysis:
 					codons_that_make_this_amino.append(codon)
 			self.amino_codon_map[amino]=codons_that_make_this_amino
 
-	#lookup-based translation
+	#lookup-based translation for a string
+	def fastTransStr(self,codons_str):
+		translation=""
+		if(len(codons_str)<3):
+			return translation
+		else:
+			while(len(codons_str)>=3):
+				a_codon=codons_str[0:3]
+				an_amino=self.fastTrans(a_codon)
+				translation+=an_amino
+				codons_str=codons_str[3:]
+				if(len(codons_str)<3):
+					return translation
+			return translation
+
+
+	#lookup-based translation for a single codon
 	def fastTrans(self,codon):
 		return self.codon_amino_map[codon]
 
