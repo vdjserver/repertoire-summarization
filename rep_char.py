@@ -914,6 +914,15 @@ if (__name__=="__main__"):
 			segment_counter.JSONIFYToFile(extractAsItemOrFirstFromList(args.vdj_db_root),organism,segments_json_out)
 			print "Writing JSON segment counts output complete!"
 
+		#write AGS/NMO information
+		print "AGS_SCORE\t"+str(myCodonCounter.computeAGS())+
+			"\tAGS6_TOT_RM\t"+str(myCodonCounter.computeAGS6TotRM())+
+			"\tTOT_RM\t"+str(myCodonCounter.computeSampTotRM())
+		print "NMO_SCORE\t"+str(myCodonCounter.computeNMO())+
+			"\tNMO_SAMP_NUC_TOT\t"+str(myCodonCounter.computeSampNMOTot())+
+			"\tNMO_QUERIES_RM\t"+str(myCodonCounter.queriesWithRM)
+
+
 	else:
 		#print "error in args!"
 		parser.print_help()
