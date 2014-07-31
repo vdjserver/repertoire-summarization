@@ -71,14 +71,19 @@ class codonCounter:
 
 	def computeAGS(self):
 		#sample total of RM
-		sampTot=self.computeSampTotRM()
+		sampTot=float(self.computeSampTotRM())
 		if(sampTot<=0):
 			#avoid division by zero error
 			return None
 		#AGS total of RM
-		sampAGSTot=self.computeAGS6TotRM()
-		pct_ags6=(sampAGSTot/sampTot)*100
-		ags_score=(pct_ags6-1.6*6)/0.9
+		sampAGSTot=float(self.computeAGS6TotRM())
+		pct_ags6=(sampAGSTot/sampTot)*100.0
+		#print "pct_ags6=",pct_ags6
+		ags_numerator=pct_ags6-1.6*6.0
+		#print "ags_numerator=",ags_numerator
+		ags_denominator=0.9
+		ags_score=ags_numerator/ags_denominator
+		#print "ags_score",ags_score
 		return ags_score
 		#1) AGS6 score   (     RMAGS6  -   1.6     ) /  
 		#2) AGS6 RM COUNT
