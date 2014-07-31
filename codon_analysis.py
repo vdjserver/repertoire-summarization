@@ -3,10 +3,13 @@
 from utils import *
 from alignment import *
 from char_utils import *
-from segment_utils import getVRegionStartAndStopGivenRefData
+from segment_utils import getVRegionStartAndStopGivenRefData,IncrementMapWrapper,getTheFrameForThisReferenceAtThisPosition,getTheFrameForThisJReferenceAtThisPosition
+from igblast_parse import rev_comp_dna
 
 #make an instance of the analyzer
-global codonAnalyzer
+#print "INIT IN CODON_ANALYSIS...."
+AGSCodonTranslator=CodonAnalysis()
+#print "FINISH INIT IN CODON_ANALYSIS...."
 
 #class for codon counting
 #currently for IGHV4 only
@@ -48,14 +51,14 @@ class codonCounter:
 
 	def computeSampTotRM(self):
 		sampTot=0
-		for num in sampleRepMuts.get_map():
-			sampTot+=sampleRepMuts[num]
+		for num in self.sampleRepMuts.get_map():
+			sampTot+=self.sampleRepMuts[num]
 		return sampTot
 
 
 	def computeAGS6TotRM(self):
 		sampAGSTot=0
-		for num ags6RepMuts.get_map():
+		for num in ags6RepMuts.get_map():
 			agsTot+=ags6RepMuts[num]
 		return sampAGSTot		
 
@@ -225,13 +228,18 @@ class codonCounter:
 		regions_to_analyze=["CDR1","FR2","CDR2","FR3"]
 		valid_flags=list()
 		valid_on_all=True
+		validityNote=""
 		for ri in range(len(regions_to_analyze)):
 			valid_lengths=self.getRegionValidLengths(regions_to_analyze[ri])
 			valid_flag=self.validate_region(region_infos[ri],min(valid_lengths),max(valid_lengths))
 			valid_flags.append(valid_flag)
 			if(not(valid_flag)):
 				valid_on_all=False
-		return valid_on_all
+			else:
+				pass				
+				#sys.exit(0)
+		validityNote="OK"		
+		return [validityNote,valid_on_all]
 		
 
 	#given a region name and length, return the numbering
@@ -305,17 +313,20 @@ class codonCounter:
 					cdP=s_codons[ci]+str(numbered_pos)+q_codons[ci]
 					if(s_aminos[ci]!=q_aminos[ci]):
 						thisReadHadAtLeastOneRM=True
-						sampleRepMuts.increment(numbered_pos)
+						self.sampleRepMuts.increment(numbered_pos)
 						for bp in range(3):
-							qbp=q_aminos[ci][bp]
-							sbp=s_aminos[ci][bp]
+							q_codon=q_codons[ci]
+							#print "q_codon is ",q_codon
+							qbp=q_codon[bp]
+							s_codon=s_codons[ci]
+							#print "s_codon is ",s_codon
+							sbp=s_codon[bp]
 							if(qbp!=sbp):
-								sampleRepNucMuts.increment(numbered_pos)
+								self.sampleRepNucMuts.increment(numbered_pos)
 								if(numbered_pos in nmo_nums):
-									NMORepNucMuts.increment(numbered_pos)
+									self.NMORepNucMuts.increment(numbered_pos)
 						if(numbered_pos in ags6_nums):
-							ags6RepMuts.increment(numbered_pos)
-					mutationCounter.
+							self.ags6RepMuts.increment(numbered_pos)
 					AA_map.append(aaP)
 					codon_map.append(cdP)
 				else:
@@ -395,10 +406,6 @@ def getNumberIndelsFromBTOPInInfo(info):
 #given v,d,j info maps return True if the seq should be 
 #skipped due to indels
 def shouldFilterOutByIndels(vInfo,dInfo,jInfo):
-	if(vInfo['query id']=="HZ8R54Q02GDVXN"):
-		print "gap v val=",getNumberIndelsFromBTOPInInfo(vInfo)
-		print "gap d val=",getNumberIndelsFromBTOPInInfo(dInfo)
-		print "gap j val=",getNumberIndelsFromBTOPInInfo(jInfo)
 	if(getNumberIndelsFromBTOPInInfo(vInfo)==0 and getNumberIndelsFromBTOPInInfo(jInfo)==0 and getNumberIndelsFromBTOPInInfo(dInfo)<=0):
 		shouldFilter=False
 	else:
@@ -407,7 +414,67 @@ def shouldFilterOutByIndels(vInfo,dInfo,jInfo):
 
 
 
-def annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted_jobs,imgtdb_obj,myCodonCounter):
+#return true if the query (assumed to be gapless in the alignment)
+#contains a stop codon in its translatoin
+def diogenixGaplessStopCodonShouldFilter(vInfo,imgtdb_obj,read_rec,organism):
+	#assumed to be GAPLESS here!
+	global AGSCodonTranslator
+	s_start=vInfo['s. start']
+	refName=vInfo['subject ids']
+	s_start_frame=getTheFrameForThisReferenceAtThisPosition(refName,organism,imgtdb_obj,s_start)
+	q_start=vInfo['q. start']
+	q_start-=1
+	if(s_start_frame!=0):
+		q_start=q_start+(3-s_start_frame)
+	q_seq_to_trans=str(read_rec.seq[q_start:])
+	#print "prc totranslate is ",q_seq_to_trans
+	if(vInfo['is_inverted']):
+		q_seq_to_trans=rev_comp_dna(q_seq_to_trans)
+	translation=AGSCodonTranslator.fastTransStr(q_seq_to_trans)
+	#print "totranslate is ",q_seq_to_trans
+	#print "The translation for ",read_rec.id," is ",translation
+	if(translation.find("*")!=(-1)):
+		#found a stop codon!
+		return True
+	else:
+		return False
+	
+
+
+
+
+def diogenixGaplessVJRearrangementShouldFilter(vInfo,jInfo,imgtdb_obj,read_rec,organism):
+	if(jInfo==None):
+		#no J means no prod. rearrangment???
+		return False
+	s_start=vInfo['s. start']
+	q_start=vInfo['q. start']
+	refName=vInfo['subject ids']	
+	s_start_frame=getTheFrameForThisReferenceAtThisPosition(refName,organism,imgtdb_obj,s_start)
+	q_start_frame=s_start_frame
+	print "q_start_frame=",q_start_frame
+	q_end_j=jInfo['q. end']
+	if(q_end_j<=q_start+3):
+		#WAY TOO SHORT!
+		return False
+	else:
+		j_end_j=jInfo['s. end']
+		j_end_frame=getTheFrameForThisJReferenceAtThisPosition(jInfo['subject ids'],organism,imgtdb_obj,j_end_j)
+		expected_frame_based_on_V=q_start_frame+(q_end_j-q_start)%3
+		print "expected_frame_based_on_V=",expected_frame_based_on_V
+		expected_frame_based_on_J=j_end_frame
+		print "expected_frame_based_on_J=",expected_frame_based_on_J
+		if(expected_frame_based_on_J==expected_frame_based_on_V):
+			#if both V and J impose the same frame, then the read should NOT be filtered
+			return False
+		else:
+			return True
+
+	
+
+
+
+def annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted_jobs,imgtdb_obj,myCodonCounter,organism,read_rec):
 	#perform codon mutation counting for IGHV4
 	filterNote=""
 	mutation_map=dict()
@@ -435,7 +502,8 @@ def annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted
 			else:
 				pass
 		get_res+=1
-
+	if(not(organism=="human")):
+		return ["not human",mutation_map]
 	if(vInfo is not None):
 		#got V hit
 		if('subject ids' in vInfo):
@@ -450,23 +518,31 @@ def annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted
 					filterNote="Had Indels!"
 					pass
 				else:
-					STOP NEW FILTER GOES HERE (new per william)
-					cdr3 in frame and cdr3 has no stop codon new filter GOES HERE (new per william)
-					#print "NOTE "+read_rec.id+" needs completeness testing..."
-					hybrid_aln=extractHybridAlignment(vInfo,imgtdb_obj)
-					if(hybrid_aln==None):
-						#print "couldn't get a hybrid!"
-						filterNote="Failure in hybrid alignment"
-					else:
-						#IGHV4, test regions for completeness and length
-						completeRegionsFlag=myCodonCounter.validate_regions_for_completenessLength(kabat_CDR1,kabat_FR2,kabat_CDR2,hybrid_aln)
-						if(completeRegionsFlag):
-							filterNote="OK"
-							mutation_map=myCodonCounter.acquire_mutation_map(kabat_CDR1,kabat_FR2,kabat_CDR2,hybrid_aln)
-							#print "THE MUTATION MAP for ",vInfo['query id']," IS ",mutation_map
+					shouldFilterForStop=diogenixGaplessStopCodonShouldFilter(vInfo,imgtdb_obj,read_rec,organism)
+					if(not(shouldFilterForStop)):
+						#did't find a stop codon!
+						#cdr3 in frame and cdr3 has no stop codon new filter GOES HERE (new per william)
+						#print "NOTE "+read_rec.id+" needs completeness testing..."
+						prodFlag=diogenixGaplessVJRearrangementShouldFilter(vInfo,jInfo,imgtdb_obj,read_rec,organism)
+						print "For ",read_rec.id," the prod VJ R flag is ",prodFlag
+						hybrid_aln=extractHybridAlignment(vInfo,imgtdb_obj)
+						if(hybrid_aln==None):
+							#print "couldn't get a hybrid!"
+							filterNote="Failure in hybrid alignment"
 						else:
-							#print "INCOMPLETE so no mutation counting!"
-							filterNote="Incomplete regions"
+							#IGHV4, test regions for completeness and length
+							completeRegionsFlags=myCodonCounter.validate_regions_for_completenessLength(kabat_CDR1,kabat_FR2,kabat_CDR2,hybrid_aln)
+							completeRegionsNote=completeRegionsFlags[0]
+							completeRegionsFlag=completeRegionsFlags[1]
+							if(completeRegionsFlag):
+								filterNote="OK"
+								mutation_map=myCodonCounter.acquire_mutation_map(kabat_CDR1,kabat_FR2,kabat_CDR2,hybrid_aln)
+								#print "THE MUTATION MAP for ",vInfo['query id']," IS ",mutation_map
+							else:
+								#print "INCOMPLETE so no mutation counting!"
+								filterNote="Incomplete regions"
+					else:
+						filterNote="Found a stop codon"
 				#validate_regions_for_completenessLength(cdr1_info,fr2_info,cdr3_info,fr3_info):
 			else:
 				#print read_rec.id+" isn't an IGHV4 hit!"
