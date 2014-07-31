@@ -336,8 +336,9 @@ class codonCounter:
 									self.NMORepNucMuts.increment(numbered_pos)
 						if(numbered_pos in ags6_nums):
 							self.ags6RepMuts.increment(numbered_pos)
-					AA_map.append(aaP)
-					codon_map.append(cdP)
+						#only record mutations when they are REPLACEMENTS
+						AA_map.append(aaP)
+						codon_map.append(cdP)
 				else:
 					pass
 		if(thisReadHadAtLeastOneRM):
