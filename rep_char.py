@@ -905,6 +905,13 @@ if (__name__=="__main__"):
 			my_cdr3_map.writeToFile(cdr3_hist_out_file)
 			print "Wrote CDR3 lengths histogram to ",cdr3_hist_out_file
 
+		#write AGS/NMO information
+		if(organism=="human"):
+			print "AGS_SCORE\t"+str(myCodonCounter.computeAGS())+"\tAGS6_TOT_RM\t"+str(myCodonCounter.computeAGS6TotRM())+"\tTOT_RM\t"+str(myCodonCounter.computeSampTotRM())
+			print "NMO_SCORE\t"+str(myCodonCounter.computeNMO())+"\tNMO_SAMP_NUC_TOT\t"+str(myCodonCounter.computeSampNMOTot())+"\tNMO_QUERIES_RM\t"+str(myCodonCounter.queriesWithRM)
+		else:
+			print "No AGS/NMO data for non-human analysis!"
+
 
 		#write the segment counts when non-dev-null
 		if(type(segments_json_out)==list):
@@ -914,13 +921,6 @@ if (__name__=="__main__"):
 			segment_counter.JSONIFYToFile(extractAsItemOrFirstFromList(args.vdj_db_root),organism,segments_json_out)
 			print "Writing JSON segment counts output complete!"
 
-		#write AGS/NMO information
-		print "AGS_SCORE\t"+str(myCodonCounter.computeAGS())+
-			"\tAGS6_TOT_RM\t"+str(myCodonCounter.computeAGS6TotRM())+
-			"\tTOT_RM\t"+str(myCodonCounter.computeSampTotRM())
-		print "NMO_SCORE\t"+str(myCodonCounter.computeNMO())+
-			"\tNMO_SAMP_NUC_TOT\t"+str(myCodonCounter.computeSampNMOTot())+
-			"\tNMO_QUERIES_RM\t"+str(myCodonCounter.queriesWithRM)
 
 
 	else:

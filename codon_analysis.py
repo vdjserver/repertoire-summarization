@@ -38,13 +38,19 @@ class codonCounter:
 			
 
 	def computeNMO(self):
-		return (self.computeSampNMOTot()/self.queriesWithRM)*100
+		if(self.queriesWithRM==0):
+			#avoid division by zero err
+			return None
+		NMO_num=float(self.computeSampNMOTot())
+		NMO_dnm=float(self.queriesWithRM)
+		NMO=(NMO_num/NMO_dnm)*float(100.0)
+		return NMO
 
 
 
 	def computeSampNMOTot(self):
 		sampNMOTot=0
-		for num in NMORepNucMuts.get_map():
+		for num in self.NMORepNucMuts.get_map():
 			sampNMOTot+=1
 		return sampNMOTot
 
@@ -52,20 +58,23 @@ class codonCounter:
 	def computeSampTotRM(self):
 		sampTot=0
 		for num in self.sampleRepMuts.get_map():
-			sampTot+=self.sampleRepMuts[num]
+			sampTot+=self.sampleRepMuts.get_map()[num]
 		return sampTot
 
 
 	def computeAGS6TotRM(self):
 		sampAGSTot=0
-		for num in ags6RepMuts.get_map():
-			agsTot+=ags6RepMuts[num]
+		for num in self.ags6RepMuts.get_map():
+			sampAGSTot+=self.ags6RepMuts.get_map()[num]
 		return sampAGSTot		
 
 
 	def computeAGS(self):
 		#sample total of RM
 		sampTot=self.computeSampTotRM()
+		if(sampTot<=0):
+			#avoid division by zero error
+			return None
 		#AGS total of RM
 		sampAGSTot=self.computeAGS6TotRM()
 		pct_ags6=(sampAGSTot/sampTot)*100
