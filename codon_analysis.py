@@ -452,7 +452,7 @@ def diogenixGaplessVJRearrangementShouldFilter(vInfo,jInfo,imgtdb_obj,read_rec,o
 	refName=vInfo['subject ids']	
 	s_start_frame=getTheFrameForThisReferenceAtThisPosition(refName,organism,imgtdb_obj,s_start)
 	q_start_frame=s_start_frame
-	print "q_start_frame=",q_start_frame
+	#print "q_start_frame=",q_start_frame
 	q_end_j=jInfo['q. end']
 	if(q_end_j<=q_start+3):
 		#WAY TOO SHORT!
@@ -461,9 +461,9 @@ def diogenixGaplessVJRearrangementShouldFilter(vInfo,jInfo,imgtdb_obj,read_rec,o
 		j_end_j=jInfo['s. end']
 		j_end_frame=getTheFrameForThisJReferenceAtThisPosition(jInfo['subject ids'],organism,imgtdb_obj,j_end_j)
 		expected_frame_based_on_V=q_start_frame+(q_end_j-q_start)%3
-		print "expected_frame_based_on_V=",expected_frame_based_on_V
+		#print "expected_frame_based_on_V=",expected_frame_based_on_V
 		expected_frame_based_on_J=j_end_frame
-		print "expected_frame_based_on_J=",expected_frame_based_on_J
+		#print "expected_frame_based_on_J=",expected_frame_based_on_J
 		if(expected_frame_based_on_J==expected_frame_based_on_V):
 			#if both V and J impose the same frame, then the read should NOT be filtered
 			return False
@@ -523,24 +523,30 @@ def annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted
 						#did't find a stop codon!
 						#cdr3 in frame and cdr3 has no stop codon new filter GOES HERE (new per william)
 						#print "NOTE "+read_rec.id+" needs completeness testing..."
-						prodFlag=diogenixGaplessVJRearrangementShouldFilter(vInfo,jInfo,imgtdb_obj,read_rec,organism)
-						print "For ",read_rec.id," the prod VJ R flag is ",prodFlag
-						hybrid_aln=extractHybridAlignment(vInfo,imgtdb_obj)
-						if(hybrid_aln==None):
-							#print "couldn't get a hybrid!"
-							filterNote="Failure in hybrid alignment"
-						else:
-							#IGHV4, test regions for completeness and length
-							completeRegionsFlags=myCodonCounter.validate_regions_for_completenessLength(kabat_CDR1,kabat_FR2,kabat_CDR2,hybrid_aln)
-							completeRegionsNote=completeRegionsFlags[0]
-							completeRegionsFlag=completeRegionsFlags[1]
-							if(completeRegionsFlag):
-								filterNote="OK"
-								mutation_map=myCodonCounter.acquire_mutation_map(kabat_CDR1,kabat_FR2,kabat_CDR2,hybrid_aln)
-								#print "THE MUTATION MAP for ",vInfo['query id']," IS ",mutation_map
+						shouldFilterprodFlag=diogenixGaplessVJRearrangementShouldFilter(vInfo,jInfo,imgtdb_obj,read_rec,organism)
+						#print "For ",read_rec.id," the prod VJ R flag is ",prodFlag
+						if(not(shouldFilterprodFlag)):
+							#go ahead and do mutation analysis
+							hybrid_aln=extractHybridAlignment(vInfo,imgtdb_obj)
+							if(hybrid_aln==None):
+								#print "couldn't get a hybrid!"
+								filterNote="Failure in hybrid alignment"
 							else:
-								#print "INCOMPLETE so no mutation counting!"
-								filterNote="Incomplete regions"
+								#IGHV4, test regions for completeness and length
+								completeRegionsFlags=myCodonCounter.validate_regions_for_completenessLength(kabat_CDR1,kabat_FR2,kabat_CDR2,hybrid_aln)
+								completeRegionsNote=completeRegionsFlags[0]
+								completeRegionsFlag=completeRegionsFlags[1]
+								if(completeRegionsFlag):
+									filterNote="OK"
+									mutation_map=myCodonCounter.acquire_mutation_map(kabat_CDR1,kabat_FR2,kabat_CDR2,hybrid_aln)
+									#print "THE MUTATION MAP for ",vInfo['query id']," IS ",mutation_map
+								else:
+									#print "INCOMPLETE so no mutation counting!"
+									filterNote="Incomplete regions"
+							###
+						else:
+							filterNote="VJ Out of Frame"
+
 					else:
 						filterNote="Found a stop codon"
 				#validate_regions_for_completenessLength(cdr1_info,fr2_info,cdr3_info,fr3_info):
