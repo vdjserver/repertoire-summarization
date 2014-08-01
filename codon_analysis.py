@@ -467,14 +467,16 @@ def diogenixGaplessStopCodonShouldFilter(vInfo,jInfo,imgtdb_obj,read_rec,organis
 def diogenixGaplessVJRearrangementShouldFilter(vInfo,jInfo,imgtdb_obj,read_rec,organism,cdr3_map):
 	#First use CDR3 length to test productive rearrangment
 	if(cdr3_map is not None):
+		print cdr3_map," is cdr3 map for ",read_rec.id
 		if('imgt' in cdr3_map):
 			imgt_cdr3_len=int(cdr3_map['imgt'])
-			if((imgt_cdr3_len%3)==0):
-				#print "CDR3 length for ",read_rec.id," is divisble by 3....don't filter!"
-				return False
-			else:
-				#print "CDR3 length for ",read_rec.id," is NOT  divisble by 3....don't filter!"
-				return True
+			if(imgt_cdr3_len!=(-1)):
+				if((imgt_cdr3_len%3)==0 ):
+					#print "CDR3 length for ",read_rec.id," is divisble by 3....don't filter!"
+					return False
+				else:
+					#print "CDR3 length for ",read_rec.id," is NOT  divisble by 3....don't filter!"
+					return True
 	#Second, if couldn't do that, then use V and J frame
 	if(jInfo==None):
 		#no J means no prod. rearrangment???
@@ -482,7 +484,6 @@ def diogenixGaplessVJRearrangementShouldFilter(vInfo,jInfo,imgtdb_obj,read_rec,o
 	s_start=vInfo['s. start']
 	q_start=vInfo['q. start']
 	refName=vInfo['subject ids']
-	
 	s_start_frame=getTheFrameForThisReferenceAtThisPosition(refName,organism,imgtdb_obj,s_start)
 	q_start_frame=s_start_frame
 	print vInfo['query id']
@@ -495,9 +496,9 @@ def diogenixGaplessVJRearrangementShouldFilter(vInfo,jInfo,imgtdb_obj,read_rec,o
 		j_end_j=jInfo['s. end']
 		j_end_frame=getTheFrameForThisJReferenceAtThisPosition(jInfo['subject ids'],organism,imgtdb_obj,j_end_j)
 		expected_frame_based_on_V=(q_start_frame+(q_end_j-q_start))%3
-		print "expected_frame_based_on_V=",expected_frame_based_on_V
+		#print "expected_frame_based_on_V=",expected_frame_based_on_V
 		expected_frame_based_on_J=j_end_frame
-		print "expected_frame_based_on_J=",expected_frame_based_on_J
+		#print "expected_frame_based_on_J=",expected_frame_based_on_J
 		if(expected_frame_based_on_J==expected_frame_based_on_V):
 			#if both V and J impose the same frame, then the read should NOT be filtered
 			return False
