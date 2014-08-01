@@ -464,7 +464,18 @@ def diogenixGaplessStopCodonShouldFilter(vInfo,jInfo,imgtdb_obj,read_rec,organis
 
 
 
-def diogenixGaplessVJRearrangementShouldFilter(vInfo,jInfo,imgtdb_obj,read_rec,organism):
+def diogenixGaplessVJRearrangementShouldFilter(vInfo,jInfo,imgtdb_obj,read_rec,organism,cdr3_map):
+	#First use CDR3 length to test productive rearrangment
+	if(cdr3_map is not None):
+		if('imgt' in cdr3_map):
+			imgt_cdr3_len=int(cdr3_map['imgt'])
+			if((imgt_cdr3_len%3)==0):
+				print "CDR3 length for ",read_rec.id," is divisble by 3....don't filter!"
+				return False
+			else:
+				print "CDR3 length for ",read_rec.id," is NOT  divisble by 3....don't filter!"
+				return True
+	#Second, if couldn't do that, then use V and J frame
 	if(jInfo==None):
 		#no J means no prod. rearrangment???
 		return False
@@ -483,7 +494,7 @@ def diogenixGaplessVJRearrangementShouldFilter(vInfo,jInfo,imgtdb_obj,read_rec,o
 	else:
 		j_end_j=jInfo['s. end']
 		j_end_frame=getTheFrameForThisJReferenceAtThisPosition(jInfo['subject ids'],organism,imgtdb_obj,j_end_j)
-		expected_frame_based_on_V=q_start_frame+(q_end_j-q_start)%3
+		expected_frame_based_on_V=(q_start_frame+(q_end_j-q_start))%3
 		print "expected_frame_based_on_V=",expected_frame_based_on_V
 		expected_frame_based_on_J=j_end_frame
 		print "expected_frame_based_on_J=",expected_frame_based_on_J
@@ -497,7 +508,7 @@ def diogenixGaplessVJRearrangementShouldFilter(vInfo,jInfo,imgtdb_obj,read_rec,o
 
 
 
-def annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted_jobs,imgtdb_obj,myCodonCounter,organism,read_rec):
+def annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted_jobs,imgtdb_obj,myCodonCounter,organism,read_rec,cdr3_map):
 	#perform codon mutation counting for IGHV4
 	filterNote=""
 	mutation_map=dict()
@@ -546,7 +557,7 @@ def annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted
 						#did't find a stop codon!
 						#cdr3 in frame and cdr3 has no stop codon new filter GOES HERE (new per william)
 						#print "NOTE "+read_rec.id+" needs completeness testing..."
-						shouldFilterprodFlag=diogenixGaplessVJRearrangementShouldFilter(vInfo,jInfo,imgtdb_obj,read_rec,organism)
+						shouldFilterprodFlag=diogenixGaplessVJRearrangementShouldFilter(vInfo,jInfo,imgtdb_obj,read_rec,organism,cdr3_map)
 						#print "For ",read_rec.id," the prod VJ R flag is ",prodFlag
 						if(not(shouldFilterprodFlag)):
 							#go ahead and do mutation analysis
