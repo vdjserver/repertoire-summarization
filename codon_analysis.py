@@ -467,7 +467,7 @@ def diogenixGaplessStopCodonShouldFilter(vInfo,jInfo,imgtdb_obj,read_rec,organis
 def diogenixGaplessVJRearrangementShouldFilter(vInfo,jInfo,imgtdb_obj,read_rec,organism,cdr3_map):
 	#First use CDR3 length to test productive rearrangment
 	if(cdr3_map is not None):
-		print cdr3_map," is cdr3 map for ",read_rec.id
+		#print cdr3_map," is cdr3 map for ",read_rec.id
 		if('imgt' in cdr3_map):
 			imgt_cdr3_len=int(cdr3_map['imgt'])
 			if(imgt_cdr3_len!=(-1)):
