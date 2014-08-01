@@ -313,14 +313,14 @@ class codonCounter:
 			s_codons=reg_info_map['subject_read']
 			q_aminos=reg_info_map['AA']
 			s_aminos=reg_info_map['AA_ref']
-			print "\n\n\n"+reg_names[r]
-			print reg_infos[r].getName()
-			print reg_infos[r].getNiceString()
-			print "Q=",q_codons," TRX=",q_aminos
-			print "q AA len=",len(q_aminos)," q codon len=",len(q_codons)
-			print "S=",s_codons," TRX=",s_aminos
-			print "s AA len=",len(s_aminos)," s codon len=",len(s_codons)
-			print "The numbering : ",numbering_list
+			#print "\n\n\n"+reg_names[r]
+			#print reg_infos[r].getName()
+			#print reg_infos[r].getNiceString()
+			#print "Q=",q_codons," TRX=",q_aminos
+			#print "q AA len=",len(q_aminos)," q codon len=",len(q_codons)
+			#print "S=",s_codons," TRX=",s_aminos
+			#print "s AA len=",len(s_aminos)," s codon len=",len(s_codons)
+			#print "The numbering : ",numbering_list
 			for ci in range(len(q_codons)):
 				if(s_codons[ci]!=q_codons[ci]):
 					#mark a mutation in the numbering system
@@ -331,7 +331,7 @@ class codonCounter:
 					cdP=s_codons[ci]+str(numbered_pos)+q_codons[ci]
 					if(s_aminos[ci]!=q_aminos[ci]):
 						thisReadHadAtLeastOneRM=True
-						print "incrementing a mutation at ",numbered_pos," in read ",cdr1_info.getName()
+						#print "incrementing a mutation at ",numbered_pos," in read ",cdr1_info.getName()
 						self.sampleRepMuts.increment(numbered_pos)
 						for bp in range(3):
 							q_codon=q_codons[ci]
@@ -470,10 +470,10 @@ def diogenixGaplessVJRearrangementShouldFilter(vInfo,jInfo,imgtdb_obj,read_rec,o
 		if('imgt' in cdr3_map):
 			imgt_cdr3_len=int(cdr3_map['imgt'])
 			if((imgt_cdr3_len%3)==0):
-				print "CDR3 length for ",read_rec.id," is divisble by 3....don't filter!"
+				#print "CDR3 length for ",read_rec.id," is divisble by 3....don't filter!"
 				return False
 			else:
-				print "CDR3 length for ",read_rec.id," is NOT  divisble by 3....don't filter!"
+				#print "CDR3 length for ",read_rec.id," is NOT  divisble by 3....don't filter!"
 				return True
 	#Second, if couldn't do that, then use V and J frame
 	if(jInfo==None):
