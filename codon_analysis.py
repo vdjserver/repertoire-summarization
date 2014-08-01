@@ -141,24 +141,24 @@ class codonCounter:
 		#6 fields
 		#gap order	KABAT	REGION_KABAT	CHOTHIA	gap order	REGION_CHOTHIA
 		self.queriesWithRM=0
-		reader=open(pos_file_path,'r')
-		line_num=1
-		for line in reader:
-			#print line
-			temp=line
-			pieces=temp.split('\t')
-			for i in range(len(pieces)):
-				pieces[i]=pieces[i].strip()
-			if(line_num!=1):
-				#ignore header line
-				self.gap_kabat.append(pieces[0])
-				self.kabat.append(pieces[1])
-				self.region_kabat.append(pieces[2])
-				self.chothia.append(pieces[3])
-				self.gap_chothia.append(pieces[4])
-				self.region_chothia.append(pieces[5])
-			line_num+=1
-		reader.close()
+		#reader=open(pos_file_path,'r')
+		#line_num=1
+		#for line in reader:
+		#	#print line
+		#	temp=line
+		#	pieces=temp.split('\t')
+		#	for i in range(len(pieces)):
+		#		pieces[i]=pieces[i].strip()
+		#	if(line_num!=1):
+		#		#ignore header line
+		#		self.gap_kabat.append(pieces[0])
+		#		self.kabat.append(pieces[1])
+		#		self.region_kabat.append(pieces[2])
+		#		self.chothia.append(pieces[3])
+		#		self.gap_chothia.append(pieces[4])
+		#		self.region_chothia.append(pieces[5])
+		#	line_num+=1
+		#reader.close()
 		self.allowGaps=init_allowGaps
 		self.internalAnalyzer=CodonAnalysis()
 		tableFilePath=self.computePathToCodonTableFile()
