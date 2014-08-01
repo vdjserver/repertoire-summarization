@@ -266,26 +266,30 @@ class codonCounter:
 		letters=["A","B","C"]
 		l_pos=0
 		if(reg_name=="CDR1"):
-			for p in range(31,36):
-				numbering.append(p)
-			for m in range(6,8):
-				#lengths of 6,7
-				if(reg_len>=m):
-					numbering.append("35"+letters[l_pos])
-					l_pos+=1
+			if(reg_len==5):
+				for p in range(31,36):
+					numbering.append(str(p))
+			elif(reg_len==6):
+				new_nums=["31","31A","32","33","34","35"]
+				for nn in new_nums:
+					numbering.append(nn)
+			elif(reg_len==7):
+				new_nums=["31","31A","31B","32","33","34","35"]
+				for nn in new_nums:
+					numbering.append(nn)					
 		elif(reg_name=="FR2" or reg_name=="FWR2"):
 			for p in range(36,50):
-				numbering.append(p)
+				numbering.append(str(p))
 		elif(reg_name=="CDR2"):
 			for p in range(50,67):
-				numbering.append(p)
+				numbering.append(str(p))
 		elif(reg_name=="FR3" or reg_name=="FWR3"):
 			for p in range(66,83):
-				numbering.append(p)
+				numbering.append(str(p))
 			for l in range(len(letters)):
 				numbering.append("82"+str(letters[l]))
 			for p in range(83,93):
-				numbering.append(p)
+				numbering.append(str(p))
 		else:
 			#invalid/unknown region!
 			print "Error, unknown region ",reg_name,"!"
@@ -309,24 +313,25 @@ class codonCounter:
 			s_codons=reg_info_map['subject_read']
 			q_aminos=reg_info_map['AA']
 			s_aminos=reg_info_map['AA_ref']
-			#print "\n\n\n"+reg_names[r]
-			#print reg_infos[r].getName()
-			#print reg_infos[r].getNiceString()
-			#print "Q=",q_codons," TRX=",q_aminos
-			#print "q AA len=",len(q_aminos)," q codon len=",len(q_codons)
-			#print "S=",s_codons," TRX=",s_aminos
-			#print "s AA len=",len(s_aminos)," s codon len=",len(s_codons)
-			#print "The numbering : ",numbering_list
+			print "\n\n\n"+reg_names[r]
+			print reg_infos[r].getName()
+			print reg_infos[r].getNiceString()
+			print "Q=",q_codons," TRX=",q_aminos
+			print "q AA len=",len(q_aminos)," q codon len=",len(q_codons)
+			print "S=",s_codons," TRX=",s_aminos
+			print "s AA len=",len(s_aminos)," s codon len=",len(s_codons)
+			print "The numbering : ",numbering_list
 			for ci in range(len(q_codons)):
 				if(s_codons[ci]!=q_codons[ci]):
 					#mark a mutation in the numbering system
-					numbered_pos=self.kabatToChothia(numbering_list[ci])
+					numbered_pos=numbering_list[ci]
 					ags6_nums=["31B","40","56","57","81","89"]
 					nmo_nums=["36","39","45","46","50","59","61","65","67","70","86","90"]
 					aaP=s_aminos[ci]+str(numbered_pos)+q_aminos[ci]
 					cdP=s_codons[ci]+str(numbered_pos)+q_codons[ci]
 					if(s_aminos[ci]!=q_aminos[ci]):
 						thisReadHadAtLeastOneRM=True
+						print "incrementing a mutation at ",numbered_pos," in read ",cdr1_info.getName()
 						self.sampleRepMuts.increment(numbered_pos)
 						for bp in range(3):
 							q_codon=q_codons[ci]
@@ -431,7 +436,7 @@ def shouldFilterOutByIndels(vInfo,dInfo,jInfo):
 
 #return true if the query (assumed to be gapless in the alignment)
 #contains a stop codon in its translatoin
-def diogenixGaplessStopCodonShouldFilter(vInfo,imgtdb_obj,read_rec,organism):
+def diogenixGaplessStopCodonShouldFilter(vInfo,jInfo,imgtdb_obj,read_rec,organism):
 	#assumed to be GAPLESS here!
 	global AGSCodonTranslator
 	s_start=vInfo['s. start']
@@ -441,7 +446,8 @@ def diogenixGaplessStopCodonShouldFilter(vInfo,imgtdb_obj,read_rec,organism):
 	q_start-=1
 	if(s_start_frame!=0):
 		q_start=q_start+(3-s_start_frame)
-	q_seq_to_trans=str(read_rec.seq[q_start:])
+	q_seq_j_end=jInfo['q. end']
+	q_seq_to_trans=str(read_rec.seq[q_start:q_seq_j_end])
 	#print "prc totranslate is ",q_seq_to_trans
 	if(vInfo['is_inverted']):
 		q_seq_to_trans=rev_comp_dna(q_seq_to_trans)
@@ -464,10 +470,12 @@ def diogenixGaplessVJRearrangementShouldFilter(vInfo,jInfo,imgtdb_obj,read_rec,o
 		return False
 	s_start=vInfo['s. start']
 	q_start=vInfo['q. start']
-	refName=vInfo['subject ids']	
+	refName=vInfo['subject ids']
+	
 	s_start_frame=getTheFrameForThisReferenceAtThisPosition(refName,organism,imgtdb_obj,s_start)
 	q_start_frame=s_start_frame
-	#print "q_start_frame=",q_start_frame
+	print vInfo['query id']
+	print "q_start_frame (spos=",s_start,") ",q_start_frame
 	q_end_j=jInfo['q. end']
 	if(q_end_j<=q_start+3):
 		#WAY TOO SHORT!
@@ -476,9 +484,9 @@ def diogenixGaplessVJRearrangementShouldFilter(vInfo,jInfo,imgtdb_obj,read_rec,o
 		j_end_j=jInfo['s. end']
 		j_end_frame=getTheFrameForThisJReferenceAtThisPosition(jInfo['subject ids'],organism,imgtdb_obj,j_end_j)
 		expected_frame_based_on_V=q_start_frame+(q_end_j-q_start)%3
-		#print "expected_frame_based_on_V=",expected_frame_based_on_V
+		print "expected_frame_based_on_V=",expected_frame_based_on_V
 		expected_frame_based_on_J=j_end_frame
-		#print "expected_frame_based_on_J=",expected_frame_based_on_J
+		print "expected_frame_based_on_J=",expected_frame_based_on_J
 		if(expected_frame_based_on_J==expected_frame_based_on_V):
 			#if both V and J impose the same frame, then the read should NOT be filtered
 			return False
@@ -533,7 +541,7 @@ def annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted
 					filterNote="Had Indels!"
 					pass
 				else:
-					shouldFilterForStop=diogenixGaplessStopCodonShouldFilter(vInfo,imgtdb_obj,read_rec,organism)
+					shouldFilterForStop=diogenixGaplessStopCodonShouldFilter(vInfo,jInfo,imgtdb_obj,read_rec,organism)
 					if(not(shouldFilterForStop)):
 						#did't find a stop codon!
 						#cdr3 in frame and cdr3 has no stop codon new filter GOES HERE (new per william)
