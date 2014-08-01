@@ -52,9 +52,6 @@ def rep_char_read(read_result_obj,meta,organism,imgtdb_obj,read_rec,skip_char=Fa
 	read_ann_map=readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_length_results,skip_char)
 	return_obj['ann_map']=read_ann_map
 
-	#printMap(read_ann_map,True)
-	#sys.exit(0)
-
 	return return_obj
 	
 
@@ -372,6 +369,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 
 
 
+
 	#characterization beside segments/CDR3
 	global characterization_thread_set
 	global characterization_queue
@@ -475,7 +473,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 			get_res+=1
 
 	#get mutation map
-	mut_map_info=annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted_jobs,imgtdb_obj,myCodonCounter,organism,read_rec)
+	mut_map_info=annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted_jobs,imgtdb_obj,myCodonCounter,organism,read_rec,cdr3_map)
 	qualifNote=mut_map_info[0]
 	maps=mut_map_info[1]
 	amino_map=maps['aminos']
