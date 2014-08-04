@@ -51,7 +51,7 @@ class codonCounter:
 	def computeSampNMOTot(self):
 		sampNMOTot=0
 		for num in self.NMORepNucMuts.get_map():
-			sampNMOTot+=1
+			sampNMOTot+=self.NMORepNucMuts.get_map()[num]
 		return sampNMOTot
 
 
@@ -486,8 +486,8 @@ def diogenixGaplessVJRearrangementShouldFilter(vInfo,jInfo,imgtdb_obj,read_rec,o
 	refName=vInfo['subject ids']
 	s_start_frame=getTheFrameForThisReferenceAtThisPosition(refName,organism,imgtdb_obj,s_start)
 	q_start_frame=s_start_frame
-	print vInfo['query id']
-	print "q_start_frame (spos=",s_start,") ",q_start_frame
+	#print vInfo['query id']
+	#print "q_start_frame (spos=",s_start,") ",q_start_frame
 	q_end_j=jInfo['q. end']
 	if(q_end_j<=q_start+3):
 		#WAY TOO SHORT!
