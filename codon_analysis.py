@@ -358,10 +358,8 @@ class codonCounter:
 						self.sampleRepMuts.increment(numbered_pos)
 						for bp in range(3):
 							q_codon=q_codons[ci]
-							#print "q_codon is ",q_codon
 							qbp=q_codon[bp]
 							s_codon=s_codons[ci]
-							#print "s_codon is ",s_codon
 							sbp=s_codon[bp]
 							if(qbp!=sbp):
 								self.sampleRepNucMuts.increment(numbered_pos)
