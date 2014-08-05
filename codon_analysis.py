@@ -28,6 +28,7 @@ class codonCounter:
 	queriesWithRM=0
 	sampleRepMuts=IncrementMapWrapper()
 	ags6RepMuts=IncrementMapWrapper()
+	ags5RepMuts=IncrementMapWrapper()
 	sampleRepNucMuts=IncrementMapWrapper()
 	NMORepNucMuts=IncrementMapWrapper()
 
@@ -69,6 +70,14 @@ class codonCounter:
 		return sampAGSTot		
 
 
+	def computeAGS5TotRM(self):
+		sampAGSTot=0
+		for num in self.ags5RepMuts.get_map():
+			sampAGSTot+=self.ags5RepMuts.get_map()[num]
+		return sampAGSTot
+
+
+
 	def computeAGS(self):
 		#sample total of RM
 		sampTot=float(self.computeSampTotRM())
@@ -88,6 +97,19 @@ class codonCounter:
 		#1) AGS6 score   (     RMAGS6  -   1.6     ) /  
 		#2) AGS6 RM COUNT
 		#3) TOT RM COUNT
+
+
+	def computeAGS5(self):
+		sampTot=float(self.computeSampTotRM())
+		if(sampTot<=0):
+			#avoid division by zero error
+			return None
+		sampAGSTot=float(self.computeAGS5TotRM())
+		pct_ags5=(sampAGSTot/sampTot)*100.0
+		ags_numerator=pct_ags5-1.6*5.0
+		ags_denominator=0.9
+		ags_score=ags_numerator/ags_denominator
+		return ags_score
 
 
 
@@ -326,6 +348,7 @@ class codonCounter:
 					#mark a mutation in the numbering system
 					numbered_pos=numbering_list[ci]
 					ags6_nums=["31B","40","56","57","81","89"]
+					ags5_nums=["31B","40","56","57","81"]
 					nmo_nums=["36","39","45","46","50","59","61","65","67","70","86","90"]
 					aaP=s_aminos[ci]+str(numbered_pos)+q_aminos[ci]
 					cdP=s_codons[ci]+str(numbered_pos)+q_codons[ci]
@@ -346,6 +369,8 @@ class codonCounter:
 									self.NMORepNucMuts.increment(numbered_pos)
 						if(numbered_pos in ags6_nums):
 							self.ags6RepMuts.increment(numbered_pos)
+						if(numbered_pos in ags5_nums):
+							self.ags5RepMuts.increment(numbered_pos)
 						#only record mutations when they are REPLACEMENTS
 						AA_map.append(aaP)
 						codon_map.append(cdP)

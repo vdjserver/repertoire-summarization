@@ -906,6 +906,7 @@ if (__name__=="__main__"):
 		#write AGS/NMO information
 		if(organism=="human"):
 			print "AGS_SCORE\t"+str(myCodonCounter.computeAGS())+"\tAGS6_TOT_RM\t"+str(myCodonCounter.computeAGS6TotRM())+"\tTOT_RM\t"+str(myCodonCounter.computeSampTotRM())
+			print "AGS5_SCRE\t"+str(myCodonCounter.computeAGS5())+"\tAGS5_TOT_RM\t"+str(myCodonCounter.computeAGS5TotRM())+"\tTOT_RM\t"+str(myCodonCounter.computeSampTotRM())
 			print "NMO_SCORE\t"+str(myCodonCounter.computeNMO())+"\tNMO_QUERIES_RM\t"+str(myCodonCounter.queriesWithRM)+"\tNMO_SAMP_NUC_TOT\t"+str(myCodonCounter.computeSampNMOTot())
 		else:
 			print "No AGS/NMO data for non-human analysis!"
