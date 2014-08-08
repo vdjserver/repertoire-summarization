@@ -488,6 +488,10 @@ def diogenixGaplessStopCodonShouldFilter(vInfo,jInfo,imgtdb_obj,read_rec,organis
 
 
 def diogenixGaplessVJRearrangementShouldFilter(vInfo,jInfo,imgtdb_obj,read_rec,organism,cdr3_map):
+	if(vInfo==None or jInfo==None):
+		#need valid data to test. return false in this case
+		return False
+
 	#First use CDR3 length to test productive rearrangment
 	if(cdr3_map is not None):
 		#print cdr3_map," is cdr3 map for ",read_rec.id
@@ -498,7 +502,7 @@ def diogenixGaplessVJRearrangementShouldFilter(vInfo,jInfo,imgtdb_obj,read_rec,o
 					#print "CDR3 length for ",read_rec.id," is divisble by 3....don't filter!"
 					return False
 				else:
-					#print "CDR3 length for ",read_rec.id," is NOT  divisble by 3....don't filter!"
+					#print "CDR3 length for ",read_rec.id," is NOT  divisble by 3....filter!"
 					return True
 	#Second, if couldn't do that, then use V and J frame
 	if(jInfo==None):
