@@ -484,7 +484,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 	annMap["AGS Codon Muts"]=codon_map
 	annMap["AGS Amino Muts"]=amino_map
 	annMap["AGS Silent Codon Muts"]=codon_silent_map
-	annMap["AGS Silen Amino Muts"]=amino_silent_map
+	annMap["AGS Silent Amino Muts"]=amino_silent_map
 
 
 	#here, compute the region total BSB, REPLACEMENTS, SILENTS
