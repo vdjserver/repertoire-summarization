@@ -478,9 +478,13 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 	maps=mut_map_info[1]
 	amino_map=maps['aminos']
 	codon_map=maps['codons']
+	amino_silent_map=maps['aminos_silent']
+	codon_silent_map=maps['codons_silent']
 	annMap["AGS Q Note"]=qualifNote
 	annMap["AGS Codon Muts"]=codon_map
 	annMap["AGS Amino Muts"]=amino_map
+	annMap["AGS Silent Codon Muts"]=codon_silent_map
+	annMap["AGS Silen Amino Muts"]=amino_silent_map
 
 
 	#here, compute the region total BSB, REPLACEMENTS, SILENTS
@@ -730,6 +734,9 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None",log
 	keys_to_append.append("AGS Q Note")
 	keys_to_append.append("AGS Codon Muts")
 	keys_to_append.append("AGS Amino Muts")
+	keys_to_append.append("AGS Silent Codon Muts")
+	keys_to_append.append("AGS Silen Amino Muts")
+
 
 
 
