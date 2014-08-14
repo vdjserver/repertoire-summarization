@@ -327,6 +327,8 @@ class codonCounter:
 		reg_infos=[cdr1_info,fr2_info,cdr2_info,fr3_info]
 		AA_map=list()
 		codon_map=list()
+		AA_silent_map=list()
+		codon_silent_map=list()
 		thisReadHadAtLeastOneRM=False
 		for r in range(len(reg_names)):
 			reg_info_map=reg_infos[r].getCharMap()
@@ -369,9 +371,16 @@ class codonCounter:
 							self.ags6RepMuts.increment(numbered_pos)
 						if(numbered_pos in ags5_nums):
 							self.ags5RepMuts.increment(numbered_pos)
-						#only record mutations when they are REPLACEMENTS
+						#record non-synonymous changes here
+						#these changes are used in NMO/AGS formulas
 						AA_map.append(aaP)
 						codon_map.append(cdP)
+					else:
+						#record synonymous changes here
+						#these changes are not used in either AGS or NMO computations
+						#but may sometimes be desired to understand background mutations
+						AA_silent_map.append(aaP)
+						codon_silent_map.append(cdP)
 				else:
 					pass
 		if(thisReadHadAtLeastOneRM):
@@ -379,6 +388,8 @@ class codonCounter:
 		overall_map=dict()
 		overall_map['codons']=codon_map
 		overall_map['aminos']=AA_map
+		overall_map['codons_silent']=codon_silent_map
+		overall_map['aminos_silent']=AA_silent_map
 		return overall_map
 			
 
