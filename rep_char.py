@@ -735,7 +735,7 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None",log
 	keys_to_append.append("AGS Codon Muts")
 	keys_to_append.append("AGS Amino Muts")
 	keys_to_append.append("AGS Silent Codon Muts")
-	keys_to_append.append("AGS Silen Amino Muts")
+	keys_to_append.append("AGS Silent Amino Muts")
 
 
 
