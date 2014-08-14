@@ -553,6 +553,8 @@ def annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted
 	mutation_map=dict()
 	mutation_map['aminos']=list()
 	mutation_map['codons']=list()
+	mutation_map['aminos_silent']=list()
+	mutation_map['codons_silent']=list()
 	eligibleForScoring=False
 	get_res=0
 	kabat_CDR1=None
