@@ -24,6 +24,25 @@ def getRegion(note):
 		raise Exception("bad number "+note)
 
 
+def isCDR(s):
+	if(s.startswith("CDR")):
+		return True
+	else:
+		return False
+
+def isFR(s):
+	if(s.startswith("FR")):
+		return True
+	else:
+		return False
+
+def isNeither(s):
+	if(not(isFR(s)) and not(isCDR(s))):
+		return True
+	else:
+		return False
+
+
 
 def readLog(logPath):
 	reader=open(logPath,'r')
@@ -53,12 +72,14 @@ def readLog(logPath):
 				AGS_RM=int(pieces[3])
 				TOT_RM=float(pieces[5])
 			elif(pieces[0]=="AGS5_SCRE"):
-				AGS5_SCRE=float(pieces[1])
+				AGS5=float(pieces[1])
+				AGS5_RM=float(pieces[3])
 			elif(pieces[0]=="NMO_SCORE"):
 				NMO=float(pieces[1])
 				NMO_Q_RM=int(pieces[3])
 				NMO_NUC_TOT=int(pieces[5])
 	reader.close()
+	ret_map=dict()
 	ret_map['total_reads']=total_reads
 	ret_map['AGS']=AGS
 	ret_map['AGS_RM']=AGS_RM
@@ -77,12 +98,12 @@ def printStats(path,logPath):
 	stat_counts=dict()
 	#stat counts
 	stat_list=list()
-	stat_list.append("NoVHit"
-	stat_list.append("Not an IGHV4 hit"
-	stat_list.append("Had Indels!"
-	stat_list.append("Found a stop codon"
-	stat_list.append("VJ Out of Frame"
-	stat_list.append("Incomplete regions"
+	stat_list.append("NoVHit")
+	stat_list.append("Not an IGHV4 hit")
+	stat_list.append("Had Indels!")
+	stat_list.append("Found a stop codon")
+	stat_list.append("VJ Out of Frame")
+	stat_list.append("Incomplete regions")
 	stat_list.append("OK")
 	for stat in stat_list:
 		stat_counts[stat]=0
@@ -116,8 +137,20 @@ def printStats(path,logPath):
 	jCounts=dict()
 	for j in jList:
 		jCounts[j]=0
-
+	base_bp_count=195
+	base_CDR_nuc_len=63
 	line_num=1
+	num_silent_mut=0
+	tot_seq_len_by_bp=0
+	tot_seq_len_by_codon=0
+	tot_CDR_len_by_nuc=0
+	tot_CDR_len_by_codon=0
+	tot_RM_in_CDR=0
+	tot_RM_in_FR=0
+	tot_SM_in_CDR=0
+	tot_SM_in_FR=0
+	tot_bp_mut_in_CDR=0
+	tot_bp_mut_in_FR=0
 	for line in reader:
 		#print line
 		if(line_num>1):
@@ -130,22 +163,118 @@ def printStats(path,logPath):
 				vHitNA=deAllelifyName(vHit)
 				if(vHitNA in vList):
 					vCounts[vHitNA]+=1
-				jHit=pieces[2]
+				jHit=pieces[3]
 				jHitNA=deAllelifyName(jHit)
 				if(jHitNA in jList):
 					jCounts[jHitNA]+=1
-				pass
+				#cdr3_len=pieces[21]
+				#if(not(cdr3_len=="None")):
+				#	cdr3_len=int(cdr3_len)
+				#print "cdr3 len for ",pieces[1]," is ",cdr3_len
+				rms=eval(pieces[185])
+				sms=eval(pieces[187])
+				bprms=eval(pieces[184])
+				bpsms=eval(pieces[186])
+				for silent_mutation in sms:
+					num_silent_mut+=1
+					sm_reg=getRegion(silent_mutation)
+					if(isCDR(sm_reg)):
+						tot_SM_in_CDR+=1
+					elif(isFR(sm_reg)):
+						tot_SM_in_FR+=1
+					else:
+						raise Exception("Error, unplacable silent mutation ",rm," for read="+pieces[1])
+				for rm in rms:
+					rm_reg=getRegion(rm)
+					if(isCDR(rm_reg)):
+						tot_RM_in_CDR+=1
+					elif(isFR(rm_reg)):
+						tot_RM_in_FR+=1
+					else:
+						raise Exception("Error, unplacable mutation ",rm," for read="+pieces[1])
+				codon_change_set=set(bprms)
+				codon_change_set=codon_change_set.union(set(bpsms))
+				for cc in codon_change_set:
+					codon_from=cc[0:3]
+					codon_to=cc[len(cc)-3:]
+					reg=getRegion(cc)
+					for bpi in range(len(codon_from)):
+						if(codon_from[bpi]!=codon_to[bpi]):
+							#mutation detected!
+							if(isCDR(reg)):
+								tot_bp_mut_in_CDR+=1
+							elif(isFR(reg)):
+								tot_bp_mut_in_FR+=1
+				#print "The codon change set for ",pieces[1]," is ",codon_change_set,"\n\n\n"
+				#print "THE CDR1 LENGTH FOR "+pieces[1]+" is "+CDR1_len
+				CDR1_len=int(pieces[110])
+				if(CDR1_len in [15,18,21]):
+					num_extra_bp=CDR1_len-15
+					num_extra_aa=num_extra_bp/3
+					tot_seq_len_by_bp+=base_bp_count+num_extra_bp
+					tot_seq_len_by_codon+=(3*(base_bp_count+num_extra_bp))
+					tot_CDR_len_by_nuc+=base_CDR_nuc_len+num_extra_bp
+					tot_CDR_len_by_codon+=3*(base_CDR_nuc_len)+num_extra_aa
+				else:
+					raise Exception("Error on CDR1 length in file "+path+" for read="+pieces[1])
 			else:
 				pass
 		line_num+=1
-	log_data=readLog(logPath)
-	print "BID\t"
-	print "SID\t
-	print log_data['total_reads']+"\t"
-	for stat in stat_list:
-		print stat_counts[stat]+"\t"
-	for v in vList:
 	reader.close()
+	log_data=readLog(logPath)
+	out_pieces=list()
+	out_pieces_header=list()
+	out_pieces_header.append("BATCH ID")
+	out_pieces.append("BID")
+	out_pieces_header.append("SAMP ID")
+	out_pieces.append("SID")
+	out_pieces_header.append("TOTAL READS")
+	out_pieces.append(log_data['total_reads'])
+	for stat in stat_list:
+		#print stat_counts[stat]+"\t"
+		out_pieces_header.append("FILTER "+stat+" COUNT")
+		out_pieces.append(stat_counts[stat])
+	for v in vList:
+		out_pieces_header.append("V4 GENE "+v+" COUNT")
+		out_pieces.append(vCounts[v])
+	for j in jList:
+		out_pieces_header.append("J GENE "+j+" COUNT")
+		out_pieces.append(jCounts[j])
+	#AGS5 and AGS5RM
+	out_pieces_header.append("AGS5")
+	out_pieces.append(log_data['AGS5'])
+	out_pieces_header.append("AGS5 RM")
+	out_pieces.append(log_data['AGS5_RM'])
+	out_pieces_header.append("AGS6")
+	out_pieces.append(log_data['AGS'])
+	out_pieces_header.append("AGS6 RM")
+	out_pieces.append(log_data['AGS_RM'])
+
+	#TOT RM SM
+	out_pieces_header.append("TOT RM")
+	out_pieces.append(log_data['TOT_RM'])
+	out_pieces_header.append("TOT SM")
+	out_pieces.append(num_silent_mut)
+
+	#items dependent on length
+	out_pieces_header.append("Total seq length by codon")
+	out_pieces.append(tot_seq_len_by_codon)
+	
+	
+
+
+
+	#stringify
+	for op in range(len(out_pieces)):
+		out_pieces[op]=str(out_pieces[op])
+	joiner="\t"
+	if(len(out_pieces)!=len(out_pieces_header)):
+		print "header len=",len(out_pieces_header)
+		print "value  len=",len(out_pieces)
+		raise Exception("Error, header, value length mismatch!")
+	print joiner.join(out_pieces_header)
+	print joiner.join(out_pieces)
+	
 
 
 if (__name__=="__main__"):
@@ -161,7 +290,7 @@ if (__name__=="__main__"):
 		parser.print_help()
 	if(not(canReadAccess(log_file_path))):
 		parser.print_help()
-	printStats(input_file_path)
+	printStats(input_file_path,log_file_path)
 
 
 
