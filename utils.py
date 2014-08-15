@@ -15,6 +15,13 @@ import glob
 import sys
 
 
+
+
+def canReadAccess(path):
+	return os.access(path,os.R_OK)
+
+
+
 #used with argparse
 def extractAsItemOrFirstFromList(t):
 	if(type(t)==list):
