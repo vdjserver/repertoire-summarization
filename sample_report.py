@@ -139,6 +139,7 @@ def printStats(path,logPath):
 		jCounts[j]=0
 	base_bp_count=195
 	base_CDR_nuc_len=63
+	base_FR_AA_len=44
 	line_num=1
 	num_silent_mut=0
 	tot_seq_len_by_bp=0
@@ -151,6 +152,9 @@ def printStats(path,logPath):
 	tot_SM_in_FR=0
 	tot_bp_mut_in_CDR=0
 	tot_bp_mut_in_FR=0
+	tot_bp_mut_all_reg=0
+	tot_len_AA_in_FR=0
+	tot_len_bp_in_FR=0
 	for line in reader:
 		#print line
 		if(line_num>1):
@@ -201,10 +205,12 @@ def printStats(path,logPath):
 					for bpi in range(len(codon_from)):
 						if(codon_from[bpi]!=codon_to[bpi]):
 							#mutation detected!
+							tot_bp_mut_all_reg+=1
 							if(isCDR(reg)):
 								tot_bp_mut_in_CDR+=1
 							elif(isFR(reg)):
 								tot_bp_mut_in_FR+=1
+								
 				#print "The codon change set for ",pieces[1]," is ",codon_change_set,"\n\n\n"
 				#print "THE CDR1 LENGTH FOR "+pieces[1]+" is "+CDR1_len
 				CDR1_len=int(pieces[110])
@@ -217,6 +223,8 @@ def printStats(path,logPath):
 					tot_CDR_len_by_codon+=3*(base_CDR_nuc_len)+num_extra_aa
 				else:
 					raise Exception("Error on CDR1 length in file "+path+" for read="+pieces[1])
+				tot_len_AA_in_FR+=base_FR_AA_len
+				tot_len_bp_in_FR+=(base_FR_AA_len*3)
 			else:
 				pass
 		line_num+=1
@@ -259,6 +267,32 @@ def printStats(path,logPath):
 	#items dependent on length
 	out_pieces_header.append("Total seq length by codon")
 	out_pieces.append(tot_seq_len_by_codon)
+	out_pieces_header.append("Tot RM in CDR")
+	out_pieces.append(tot_RM_in_CDR)
+	out_pieces_header.append("Tot SM in CDR")
+	out_pieces.append(tot_SM_in_CDR)
+	out_pieces_header.append("Tot CDR Length by Codon")
+	out_pieces.append(tot_CDR_len_by_codon)
+	out_pieces_header.append("Tot RM in FR")
+	out_pieces.append(tot_RM_in_FR)	
+	out_pieces_header.append("Tot SM in FR")
+	out_pieces.append(tot_SM_in_FR)		
+	out_pieces_header.append("Tot FR Length by Codon")
+	out_pieces.append(tot_len_AA_in_FR)
+	out_pieces_header.append("Tot nucleotide mutations")
+	out_pieces.append(tot_bp_mut_all_reg)
+	out_pieces_header.append("Tot seq. len by nucleotide")
+	out_pieces.append(tot_seq_len_by_bp)
+	out_pieces_header.append("Tot nucleotide CDR mutations")
+	out_pieces.append(tot_bp_mut_in_CDR)
+	out_pieces_header.append("Tot seq. len by CDR nucleotide")
+	out_pieces.append(tot_CDR_len_by_nuc)
+	out_pieces_header.append("Tot. nucleotide FR mutations")
+	out_pieces.append(tot_bp_mut_in_FR)
+	out_pieces_header.append("Tot FR length by nucleotide")
+	out_pieces.append(tot_len_bp_in_FR)
+	
+	
 	
 	
 
