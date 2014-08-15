@@ -664,7 +664,7 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None",log
 	"Silent mutation freq% (over V)",
 	"Silent mutations (codons) (over V)",
 	"Indel frequency (over V and J)",
-	"Insertion cohuman.IG.fna.igblast.imgt.out.rc_out.tsvunt (over V and J)",
+	"Insertion count (over V and J)",
 	"Deletion count (over V and J)"]
 	
 
