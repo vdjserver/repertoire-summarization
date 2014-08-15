@@ -1,7 +1,28 @@
 #!/usr/bin/env python
 
 from utils import extractAsItemOrFirstFromList,canReadAccess
+from segment_utils import deAllelifyName
 import argparse
+import re
+
+def getRegion(note):
+	note_re=re.compile(r'^[A-Z]+(\d+)[A-Z]+$',re.IGNORECASE)
+	sr=re.search(note_re,note)
+	if(sr):
+		num=int(sr.group(1))
+		if(num>=31 and num<=35):
+			return "CDR1"
+		elif(num>=36 and num<=51):
+			return "FR2"
+		elif(num>=52 and num<=56):
+			return "CDR2"
+		elif(num>=57 and num<=92):
+			return "FR3"
+		else:
+			raise Exception("bad number "+note)			
+	else:
+		raise Exception("bad number "+note)
+
 
 
 def readLog(logPath):
@@ -27,66 +48,103 @@ def readLog(logPath):
 			total_reads=int(re_res.group(1))
 		pieces=line.split('\t')
 		if(len(pieces)==6):
-			if(pieces[0]=="AGS_SCORE")
+			if(pieces[0]=="AGS_SCORE"):
 				AGS=float(pieces[1])
 				AGS_RM=int(pieces[3])
 				TOT_RM=float(pieces[5])
 			elif(pieces[0]=="AGS5_SCRE"):
 				AGS5_SCRE=float(pieces[1])
 			elif(pieces[0]=="NMO_SCORE"):
-				
-		
+				NMO=float(pieces[1])
+				NMO_Q_RM=int(pieces[3])
+				NMO_NUC_TOT=int(pieces[5])
 	reader.close()
+	ret_map['total_reads']=total_reads
+	ret_map['AGS']=AGS
+	ret_map['AGS_RM']=AGS_RM
+	ret_map['TOT_RM']=TOT_RM
+	ret_map['AGS5']=AGS5
+	ret_map['AGS5_RM']=AGS5_RM
+	ret_map['NMO']=NMO
+	ret_map['NMO_Q_RM']=NMO_Q_RM
+	ret_map['NMU_NUC_TOT']=NMO_NUC_TOT
+	return ret_map
 
 
-def printStats(path):
+
+def printStats(path,logPath):
 	reader=open(path,'r')
 	stat_counts=dict()
 	#stat counts
-	stat_counts["Found a stop codon"]=0
-	stat_counts["Had Indels!"]=0
-	stat_counts["Incomplete regions"]=0
-	stat_counts["NoVHit"]=0
-	stat_counts["OK"]=0
-	stat_counts["VJ Out of Frame"]=0
-	stat_counts["Not an IGHV4 hit"]
+	stat_list=list()
+	stat_list.append("NoVHit"
+	stat_list.append("Not an IGHV4 hit"
+	stat_list.append("Had Indels!"
+	stat_list.append("Found a stop codon"
+	stat_list.append("VJ Out of Frame"
+	stat_list.append("Incomplete regions"
+	stat_list.append("OK")
+	for stat in stat_list:
+		stat_counts[stat]=0
 	#V4 counts
+	vList=list()
+	vList.append("IGHV4-4")
+	vList.append("IGHV4-28")
+	vList.append("IGHV4-30-1")
+	vList.append("IGHV4-30-2")
+	vList.append("IGHV4-30-4")
+	vList.append("IGHV4-31")
+	vList.append("IGHV4-34")
+	vList.append("IGHV4-38-2")
+	vList.append("IGHV4-39")
+	vList.append("IGHV4-55")
+	vList.append("IGHV4-59")
+	vList.append("IGHV4-61")
+	vList.append("IGHV4-80")
+	vList.append("IGHV4/OR15-8")
 	vCounts=dict()
-	vCounts["IGHV4-4"]=0
-	vCounts["IGHV4-28"]=0
-	vCounts["IGHV4-30-1"]=0
-	vCounts["IGHV4-30-2"]=0
-	vCounts["IGHV4-30-4"]=0
-	vCounts["IGHV4-31"]=0
-	vCounts["IGHV4-34"]=0
-	vCounts["IGHV4-38-2"]=0
-	vCounts["IGHV4-39"]=0
-	vCounts["IGHV4-55"]=0
-	vCounts["IGHV4-59"]=0
-	vCounts["IGHV4-61"]=0
-	vCounts["IGHV4-80"]=0
-	vCounts["IGHV4/OR15-8"]=0
+	for v in vList:
+		vCounts[v]=0
 	#J counts
+	jList=list()
+	jList.append("IGHJ1")
+	jList.append("IGHJ2")
+	jList.append("IGHJ3")
+	jList.append("IGHJ4")
+	jList.append("IGHJ5")
+	jList.append("IGHJ6")
 	jCounts=dict()
-	jCounts["IGHJ1"]=0
-	jCounts["IGHJ2"]=0
-	jCounts["IGHJ3"]=0
-	jCounts["IGHJ4"]=0
-	jCounts["IGHJ5"]=0
-	jCounts["IGHJ6"]=0
+	for j in jList:
+		jCounts[j]=0
 
-
+	line_num=1
 	for line in reader:
 		#print line
-		pieces=line.split('\t')
-		status=pieces[184]
-		stat_counts[status]+=1
-		if(status=="OK"):
-			#proceed
-		else:
-			pass
-		
-	
+		if(line_num>1):
+			pieces=line.split('\t')
+			status=pieces[183]
+			stat_counts[status]+=1
+			if(status=="OK"):
+				#proceed
+				vHit=pieces[2]
+				vHitNA=deAllelifyName(vHit)
+				if(vHitNA in vList):
+					vCounts[vHitNA]+=1
+				jHit=pieces[2]
+				jHitNA=deAllelifyName(jHit)
+				if(jHitNA in jList):
+					jCounts[jHitNA]+=1
+				pass
+			else:
+				pass
+		line_num+=1
+	log_data=readLog(logPath)
+	print "BID\t"
+	print "SID\t
+	print log_data['total_reads']+"\t"
+	for stat in stat_list:
+		print stat_counts[stat]+"\t"
+	for v in vList:
 	reader.close()
 
 
@@ -98,7 +156,10 @@ if (__name__=="__main__"):
 	if(not(args)):
 		parser.print_help()
 	input_file_path=extractAsItemOrFirstFromList(args.tsv_in)
+	log_file_path=extractAsItemOrFirstFromList(args.log_in)
 	if(not(canReadAccess(input_file_path))):
+		parser.print_help()
+	if(not(canReadAccess(log_file_path))):
 		parser.print_help()
 	printStats(input_file_path)
 
