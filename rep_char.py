@@ -67,17 +67,20 @@ def readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,read_ann
 		t=cdr3_length_results[mode+'_to']
 		len_key_aa="CDR3 AA length ("+mode+")"
 		aa_key="CDR3 AA ("+mode+")"
-		
+		na_key="CDR3 NA ("+mode+")"
+		len_key_na="CDR3 NA length ("+mode+")"
 		if(f!=(-1) and t!=(-1) and cdr3_length_results[mode]!=(-1) ):
 			qw=str(read_rec.seq)
 			if(cdr3_length_results['qry_rev']):
 				qw=rev_comp_dna(qw)
 			query_cdr3=qw[f-1:t]
 			read_ann_map[global_key_base+mode+'_cdr3_na']=query_cdr3
+			read_ann_map[na_key]=query_cdr3.upper()
 			read_ann_map[aa_key]=biopythonTranslate(read_ann_map[global_key_base+mode+'_cdr3_na'])
 			#add in lengths!
 			read_ann_map[global_key_base+mode+'_cdr3_na_len']=len(query_cdr3)
 			read_ann_map[len_key_aa]=len(read_ann_map[aa_key])
+			read_ann_map[len_key_na]=len(read_ann_map[na_key])
 			#this stuff below was once in here becuase we might've done some CDR3 specific annotation...but
 			#it is commented out for now because such goals are either postponed or canceled
 			#vMap=getHitInfo(read_result_obj,meta,read_ann_map['top_V'],read_rec,imgtdb_obj,organism)
@@ -661,7 +664,7 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None",log
 	"Silent mutation freq% (over V)",
 	"Silent mutations (codons) (over V)",
 	"Indel frequency (over V and J)",
-	"Insertion count (over V and J)",
+	"Insertion cohuman.IG.fna.igblast.imgt.out.rc_out.tsvunt (over V and J)",
 	"Deletion count (over V and J)"]
 	
 
@@ -673,6 +676,8 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None",log
 	for mode in modes:
 		keys_to_append.append("CDR3 AA ("+mode+")")
 		keys_to_append.append("CDR3 AA length ("+mode+")")
+		keys_to_append.append("CDR3 NA ("+mode+")")
+		keys_to_append.append("CDR3 NA length ("+mode+")")
 		#Base substition totals
 		keys_to_append.append("Total base substitution freq(%) over regions ("+mode+")") 	#a/b
 		keys_to_append.append("Total base substitutions over regions ("+mode+")") 		#a
