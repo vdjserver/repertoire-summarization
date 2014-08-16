@@ -88,7 +88,7 @@ def readLog(logPath):
 	ret_map['AGS5_RM']=AGS5_RM
 	ret_map['NMO']=NMO
 	ret_map['NMO_Q_RM']=NMO_Q_RM
-	ret_map['NMU_NUC_TOT']=NMO_NUC_TOT
+	ret_map['NMO_NUC_TOT']=NMO_NUC_TOT
 	return ret_map
 
 
@@ -218,7 +218,7 @@ def printStats(path,logPath):
 					num_extra_bp=CDR1_len-15
 					num_extra_aa=num_extra_bp/3
 					tot_seq_len_by_bp+=base_bp_count+num_extra_bp
-					tot_seq_len_by_codon+=(3*(base_bp_count+num_extra_bp))
+					tot_seq_len_by_codon+=((base_bp_count+num_extra_bp)/3)
 					tot_CDR_len_by_nuc+=base_CDR_nuc_len+num_extra_bp
 					tot_CDR_len_by_codon+=3*(base_CDR_nuc_len)+num_extra_aa
 				else:
@@ -291,11 +291,15 @@ def printStats(path,logPath):
 	out_pieces.append(tot_bp_mut_in_FR)
 	out_pieces_header.append("Tot FR length by nucleotide")
 	out_pieces.append(tot_len_bp_in_FR)
-	
-	
-	
-	
 
+	
+	#NMO
+	out_pieces_header.append("NMO Score (no norm by 100)")
+	out_pieces.append(log_data['NMO']/100.0)
+	out_pieces_header.append("NMO Nuc Muts (sum nuc mutations in NMO codons)")
+	out_pieces.append(log_data['NMO_NUC_TOT'])
+	out_pieces_header.append("# Seqs with RM>=1")
+	out_pieces.append(log_data['NMO_Q_RM'])
 
 
 	#stringify
