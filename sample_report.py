@@ -12,11 +12,11 @@ def getRegion(note):
 		num=int(sr.group(1))
 		if(num>=31 and num<=35):
 			return "CDR1"
-		elif(num>=36 and num<=51):
+		elif(num>=36 and num<=49):
 			return "FR2"
-		elif(num>=52 and num<=56):
+		elif(num>=50 and num<=65):
 			return "CDR2"
-		elif(num>=57 and num<=92):
+		elif(num>=66 and num<=92):
 			return "FR3"
 		else:
 			raise Exception("bad number "+note)			
@@ -184,15 +184,19 @@ def printStats(path,logPath):
 					sm_reg=getRegion(silent_mutation)
 					if(isCDR(sm_reg)):
 						tot_SM_in_CDR+=1
+						#print "SM",silent_mutation," detected in CDR for ",pieces[1]
 					elif(isFR(sm_reg)):
+						#print "SM",silent_mutation," detected in FR for ",pieces[1]
 						tot_SM_in_FR+=1
 					else:
 						raise Exception("Error, unplacable silent mutation ",rm," for read="+pieces[1])
 				for rm in rms:
 					rm_reg=getRegion(rm)
 					if(isCDR(rm_reg)):
+						#print "RM",rm," detected in CDR for ",pieces[1]
 						tot_RM_in_CDR+=1
 					elif(isFR(rm_reg)):
+						#print "RM",rm," detected in FR for ",pieces[1]
 						tot_RM_in_FR+=1
 					else:
 						raise Exception("Error, unplacable mutation ",rm," for read="+pieces[1])
@@ -220,7 +224,7 @@ def printStats(path,logPath):
 					tot_seq_len_by_bp+=base_bp_count+num_extra_bp
 					tot_seq_len_by_codon+=((base_bp_count+num_extra_bp)/3)
 					tot_CDR_len_by_nuc+=base_CDR_nuc_len+num_extra_bp
-					tot_CDR_len_by_codon+=3*(base_CDR_nuc_len)+num_extra_aa
+					tot_CDR_len_by_codon+=(((base_CDR_nuc_len)/3)+num_extra_aa)
 				else:
 					raise Exception("Error on CDR1 length in file "+path+" for read="+pieces[1])
 				tot_len_AA_in_FR+=base_FR_AA_len
