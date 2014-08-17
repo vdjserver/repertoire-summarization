@@ -6,7 +6,7 @@ import argparse
 import re
 
 def getRegion(note):
-	note_re=re.compile(r'^[A-Z]+(\d+)[A-Z]+$',re.IGNORECASE)
+	note_re=re.compile(r'^[A-Z\*]+(\d+)[A-Z\*]+$',re.IGNORECASE)
 	sr=re.search(note_re,note)
 	if(sr):
 		num=int(sr.group(1))
