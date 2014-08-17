@@ -81,7 +81,10 @@ def readLog(logPath):
 					AGS5=0.0
 				AGS5_RM=float(pieces[3])
 			elif(pieces[0]=="NMO_SCORE"):
-				NMO=float(pieces[1])
+				if(pieces[1]!="None"):
+					NMO=float(pieces[1])
+				else:
+					NMO=0.0
 				NMO_Q_RM=int(pieces[3])
 				NMO_NUC_TOT=int(pieces[5])
 	reader.close()
