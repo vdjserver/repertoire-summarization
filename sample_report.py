@@ -93,7 +93,7 @@ def readLog(logPath):
 
 
 
-def printStats(path,logPath):
+def printStats(path,logPath,bid,sid):
 	reader=open(path,'r')
 	stat_counts=dict()
 	#stat counts
@@ -237,9 +237,9 @@ def printStats(path,logPath):
 	out_pieces=list()
 	out_pieces_header=list()
 	out_pieces_header.append("BATCH ID")
-	out_pieces.append("BID")
+	out_pieces.append(bid)
 	out_pieces_header.append("SAMP ID")
-	out_pieces.append("SID")
+	out_pieces.append(sid)
 	out_pieces_header.append("TOTAL READS")
 	out_pieces.append(log_data['total_reads'])
 	for stat in stat_list:
@@ -323,6 +323,8 @@ if (__name__=="__main__"):
 	parser=argparse.ArgumentParser(description='Print DIOGENIX formatted rep_char run statistics')
 	parser.add_argument('tsv_in',type=str,nargs=1,help="path to a rep_char TSV output file")
 	parser.add_argument('log_in',type=str,nargs=1,help="path to the corresponding rep_char output log file")
+	parser.add_argument('bid',type=str,nargs=1,help="string for BATCH ID")
+	parser.add_argument('sid',type=str,nargs=1,help="string for SAMPLE ID")
 	args=parser.parse_args()
 	if(not(args)):
 		parser.print_help()
@@ -332,7 +334,9 @@ if (__name__=="__main__"):
 		parser.print_help()
 	if(not(canReadAccess(log_file_path))):
 		parser.print_help()
-	printStats(input_file_path,log_file_path)
+	bid=extractAsItemOrFirstFromList(args.bid)
+	sid=extractAsItemOrFirstFromList(args.sid)
+	printStats(input_file_path,log_file_path,bid,sid)
 
 
 
