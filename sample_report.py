@@ -68,11 +68,17 @@ def readLog(logPath):
 		pieces=line.split('\t')
 		if(len(pieces)==6):
 			if(pieces[0]=="AGS_SCORE"):
-				AGS=float(pieces[1])
+				if(pieces[1]!="None"):
+					AGS=float(pieces[1])
+				else:
+					AGS=0.0
 				AGS_RM=int(pieces[3])
 				TOT_RM=float(pieces[5])
 			elif(pieces[0]=="AGS5_SCRE"):
-				AGS5=float(pieces[1])
+				if(pieces[1]!="None"):
+					AGS5=float(pieces[1])
+				else:
+					AGS5=0.0
 				AGS5_RM=float(pieces[3])
 			elif(pieces[0]=="NMO_SCORE"):
 				NMO=float(pieces[1])
