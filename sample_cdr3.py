@@ -4,21 +4,41 @@ from utils import extractAsItemOrFirstFromList,canReadAccess
 import argparse
 import re
 
-def cdr3LenStats(path,out_hist,min_len,max_len):
-	reader=open(path,'r')
-	line_num=1
-	for line in reader:
-		#print line
-		if(line_num>1):
-			pieces=line.split('\t')
-			status=pieces[183]
-			stat_counts[status]+=1
-			if(status=="OK"):
+def getBatchIDAndSampleIDFromPath(tsv_path):
+	return ["BID","SID"]
+
+
+def cdr3LenStats(dir_base,out_hist,min_len,max_len):
+	file_num=0
+	for root, dir, files in os.walk(dir_base):
+		for items in fnmatch.filter(files, "*out.tsv"):
+			full_tsv_path=root+"/"+items
+			reader=open(full_tsv_path,'r')
+			line_num=1
+			len_hist_this_file=dict()
+			for line in reader:
+				if(line_num>1):
+					pass
+					pieces=line.split('\t')
+					status=pieces[183]
+					if(status=="OK"):
+						cdr3_na_len=pieces[21]
+						if(cdr3_na_len!="None"):
+							cdr3_na_len=int(cdr3_na_len)
+							if(cdr3_na_len in len_hist_this_file):
+								len_hist_this_file[cdr3_na_len]+=1
+							else:
+								len_hist_this_file[cdr3_na_len]=1
+				line_num+=1
+			reader.close()
+			writer=open(out_hist,'a')
+			if(file_num==0):
+				#print headers
 				pass
-			else:
-				pass
-		line_num+=1
-	reader.close()
+			for val in range(min_len,max_len+1):
+								
+			file_num+=1
+
 
 
 
@@ -27,6 +47,7 @@ def cdr3DiverStats(dir_base,out_diva):
 		full_tsv_path=root+"/"+items
 		reader=open(full_tsv_path,'r')
 		line_num=1
+		cdr3_na_this_file=dict()
 		for line in reader:
 			if(line_num>1):
 				pass
@@ -37,9 +58,23 @@ def cdr3DiverStats(dir_base,out_diva):
 					#20:CDR3 AA length (imgt)
 					#21:CDR3 NA (imgt)
 					#22:CDR3 NA length (imgt)
-					pass
+					cdr3_na=pieces[20]
+					if(cdr3_na!="None"):
+						if(cdr3_na in cdr3_na_this_file):
+							cdr3_na_this_file[cdr3_na]+=1
+						else:
+							cdr3_na_this_file[cdr3_na]=1
 			line_num+=1
 		reader.close()		
+#coal_like.py-96-	#x = {1: 2, 3: 4, 4:3, 2:1, 0:0}
+#coal_like.py:97:	#sorted_x = sorted(x.iteritems(), key=operator.itemgetter(1))
+#coal_like.py-98-	import operator
+#coal_like.py:99:	sorted_x=sorted(bases.iteritems(),key=operator.itemgetter(1))
+#coal_like.py-100-	#most frequent base to appear at end of list
+#coal_like.py-101-	i_count=0
+#coal_like.py:102:	for c in range(len(sorted_x)-1):		
+#coal_like.py:103:		i_count+=sorted_x[c][1]
+#coal_like.py-104-	return i_count
 
 
 
