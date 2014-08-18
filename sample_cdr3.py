@@ -4,7 +4,7 @@ from utils import extractAsItemOrFirstFromList,canReadAccess
 import argparse
 import re
 
-def cdr3LenStats(path,bid,sid,out_hist):
+def cdr3LenStats(path,out_hist):
 	reader=open(path,'r')
 	line_num=1
 	for line in reader:
@@ -19,6 +19,13 @@ def cdr3LenStats(path,bid,sid,out_hist):
 				pass
 		line_num+=1
 	reader.close()
+
+
+
+def cdr3DiverStats(path,out_diva):
+	pass
+
+
 
 
 def getCDR3MinMax(dir_base):
