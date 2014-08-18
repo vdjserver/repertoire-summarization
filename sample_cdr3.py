@@ -4,7 +4,7 @@ from utils import extractAsItemOrFirstFromList,canReadAccess
 import argparse
 import re
 
-def cdr3LenStats(path,out_hist):
+def cdr3LenStats(path,out_hist,min_len,max_len):
 	reader=open(path,'r')
 	line_num=1
 	for line in reader:
@@ -22,8 +22,24 @@ def cdr3LenStats(path,out_hist):
 
 
 
-def cdr3DiverStats(path,out_diva):
-	pass
+def cdr3DiverStats(dir_base,out_diva):
+	for root, dir, files in os.walk(dir_base):
+		full_tsv_path=root+"/"+items
+		reader=open(full_tsv_path,'r')
+		line_num=1
+		for line in reader:
+			if(line_num>1):
+				pass
+				pieces=line.split('\t')
+				status=pieces[183]
+				if(status=="OK"):
+					#19:CDR3 AA (imgt)
+					#20:CDR3 AA length (imgt)
+					#21:CDR3 NA (imgt)
+					#22:CDR3 NA length (imgt)
+					pass
+			line_num+=1
+		reader.close()		
 
 
 
@@ -32,7 +48,7 @@ def getCDR3MinMax(dir_base):
 	max_cdr3=None
 	min_cdr3=None
 	cdr3_len_set=set()
-	for root, dir, files in os.walk(top):
+	for root, dir, files in os.walk(dir_base):
 		for items in fnmatch.filter(files, "*out.tsv"):
 			full_tsv_path=root+"/"+items
 			reader=open(full_tsv_path,'r')
