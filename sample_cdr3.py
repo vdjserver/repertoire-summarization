@@ -31,8 +31,8 @@ def cdr3LenStats(dir_base,out_hist,min_len,max_len):
 					pieces=line.split('\t')
 					status=pieces[183]
 					if(status=="OK"):
-						cdr3_na_len=pieces[21]
-						if(cdr3_na_len!="None"):
+						cdr3_na_len=pieces[19]
+						if(cdr3_na_len!="None" and cdr3_na_len!=""):
 							cdr3_na_len=int(cdr3_na_len)
 							if(cdr3_na_len in len_hist_this_file):
 								len_hist_this_file[cdr3_na_len]+=1
@@ -105,14 +105,14 @@ def cdr3DiverStats(dir_base,out_diva):
 			if(file_num==0):
 				#print headers
 				writer=open(out_diva,'w')
-				writer.write("batch\tsample\tCDR3_DIVERSITY_VECTOR")
+				writer.write("batch\tsample\tNUM_UNIQ_CDR3\tCDR3_DIVERSITY_VECTOR")
 				writer.write("\n")
 				writer.close()
 			writer=open(out_diva,'a')
 			bs=getBatchIDAndSampleIDFromPath(full_tsv_path)
-			print "Writing CDR3 diversity data for",bs,"to ",out_diva
-			writer.write(bs[0]+"\t"+bs[1])
 			num_keys=len(sorted_lens)
+			print "Writing CDR3 diversity data for",bs,"to ",out_diva
+			writer.write(bs[0]+"\t"+bs[1]+"\t"+str(num_keys))
 			for i in range(0,min(100,num_keys)):
 				dna=sorted_lens[i][0]
 				dna_count=sorted_lens[i][1]
@@ -152,8 +152,8 @@ def getCDR3MinMax(dir_base):
 						#20:CDR3 AA length (imgt)
 						#21:CDR3 NA (imgt)
 						#22:CDR3 NA length (imgt)
-						cdr3_na_len=pieces[21]
-						if(cdr3_na_len!="None"):
+						cdr3_na_len=pieces[19]
+						if(cdr3_na_len!="None" and cdr3_na_len!=""):
 							cdr3_na_len=int(cdr3_na_len)
 							cdr3_len_set.add(cdr3_na_len)
 				line_num+=1
@@ -180,12 +180,12 @@ if (__name__=="__main__"):
 			parser.print_help()
 		else:
 			print "using dir_base ",dir_base
-			#cdr3_min_max=getCDR3MinMax(dir_base)
-			#min_len=cdr3_min_max[0]
-			#max_len=cdr3_min_max[1]
-			#print "min/max are :",cdr3_min_max
-			#print "Writing histogram to",out_hist
-			#cdr3LenStats(dir_base,out_hist,min_len,max_len)
+			cdr3_min_max=getCDR3MinMax(dir_base)
+			min_len=cdr3_min_max[0]
+			max_len=cdr3_min_max[1]
+			print "min/max are :",cdr3_min_max
+			print "Writing histogram to",out_hist
+			cdr3LenStats(dir_base,out_hist,min_len,max_len)
 			cdr3DiverStats(dir_base,out_diva)
 
 
