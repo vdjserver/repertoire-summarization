@@ -50,7 +50,7 @@ def cdr3LenStats(dir_base,out_hist,min_len,max_len):
 				writer.close()
 			writer=open(out_hist,'a')
 			bs=getBatchIDAndSampleIDFromPath(full_tsv_path)
-			print "Writing CDR3 len/hist data for",bs
+			print "Writing CDR3 len/hist data for",bs,"to",out_hist
 			writer.write(bs[0]+"\t"+bs[1])
 			for val in range(min_len,max_len+1):
 				if(val in len_hist_this_file):
@@ -65,12 +65,14 @@ def cdr3LenStats(dir_base,out_hist,min_len,max_len):
 
 
 def cdr3DiverStats(dir_base,out_diva):
+	file_num=0
 	for root, dirs, files in sorted(os.walk(dir_base)):
 		for items in sorted(fnmatch.filter(files, "*out.tsv")):
 			full_tsv_path=root+"/"+items
 			reader=open(full_tsv_path,'r')
 			line_num=1
 			cdr3_na_this_file=dict()
+			denominator=0
 			for line in reader:
 				if(line_num>1):
 					pass
@@ -83,6 +85,7 @@ def cdr3DiverStats(dir_base,out_diva):
 						#22:CDR3 NA length (imgt)
 						cdr3_na=pieces[20]
 						if(cdr3_na!="None"):
+							denominator+=1
 							if(cdr3_na in cdr3_na_this_file):
 								cdr3_na_this_file[cdr3_na]+=1
 							else:
@@ -92,13 +95,36 @@ def cdr3DiverStats(dir_base,out_diva):
 			sorted_lens=sorted(cdr3_na_this_file.iteritems(),key=operator.itemgetter(1))
 			sorted_lens.reverse()
 			bs=getBatchIDAndSampleIDFromPath(full_tsv_path)
-			print "Analysis for",bs
-			print "sorted_lens :",sorted_lens
-			print "sorted_lens[0]=",sorted_lens[0]
-			dna=sorted_lens[0][0]
-			dna_count=sorted_lens[0][1]
-			print "dna and count are : ",dna,"<>",dna_count
-			print "\n\n\n\n\n"
+			#print "Analysis for",bs
+			#print "sorted_lens :",sorted_lens
+			#print "sorted_lens[0]=",sorted_lens[0]
+			#dna=sorted_lens[0][0]
+			#dna_count=sorted_lens[0][1]
+			#print "dna and count are : ",dna,"<>",dna_count
+			#print "\n\n\n\n\n"
+			if(file_num==0):
+				#print headers
+				writer=open(out_diva,'w')
+				writer.write("batch\tsample\tCDR3_DIVERSITY_VECTOR")
+				writer.write("\n")
+				writer.close()
+			writer=open(out_diva,'a')
+			bs=getBatchIDAndSampleIDFromPath(full_tsv_path)
+			print "Writing CDR3 diversity data for",bs,"to ",out_diva
+			writer.write(bs[0]+"\t"+bs[1])
+			num_keys=len(sorted_lens)
+			for i in range(0,min(100,num_keys)):
+				dna=sorted_lens[i][0]
+				dna_count=sorted_lens[i][1]
+				numerator=float(dna_count)
+				if(denominator!=0):
+					ratio=numerator/float(denominator)
+				else:
+					ratio=0.0
+				writer.write("\t"+str(ratio))
+			writer.write("\n")
+			writer.close()			
+			file_num+=1
 
 
 
