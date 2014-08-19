@@ -5,6 +5,7 @@ import fnmatch
 import argparse
 import re
 import os
+import operator
 
 def getBatchIDAndSampleIDFromPath(tsv_path):
 	bsre=re.compile(r'/([^/]+)/(Sample[^\.]+)\.fasta')
@@ -64,39 +65,41 @@ def cdr3LenStats(dir_base,out_hist,min_len,max_len):
 
 
 def cdr3DiverStats(dir_base,out_diva):
-	for root, dir, files in os.walk(dir_base):
-		full_tsv_path=root+"/"+items
+	for root, dirs, files in sorted(os.walk(dir_base)):
+		for items in sorted(fnmatch.filter(files, "*out.tsv")):
+			full_tsv_path=root+"/"+items
+			reader=open(full_tsv_path,'r')
+			line_num=1
+			cdr3_na_this_file=dict()
+			for line in reader:
+				if(line_num>1):
+					pass
+					pieces=line.split('\t')
+					status=pieces[183]
+					if(status=="OK"):
+						#19:CDR3 AA (imgt)
+						#20:CDR3 AA length (imgt)
+						#21:CDR3 NA (imgt)
+						#22:CDR3 NA length (imgt)
+						cdr3_na=pieces[20]
+						if(cdr3_na!="None"):
+							if(cdr3_na in cdr3_na_this_file):
+								cdr3_na_this_file[cdr3_na]+=1
+							else:
+								cdr3_na_this_file[cdr3_na]=1
+				line_num+=1
+			reader.close()
+			sorted_lens=sorted(cdr3_na_this_file.iteritems(),key=operator.itemgetter(1))
+			sorted_lens.reverse()
+			bs=getBatchIDAndSampleIDFromPath(full_tsv_path)
+			print "Analysis for",bs
+			print "sorted_lens :",sorted_lens
+			print "sorted_lens[0]=",sorted_lens[0]
+			dna=sorted_lens[0][0]
+			dna_count=sorted_lens[0][1]
+			print "dna and count are : ",dna,"<>",dna_count
+			print "\n\n\n\n\n"
 
-		reader=open(full_tsv_path,'r')
-		line_num=1
-		cdr3_na_this_file=dict()
-		for line in reader:
-			if(line_num>1):
-				pass
-				pieces=line.split('\t')
-				status=pieces[183]
-				if(status=="OK"):
-					#19:CDR3 AA (imgt)
-					#20:CDR3 AA length (imgt)
-					#21:CDR3 NA (imgt)
-					#22:CDR3 NA length (imgt)
-					cdr3_na=pieces[20]
-					if(cdr3_na!="None"):
-						if(cdr3_na in cdr3_na_this_file):
-							cdr3_na_this_file[cdr3_na]+=1
-						else:
-							cdr3_na_this_file[cdr3_na]=1
-			line_num+=1
-		reader.close()		
-#coal_like.py-96-	#x = {1: 2, 3: 4, 4:3, 2:1, 0:0}
-#coal_like.py:97:	#sorted_x = sorted(x.iteritems(), key=operator.itemgetter(1))
-#coal_like.py-98-	import operator
-#coal_like.py:99:	sorted_x=sorted(bases.iteritems(),key=operator.itemgetter(1))
-#coal_like.py-100-	#most frequent base to appear at end of list
-#coal_like.py-101-	i_count=0
-#coal_like.py:102:	for c in range(len(sorted_x)-1):		
-#coal_like.py:103:		i_count+=sorted_x[c][1]
-#coal_like.py-104-	return i_count
 
 
 
@@ -151,13 +154,13 @@ if (__name__=="__main__"):
 			parser.print_help()
 		else:
 			print "using dir_base ",dir_base
-			cdr3_min_max=getCDR3MinMax(dir_base)
-			min_len=cdr3_min_max[0]
-			max_len=cdr3_min_max[1]
-			print "min/max are :",cdr3_min_max
-			print "Writing histogram to",out_hist
-			cdr3LenStats(dir_base,out_hist,min_len,max_len)
-
+			#cdr3_min_max=getCDR3MinMax(dir_base)
+			#min_len=cdr3_min_max[0]
+			#max_len=cdr3_min_max[1]
+			#print "min/max are :",cdr3_min_max
+			#print "Writing histogram to",out_hist
+			#cdr3LenStats(dir_base,out_hist,min_len,max_len)
+			cdr3DiverStats(dir_base,out_diva)
 
 
 
