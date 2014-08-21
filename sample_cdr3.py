@@ -8,7 +8,7 @@ import os
 import operator
 
 def getBatchIDAndSampleIDFromPath(tsv_path):
-	bsre=re.compile(r'/([^/]+)/(Sample[^\.]+)\.fasta')
+	bsre=re.compile(r'/([^/]+)/([^/]+)\.fasta')
 	re_res=re.search(bsre,tsv_path)
 	if(re_res):
 		batch=re_res.group(1)
