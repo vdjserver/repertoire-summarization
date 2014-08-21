@@ -93,14 +93,14 @@ def getNumPosArr():
 
 def writeRMInfoToTable(dir_base,out_tbl):
 	file_num=0
-	for root, dirs, files in os.walk(dir_base):
-		for items in fnmatch.filter(files, "*out.tsv"):
+	for root, dirs, files in sorted(os.walk(dir_base)):
+		for items in sorted(fnmatch.filter(files, "*out.tsv")):
 			cdr1_lens=[0,0,0]
 			num_pass_filter=0
 			full_tsv_path=root+"/"+items
-			#print "Analyzing file ",full_tsv_path," for CDR3 min/max length...."
+			print "Analyzing file ",full_tsv_path,"..."
 			bs=getBatchIDAndSampleIDFromPath(full_tsv_path)
-			#print "The batch and sample :",bs
+			print "The batch and sample :",bs
 			reader=open(full_tsv_path,'r')
 			line_num=1
 			rm_count_map=initNMCountMap()
@@ -147,9 +147,10 @@ def writeRMInfoToTable(dir_base,out_tbl):
 				writer.write("\t"+str(cdr1_lens[c]))
 			writer.write("\t"+str(num_pass_filter))
 			for npi in range(len(nPos_arr)):
-				writer.write("\t"+rm_count_map[nPoss_arr[npi]])
+				writer.write("\t"+str(rm_count_map[nPos_arr[npi]]))
 			writer.write("\n")
 			writer.close()
+			file_num+=1
 			
 			
 
@@ -157,7 +158,7 @@ def writeRMInfoToTable(dir_base,out_tbl):
 if (__name__=="__main__"):
 	parser=argparse.ArgumentParser(description='Print DIOGENIX formatted RM frequency statistics')
 	parser.add_argument('out_tbl',type=str,nargs=1,help="output file path for TSV of sample/RM data table")
-	parser.add_argument('dir_base',type=str,nargs=1,help="base dir for files"
+	parser.add_argument('dir_base',type=str,nargs=1,help="base dir for files")
 	args=parser.parse_args()
 	if(not(args)):
 		parser.print_help()
@@ -165,8 +166,9 @@ if (__name__=="__main__"):
 		out_tbl=extractAsItemOrFirstFromList(args.out_tbl)
 		dir_base=extractAsItemOrFirstFromList(args.dir_base)
 		if(not(os.path.exists(dir_base))):
-			parser.print_help()	
-
+			parser.print_help()
+		else:
+			writeRMInfoToTable(dir_base,out_tbl)
 
 
 
