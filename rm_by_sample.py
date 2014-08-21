@@ -7,6 +7,7 @@ import argparse
 import re
 import os
 import operator
+from sample_cdr3 import getBatchIDAndSampleIDFromPath
 
 def initNMCountMap():
 	keys=getNumPosArr()
@@ -90,11 +91,12 @@ def getNumPosArr():
 	return np_list
 
 
-def writeRMInfoToTable(dir_base):
+def writeRMInfoToTable(dir_base,out_tbl):
 	file_num=0
 	for root, dirs, files in os.walk(dir_base):
 		for items in fnmatch.filter(files, "*out.tsv"):
 			cdr1_lens=[0,0,0]
+			num_pass_filter=0
 			full_tsv_path=root+"/"+items
 			#print "Analyzing file ",full_tsv_path," for CDR3 min/max length...."
 			bs=getBatchIDAndSampleIDFromPath(full_tsv_path)
@@ -107,6 +109,7 @@ def writeRMInfoToTable(dir_base):
 					pieces=line.split('\t')
 					status=pieces[183]
 					if(status=="OK"):
+						num_pass_filter+=1
 						CDR1_len=int(pieces[110])
 						cdr1_amino_len=CDR1_len/3
 						cdr1_lens[cdr1_amino_len-5]+=1
@@ -126,23 +129,40 @@ def writeRMInfoToTable(dir_base):
 								
 				line_num+=1
 			reader.close()
+			nPos_arr=getNumPosArr()
 			if(file_num==0):
-				#put header
-				pass
-				
-
+				writer=open(out_tbl,'w')
+				writer.write("BATCH\tSAMPLE\tCDR1_5_NUM\tCDR1_6_NUM\tCDR1_7_NUM\tNUM_PASS")
+				for n in range(len(nPos_arr)):
+					writer.write("\t"+nPos_arr[n])
+				writer.write("\n")
+				writer.close()
+			bs=getBatchIDAndSampleIDFromPath(full_tsv_path)
+			writer=open(out_tbl,'a')
+			batch=bs[0]
+			sample=bs[1]
+			writer.write(batch+"\t")
+			writer.write(sample)
+			for c in range(len(cdr1_lens)):
+				writer.write("\t"+str(cdr1_lens[c]))
+			writer.write("\t"+str(num_pass_filter))
+			for npi in range(len(nPos_arr)):
+				writer.write("\t"+rm_count_map[nPoss_arr[npi]])
+			writer.write("\n")
+			writer.close()
+			
+			
 
 
 if (__name__=="__main__"):
-	parser=argparse.ArgumentParser(description='Print DIOGENIX formatted rep_char CDR3 statistics')
-	parser.add_argument('out_tbl',type=str,nargs=1,help="output file path for TSV of sample/CDR3 length table")
-	parser.add_argument('dir_base',type=str,nargs=1,help="base dir for CDR3 length hist")
+	parser=argparse.ArgumentParser(description='Print DIOGENIX formatted RM frequency statistics')
+	parser.add_argument('out_tbl',type=str,nargs=1,help="output file path for TSV of sample/RM data table")
+	parser.add_argument('dir_base',type=str,nargs=1,help="base dir for files"
 	args=parser.parse_args()
 	if(not(args)):
 		parser.print_help()
 	else:
-		out_hist=extractAsItemOrFirstFromList(args.out_hist)
-		out_diva=extractAsItemOrFirstFromList(args.out_diva)
+		out_tbl=extractAsItemOrFirstFromList(args.out_tbl)
 		dir_base=extractAsItemOrFirstFromList(args.dir_base)
 		if(not(os.path.exists(dir_base))):
 			parser.print_help()	
