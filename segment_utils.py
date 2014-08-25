@@ -1045,7 +1045,14 @@ class recombFreqManager():
 		else:
 			self.freq_map[comb_str]=1
 
+	#write JSON to a file
+	def writeJSONToFile(self,outPath):
+		writer=open(outPath,'w')
+		JSON=self.makeJSON()
+		writer.write(JSON)
+		writer.close()
 
+	#create JSON from combos
 	def makeJSON(self):
 		json="{\ncombinations=[\n"
 		combo_array=list()
