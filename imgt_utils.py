@@ -359,6 +359,7 @@ class imgt_db:
 	indexPath=None
 	ref_dir_set_desc_seqs_map=None
 	ol=["human","Mus_musculus"]
+	pickle_file_name="hierarchy_data.pkl"
 
 	####################
 	#constructor(s)
@@ -368,6 +369,10 @@ class imgt_db:
 
 	####################
 	#function members
+
+	def getPickleFullPath(self):
+		return self.getBaseDir()+"/"+self.pickle_file_name
+
 
 
 	#for each locus, for each organism, dump it into a FASTA to be blast formatted
