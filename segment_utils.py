@@ -150,7 +150,7 @@ def dicts(t): return {k: dicts(t[k]) for k in t}
 #tables so that all fasta entries have a place!
 #Also, obtain clone name data
 #Finally, return all the hierarchy and clone data!
-def analyze_download_dir_forVDJserver(base_dir,countsMap=None,specifiedOrganism=None,specifiedLocus=None):
+def analyze_download_dir_forVDJserver(base_dir,pickle_file_full_path=None,countsMap=None,specifiedOrganism=None,specifiedLocus=None):
 	myDB=imgt_db(base_dir)
 	organisms=myDB.getOrganismList()
 	org_hierarchy=tree()
@@ -414,6 +414,36 @@ def zeroPadDigitsTo(s,num=8):
 
 
 
+def determineAllelicOrdering(a1,a2):
+	if(a1==a2):
+		return 0
+	else:
+		aa=[a1,a2]
+		o_aa=orderAlleicArrayWithZeroPadding(aa)
+		if(a1==o_aa[0]):
+			return (-1)
+		else:
+			return 1	
+
+
+
+def orderAlleicArrayWithZeroPadding(a_arr):
+	#the reason for all this "padded" stuff is so that digits are zero-padded
+	#so that ordering (based on ASCII) will put IGHV4 before IGHV40 (and not IGHV40 before IGHV4)
+	original_to_padded=dict()
+	padded_to_original=dict()	
+	for a in a_arr:
+		padded_key=zeroPadDigitsTo(hier_map_key)
+		original_to_padded[a]=padded_key
+		padded_to_original[padded_key]=hier_map_key
+		padded_key_list.append(padded_key)
+	padded_key_list.sort()
+	ready_list=list()
+	for p in range(len(padded_key_list)):
+		ready_list.append(padded_to_original[padded_key_list[p]])
+	return ready_list
+
+
 
 #JSONIFY from a hierarchy with a counts map
 #the "count_string" is used to make the label for the count in the JSON
@@ -424,6 +454,8 @@ def jsonify_hierarchy(hier_map,name,counts_map,count_string,labelString="label")
 	original_to_padded=dict()
 	padded_to_original=dict()
 	padded_key_list=list()
+	#the reason for all this "padded" stuff is so that digits are zero-padded
+	#so that ordering (based on ASCII) will put IGHV4 before IGHV40 (and not IGHV40 before IGHV4)
 	for hier_map_key in hier_map_keys:
 		padded_key=zeroPadDigitsTo(hier_map_key)
 		original_to_padded[hier_map_key]=padded_key
@@ -989,6 +1021,56 @@ def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 
 
 
+class recombFreqManager():
+
+	#have a frequency map
+	freq_map=None
+
+	def itemToStr(self,item):
+		if(item is None):
+			return "None"
+		else:
+			return str(item)
+
+	#constructor
+	def __init__(self):
+		self.freq_map=dict()
+	
+	#increment the count for a particular combination	
+	def addVDJRecombination(self,vName,dName,jName):
+		comb=[self.itemToStr(vName),self.itemToStr(dName),self.itemToStr(jName)]
+		comb_str=",".join(comb)
+		if(comb_str in self.freq_map):
+			self.freq_map[comb_str]=self.freq_map[comb_str]+1
+		else:
+			self.freq_map[comb_str]=1
+
+
+	def makeJSON(self):
+		json="{\ncombinations=[\n"
+		combo_array=list()
+		for combination in self.freq_map:
+			combo_json="{"
+			combo_pieces=combination.split(",")
+			combo_json+="v : '"+combo_pieces[0]+"',"
+			combo_json+="d : '"+combo_pieces[1]+"',"
+			combo_json+="j : '"+combo_pieces[2]+"',"
+			combo_json+="count : "+str(self.freq_map[combination])
+			combo_json+="}"
+			combo_array.append(combo_json)
+		all_combos=",\n".join(combo_array)
+		json+=all_combos+"\n]}"
+		return json
+
+
+
+	
+		
+
+
+
+
+
 #class for count map
 class IncrementMapWrapper():
 
@@ -1059,16 +1141,16 @@ class IncrementMapWrapper():
 				self.increment(k)
 
 	#write JSON to file
-	def JSONIFYToFile(self,db_base,organism,filePath,filterbyFastaAlleles=False):
-		JSON=self.JSONIFYIntoHierarchy(db_base,organism,filterbyFastaAlleles)
+	def JSONIFYToFile(self,db_base,organism,filePath,filterbyFastaAlleles=False,pickle_file_full_path=None):
+		JSON=self.JSONIFYIntoHierarchy(db_base,organism,filterbyFastaAlleles,pickle_file_full_path)
 		writer=open(filePath,'w')
 		writer.write(JSON)
 		writer.close()
 
 
 	#JSONIFY into hierarchy
-	def JSONIFYIntoHierarchy(self,db_base,organism,filterbyFastaAlleles=False):
-		hierarchy=getHierarchyByOrganism(db_base+"/"+organism+"/GeneTables/",organism,filterbyFastaAlleles)
+	def JSONIFYIntoHierarchy(self,db_base,organism,filterbyFastaAlleles=False,pickle_file_full_path=None):
+		hierarchy=getHierarchyBy(db_base+"/"+organism+"/GeneTables/",organism,filterbyFastaAlleles,pickle_file_full_path)
 		JSON=jsonify_hierarchy(hierarchy,organism,self.count_map,"value")
 		return JSON
 
@@ -1157,7 +1239,21 @@ def getQueryIndexGivenSubjectIndexAndAlignment(query_aln,subject_aln,q_start,q_s
 
 
 #rooted at an organism get the hierarchy from the gene tables
-def getHierarchyByOrganism(geneTablesDirectoryOfHTMLFiles,org_name,filterbyFastaAlleles=False):
+def getHierarchyBy(geneTablesDirectoryOfHTMLFiles,org_name,filterbyFastaAlleles=False,fullPklPath=None):
+	print "Trying to use " ,fullPklPath
+	if(not(fullPklPath==None)):
+		print "not none"
+		if(os.path.exists(fullPklPath)):
+			print "it exists"
+			unpickled_data=pickleRead(fullPklPath)
+			#print unpickled_data
+			print "len of data is ",len(unpickled_data)
+			subset_for_extraction=unpickled_data[0]
+			for item in subset_for_extraction:
+				if(item==org_name):
+					return subset_for_extraction[item]
+				#print item
+			#return unpickled_data[org_name]
 	loci=get_loci_list()
 	hierarchy=tree()
 	for locus in loci:
