@@ -11,6 +11,7 @@ from cdr3_hist import CDR3LengthAnalysisVDMLOBJ,histoMapClass
 from vdjml_utils import *
 from Bio import SeqIO
 from segment_utils import IncrementMapWrapper,getVRegionsList,getEmptyRegCharMap,getAdjustedCDR3StartFromRefDirSetAllele,getTheFrameForThisReferenceAtThisPosition,getVRegionStartAndStopGivenRefData,getADJCDR3EndFromJAllele,alleleIsTR
+from segment_utils import recombFreqManager
 from char_utils import getNumberBaseSubsFromBTOP,getNumberIndelsFromBTOP,getIndelMapFromBTOP
 from alignment import alignment
 from CharacterizationThread import CharacterizationThread
@@ -805,6 +806,7 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None",log
 def add_rep_char_args_to_parser(parser):
 	parser.description+=' Generate read-level repertoire-characterization data.'
 	parser.add_argument('-json_out',type=str,nargs=1,default="/dev/stdout",help="output file for the JSON segment count IMGT hierarchy")
+	#parser.add_argument('
 	parser.add_argument('-cdr3_hist_out',type=str,nargs=1,default="/dev/stdout",help="output file for the CDR3 histogram of lengths (both kabat and imgt systems)")
 	parser.add_argument('-skip_char',action='store_true', default=False,help="If this is set, then characterization besides germline segment assignment and CDR3 length is skipped")
 	parser.add_argument('char_out',type=str,nargs=1,help="the path to the output TSV file of read-level repertoire characterization data")
@@ -842,6 +844,7 @@ if (__name__=="__main__"):
 		my_cdr3_map=histoMapClass(modes)
 		cdr3_hist_out_file=args.cdr3_hist_out
 		segment_counter=IncrementMapWrapper()
+		combo_counter=recombFreqManager()
 		read_num=1
 		segments_json_out=extractAsItemOrFirstFromList(args.json_out)
 		#print "to write vdjml to ",args.vdjml_out
@@ -889,6 +892,10 @@ if (__name__=="__main__"):
 					actual=segments[s]
 					if(actual is not None):
 						segment_counter.increment(actual)
+				vseg=segments['V']
+				dseg=segments['D']
+				jseg=segments['J']
+				combo_counter.addVDJRecombination(vseg,dseg,jseg)
 
 			#process for writing
 			rrw(read_result_obj)
@@ -929,9 +936,15 @@ if (__name__=="__main__"):
 			segments_json_out=segments_json_out
 		if(not(segments_json_out=="/dev/null")):
 			print "Writing JSON segment counts output to ",segments_json_out,"..."
-			segment_counter.JSONIFYToFile(extractAsItemOrFirstFromList(args.vdj_db_root),organism,segments_json_out)
+			segment_counter.JSONIFYToFile(
+				extractAsItemOrFirstFromList(args.vdj_db_root),
+				organism,
+				segments_json_out,
+				False,
+				imgtdb_obj.getPickleFullPath()
+				)
 			print "Writing JSON segment counts output complete!"
-
+		print "HERE\n",combo_counter.makeJSON()
 
 
 	else:
