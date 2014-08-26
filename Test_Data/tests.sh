@@ -62,6 +62,7 @@ do
 			DB_D=${BLAST_DB_ROOT}_D.fna
 			DB_J=${BLAST_DB_ROOT}_J.fna
 			RC_VDJML=$RC_IN.rc.vdjml
+			RC_COMBO=$RC_IN.combo.json
 			RC_CDR3_HIST=$RC_IN.cdr3_hist.tsv
 			RC_CDR3_SEG_JSON=$RC_IN.segments.json
 			RC_OUT=$RC_IN.rc_out.tsv
@@ -87,6 +88,7 @@ do
 			SIM_JSON=$SIM_B_OUT.json
 			SIM_CDR3=$SIM_B_OUT.cdr3_hist.tsv
 			SIM_VDJML=$SIM_B_OUT.vdjml
+			SIM_COMBO=$SIM_B_OUT.combo.json
 			SIM_RC_OUT=$SIM_B_OUT.rc_out.tsv
 			SIM_RC_OUT_LOG=${SIM_RC_OUT}.log
 			SIM_RC_OUT_ERR=${SIM_RC_OUT}.err
@@ -95,7 +97,7 @@ do
 			then 
 				echo "Skipping rep_char on $SIM_B_OUT because the number of simulated sequences is $NUM_SIM" ;
 			else
-				time ../rep_char.py  ${REP_CHAR_OPTS}  -json_out $SIM_JSON -cdr3_hist_out $SIM_CDR3 $SIM_B_OUT $SIM_VDJML $SIM_RC_OUT $RC_DB ${SIM_DATA} $ORGANISM  1>$SIM_RC_OUT_LOG 2>$SIM_RC_OUT_ERR
+				time ../rep_char.py  ${REP_CHAR_OPTS}  -combo_out $SIM_COMBO     -json_out $SIM_JSON -cdr3_hist_out $SIM_CDR3 $SIM_B_OUT $SIM_VDJML $SIM_RC_OUT $RC_DB ${SIM_DATA} $ORGANISM  1>$SIM_RC_OUT_LOG 2>$SIM_RC_OUT_ERR
 			fi ;
 			if [ -f "$QRY" ]  ;
 			then
@@ -111,7 +113,7 @@ do
 				echo "IgBLAST for human-readable output finished."
 				date
 				echo "Now running repertoire characterization ..."
-				time ../rep_char.py   ${REP_CHAR_OPTS}  -json_out $RC_CDR3_SEG_JSON -cdr3_hist_out $RC_CDR3_HIST $RC_IN $RC_VDJML $RC_OUT $RC_DB $QRY $ORGANISM  1>$RC_LOG_OUT 2>$RC_LOG_ERR
+				time ../rep_char.py   ${REP_CHAR_OPTS}  -combo_out $RC_COMBO   -json_out $RC_CDR3_SEG_JSON -cdr3_hist_out $RC_CDR3_HIST $RC_IN $RC_VDJML $RC_OUT $RC_DB $QRY $ORGANISM  1>$RC_LOG_OUT 2>$RC_LOG_ERR
 			else
 				echo "QUERY $QRY NOT FOUND" ;
 				echo 'So no analysis for it being done !'
