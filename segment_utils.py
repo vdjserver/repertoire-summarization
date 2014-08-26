@@ -1037,7 +1037,11 @@ class recombFreqManager():
 		self.freq_map=dict()
 	
 	#increment the count for a particular combination	
-	def addVDJRecombination(self,vName,dName,jName):
+	def addVDJRecombination(self,vName,dName,jName,maskAllele=True):
+		if(maskAllele):
+			vName=deAllelifyName(vName)
+			dName=deAllelifyName(dName)
+			jName=deAllelifyName(jName)
 		comb=[self.itemToStr(vName),self.itemToStr(dName),self.itemToStr(jName)]
 		comb_str=",".join(comb)
 		if(comb_str in self.freq_map):
@@ -1059,10 +1063,10 @@ class recombFreqManager():
 		for combination in self.freq_map:
 			combo_json="{"
 			combo_pieces=combination.split(",")
-			combo_json+="v : '"+combo_pieces[0]+"',"
-			combo_json+="d : '"+combo_pieces[1]+"',"
-			combo_json+="j : '"+combo_pieces[2]+"',"
-			combo_json+="count : "+str(self.freq_map[combination])
+			combo_json+=" v : '"+combo_pieces[0]+"',"
+			combo_json+=" d : '"+combo_pieces[1]+"',"
+			combo_json+=" j : '"+combo_pieces[2]+"',"
+			combo_json+=" count : "+str(self.freq_map[combination])
 			combo_json+="}"
 			combo_array.append(combo_json)
 		all_combos=",\n".join(combo_array)
