@@ -1039,9 +1039,10 @@ class recombFreqManager():
 	#increment the count for a particular combination	
 	def addVDJRecombination(self,vName,dName,jName,maskAllele=True):
 		if(maskAllele):
-			vName=deAllelifyName(vName)
-			dName=deAllelifyName(dName)
-			jName=deAllelifyName(jName)
+			#print "v=",vName,"d=",dName,"j=",jName
+			vName=deAllelifyName(self.itemToStr(vName))
+			dName=deAllelifyName(self.itemToStr(dName))
+			jName=deAllelifyName(self.itemToStr(jName))
 		comb=[self.itemToStr(vName),self.itemToStr(dName),self.itemToStr(jName)]
 		comb_str=",".join(comb)
 		if(comb_str in self.freq_map):
@@ -1253,12 +1254,12 @@ def getQueryIndexGivenSubjectIndexAndAlignment(query_aln,subject_aln,q_start,q_s
 def getHierarchyBy(geneTablesDirectoryOfHTMLFiles,org_name,filterbyFastaAlleles=False,fullPklPath=None):
 	print "Trying to use " ,fullPklPath
 	if(not(fullPklPath==None)):
-		print "not none"
+		#print "not none"
 		if(os.path.exists(fullPklPath)):
-			print "it exists"
+			#print "it exists"
 			unpickled_data=pickleRead(fullPklPath)
 			#print unpickled_data
-			print "len of data is ",len(unpickled_data)
+			#print "len of data is ",len(unpickled_data)
 			subset_for_extraction=unpickled_data[0]
 			for item in subset_for_extraction:
 				if(item==org_name):
