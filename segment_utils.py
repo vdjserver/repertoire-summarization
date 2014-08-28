@@ -1059,7 +1059,7 @@ class recombFreqManager():
 
 	#create JSON from combos
 	def makeJSON(self):
-		json="{\ncombinations=[\n"
+		json="{\ncombinations : [\n"
 		combo_array=list()
 		for combination in self.freq_map:
 			combo_json="{"
