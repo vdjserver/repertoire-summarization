@@ -33,6 +33,24 @@ class codonCounter:
 	NMORepNucMuts=IncrementMapWrapper()
 
 
+
+	def get_ags6_pos(self):
+		ags6_nums=["31B","40","56","57","81","89"]
+		return ags6_nums
+
+	
+
+	def get_ags5_nums(self):
+		ags5_nums=["31B","40","56","57","81"]
+		return ags5_numbs
+
+
+	def get_nmo_nums(self):
+		nmo_nums=["36","39","45","46","50","59","61","65","67","70","86","90"]
+		return nmo_nums
+
+
+
 	def generateSampleAGSSum(self,):
 		ags_score=self.computeAGS()
 		summ_str="AGS Score\t"+str(ags_score)
@@ -181,10 +199,10 @@ class codonCounter:
 		#		self.region_chothia.append(pieces[5])
 		#	line_num+=1
 		#reader.close()
-		self.allowGaps=init_allowGaps
+		#self.allowGaps=init_allowGaps
 		self.internalAnalyzer=CodonAnalysis()
-		tableFilePath=self.computePathToCodonTableFile()
-		self.initKabatChotiaTrans(tableFilePath)
+		#tableFilePath=self.computePathToCodonTableFile()
+		#self.initKabatChotiaTrans(tableFilePath)
 
 
 
@@ -641,7 +659,7 @@ def annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted
 
 if (__name__=="__main__"):
 	myCounter=codonCounter("/home/data/vdj_server/repertoire-summarization/codon_data/codon_pos_IGHV4")
-
+	
 
 
 
