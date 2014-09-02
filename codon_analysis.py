@@ -34,7 +34,15 @@ class codonCounter:
 
 
 
-	def get_ags6_pos(self):
+	def increment_ags6_rep_muts(self,numbered_pos):
+		self.ags6RepMuts.increment(numbered_pos)
+
+
+	def increment_ags5_rep_muts(self,numbered_pos):
+		self.ags5RepMuts.increment(numbered_pos)		
+
+
+	def get_ags6_nums(self):
 		ags6_nums=["31B","40","56","57","81","89"]
 		return ags6_nums
 
@@ -42,7 +50,7 @@ class codonCounter:
 
 	def get_ags5_nums(self):
 		ags5_nums=["31B","40","56","57","81"]
-		return ags5_numbs
+		return ags5_nums
 
 
 	def get_nmo_nums(self):
@@ -131,6 +139,20 @@ class codonCounter:
 
 
 
+	def appearsToBeNumberedMut(self,nm):
+		nmRe=re.compile(r'^([A-Z\*])([0-9][0-9][ABC]?)([A-Z\*])$')
+		nmmo=re.search(nmRe,nm)
+		if(nmmo):
+			mut_from=nmmo.group(1)
+			mut_pos=nmmo.group(2)
+			mut_to=nmmo.group(3)
+			return [str(mut_from),str(mut_pos),str(mut_to)]
+		else:
+			return False
+		
+
+
+
 	#load kabat->chotia translation
 	def initKabatChotiaTrans(self,tableFilePath):
 		self.kabat_chothia_trans=dict()
@@ -176,7 +198,8 @@ class codonCounter:
 
 
 	#init
-	def __init__(self,pos_file_path,init_allowGaps=False):
+	#def __init__(self,pos_file_path,init_allowGaps=False):
+	def __init__(self,init_allowGaps=False):
 		#currently reads a TSV
 		#6 fields
 		#gap order	KABAT	REGION_KABAT	CHOTHIA	gap order	REGION_CHOTHIA
