@@ -8,11 +8,14 @@ class ags_manager:
 	codonCounterObj=None
 	ags6_nums=None
 	ags5_nums=None
+	name=None
 
-	def __init__(self):
-		self.codonCounterObj=codonCounter()
+	def __init__(self,init_name):
+		self.name=init_name
+		self.codonCounterObj=codonCounter(init_name)
 		self.ags6_nums=self.codonCounterObj.get_ags6_nums()
 		self.ags5_nums=self.codonCounterObj.get_ags5_nums()
+		
 		
 
 	def receive_numbered_mut(self,numbered_mut):
@@ -31,6 +34,7 @@ class ags_manager:
 
 
 	def compute_ags(self,mode="AGS6"):
+		#print "mgr named ",self.name,"giving ags from counter obj named ",self.codonCounterObj.name
 		if(mode=="AGS6"):
 			ags6_score=self.codonCounterObj.computeAGS()
 			sampAGSTot=float(self.codonCounterObj.computeAGS6TotRM())
@@ -61,6 +65,7 @@ if (__name__=="__main__"):
 			myAGSMgr.receive_numbered_mut(pm)
 		else:
 			#print "not a pm"
+			pass
 	print myAGSMgr.compute_ags()
 
 
