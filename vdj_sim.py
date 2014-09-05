@@ -321,7 +321,7 @@ if (__name__=="__main__"):
 	parser.add_argument('-dfasta',type=str,nargs=1,help="path to the D fasta file for heavy chains")
 	parser.add_argument('-loci',type=str,nargs=1,help="comma-separated list of allowed loci classes (default these 7 : \"IGH,IGK,IGV,TRA,TRB,TRD,TRG\")")
 	parser.add_argument('-num_seqs',type=int,default=float("inf"),nargs=1,help="the number of sequences to simulate (default : infinity!) ")
-	parser.add_argument('-mut_lam',type=float,default=float(0.5),nargs=1,help="the lambda parameter for SHM")
+	parser.add_argument('-mut_lam',type=float,default=float(0.5),nargs=1,help="the lambda parameter for SHM ; default 0.5")
 	args = parser.parse_args()
 	mut_lam=None
 	if(type(args.mut_lam)==list):
