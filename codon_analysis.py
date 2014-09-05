@@ -31,6 +31,7 @@ class codonCounter:
 	ags5RepMuts=IncrementMapWrapper()
 	sampleRepNucMuts=IncrementMapWrapper()
 	NMORepNucMuts=IncrementMapWrapper()
+	name=None
 
 
 
@@ -199,7 +200,8 @@ class codonCounter:
 
 	#init
 	#def __init__(self,pos_file_path,init_allowGaps=False):
-	def __init__(self,init_allowGaps=False):
+	def __init__(self,init_name,init_allowGaps=False):
+		self.name=init_name
 		#currently reads a TSV
 		#6 fields
 		#gap order	KABAT	REGION_KABAT	CHOTHIA	gap order	REGION_CHOTHIA
