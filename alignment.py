@@ -200,6 +200,35 @@ class alignment:
 		self.setQBasePosLookUp()
 
 
+
+	def overlapsWith(self,otherAln):
+		#determine if self is contained in other
+		if(otherAln.q_start<=self.q_start and self.q_start<=otherAln.q_end):
+			#this start is contained in other interval
+			return True
+		if(otherAln.q_start<=self.q_end and self.q_end<=otherAln.q_end):
+			#this end is contained in other interval
+			return True
+		if(otherAln.q_start<=self.q_start and self.q_start<=otherAln.q_end):
+			#other straddles this start
+			return True
+		if(otherAln.q_start<=self.q_end and self.q_end<otherAln.q_end):
+			#other straddles this end
+			return True
+		if(self.q_start<=otherAln.q_start and otherAln.q_end<=self.q_end):
+			#other totally contained in this
+			return True
+		if(otherAln.q_start<=self.q_start and self.q_end<=otherAln.q_end):
+			#this totally contained in other
+			return True
+		#none of the above
+		return False
+
+
+
+
+
+
 	#setter for alignment name
 	def setName(self,newName):
 		self.alignment_name=newName
