@@ -615,6 +615,34 @@ class alignment:
 
 
 	
+
+	def logical2WayMerge(self,otherAln,juncSeq=""):
+		if(self.overlapsWith(otherAln)):
+			return
+		else:
+			if(self.q_start<otherAln.q_start):
+				firstAln=self
+				secondAln=otherAln
+			else:
+				firstAln=otherAln
+				secondAln=self
+		new_q_start=firstAln.q_start
+		new_q_end=secondAln.q_end
+		new_q_aln=firstAln.q_aln+juncSeq+secondAln.q_aln
+		new_s_aln=firstAln.s_aln+juncSeq+secondAln.s_aln
+		new_s_aln_noGAPs=re.sub(r'\-',"",new_s_aln)
+		gap_free_len=len(new_s_aln_noGAPs)
+		new_s_start=1
+		new_s_end=gap_free_len
+		#def __init__(Cq_aln,Cs_aln,Cq_start=None,Cq_end=None,Cs_start=None,Cs_end=None,Cs_frame_mask=None):
+		mergedAln=alignment(new_q_aln,new_s_aln,new_q_start,new_q_end,new_s_start,new_s_end)
+		return mergedAln
+
+		
+
+
+
+	
 	def getCharMap(self):
 		if(self.public_char_map==None):
 			self.characterize()
@@ -822,6 +850,18 @@ class alignment:
 			sub_aln.setSFM()
 			print sub_aln.getNiceString()
 			print "QBM:",sub_aln.q_base_pos_LookUp
+
+		print "JUNC 2 TEST"
+		base_q=TGTGCGAGAGGCAGTACCGGCCGATTTTTGGAGTGGTTATTATACTTTGACTACTGGGGCCAG
+		car=base_q[0:10]
+		#dyw=base_q[:
+		
+
+
+
+
+
+
 
 
 
