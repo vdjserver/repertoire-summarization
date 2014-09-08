@@ -27,7 +27,16 @@ import math
 
 global_key_base="vdj_server_ann_"
 myCodonCounter=codonCounter("/home/data/vdj_server/repertoire-summarization/codon_data/codon_pos_IGHV4")
+release_info_tag=None
+release_info_hash=None
 
+
+def loadReleaseInfoTagAndHash():
+	global release_info_tag
+	global release_info_hash
+	release_info_tag=getVersionInfo("desc")
+	release_info_hash=getVersionInfo("hash")
+	
 
 
 # use a read_result_ojbect return several things:
@@ -742,6 +751,10 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None",log
 	keys_to_append.append("AGS Amino Muts")
 	keys_to_append.append("AGS Silent Codon Muts")
 	keys_to_append.append("AGS Silent Amino Muts")
+	keys_to_append.append("Release Version Tag")
+	keys_to_append.append("Release Version Hash")
+
+
 
 
 
@@ -758,6 +771,13 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None",log
 		keys.append(keys_to_append[ki])
 	#set the READ ID in the map
 	m[keys[0]]=rid
+	global release_info_tag
+	global release_info_hash	
+	m[keys[len(keys)-2]]=release_info_tag
+	m[keys[len(keys)-1]]=release_info_hash
+
+
+
 
 	#now, append everything from the map passed in that hasn't been added
 	#for map_key in m:
@@ -804,7 +824,8 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None",log
 
 #add on the kinds of arguments this program accepts
 def add_rep_char_args_to_parser(parser):
-	parser.description+=' Generate read-level repertoire-characterization data.'
+	version_info=getVersionInfo()
+	parser.description+=' Generate read-level repertoire-characterization data. VERSION '+version_info
 	parser.add_argument('-json_out',type=str,nargs=1,default="/dev/stdout",help="output file for the JSON segment count IMGT hierarchy")
 	parser.add_argument('-combo_out',type=str,nargs=1,default="/dev/stdout",help="output file for JSON segment recombination count data")
 	parser.add_argument('-cdr3_hist_out',type=str,nargs=1,default="/dev/stdout",help="output file for the CDR3 histogram of lengths (both kabat and imgt systems)")
@@ -866,6 +887,14 @@ if (__name__=="__main__"):
 				every_read=int(every_read)
 				every_read=int(10**every_read)
 			#print "every_read at ",every_read
+
+		#test release info
+		loadReleaseInfoTagAndHash()
+		if(release_info_tag==None or release_info_hash==None):
+			print "ERROR IN RELEASE_INFO ?!"
+
+
+
 		for read_result_obj in scanOutputToVDJML(extractAsItemOrFirstFromList(args.igblast_in),fact,query_fasta):
 
 
@@ -946,6 +975,8 @@ if (__name__=="__main__"):
 		recomb_out_file=extractAsItemOrFirstFromList(args.combo_out)
 		print "Writing JSONS segment combination frequency data to ",recomb_out_file
 		combo_counter.writeJSONToFile(recomb_out_file)
+		
+
 
 
 
