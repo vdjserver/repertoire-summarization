@@ -200,7 +200,7 @@ class alignment:
 		self.setQBasePosLookUp()
 
 
-
+	#test for overlap
 	def overlapsWith(self,otherAln):
 		#determine if self is contained in other
 		if(otherAln.q_start<=self.q_start and self.q_start<=otherAln.q_end):
@@ -223,8 +223,6 @@ class alignment:
 			return True
 		#none of the above
 		return False
-
-
 
 
 
@@ -855,6 +853,18 @@ class alignment:
 
 
 
+#test for bare-minimum overlap (any of 3 possibilites triggers true)
+def threeWayOverlapTest(aln0,aln1,aln2):
+	ab=False
+	bc=False
+	ac=False
+	ab=aln0.overlapsWith(aln1)
+	bc=aln.overlapsWith(aln2)
+	ac=aln0.overlapsWith(aln2)
+	if(ab or bc or ac):
+		return True
+	else:
+		return False
 
 
 if (__name__=="__main__"):
