@@ -28,6 +28,7 @@ class CodonAnalysis:
 	unambiguous_codon_dict=dict()
 	bases=["A","C","G","T","a","c","g","t"]
 	valid_aminos=None
+	junc_mask=None
 
 	def is_unambiguous_amino(self,aa_res):
 		if(aa_res in self.valid_aminos):
@@ -852,17 +853,26 @@ class alignment:
 			print "QBM:",sub_aln.q_base_pos_LookUp
 
 		print "JUNC 2 TEST"
-		base_q=TGTGCGAGAGGCAGTACCGGCCGATTTTTGGAGTGGTTATTATACTTTGACTACTGGGGCCAG
-		car=base_q[0:10]
-		#dyw=base_q[:
-		
-
-
-
-
-
-
-
+		base_q="TGTGCGAGAGGCAGTACCGGCCGATTTTTGGAGTGGTTATTATACTTTGACTACTGGGGCCAG"
+		car_q=base_q[0:11]
+		car_s=base_q[0:11]
+		trp_q=base_q[42:]
+		trp_s=base_q[42:]
+		v_aln=alignment(car_q,car_s,1,11,1,11)
+		v_aln.setSFM()
+		for i in range(len(base_q)):
+			print "i=",i
+			print "base_q[",i,"] : ",base_q[i]
+		print v_aln.getNiceString()
+		j_aln=alignment(trp_q,trp_s,43,63,1,21)
+		j_aln.setSFM()
+		print j_aln.getNiceString()
+		juncSeq=base_q[11:42]
+		print "The junc seq = ",juncSeq
+		merged_aln_1=v_aln.logical2WayMerge(j_aln,juncSeq)
+		merged_aln_2=j_aln.logical2WayMerge(v_aln,juncSeq)
+		print "m1\n",merged_aln_1.getNiceString()
+		print "\nm2\n",merged_aln_2.getNiceString()
 
 
 
@@ -884,6 +894,7 @@ class alignment:
 		aln[0]="QURY:"+aln[0]
 		aln[1]="MDLN:"+aln[1]
 		aln[2]="SBCT:"+aln[2]
+		self.setName("")
 		s_final="ALIGNMENT "+self.getName()+".\n Q_FROM="+str(self.q_start)+ " Q_TO="+str(self.q_end)+" S_FROM="+str(self.s_start)+" S_TO="+str(self.s_end)
 		newLine="\n"
 		s_final+="\n"+newLine.join(aln)
