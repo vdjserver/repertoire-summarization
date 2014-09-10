@@ -17,6 +17,16 @@ import sys
 
 
 
+#generator for glob
+def glob_walk(glob_str):
+	import glob
+	for x in glob.glob(glob_str):
+		yield x
+
+
+
+
+
 def canReadAccess(path):
 	return os.access(path,os.R_OK)
 
