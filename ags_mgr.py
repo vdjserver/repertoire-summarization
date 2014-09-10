@@ -28,6 +28,7 @@ class ags_manager:
 	
 	def appearsToBeNumberedMut(self,nm):
 		#return self.codonCounterObj.appearsToBeNumberedMut(nm)
+		import re
 		nmRe=re.compile(r'^([A-Z\*])([0-9][0-9][ABC]?)([A-Z\*])$')
 		nmmo=re.search(nmRe,nm)
 		if(nmmo):
@@ -75,7 +76,7 @@ class ags_manager:
 
 if (__name__=="__main__"):
 	#myCounter=codonCounter("/home/data/vdj_server/repertoire-summarization/codon_data/codon_pos_IGHV4")
-	myAGSMgr=ags_manager()
+	myAGSMgr=ags_manager("test")
 	print "now to enter...."
 	for line in fileinput.input():
     		#print "got '"+line.strip()+"'"
