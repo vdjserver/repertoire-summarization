@@ -18,11 +18,14 @@ import sys
 
 
 #generator for glob
-def glob_walk(glob_str):
+def glob_walk(glob_str,sort_it=True):
 	import glob
-	for x in glob.glob(glob_str):
-		yield x
-
+	if(sort_it):
+		for x in sorted(glob.glob(glob_str)):
+			yield x
+	else:
+		for x in glob.glob(glob_str):
+			yield x		
 
 
 
