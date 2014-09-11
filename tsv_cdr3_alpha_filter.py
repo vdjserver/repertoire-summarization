@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
-from utils import glob_walk
+from utils import glob_walk,extractAsItemOrFirstFromList
 import os
 from sample_cdr3 import getBatchIDAndSampleIDFromPath
 from Bio import SeqIO
 from ags_mgr import ags_manager
+import argparse
 
 
 def isControlBC(bc):
@@ -55,7 +56,7 @@ def get_batch_sample_barcode_lookup(BS_SBC_lookup_file):
 	#S1401136_Run1	Sample00003	4UKMS
 	#S1401136_Run1	Sample00005	GIFTL
 	#S1401136_Run1	Sample00006	XURET
-	treader=open(BS_SBC_lookup,'r')
+	treader=open(BS_SBC_lookup_file,'r')
 	for line in treader:
 		temp_line=line.strip()
 		pieces=temp_line.split('\t')
@@ -87,7 +88,7 @@ def get_batch_sample_barcode_lookup(BS_SBC_lookup_file):
 def obtain_alpha_filtered_CDR3_barcode_blacklist_mapping(alpha,sb_cdr3_pct_file):
 	#create the new black list
 	new_black_list_cdr3_bc=dict()
-	w_reader=open(cdr3_black_list_whittle,'r')
+	w_reader=open(sb_cdr3_pct_file,'r')
 	for line in w_reader:
 		temp_line=line.strip()
 		pieces=temp_line.split('\t')
@@ -107,7 +108,7 @@ def obtain_alpha_filtered_CDR3_barcode_blacklist_mapping(alpha,sb_cdr3_pct_file)
 	for bcdr3 in new_black_list_cdr3_bc:
 		for bbs in new_black_list_cdr3_bc[bcdr3]:
 			pair_count+=1
-	print "The number of CDR3-sample-barcode pairse (uniq CDR3,sample-barcode pairs) is ",pair_count
+	print "The number of CDR3-sample-barcode pairse (post-alpha filtered at alpha="+str(alpha)+" ) is ",pair_count
 	return new_black_list_cdr3_bc
 
 
@@ -116,7 +117,7 @@ def obtain_alpha_filtered_CDR3_barcode_blacklist_mapping(alpha,sb_cdr3_pct_file)
 
 #perform TSV filtering using a alpha-modified CDR3->sample-barcode blacklist (input and output paths are used)
 #a batch->sample=sample_barcode lookup is also required
-def TSV_alpha_filter(input_dir,cdr3_bc_blacklist,output_dir,filter_report_output_path,batch_sample_bc_loookup):
+def TSV_alpha_filter(input_dir,new_black_list_cdr3_bc,output_dir,filter_report_output_path,batch_sample_bc_loookup):
 	#define the output base
 	output_filtered_base=output_dir
 	if(not(os.path.exists(output_filtered_base))):
@@ -128,18 +129,20 @@ def TSV_alpha_filter(input_dir,cdr3_bc_blacklist,output_dir,filter_report_output
 	#now write out the post-filtered TSVs
 	base_dir=input_dir
 	tsvs=glob_walk(base_dir+"/*/*out.tsv")
+	isFirstTSV=True
+	report_writer=open(filter_report_output_path,'w')
 	for tsv in tsvs:
 		print "looking at TSV ",tsv
 		#print "BS : ",
 		b_s=getBatchIDAndSampleIDFromPath(tsv)
 		batch=b_s[0]
 		sample=b_s[1]
-		subject_barcode=b_s_b_lookup[batch][sample]
-		output_dir=output_filtered_base+batch+"/"
-		if(not(os.path.exists(output_dir))):
-			os.makedirs(output_dir)
-		output_path=output_dir+os.path.basename(tsv)
-		print "output path is ",output_path
+		subject_barcode=batch_sample_bc_loookup[batch][sample]
+		tsv_output_dir=output_filtered_base+"/"+batch+"/"
+		if(not(os.path.exists(tsv_output_dir))):
+			os.makedirs(tsv_output_dir)
+		output_path=tsv_output_dir+os.path.basename(tsv)
+		print "output TSV path is ",output_path
 		tsv_writer=open(output_path,'w')
 		num_reads_OK=0
 		num_reads_OK_None_CDR3=0
@@ -191,7 +194,13 @@ def TSV_alpha_filter(input_dir,cdr3_bc_blacklist,output_dir,filter_report_output
 			line_num+=1
 		ags_6=myAGSMgr.compute_ags("AGS6")
 		ags_5=myAGSMgr.compute_ags("AGS5")
-		print "REPORT\t"+batch+"\t"+sample+"\t"+str(num_reads_OK)+"\t"+str(num_reads_OK_None_CDR3)+"\t"+str(num_reads_OK_Have_CDR3_ON_black_list)+"\t"+str(num_written)+"\t"+niceAGS(ags_6)+"\t"+niceAGS(ags_5)
+		if(isFirstTSV):
+			header="BATCH\tSAMPLE\tNUM_READ_OK\tNUM_READ_CDR3_NONE\tNUM_READ_CDR3_BLACKLIST\tNUM_READ_WRITTEN\tAGS6\tAGS6_RM\tTOT_RM\tAGS5\tAGS5_RM\tTOT_RM"
+			report_writer.write(header+"\n")
+			
+		report_line=batch+"\t"+sample+"\t"+str(num_reads_OK)+"\t"+str(num_reads_OK_None_CDR3)+"\t"+str(num_reads_OK_Have_CDR3_ON_black_list)+"\t"+str(num_written)+"\t"+niceAGS(ags_6)+"\t"+niceAGS(ags_5)
+		report_writer.write(report_line+"\n")
+		isFirstTSV=False
 	return True
 
 
@@ -199,17 +208,33 @@ def TSV_alpha_filter(input_dir,cdr3_bc_blacklist,output_dir,filter_report_output
 
 
 
-
-
-
-
-
-
-
-
-
-
-
+#program to merge CDR3 histograms for kabat and imgt modes
+if (__name__=="__main__"):
+	parser=argparse.ArgumentParser(description='Perform TSV CO filtering with sample-barcode-CDR3 distribution percents.  Generate a filter report.')
+	parser.add_argument('b_s_b_file_path',type=str,nargs=1,help="path to a BS_SBC_lookup_file of 3 (tab-separated) columns : BATCH, SAMPLE, and BARCODE SAMPLE.")
+	parser.add_argument('sb_cdr3_pct_file',type=str,nargs=1,help="the file to tab-separated triples (sample_barcode, CDR3 nucl. acid, ")
+	parser.add_argument('input_base',type=str,nargs=1,help="path to a directory holding batches (them holding samples)")
+	parser.add_argument('output_base',type=str,nargs=1,help="path to a (non-existent!) directory that will contain the filterd output and the filter report")
+	parser.add_argument('-alpha_cutoff',type=float,nargs=1,default=float(0.95),help="the alpha cutoff for defining false positive of the blacklist (default 0.95)")
+	args=parser.parse_args()
+	if(args):
+		print "success!"
+		BS_SBC_lookup_file=extractAsItemOrFirstFromList(args.b_s_b_file_path)
+		print "Using batch,sample,sample_barcode lookup file ",BS_SBC_lookup_file
+		batch_sample_bc_loookup=get_batch_sample_barcode_lookup(BS_SBC_lookup_file)
+		alpha=extractAsItemOrFirstFromList(args.alpha_cutoff)
+		print "Using alpha cutoff = ",alpha
+		sb_cdr3_pct_file=extractAsItemOrFirstFromList(args.sb_cdr3_pct_file)
+		cdr3_bc_blacklist=obtain_alpha_filtered_CDR3_barcode_blacklist_mapping(alpha,sb_cdr3_pct_file)
+		input_dir=extractAsItemOrFirstFromList(args.input_base)
+		output_dir=extractAsItemOrFirstFromList(args.output_base)
+		print "Using input (for TSV) : ",input_dir
+		print "Using output (for post-filtered TSV) : ",output_dir
+		filter_report_output_path=output_dir+"/filter_report.tsv"
+		print "To generate filter_report at ",filter_report_output_path
+		TSV_alpha_filter(input_dir,cdr3_bc_blacklist,output_dir,filter_report_output_path,batch_sample_bc_loookup)
+	else:
+		print "failure!"
 
 
 
