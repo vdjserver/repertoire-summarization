@@ -164,6 +164,16 @@ def printStats(path,logPath,bid,sid):
 	tot_bp_mut_all_reg=0
 	tot_len_AA_in_FR=0
 	tot_len_bp_in_FR=0
+	num_seqs_with_equal_or_greater_rm=dict()
+	rm_gq_max=6
+	for y in range(0,rm_gq_max+1):
+		num_seqs_with_equal_or_greater_rm[y]=0
+	num_seqs_with_equal_or_greater_nuc_muts=dict()
+	num_mut_max=6
+	for y in range(0,num_mut_max+1):
+		num_seqs_with_equal_or_greater_nuc_muts[y]=0
+	homology_over_v_thresh=0.85
+	num_homology_over_v_less_than_thresh=0
 	for line in reader:
 		#print line
 		if(line_num>1):
@@ -184,10 +194,13 @@ def printStats(path,logPath,bid,sid):
 				#if(not(cdr3_len=="None")):
 				#	cdr3_len=int(cdr3_len)
 				#print "cdr3 len for ",pieces[1]," is ",cdr3_len
-				rms=eval(pieces[185])
-				sms=eval(pieces[187])
-				bprms=eval(pieces[184])
-				bpsms=eval(pieces[186])
+				rms=eval(pieces[185]) #replacement mutations amino
+				sms=eval(pieces[187]) #silent mutations amino
+				bprms=eval(pieces[184]) #replacment mutation codons
+				bpsms=eval(pieces[186]) #silent mutation codons
+				homology_over_v=float(pieces[5])
+				if(homology_over_v<homology_over_v_thresh):
+					num_homology_over_v_less_than_thresh+=1
 				for silent_mutation in sms:
 					num_silent_mut+=1
 					sm_reg=getRegion(silent_mutation)
@@ -199,8 +212,10 @@ def printStats(path,logPath,bid,sid):
 						tot_SM_in_FR+=1
 					else:
 						raise Exception("Error, unplacable silent mutation ",rm," for read="+pieces[1])
+				num_rms_in_this_row=0
 				for rm in rms:
 					rm_reg=getRegion(rm)
+					num_rms_in_this_row+=1
 					if(isCDR(rm_reg)):
 						#print "RM",rm," detected in CDR for ",pieces[1]
 						tot_RM_in_CDR+=1
@@ -209,8 +224,11 @@ def printStats(path,logPath,bid,sid):
 						tot_RM_in_FR+=1
 					else:
 						raise Exception("Error, unplacable mutation ",rm," for read="+pieces[1])
+				num_seqs_with_equal_or_greater_rm[min(num_rms_in_this_row,rm_gq_max)]+=1
+				#here MERGE the two sets (both silent and non-silent by UNION)
 				codon_change_set=set(bprms)
 				codon_change_set=codon_change_set.union(set(bpsms))
+				num_nuc_muts_this_row=0
 				for cc in codon_change_set:
 					codon_from=cc[0:3]
 					codon_to=cc[len(cc)-3:]
@@ -218,12 +236,13 @@ def printStats(path,logPath,bid,sid):
 					for bpi in range(len(codon_from)):
 						if(codon_from[bpi]!=codon_to[bpi]):
 							#mutation detected!
+							num_nuc_muts_this_row+=1
 							tot_bp_mut_all_reg+=1
 							if(isCDR(reg)):
 								tot_bp_mut_in_CDR+=1
 							elif(isFR(reg)):
 								tot_bp_mut_in_FR+=1
-								
+				num_seqs_with_equal_or_greater_nuc_muts[min(num_mut_max,num_nuc_muts_this_row)]+=1
 				#print "The codon change set for ",pieces[1]," is ",codon_change_set,"\n\n\n"
 				#print "THE CDR1 LENGTH FOR "+pieces[1]+" is "+CDR1_len
 				CDR1_len=int(pieces[110])
@@ -313,6 +332,28 @@ def printStats(path,logPath,bid,sid):
 	out_pieces.append(log_data['NMO_NUC_TOT'])
 	out_pieces_header.append("# Seqs with RM>=1")
 	out_pieces.append(log_data['NMO_Q_RM'])
+
+
+	#RM FREQUENCY SPECTRA
+	for rm_count in range(0,rm_gq_max+1):
+		if(rm_count==rm_gq_max):
+			out_pieces_header.append("NUM_SEQS_WITH_RM_GEQ_"+str(rm_count))
+		else:
+			out_pieces_header.append("NUM_SEQS_WITH_RM_"+str(rm_count))
+		out_pieces.append(str(num_seqs_with_equal_or_greater_rm[rm_count]))
+
+	#HOMOLOGY THRESHOLD
+	out_pieces_header.append("NUM_SEQS_WITH_V_HOMOLOGY_LT_"+str(homology_over_v_thresh))
+	out_pieces.append(str(num_homology_over_v_less_than_thresh))
+
+
+	#MUT FREQ SPECTRA
+	for nuc_mut_count in range(0,num_mut_max+1):
+		if(nuc_mut_count==num_mut_max):
+			out_pieces_header.append("NUM_SEQS_WITH_NUC_MUT_GEQ_"+str(nuc_mut_count))		
+		else:
+			out_pieces_header.append("NUM_SEQS_WITH_NUC_MUT_"+str(nuc_mut_count))
+		out_pieces.append(str(num_seqs_with_equal_or_greater_nuc_muts[nuc_mut_count]))
 
 
 	#stringify
