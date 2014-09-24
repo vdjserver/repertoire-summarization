@@ -172,7 +172,7 @@ def printStats(path,logPath,bid,sid):
 	num_mut_max=6
 	for y in range(0,num_mut_max+1):
 		num_seqs_with_equal_or_greater_nuc_muts[y]=0
-	homology_over_v_thresh=0.85
+	homology_over_v_thresh=85.00
 	num_homology_over_v_less_than_thresh=0
 	for line in reader:
 		#print line
