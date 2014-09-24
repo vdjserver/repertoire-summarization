@@ -910,7 +910,7 @@ def threeWayOverlapTest(aln0,aln1,aln2):
 	bc=False
 	ac=False
 	ab=aln0.overlapsWith(aln1)
-	bc=aln.overlapsWith(aln2)
+	bc=aln1.overlapsWith(aln2)
 	ac=aln0.overlapsWith(aln2)
 	if(ab or bc or ac):
 		return True
