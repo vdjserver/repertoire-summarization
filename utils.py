@@ -842,14 +842,20 @@ def uncompressZFile(path,uncompressInPlace=False):
 
 def getVersionInfo(ver_type="desc"):
 	import sys
-	release_info_path="release_info"
-	if(os.path.exists(release_info_path)):
+	import os
+	vdj_server_root=os.environ['VDJSERVER_ROOT']
+	if(not(os.path.isdir(vdj_server_root) and os.path.exists(vdj_server_root))):
+		print "FAIL to get VDJSERVER_ROOT from environment variable?  Did you forget to set it?"
+		print "Set VDJSERVER_ROOT to point to directory holding scripts (e.g. export VDJSERVER_ROOT=`dirname /home/User/programs/vdjserver/rep_char.py`"
+		sys.exit(1)
+	release_info_complete_path=vdj_server_root+"/"+"release_info"
+	if(os.path.exists(release_info_complete_path)):
 		#good, it's found!
 		pass
 	else:
 		print "please run release.pl to generate release_info executable!"
 		sys.exit()
-	release_cmd=["./release_info"]
+	release_cmd=[release_info_complete_path]
 	release_arg=[]
 	if(ver_type=="desc"):
 		pass
