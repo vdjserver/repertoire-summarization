@@ -586,11 +586,44 @@ def diogenixGaplessVJRearrangementShouldFilter(vInfo,jInfo,imgtdb_obj,read_rec,o
 		else:
 			return True
 
+
+def passesPctHomologyFilter31To92(pct_filter,vInfo,imgtdb_obj,read_rec,organism,cdr3_map):
+	ighv4allelename=vInfo['subject ids']
+	ref_cdr1=getVRegionStartAndStopGivenRefData(ighv4allelename,"human",imgtdb_obj,"CDR1","kabat")
+	ref_fr3=getVRegionStartAndStopGivenRefData(ighv4allelename,"human",imgtdb_obj,"FR3","imgt")
+	if(ref_cdr1==None or ref_fr3==None):
+		return False
+	reg_start=ref_cdr1[0]
+	reg_end=ref_fr3[1]
+	#print "In 85P Using subject start/stop ",reg_start," and ",reg_end
+	#print "vinfo is ",vInfo
+	main_aln_obj=alignment(vInfo['query seq'],vInfo['subject seq'],vInfo['q. start'],vInfo['q. end'],vInfo['s. start'],vInfo['s. end'])
+	#print "The main alignment is "
+	#print main_aln_obj.getNiceString()
+	alignment_of_interest=main_aln_obj.getSubAlnInc(reg_start,reg_end,"subject")
+	#print "The alignment of interest is "
+	#print alignment_of_interest.getNiceString()
+	reg_char=alignment_of_interest.characterize()
+	#print "reg char is ",reg_char
+	pct_homology=float(reg_char['homology%'])
+	#print "filter is ",pct_filter
+	#print "score is ",pct_homology
+	if(pct_homology<pct_filter):
+		#print "to return false"
+		#FALSE on dump
+		return False
+	else:
+		#print "to return true"
+		#TRUE on dump
+		return True
+	#sys.exit(0)
+	
+
 	
 
 
 
-def annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted_jobs,imgtdb_obj,myCodonCounter,organism,read_rec,cdr3_map):
+def annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted_jobs,imgtdb_obj,myCodonCounter,organism,read_rec,cdr3_map,homology_filter_val):
 	#perform codon mutation counting for IGHV4
 	filterNote=""
 	mutation_map=dict()
@@ -655,13 +688,16 @@ def annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted
 								completeRegionsNote=completeRegionsFlags[0]
 								completeRegionsFlag=completeRegionsFlags[1]
 								if(completeRegionsFlag):
-									filterNote="OK"
-									mutation_map=myCodonCounter.acquire_mutation_map(kabat_CDR1,kabat_FR2,kabat_CDR2,hybrid_aln)
-									#print "THE MUTATION MAP for ",vInfo['query id']," IS ",mutation_map
+									passesHomologyFilter=passesPctHomologyFilter31To92(homology_filter_val,vInfo,imgtdb_obj,read_rec,organism,cdr3_map)
+									if(passesHomologyFilter):
+										filterNote="Fail Homology Filter "+str(homology_filter_val)
+									else:										
+										filterNote="OK"
+										mutation_map=myCodonCounter.acquire_mutation_map(kabat_CDR1,kabat_FR2,kabat_CDR2,hybrid_aln)
+										#print "THE MUTATION MAP for ",vInfo['query id']," IS ",mutation_map
 								else:
 									#print "INCOMPLETE so no mutation counting!"
 									filterNote="Incomplete regions"
-							###
 						else:
 							filterNote="VJ Out of Frame"
 
