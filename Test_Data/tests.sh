@@ -1,6 +1,7 @@
 #!/bin/bash -x 
 NUM_SIM=${1:-0}
 echo "Using NUM_SIM ${NUM_SIM}"
+export VDJSERVER_ROOT=`dirname /home/data/vdj_server/repertoire-summarization/rep_char.py`
 VDJ_DB_ROOT=/home/data/DATABASE/07_11_2014
 IGDATA=/usr/local/igblast-1.3.0
 NEW_PYTHONPATH=/home/data/vdj_server/vdjml/python/
