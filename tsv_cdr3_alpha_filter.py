@@ -212,7 +212,7 @@ def TSV_alpha_filter(input_dir,new_black_list_cdr3_bc,output_dir,filter_report_o
 if (__name__=="__main__"):
 	parser=argparse.ArgumentParser(description='Perform TSV CO filtering with sample-barcode-CDR3 distribution percents.  Generate a filter report.')
 	parser.add_argument('b_s_b_file_path',type=str,nargs=1,help="path to a BS_SBC_lookup_file of 3 (tab-separated) columns : BATCH, SAMPLE, and BARCODE SAMPLE.")
-	parser.add_argument('sb_cdr3_pct_file',type=str,nargs=1,help="the file to tab-separated triples (sample_barcode, CDR3 nucl. acid, ")
+	parser.add_argument('sb_cdr3_pct_file',type=str,nargs=1,help="the file to tab-separated triples (sample_barcode, CDR3 nucl. acid, percent ")
 	parser.add_argument('input_base',type=str,nargs=1,help="path to a directory holding batches (them holding samples)")
 	parser.add_argument('output_base',type=str,nargs=1,help="path to a (non-existent!) directory that will contain the filterd output and the filter report")
 	parser.add_argument('-alpha_cutoff',type=float,nargs=1,default=float(0.95),help="the alpha cutoff for defining false positive of the blacklist (default 0.95)")
