@@ -136,6 +136,10 @@ def writeRMInfoToTable(dir_base,out_tbl,num_rm_filter_thresh="0+"):
 									rm_count_map[numbered_pos]+=1
 								else:
 									raise Exception("Error, unseen number (extraction pos) in  numbered RM : "+rm)
+						else:
+							#undo these counts!
+							cdr1_lens[cdr1_amino_len-5]-=1
+							num_pass_filter-=1
 				line_num+=1
 			reader.close()
 			nPos_arr=getNumPosArr()
