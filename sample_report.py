@@ -54,6 +54,8 @@ def isNeither(s):
 
 
 def readLog(logPath):
+	if(not(os.path.isfile(logPath))):
+		logPath="/dev/null"
 	reader=open(logPath,'r')
 	total_re=re.compile(r'total\sof\s(\d+)\sreads')
 	total_reads=0
