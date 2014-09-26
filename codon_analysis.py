@@ -689,7 +689,7 @@ def annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted
 								completeRegionsFlag=completeRegionsFlags[1]
 								if(completeRegionsFlag):
 									passesHomologyFilter=passesPctHomologyFilter31To92(homology_filter_val,vInfo,imgtdb_obj,read_rec,organism,cdr3_map)
-									if(passesHomologyFilter):
+									if(not(passesHomologyFilter)):
 										filterNote="Fail Homology Filter "+str(homology_filter_val)
 									else:										
 										filterNote="OK"
