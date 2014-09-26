@@ -113,7 +113,7 @@ def cdr3DiverStats(dir_base,out_diva):
 			num_keys=len(sorted_lens)
 			print "Writing CDR3 diversity data for",bs,"to ",out_diva
 			writer.write(bs[0]+"\t"+bs[1]+"\t"+str(num_keys))
-			for i in range(0,min(100,num_keys)):
+			for i in range(0,min(100000,num_keys)):
 				dna=sorted_lens[i][0]
 				dna_count=sorted_lens[i][1]
 				numerator=float(dna_count)
