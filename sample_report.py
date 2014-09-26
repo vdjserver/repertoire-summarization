@@ -1,9 +1,18 @@
 #!/usr/bin/env python
 
-from utils import extractAsItemOrFirstFromList,canReadAccess
+from utils import extractAsItemOrFirstFromList,canReadAccess,glob_walk
 from segment_utils import deAllelifyName
+from sample_cdr3 import getBatchIDAndSampleIDFromPath
 import argparse
 import re
+
+def getLogPathGivenTSVPath(tsv_path):
+	tsv_path_len=len(tsv_path)
+	tsv_log_path=tsv_path[:(tsv_path_len-3)]+"log"
+	#print "given ",tsv_path," returning log ",tsv_log_path
+	return tsv_log_path
+	
+
 
 def getRegion(note):
 	note_re=re.compile(r'^[A-Z\*]+(\d+)[A-Z\*]+$',re.IGNORECASE)
@@ -102,7 +111,7 @@ def readLog(logPath):
 
 
 
-def printStats(path,logPath,bid,sid):
+def printStats(path,logPath,bid,sid,returnInsteadOfPrint=False):
 	reader=open(path,'r')
 	stat_counts=dict()
 	#stat counts
@@ -113,6 +122,7 @@ def printStats(path,logPath,bid,sid):
 	stat_list.append("Found a stop codon")
 	stat_list.append("VJ Out of Frame")
 	stat_list.append("Incomplete regions")
+	stat_list.append("Fail Homology Filter 0.85")
 	stat_list.append("OK")
 	for stat in stat_list:
 		stat_counts[stat]=0
@@ -364,29 +374,43 @@ def printStats(path,logPath,bid,sid):
 		print "header len=",len(out_pieces_header)
 		print "value  len=",len(out_pieces)
 		raise Exception("Error, header, value length mismatch!")
-	print joiner.join(out_pieces_header)
-	print joiner.join(out_pieces)
-	
+	if(not(returnInsteadOfPrint)):
+		print joiner.join(out_pieces_header)
+		print joiner.join(out_pieces)
+	else:
+		header=joiner.join(out_pieces_header)
+		values=joiner.join(out_pieces)
+		return [header,values]
 
 
 if (__name__=="__main__"):
 	parser=argparse.ArgumentParser(description='Print DIOGENIX formatted rep_char run statistics')
-	parser.add_argument('tsv_in',type=str,nargs=1,help="path to a rep_char TSV output file")
-	parser.add_argument('log_in',type=str,nargs=1,help="path to the corresponding rep_char output log file")
-	parser.add_argument('bid',type=str,nargs=1,help="string for BATCH ID")
-	parser.add_argument('sid',type=str,nargs=1,help="string for SAMPLE ID")
+	#parser.add_argument('tsv_in',type=str,nargs=1,help="path to a rep_char TSV output file")
+	#parser.add_argument('log_in',type=str,nargs=1,help="path to the corresponding rep_char output log file")
+	parser.add_argument('tsv_base',type=str,nargs=1,help="path to a directory itself holding BATCHES, each BATCH directory holding samples")
 	args=parser.parse_args()
 	if(not(args)):
 		parser.print_help()
-	input_file_path=extractAsItemOrFirstFromList(args.tsv_in)
-	log_file_path=extractAsItemOrFirstFromList(args.log_in)
-	if(not(canReadAccess(input_file_path))):
-		parser.print_help()
-	if(not(canReadAccess(log_file_path))):
-		parser.print_help()
-	bid=extractAsItemOrFirstFromList(args.bid)
-	sid=extractAsItemOrFirstFromList(args.sid)
-	printStats(input_file_path,log_file_path,bid,sid)
+		sys.exit(0)
+	#input_file_path=extractAsItemOrFirstFromList(args.tsv_in)
+	#log_file_path=extractAsItemOrFirstFromList(args.log_in)
+	input_base=extractAsItemOrFirstFromList(args.tsv_base)
+	input_glob=input_base+"/*/*.rc_out.tsv"
+	tsv_num=1
+	for TSV in glob_walk(input_glob):
+		LOG=getLogPathGivenTSVPath(TSV)
+		bid_sid=getBatchIDAndSampleIDFromPath(TSV)
+		#print "FROM TSV=",TSV
+		#print "\tLOG=",LOG
+		#print "\tBID,SID=",bid_sid
+		BID=bid_sid[0]
+		SID=bid_sid[1]
+		report_lines=printStats(TSV,LOG,BID,SID,True)
+		if(tsv_num==1):
+			print report_lines[0]
+		print report_lines[1]
+		tsv_num+=1
+
 
 
 
