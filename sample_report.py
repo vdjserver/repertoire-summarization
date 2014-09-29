@@ -5,6 +5,7 @@ from segment_utils import deAllelifyName
 from sample_cdr3 import getBatchIDAndSampleIDFromPath
 import argparse
 import re
+import os
 
 def getLogPathGivenTSVPath(tsv_path):
 	tsv_path_len=len(tsv_path)
