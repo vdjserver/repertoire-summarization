@@ -924,7 +924,7 @@ if (__name__=="__main__"):
 				vseg=segments['V']
 				dseg=segments['D']
 				jseg=segments['J']
-				combo_counter.addVDJRecombination(vseg,dseg,jseg)
+				combo_counter.addVDJRecombination(vseg,dseg,jseg,False)
 
 			#process for writing
 			rrw(read_result_obj)
