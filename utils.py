@@ -739,7 +739,7 @@ def readFileIntoString(path):
 
 def readFileIntoArrayOneLinePerArrayElement(path):
 	file_as_str=readFileIntoString(path)
-	pieces=split(file_as_str,"\n")
+	pieces=file_as_str.split("\n")
 	return pieces
 
 
