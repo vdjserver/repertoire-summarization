@@ -737,6 +737,11 @@ def readFileIntoString(path):
 	return data
 
 
+def readFileIntoArrayOneLinePerArrayElement(path):
+	file_as_str=readFileIntoString(path)
+	pieces=split(file_as_str,"\n")
+	return pieces
+
 
 def readFileURL(url):
 	url=url.strip()
