@@ -131,31 +131,58 @@ def computeEuclidean(v1,v2):
 	ed=sos**(0.5)
 	return ed
 
+#given a group assignment array compute the number of possible permutations
+#it's a factorial
+def computeNumAsnCombos(group_asn_arr):
+	num_combos=math.factorial(len(group_asn_arr))
+	return num_combos
 
-#given a label assignment and rank stat matrix, compute the R statistic!
+
+#given a label assignment and rank 
+#stat matrix, compute the R statistic!
 def computeRStat(rank_sim_mat,group_asn_arr):
 	in_grp_sum=0
 	bt_grp_sum=0
-	num_in_sum=0
+	#num_in_sum=0
 	total_num_samps_under_consideration=len(group_asn_arr)
+	num_bt_sum=0
+	num_gr_sum=0
 	for r in range(len(group_asn_arr)):
 		for c in range(len(group_asn_arr)):
 			if(r<c):
 				c_class=group_asn_arr[c]
 				r_class=group_asn_arr[r]
-				num_in_sum+=1
+				#num_in_sum+=1
 				if(r_class==c_class):
 					in_grp_sum+=group_asn_arr[r][c]
+					num_gr_sum+=1
 				else:
 					bt_grp_sum+=group_asn_arr[r][c]
-	in_grp_avg=float(in_grp_sum)/float(num_in_sum)
-	bt_grp_avg=float(bt_grp_sum)/float(num_in_sum)
+					num_bt_sum+=1
+	in_grp_avg=float(in_grp_sum)/float(num_gr_sum)
+	bt_grp_avg=float(bt_grp_sum)/float(num_bt_sum)
 	n=float(total_num_samps_under_consideration)
 	M=(n*(n-1.0))/2.0
 	numerator=bt_grp_avg-bt_grp_avg
 	denominator=M/2.0
 	r_stat=numerator/denominator
 	return r_stat
+
+
+
+
+#return a string roundned to nearest 100th
+def getPctStr(num,tot_poss):
+	pct=float(num)/float(tot_poss)
+	pct*=100.0
+	pct_str=str(rount(pct,2))
+	pct_str=pct_str[0:5]
+	return pct_str
+
+
+
+
+
 
 
 
