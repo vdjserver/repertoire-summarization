@@ -6,18 +6,20 @@ from utils import readFileIntoArrayOneLinePerArrayElement
 
 
 
-
-
-
-
-
-
-
-
-
-
-def readCDR3FileOnePerLineAsCDR3List(path)
-	return readFileIntoArrayOneLinePerArrayElement(path)
+#read a file of CDR3s into an array
+def readCDR3FileOnePerLineAsCDR3List(path,filterOutStop=True)
+	import re
+	cdr3_list=readFileIntoArrayOneLinePerArrayElement(path)
+	if(filter_out_stop):
+		new_list=list()
+		for c in cdr3_list:
+			if(re.search("\*",c)):
+				#it has a stop, don't add it!
+			else:
+				new_list.append(c)
+		cdr3_list=new_list
+	return cdr3_list
+	
 
 
 
@@ -99,6 +101,13 @@ def createAAKideraMap():
 	for aa in AAs:
 		AA_kidera_map[aa]=getFactorsGivenResidue(aa)
 	return AA_kidera_map
+
+
+
+
+
+
+
 
 #given a CDR3 AA string, compute the average KIDERA
 def computeAverageKideraFromCDR3(cdr3):
@@ -236,6 +245,8 @@ def getPctStr(num,tot_poss):
 
 
 
+tstnegD2=readCDR3FileOnePerLineAsCDR3List("/home/data/Mei/TST-_Delta2.txt.CDR3.aa")
+tstpozD2=readCDR3FileOnePerLineAsCDR3List("/home/data/Mei/TST+_Delta2.txt.CDR3.aa")
 
 
 
