@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+
+
+from utils import readFileIntoArrayOneLinePerArrayElement
 
 
 
@@ -12,9 +16,8 @@
 
 
 
-
-
-
+def readCDR3FileOnePerLineAsCDR3List(path)
+	return readFileIntoArrayOneLinePerArrayElement(path)
 
 
 
@@ -105,7 +108,9 @@ def computeAverageKideraFromCDR3(cdr3):
 	#sequence. This resulted in an average score for each of the Kidera
 	#Factors represented as a ten dimensional vector and inserted into a
 	#csv file.
-	#Epstein M, Barenco M, Klein N, Hubank M, Callard RE (2014) Revealing Individual Signatures of Human T Cell CDR3 Sequence Repertoires with Kidera Factors. PLoS ONE 9(1): e86986. doi:10.1371/journal.pone.0086986
+	#Epstein M, Barenco M, Klein N, Hubank M, Callard RE (2014) Revealing 
+	#Individual Signatures of Human T Cell CDR3 Sequence Repertoires with 
+	#Kidera Factors. PLoS ONE 9(1): e86986. doi:10.1371/journal.pone.0086986
 	aa_k_m=createAAKideraMap()
 	kidera=[0,0,0,0,0,0,0,0,0,0]
 	num_aminos=0
@@ -122,12 +127,58 @@ def computeAverageKideraFromCDR3(cdr3):
 		
 
 
+
+
+#given one or more kideras, return the averaged kidera
+def computeAverageKideraFromKideraList(kidera_list):
+	kidera_avg=[0,0,0,0,0,0,0,0,0,0]
+	for kidera in kidera_list:
+		for d in range(10):
+			kidera_avg[d]+=kidera[d]
+	for d in range(10):
+		kidera_avg[d]=float(kidera_avg[d])/float(len(kidera_list))
+	return kidera_avg
+	
+
+
+
+
+#given two lists of kidera factors, return a distance matrix
+def computeEuclideanDistMatrix(kidera_1,kidera_2):
+	#init with kidera_1 as first index, then kidera_2 as second index
+	dist_matrix = [[None for x in xrange(len(kidera_2))] for x in xrange(len(kidera_1))]
+	for k1 in range(len(kidera_1)):
+		for k2 in range(len(kidera_2)):
+			dist=computeEuclidean(kidera_1[k1],kidera_2[k2])
+			dist_matrix[k1][k2]=dist
+	return dist_matrix
+
+
+
+
+
+#given a pairwise distance matrix, convert it into a rank matrix
+def constructRankMatrixGivenDistMatrix(dist_matrix):
+	import scipy.stats as ss
+	data_list=list()
+	for r in range(len(dist_matrix)):
+		for c in range(len(dist_matrix)):
+			data_list.append(dist_matrix[r][c])
+	data_list_ranking=ss.rankdata(data_list)
+	data_to_ranking_dict=dict()
+	for i in range(len(data_list)):
+		data_to_ranking_dict[data_list[i]]=data_list_ranking[i]
+	
+
+
+
 #compute euclidean distance between two vectors
 def computeEuclidean(v1,v2):
-	#sum of squares
+	#sum of squares of differences
 	sos=0
 	for d in v1:
 		sos=(abs(v1[d]-v2[d))**2
+	#ed gets computed as the square root of sos
 	ed=sos**(0.5)
 	return ed
 
