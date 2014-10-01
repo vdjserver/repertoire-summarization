@@ -7,14 +7,18 @@ from utils import readFileIntoArrayOneLinePerArrayElement
 
 
 #read a file of CDR3s into an array
-def readCDR3FileOnePerLineAsCDR3List(path,filterOutStop=True)
+def readCDR3FileOnePerLineAsCDR3List(path,filterOutStop=True,filterOutX=True):
 	import re
 	cdr3_list=readFileIntoArrayOneLinePerArrayElement(path)
-	if(filter_out_stop):
+	if(filterOutStop):
 		new_list=list()
 		for c in cdr3_list:
 			if(re.search("\*",c)):
 				#it has a stop, don't add it!
+				pass
+			elif(re.search("X",c)):
+				#filter out the X amino
+				pass
 			else:
 				new_list.append(c)
 		cdr3_list=new_list
@@ -30,7 +34,7 @@ def readCDR3FileOnePerLineAsCDR3List(path,filterOutStop=True)
 def getFactorsGivenResidue(aa):
 	if(aa=="A"):
 		ALA=[-1.56,-1.67,-0.97,-0.27,-0.93,-0.78,-0.20,-0.08,0.21,-0.48]
-		fact=AA
+		fact=ALA
 	elif(aa=="D"):
 		ASP=[0.58,-0.22,-1.58,0.81,-0.92,0.15,-1.52,0.47,0.76,0.70]
 		fact=ASP
@@ -49,10 +53,10 @@ def getFactorsGivenResidue(aa):
 	elif(aa=="H"):
 		HIS=[-0.41,0.52,-0.28,0.28,1.61,1.01,-1.85,0.47,1.13,1.63]
 		fact=HIS
-	elif(aa="I"):
+	elif(aa=="I"):
 		ILE=[-0.73,-0.16,1.79,-0.77,-0.54,0.03,-0.83,0.51,0.66,-1.78]
 		fact=ILE
-	elif(aa="K"):
+	elif(aa=="K"):
 		LYS=[-0.34,0.82,-0.23,1.70,1.54,-1.62,1.15,-0.08,-0.48,0.60]
 		fact=LYS
 	elif(aa=="L"):
@@ -104,8 +108,15 @@ def createAAKideraMap():
 
 
 
-
-
+#from an array of CDR3 strings, return a list of as many kidera vectors
+def convertListOfCDR3sToListOfKideras(cdr3_list,getAvg=False):
+	kidera_list=list()
+	for cdr3 in cdr3_list:
+		kidera_list.append(computeAverageKideraFromCDR3(cdr3))
+	if(getAvg):
+		return computeAverageKideraFromKideraList(kidera_list)
+	else:
+		return kidera_list
 
 
 
@@ -125,7 +136,7 @@ def computeAverageKideraFromCDR3(cdr3):
 	num_aminos=0
 	for aa in cdr3:
 		#get the kidera for the AA
-		aa_kidera=aa_k_m(aa)
+		aa_kidera=aa_k_m[aa]
 		#add it to the aggregate kidera
 		for d in range(len(kidera)):
 			kidera[d]+=aa_kidera[d]
@@ -177,7 +188,10 @@ def constructRankMatrixGivenDistMatrix(dist_matrix):
 	data_to_ranking_dict=dict()
 	for i in range(len(data_list)):
 		data_to_ranking_dict[data_list[i]]=data_list_ranking[i]
-	
+	rank_mat=[[None for x in xrange(len(dist_matrix[0]))] for x in xrange(len(dist_matrix))]
+	for r in range(len(dist_matrix)):
+		for c in range(len(dist_matrix)):
+			rank_mat[r][c]=data_to_ranking_dict[dist_matrix[r][c]]
 
 
 
@@ -186,16 +200,24 @@ def computeEuclidean(v1,v2):
 	#sum of squares of differences
 	sos=0
 	for d in v1:
-		sos=(abs(v1[d]-v2[d))**2
+		sos=(abs(v1[d]-v2[d]))**2
 	#ed gets computed as the square root of sos
 	ed=sos**(0.5)
 	return ed
 
 #given a group assignment array compute the number of possible permutations
 #it's a factorial
-def computeNumAsnCombos(group_asn_arr):
-	num_combos=math.factorial(len(group_asn_arr))
-	return num_combos
+def computeNumAsnCombos(group_asn_arr,isList=True):
+	import math
+	if(isList):
+		num_combos=math.factorial(len(group_asn_arr))
+		return num_combos
+	else:
+		return math.factorial(int(group_asn_arr))	
+
+
+
+
 
 
 #given a label assignment and rank 
@@ -247,6 +269,11 @@ def getPctStr(num,tot_poss):
 
 tstnegD2=readCDR3FileOnePerLineAsCDR3List("/home/data/Mei/TST-_Delta2.txt.CDR3.aa")
 tstpozD2=readCDR3FileOnePerLineAsCDR3List("/home/data/Mei/TST+_Delta2.txt.CDR3.aa")
+print "TST neg : ",tstnegD2
+print "TST poz : ",tstpozD2
+kidera_negD2=convertListOfCDR3sToListOfKideras(tstnegD2)
+kidera_pozD2=convertListOfCDR3sToListOfKideras(tstpozD2)
+print "Tot num combos is ",computeNumAsnCombos(len(tstnegD2)+len(tstpozD2),False)
 
 
 
