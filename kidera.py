@@ -20,6 +20,7 @@ def readCDR3FileOnePerLineAsCDR3List(path,filterOutStop=True,filterOutX=True):
 				#filter out the X amino
 				pass
 			else:
+				#print "adding ",c," from ",path
 				new_list.append(c)
 		cdr3_list=new_list
 	return cdr3_list
@@ -182,16 +183,16 @@ def constructRankMatrixGivenDistMatrix(dist_matrix):
 	import scipy.stats as ss
 	data_list=list()
 	for r in range(len(dist_matrix)):
-		for c in range(len(dist_matrix)):
+		for c in range(len(dist_matrix[r])):
 			data_list.append(dist_matrix[r][c])
 	data_list_ranking=ss.rankdata(data_list)
-	data_to_ranking_dict=dict()
-	for i in range(len(data_list)):
-		data_to_ranking_dict[data_list[i]]=data_list_ranking[i]
 	rank_mat=[[None for x in xrange(len(dist_matrix[0]))] for x in xrange(len(dist_matrix))]
+	temp_i=0
 	for r in range(len(dist_matrix)):
-		for c in range(len(dist_matrix)):
-			rank_mat[r][c]=data_to_ranking_dict[dist_matrix[r][c]]
+		for c in range(len(dist_matrix[r])):
+			rank_mat[r][c]=data_list_ranking[temp_i]
+			temp_i+=1
+	return rank_mat
 
 
 
@@ -199,7 +200,7 @@ def constructRankMatrixGivenDistMatrix(dist_matrix):
 def computeEuclidean(v1,v2):
 	#sum of squares of differences
 	sos=0
-	for d in v1:
+	for d in range(len(v1)):
 		sos=(abs(v1[d]-v2[d]))**2
 	#ed gets computed as the square root of sos
 	ed=sos**(0.5)
@@ -236,18 +237,19 @@ def computeRStat(rank_sim_mat,group_asn_arr):
 				r_class=group_asn_arr[r]
 				#num_in_sum+=1
 				if(r_class==c_class):
-					in_grp_sum+=group_asn_arr[r][c]
+					in_grp_sum+=rank_sim_mat[r][c]
 					num_gr_sum+=1
 				else:
-					bt_grp_sum+=group_asn_arr[r][c]
+					bt_grp_sum+=rank_sim_mat[r][c]
 					num_bt_sum+=1
 	in_grp_avg=float(in_grp_sum)/float(num_gr_sum)
 	bt_grp_avg=float(bt_grp_sum)/float(num_bt_sum)
 	n=float(total_num_samps_under_consideration)
 	M=(n*(n-1.0))/2.0
-	numerator=bt_grp_avg-bt_grp_avg
+	numerator=bt_grp_avg-in_grp_avg
 	denominator=M/2.0
-	r_stat=numerator/denominator
+	#print "num=",numerator,"denom=",denominator
+	r_stat=float(numerator)/float(denominator)
 	return r_stat
 
 
@@ -265,19 +267,102 @@ def getPctStr(num,tot_poss):
 
 
 
+def randomPermutation(m_list):
+	import random
+	num_swaps=len(m_list)
+	temp_list=list(m_list)
+	for i in range(num_swaps):
+		a=i
+		b=a
+		while(b==a):
+			b=int(random.random()*len(m_list))
+			if(b>=len(m_list)):
+				b=len(m_list)-1
+		c=temp_list[a]
+		temp_list[a]=temp_list[b]
+		temp_list[b]=c
+	return temp_list
+	
+
+def randomPermuter(m_list,numPermutations=10):
+	t_list=m_list
+	for p in range(numPermutations):
+		t_list=randomPermutation(t_list)
+		yield t_list
+
+
+
+def getMatrixDim(m):
+	num_rows=len(m)
+	if(num_rows==0):
+		return [0,0]
+	else:
+		num_cols=len(m[0])
+		return [num_rows,num_cols]
+
+
+def joinKideraListsAndMakeLabels(l1,l2,lab1="first",lab2="second"):
+	merged=list()
+	labels=list()
+	for k in l1:
+		merged.append(k)
+		labels.append(lab1)
+	for k in l2:
+		merged.append(k)
+		labels.append(lab2)
+	return [merged,labels]
+
+
+def printMatrixNice(m):
+	print "The dim of a matrix is ",getMatrixDim(m)
+	for r in range(len(m)):
+		for c in range(len(m[r])):
+			if(c!=len(m[r])-1):
+				print str(round(m[r][c],2))+" , ",
+			else:
+				print str(round(m[r][c],2))
+			
 
 
 tstnegD2=readCDR3FileOnePerLineAsCDR3List("/home/data/Mei/TST-_Delta2.txt.CDR3.aa")
 tstpozD2=readCDR3FileOnePerLineAsCDR3List("/home/data/Mei/TST+_Delta2.txt.CDR3.aa")
 print "TST neg : ",tstnegD2
 print "TST poz : ",tstpozD2
+print "num neg ",len(tstnegD2)
+print "num poz ",len(tstpozD2)
 kidera_negD2=convertListOfCDR3sToListOfKideras(tstnegD2)
 kidera_pozD2=convertListOfCDR3sToListOfKideras(tstpozD2)
-print "Tot num combos is ",computeNumAsnCombos(len(tstnegD2)+len(tstpozD2),False)
-
-
-
-
+print "The length of neg is",len(kidera_negD2)
+print "the legnth of poz is ",len(kidera_pozD2)
+merged_and_labels=joinKideraListsAndMakeLabels(kidera_negD2,kidera_pozD2,"neg","poz")
+merged=merged_and_labels[0]
+labels=merged_and_labels[1]
+print "the merged labels are ",labels
+merged_dist_matrix=computeEuclideanDistMatrix(merged,merged)
+#print "the merged dists is ",merged_dist_matrix
+print "FOR MERGED DIST : "
+printMatrixNice(merged_dist_matrix)
+merged_rank_matrix=constructRankMatrixGivenDistMatrix(merged_dist_matrix)
+print "FOR MERGED RANK : "
+printMatrixNice(merged_rank_matrix)
+r_stat=computeRStat(merged_rank_matrix,labels)
+print "the r stat is ",r_stat
+num_permuts=1000000
+r_stats=list()
+num_pass=0
+for pl in randomPermuter(labels,num_permuts):
+	#if(num_permuts%100000==0):
+	#	print "in a loop, ...."
+	temp_r=computeRStat(merged_rank_matrix,pl)
+	if(r_stat<0):
+		if(r_stat<temp_r):
+			num_pass+=1
+	elif(r_stat>0):
+		if(r_stat>temp_r):
+			num_pass+=1
+p_val=1.0-(float(num_pass)/float(num_permuts))
+print "pval is ",p_val," with num_permuts=",num_permuts," and tot num samps =",str(len(tstnegD2)+len(kidera_pozD2))
+		
 
 
 
