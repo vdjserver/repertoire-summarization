@@ -740,7 +740,7 @@ def readFileIntoString(path):
 def readFileIntoArrayOneLinePerArrayElement(path):
 	file_as_str=readFileIntoString(path)
 	pieces=file_as_str.split("\n")
-	return pieces
+	return pieces[0:len(pieces)-1]
 
 
 def readFileURL(url):
