@@ -770,6 +770,12 @@ def getRegionAlignmentFromLargerVAlignment(sub_info_map,org,mode,region_name,img
 	if(ref_region_interval[0]==(-1) or ref_region_interval[1]==(-1)):
 		#print "Can't get region info, start or stop of ref region is neg 1...."
 		return None
+	elif(
+		(ref_region_interval[0]!=(-1) and  ref_region_interval[0]>int(sub_info_map['s. end'])) or 
+		(ref_region_interval[1]!=(-1) and ref_region_interval[1]<int(sub_info_map['s. start']))
+		):
+		#this is for the case where the region isn't covered at all!
+		return None
 	else:
 		#create an alignment from the whole V
 		aln_obj=alignment(
