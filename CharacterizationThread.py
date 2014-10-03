@@ -5,6 +5,8 @@ import threading
 from vdjml_utils import getVDJServerRegionAlignmentFromLargerVAlignmentPyObj,getHitInfo
 from alignment import alignment
 from segment_utils import getTheFrameForThisReferenceAtThisPosition,getVRegionStartAndStopGivenRefData
+import re
+from utils import printMap
 
 #thread class for parallel charactgerization of regions
 class CharacterizationThread(threading.Thread):
@@ -62,12 +64,13 @@ class CharacterizationThread(threading.Thread):
 						reg_ann_msg="characterization for region="+region+" mode="+mode+" for read="+read_rec.id
 						#reg_ann_msg=None
 						reg_ann=regionAlignment.characterize(reg_ann_msg,reg_ann_show_msg)
-						#if(mode=="imgt" and read_rec.id=="FR3_STOP" and region=="FR3"):
-						#	print "got ann "
+						#if(mode=="imgt" and re.search("IS9DOBB01B0XCX",str(read_rec.id)) and region=="CDR2"):
+						#	print "got ann for ",read_rec," for region=CDR2"
 						#	printMap(reg_ann)
 						#	print "The alignment nice : "
 						#	print regionAlignment.getNiceString()
-						#	sys.exit(0)
+						#	#sys.exit(0)
+						#	print "\n\n\n\n\n\n\n\n\n"
 						annMap=dict()
 						for key in reg_ann:
 							#annMap[key_base+region+"_"+key]=reg_ann[key]
