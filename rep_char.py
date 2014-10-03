@@ -378,8 +378,13 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 
 
 	#annotations such as NA and AA from CDR3 from cdr3_map
+	annMap["BP In Read After J Aln"]=None
 	annMap["J bp After CDR3"]=None
 	annMap=readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,annMap,cdr3_map)
+	if(jInfo!=None):
+		read_len=len(str(read_rec.seq))
+		num_bp_after_j_aln=read_len-int(jInfo['q. end'])
+		annMap["BP In Read After J Aln"]=num_bp_after_j_aln
 	if("imgt_to" in cdr3_map and jInfo!=None):
 		if(cdr3_map['imgt_to']!=None):
 			if(int(cdr3_map['imgt_to'])>=2):
@@ -760,6 +765,7 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None",log
 	keys_to_append.append("AGS Silent Codon Muts")
 	keys_to_append.append("AGS Silent Amino Muts")
 	keys_to_append.append("J bp After CDR3")
+	keys_to_append.append("BP In Read After J Aln")
 	keys_to_append.append("Release Version Tag")
 	keys_to_append.append("Release Version Hash")
 
