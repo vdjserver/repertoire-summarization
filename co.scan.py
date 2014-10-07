@@ -14,7 +14,8 @@ import re
 
 
 
-
+#is a given sample-barcode a controL?  return true or false
+#M105,M106,N105,N106 are classified as CONTROLS all others not.
 def isControlBC(bc):
 	if(
 		bc=="M105" or
@@ -27,7 +28,7 @@ def isControlBC(bc):
 
 
 
-
+#given a sample barcode, map it to itself (if it's not control) and to CONTROL othertise
 def mapToControl(bc):
 	if(isControlBC(bc)):
 		return "CONTROL"
@@ -36,19 +37,46 @@ def mapToControl(bc):
 
 
 
-#Given the input file, return 3 things:
-#1) return a sample-barcode -> CDR3 mapping (one -> many) telling, for a given sample-barcode, the set of CDR3s found in it
-#2) a CDR3->count dict, telling, given a CDR3, the number of times it was found in the input file
-#3) a pair->count file telling, given a [barcode-sample,CDR3] pair, the number of times it was encountered in the input file
-def get_bccdr3map_cdr3countmap_paircountmap(bc_cdr3_file):
+
+#utility to read the BATCH_SAMPLE_BARCODE file and return a lookup datastructure from it
+def obtainBatchSampleBSMapFromLookupFile(lookup_file_path):
+	lu=dict()
+	reader=open(lookup_file_path,'r')
+	for line in reader:
+		temp_line=line.strip()
+		pieces=temp_line.split('\t')
+		if(not(len(pieces)==3)):
+			err_msg="Error, got "+str(len(pieces))+" tab-separated values in file "+lookup_file_path+" but expected 3 : BATCH[TAB]SAMPLE[TAB]SUBJECT_BARCODE !"
+			raise Exception(err_msg)
+			sys.exit(0)
+		batch=pieces[0]
+		sample=pieces[1]
+		bs=pieces[2]
+		if(not(batch in lu)):
+			lu[batch]=dict()
+		lu[batch][sample]=bs
+	reader.close()
+	return lu
+	#/home/esalina2/diogenix_2014_contract/B.S.SBC.Lookup.tsv
+
+
+
+
+
+
+#Given the input file (BS_CDR3NA_COUNT) , return 3 things:
+#1) return a sample-barcode -> CDR3 mapping (one -> many) telling, for a given sample-barcode, the set of CDR3s found in it (this is an indicator-style type structure)
+#2) a CDR3->count dict, telling, given a CDR3, the number of times it was found in the input file (this keeps a weighted count ; weighted based on input counts from 3rd column)
+#3) a pair->count file telling, given a [barcode-sample,CDR3] pair, the number of times it was encountered in the input file (this keeps a weighted count ; weighted based on input counts from third column)
+def get_bccdr3map_cdr3countmap_paircountmap(bc_cdr3_count_file):
 	#given a barcode, get the set of CDR3s present in it
 	bc_cdr3_dict=dict()
-	reader=open(bc_cdr3_file,'r')
+	reader=open(bc_cdr3_count_file,'r')
 	#dict to count number of CDR3 appearances
 	cdr3_count=dict()
 	print "Now mapping codes to a set of CDRs...so that given a code, a set of CDR3s may be obtained."
 	print "Also counting the CDR3s....."
-	print "Also counting sample-barcode CDR3 paired counts!"
+	print "Also counting sample-barcode CDR3 paired counts! (weighted by redundancy counts)"
 	bc_cdr3_pair_count=dict()
 	for line in reader:
 		temp_line=line.strip()
@@ -56,14 +84,15 @@ def get_bccdr3map_cdr3countmap_paircountmap(bc_cdr3_file):
 		pieces=temp_line.split('\t')
 		code=pieces[0]
 		c=pieces[1]
+		this_INPUT_count=int(pieces[2])
 		#will look for 3 columns soon
 		pair=str(temp_line)
 		if(not(pair in bc_cdr3_pair_count)):
 			bc_cdr3_pair_count[pair]=0
-		bc_cdr3_pair_count[pair]+=1
+		bc_cdr3_pair_count[pair]+=this_INPUT_count
 		if(not(c in cdr3_count)):
 			cdr3_count[c]=0
-		cdr3_count[c]+=1
+		cdr3_count[c]+=this_INPUT_count
 		if(code in bc_cdr3_dict):
 			bc_cdr3_dict[mapToControl(code)].add(c)
 		else:
@@ -188,27 +217,6 @@ def scanTSVAppendingTripletBSAndCDR3NAAndCountToFile(tsv_file_base,file_to_appen
 
 
 
-def obtainBatchSampleBSMapFromLookupFile(lookup_file_path):
-	lu=dict()
-	reader=open(lookup_file_path,'r')
-	for line in reader:
-		temp_line=line.strip()
-		pieces=temp_line.split('\t')
-		if(not(len(pieces)==3)):
-			err_msg="Error, got "+str(len(pieces))+" tab-separated values in file "+lookup_file_path+" but expected 3 : BATCH[TAB]SAMPLE[TAB]SUBJECT_BARCODE !"
-			raise Exception(err_msg)
-			sys.exit(0)
-		batch=pieces[0]
-		sample=pieces[1]
-		bs=pieces[2]
-		if(not(batch in lu)):
-			lu[batch]=dict()
-		lu[batch][sample]=bs
-	reader.close()
-	return lu
-	#/home/esalina2/diogenix_2014_contract/B.S.SBC.Lookup.tsv
-
-
 
 if (__name__=="__main__"):
 	parser=argparse.ArgumentParser(description='Perfrom subject-barcode CDR3 cross-over initial scan writing output of sample-barcode, CDR3 and cross-over percent.  First, scan for CDR3s being contained in multiple barcode-samples.  If a CDR3 is contained in exactly 1 barcode-sample it it NOT blacklisted and does NOT appear in the output.  If a CDR3 DOES appear in two or more barcode-samples then it it \'blacklisted\' and DOES appear in the output.  For each CDR3 blacklisted, for each barcode-sample it appears in, there will be a corresponding line in the output.  Moreover, each of those lines in the output is accompanied by a percentage indicating the relative percent that the CDR3 appears in the sample-barcode as a percentage of all the sample-barcodes it appears in.  NOTE : any one of the 4 : M105,M106,N105,N106 subject-barcodes will be interpeted as CONTROL!')
@@ -231,6 +239,16 @@ if (__name__=="__main__"):
 				if(not(os.path.exists(file_to_append_to))):
 					#good, can't overwrite a non-existing file!! now proceed to generate it!
 					scanTSVAppendingTripletBSAndCDR3NAAndCountToFile(tsv_base,file_to_append_to,bs_lookup)
+					ontained_counting_info=get_bccdr3map_cdr3countmap_paircountmap(file_to_append_to)
+					bc_cdr3_dict=ontained_counting_info[0] #map, given a BS, gives a set of CDR3s found in it (not weighted, just an indicator)
+					cdr3_count=ontained_counting_info[1] # map, given a CDR3 NA seq, get how many times it appeared (WEIGHTED)
+					bc_cdr3_pair_count=ontained_counting_info[2]= #WEIGHTED count of BC/CDR3 pairings
+					#given  weighted counts, obtain a mapping where you give it a CDR3, 
+					#it tells/gives you a SET of sample-barcodes that the CDR3 falls in
+					cdr3_bc_dict=create_cdr3_bcset_mapping(bc_cdr3_dict,cdr3_count)
+					#given the CDR3->BS mapping obtain a set of 'blacklisted CDR3s (appearing in more than one sample-barcode)
+					cdr3_black_list_set=getCDR3sBlackListed(cdr3_bc_dict)
+					 generate_whittle_down(bc_cdr3_pair_count,cdr3_black_list_set,whittled_down_output):
 				else:
 					print "File ",file_to_append_to," found!  must delete it first to proceed!"
 					parser.print_help()
