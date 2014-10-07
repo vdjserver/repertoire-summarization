@@ -6,6 +6,7 @@ from sample_cdr3 import getBatchIDAndSampleIDFromPath
 import argparse
 import re
 import os
+from ags_mgr import ags_manager
 
 def getLogPathGivenTSVPath(tsv_path):
 	tsv_path_len=len(tsv_path)
@@ -114,11 +115,12 @@ def readLog(logPath):
 
 
 
-def printStats(path,logPath,bid,sid,returnInsteadOfPrint=False):
+def printStats(path,logPath,bid,sid,minCountNum,returnInsteadOfPrint=False):
 	reader=open(path,'r')
 	stat_counts=dict()
 	#stat counts
 	stat_list=list()
+	stat_list.append("MinCount_"+str(minCountNum)+"_Fail")
 	stat_list.append("NoVHit")
 	stat_list.append("Not an IGHV4 hit")
 	stat_list.append("Had Indels!")
@@ -187,90 +189,100 @@ def printStats(path,logPath,bid,sid,returnInsteadOfPrint=False):
 		num_seqs_with_equal_or_greater_nuc_muts[y]=0
 	homology_over_v_thresh=85.00
 	num_homology_over_v_less_than_thresh=0
+	mySampleAGSMGR=ags_manager(str(bid+"."+sid))
 	for line in reader:
 		#print line
 		if(line_num>1):
 			pieces=line.split('\t')
 			status=pieces[183]
-			stat_counts[status]+=1
-			if(status=="OK"):
-				#proceed
-				vHit=pieces[2]
-				vHitNA=deAllelifyName(vHit)
-				if(vHitNA in vList):
-					vCounts[vHitNA]+=1
-				jHit=pieces[3]
-				jHitNA=deAllelifyName(jHit)
-				if(jHitNA in jList):
-					jCounts[jHitNA]+=1
-				#cdr3_len=pieces[21]
-				#if(not(cdr3_len=="None")):
-				#	cdr3_len=int(cdr3_len)
-				#print "cdr3 len for ",pieces[1]," is ",cdr3_len
-				rms=eval(pieces[185]) #replacement mutations amino
-				sms=eval(pieces[187]) #silent mutations amino
-				bprms=eval(pieces[184]) #replacment mutation codons
-				bpsms=eval(pieces[186]) #silent mutation codons
-				homology_over_v=float(pieces[5])
-				if(homology_over_v<homology_over_v_thresh):
-					num_homology_over_v_less_than_thresh+=1
-				for silent_mutation in sms:
-					num_silent_mut+=1
-					sm_reg=getRegion(silent_mutation)
-					if(isCDR(sm_reg)):
-						tot_SM_in_CDR+=1
-						#print "SM",silent_mutation," detected in CDR for ",pieces[1]
-					elif(isFR(sm_reg)):
-						#print "SM",silent_mutation," detected in FR for ",pieces[1]
-						tot_SM_in_FR+=1
+			count_val=int(pieces[len(pieces)-1])
+			#print "for ",pieces[1]," count is ",str(count_val)
+			#llsys.exit(0)
+			if(count_val>=minCountNum):
+				stat_counts[status]+=1
+				if(status=="OK"):
+					#proceed
+					vHit=pieces[2]
+					vHitNA=deAllelifyName(vHit)
+					if(vHitNA in vList):
+						vCounts[vHitNA]+=1
+					jHit=pieces[3]
+					jHitNA=deAllelifyName(jHit)
+					if(jHitNA in jList):
+						jCounts[jHitNA]+=1
+					#cdr3_len=pieces[21]
+					#if(not(cdr3_len=="None")):
+					#	cdr3_len=int(cdr3_len)
+					#print "cdr3 len for ",pieces[1]," is ",cdr3_len
+					rms=eval(pieces[185]) #replacement mutations amino
+					sms=eval(pieces[187]) #silent mutations amino
+					bprms=eval(pieces[184]) #replacment mutation codons
+					bpsms=eval(pieces[186]) #silent mutation codons
+					homology_over_v=float(pieces[5])
+					if(homology_over_v<homology_over_v_thresh):
+						num_homology_over_v_less_than_thresh+=1
+					for silent_mutation in sms:
+						num_silent_mut+=1
+						sm_reg=getRegion(silent_mutation)
+						if(isCDR(sm_reg)):
+							tot_SM_in_CDR+=1
+							#print "SM",silent_mutation," detected in CDR for ",pieces[1]
+						elif(isFR(sm_reg)):
+							#print "SM",silent_mutation," detected in FR for ",pieces[1]
+							tot_SM_in_FR+=1
+						else:
+							raise Exception("Error, unplacable silent mutation ",rm," for read="+pieces[1])
+					num_rms_in_this_row=0
+					for rm in rms:
+						mySampleAGSMGR.receive_numbered_mut(rm)
+						rm_reg=getRegion(rm)
+						num_rms_in_this_row+=1
+						if(isCDR(rm_reg)):
+							#print "RM",rm," detected in CDR for ",pieces[1]
+							tot_RM_in_CDR+=1
+						elif(isFR(rm_reg)):
+							#print "RM",rm," detected in FR for ",pieces[1]
+							tot_RM_in_FR+=1
+						else:
+							raise Exception("Error, unplacable mutation ",rm," for read="+pieces[1])
+					num_seqs_with_equal_or_greater_rm[min(num_rms_in_this_row,rm_gq_max)]+=1
+					#here MERGE the two sets (both silent and non-silent by UNION)
+					codon_change_set=set(bprms)
+					codon_change_set=codon_change_set.union(set(bpsms))
+					num_nuc_muts_this_row=0
+					for cc in codon_change_set:
+						codon_from=cc[0:3]
+						codon_to=cc[len(cc)-3:]
+						reg=getRegion(cc)
+						for bpi in range(len(codon_from)):
+							if(codon_from[bpi]!=codon_to[bpi]):
+								#mutation detected!
+								num_nuc_muts_this_row+=1
+								tot_bp_mut_all_reg+=1
+								if(isCDR(reg)):
+									tot_bp_mut_in_CDR+=1
+								elif(isFR(reg)):
+									tot_bp_mut_in_FR+=1
+					num_seqs_with_equal_or_greater_nuc_muts[min(num_mut_max,num_nuc_muts_this_row)]+=1
+					#print "The codon change set for ",pieces[1]," is ",codon_change_set,"\n\n\n"
+					#print "THE CDR1 LENGTH FOR "+pieces[1]+" is "+CDR1_len
+					CDR1_len=int(pieces[110])
+					if(CDR1_len in [15,18,21]):
+						num_extra_bp=CDR1_len-15
+						num_extra_aa=num_extra_bp/3
+						tot_seq_len_by_bp+=base_bp_count+num_extra_bp
+						tot_seq_len_by_codon+=((base_bp_count+num_extra_bp)/3)
+						tot_CDR_len_by_nuc+=base_CDR_nuc_len+num_extra_bp
+						tot_CDR_len_by_codon+=(((base_CDR_nuc_len)/3)+num_extra_aa)
 					else:
-						raise Exception("Error, unplacable silent mutation ",rm," for read="+pieces[1])
-				num_rms_in_this_row=0
-				for rm in rms:
-					rm_reg=getRegion(rm)
-					num_rms_in_this_row+=1
-					if(isCDR(rm_reg)):
-						#print "RM",rm," detected in CDR for ",pieces[1]
-						tot_RM_in_CDR+=1
-					elif(isFR(rm_reg)):
-						#print "RM",rm," detected in FR for ",pieces[1]
-						tot_RM_in_FR+=1
-					else:
-						raise Exception("Error, unplacable mutation ",rm," for read="+pieces[1])
-				num_seqs_with_equal_or_greater_rm[min(num_rms_in_this_row,rm_gq_max)]+=1
-				#here MERGE the two sets (both silent and non-silent by UNION)
-				codon_change_set=set(bprms)
-				codon_change_set=codon_change_set.union(set(bpsms))
-				num_nuc_muts_this_row=0
-				for cc in codon_change_set:
-					codon_from=cc[0:3]
-					codon_to=cc[len(cc)-3:]
-					reg=getRegion(cc)
-					for bpi in range(len(codon_from)):
-						if(codon_from[bpi]!=codon_to[bpi]):
-							#mutation detected!
-							num_nuc_muts_this_row+=1
-							tot_bp_mut_all_reg+=1
-							if(isCDR(reg)):
-								tot_bp_mut_in_CDR+=1
-							elif(isFR(reg)):
-								tot_bp_mut_in_FR+=1
-				num_seqs_with_equal_or_greater_nuc_muts[min(num_mut_max,num_nuc_muts_this_row)]+=1
-				#print "The codon change set for ",pieces[1]," is ",codon_change_set,"\n\n\n"
-				#print "THE CDR1 LENGTH FOR "+pieces[1]+" is "+CDR1_len
-				CDR1_len=int(pieces[110])
-				if(CDR1_len in [15,18,21]):
-					num_extra_bp=CDR1_len-15
-					num_extra_aa=num_extra_bp/3
-					tot_seq_len_by_bp+=base_bp_count+num_extra_bp
-					tot_seq_len_by_codon+=((base_bp_count+num_extra_bp)/3)
-					tot_CDR_len_by_nuc+=base_CDR_nuc_len+num_extra_bp
-					tot_CDR_len_by_codon+=(((base_CDR_nuc_len)/3)+num_extra_aa)
+						raise Exception("Error on CDR1 length in file "+path+" for read="+pieces[1])
+					tot_len_AA_in_FR+=base_FR_AA_len
+					tot_len_bp_in_FR+=(base_FR_AA_len*3)
 				else:
-					raise Exception("Error on CDR1 length in file "+path+" for read="+pieces[1])
-				tot_len_AA_in_FR+=base_FR_AA_len
-				tot_len_bp_in_FR+=(base_FR_AA_len*3)
+					pass
 			else:
+				#count_val<min_count_num
+				stat_counts["MinCount_"+str(minCountNum)+"_Fail"]+=1
 				pass
 		line_num+=1
 	reader.close()
@@ -293,6 +305,18 @@ def printStats(path,logPath,bid,sid,returnInsteadOfPrint=False):
 	for j in jList:
 		out_pieces_header.append("J GENE "+j+" COUNT")
 		out_pieces.append(jCounts[j])
+
+	#REPLACE LOG AGS/RM data with AGS_MGR dynamically computed data
+	ags_5_info=mySampleAGSMGR.compute_ags("AGS5")#[ags5_score,sampAGSTot,sampTot]
+	ags_6_info=mySampleAGSMGR.compute_ags("AGS6")#[ags6_score,sampAGSTot,sampTot]
+	#print "ags_5_info : ",ags_5_info
+	#print "ags_6_info : ",ags_6_info
+	log_data['AGS5']=ags_5_info[0]
+	log_data['AGS5_RM']=ags_5_info[1]
+	log_data['AGS']=ags_6_info[0]
+	log_data['AGS_RM']=ags_6_info[1]
+	log_data['TOT_RM']=ags_6_info[2]
+
 	#AGS5 and AGS5RM
 	out_pieces_header.append("AGS5")
 	out_pieces.append(log_data['AGS5'])
@@ -391,6 +415,7 @@ if (__name__=="__main__"):
 	#parser.add_argument('tsv_in',type=str,nargs=1,help="path to a rep_char TSV output file")
 	#parser.add_argument('log_in',type=str,nargs=1,help="path to the corresponding rep_char output log file")
 	parser.add_argument('tsv_base',type=str,nargs=1,help="path to a directory itself holding BATCHES, each BATCH directory holding samples")
+	parser.add_argument('-min_count_num',type=int,default=1,nargs=1,help="required minimum count value that triggers row into aggregtation (default 1)")
 	args=parser.parse_args()
 	if(not(args)):
 		parser.print_help()
@@ -398,8 +423,11 @@ if (__name__=="__main__"):
 	#input_file_path=extractAsItemOrFirstFromList(args.tsv_in)
 	#log_file_path=extractAsItemOrFirstFromList(args.log_in)
 	input_base=extractAsItemOrFirstFromList(args.tsv_base)
+	min_count_num=extractAsItemOrFirstFromList(args.min_count_num)
 	input_glob=input_base+"/*/*.rc_out.tsv"
 	tsv_num=1
+	#print "using min_count_num=",min_count_num
+	#sys.exit(0)
 	for TSV in glob_walk(input_glob):
 		LOG=getLogPathGivenTSVPath(TSV)
 		bid_sid=getBatchIDAndSampleIDFromPath(TSV)
@@ -408,7 +436,8 @@ if (__name__=="__main__"):
 		#print "\tBID,SID=",bid_sid
 		BID=bid_sid[0]
 		SID=bid_sid[1]
-		report_lines=printStats(TSV,LOG,BID,SID,True)
+		returnInsteadOfPrint=True
+		report_lines=printStats(TSV,LOG,BID,SID,min_count_num,returnInsteadOfPrint)
 		if(tsv_num==1):
 			print report_lines[0]
 		print report_lines[1]
