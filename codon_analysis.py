@@ -249,6 +249,8 @@ class codonCounter:
 		if(self.allowGaps):
 			#unimp!
 			sys.exit(0)
+		if(region_info==None):
+			return False
 		q_char_map=region_info.getCharMap()
 		if(q_char_map==None):
 			return False
