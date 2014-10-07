@@ -91,7 +91,7 @@ def getNumPosArr():
 	return np_list
 
 
-def writeRMInfoToTable(dir_base,out_tbl,num_rm_filter_thresh="0+"):
+def writeRMInfoToTable(dir_base,out_tbl,minCountNum,num_rm_filter_thresh="0+"):
 	file_num=0
 	validation_res=validate_filter_stat_arg(num_rm_filter_thresh)
 	thresh_num=validation_res[0] #a non-negative integer
@@ -111,7 +111,8 @@ def writeRMInfoToTable(dir_base,out_tbl,num_rm_filter_thresh="0+"):
 				if(line_num>1):
 					pieces=line.split('\t')
 					status=pieces[183]
-					if(status=="OK"):
+					count_val=int(pieces[len(pieces)-1])
+					if(status=="OK" and count_val>=minCountNum):
 						num_pass_filter+=1
 						CDR1_len=int(pieces[110])
 						cdr1_amino_len=CDR1_len/3
@@ -193,6 +194,7 @@ if (__name__=="__main__"):
 	parser.add_argument('out_tbl',type=str,nargs=1,help="output file path for TSV of sample/RM data table")
 	parser.add_argument('dir_base',type=str,nargs=1,help="base dir for files")
 	parser.add_argument('-exact_plus',type=str,nargs=1,default="0+",help="valid range to report over : may be : 0,0+,1,1+,2,2+, etc.... depending on range")
+	parser.add_argument('-min_count_num',type=int,default=1,nargs=1,help="required minimum count value that triggers row into aggregtation (default 1)")
 	args=parser.parse_args()
 	if(not(args)):
 		parser.print_help()
@@ -209,7 +211,8 @@ if (__name__=="__main__"):
 		if(not(os.path.exists(dir_base))):
 			parser.print_help()
 		else:
-			writeRMInfoToTable(dir_base,out_tbl,exact_val)
+			min_val=extractAsItemOrFirstFromList(args.min_count_num)
+			writeRMInfoToTable(dir_base,out_tbl,min_val,exact_val)
 
 
 
