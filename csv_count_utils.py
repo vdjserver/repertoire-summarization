@@ -18,6 +18,7 @@ def create_read_id_count_map(csv_file_path):
 				pass
 			else:
 				pieces=temp_line.split('\t')
+				#print "Pieces read in are ",pieces
 				read_id=pieces[0]
 				count_str=pieces[1]
 				count_val=int(count_str)
@@ -85,8 +86,8 @@ def fromTSVGenerateCSVPath(tsv_path):
 def addExtraCountColToTSV(tsv_path):
 	csv_path=fromTSVGenerateCSVPath(tsv_path)
 	csv_read_ids=getOrderedReadIDListFromCSV(csv_path)
-	print "The length of csv_read_ids is ",len(csv_read_ids)
-	read_id_to_count_map=create_read_id_count_map(tsv_path)
+	#print "The length of csv_read_ids is ",len(csv_read_ids)
+	read_id_to_count_map=create_read_id_count_map(csv_path)
 	new_path=tsv_path+".with_counts.tsv"
 	#first read in the file and write out the new one with countds
 	reader=open(tsv_path,'r')
@@ -101,25 +102,40 @@ def addExtraCountColToTSV(tsv_path):
 			pieces.append(new_col_name)
 			new_line="\t".join(pieces)
 			writer.write(new_line+"\n")
-			print "Just wrote header"
+			#print "Just wrote header"
 		else:
 			#data
 			pieces=temp_line.split('\t')
 			read_id=pieces[1]
-			print "retreive TSV id is ",read_id
+			#print "retreive TSV id is ",read_id
 			ordered_id=csv_read_ids[ln-1]
-			print "retrived CSV id is ",ordered_id
+			#print "retrived CSV id is ",ordered_id
+			err_msg="Error in file CSV="+csv_path+" TSV="+tsv_path+" at read ID(TSV)="+read_id+" and read ID(CSV)="+ordered_id+
 			if(not(ordered_id==read_id)):
-				err_msg="Error in file CSV="+csv_path+" TSV="+tsv_path+" at read ID(TSV)="+read_id+" and read ID(CSV)="+ordered_id+". Mismatch (line="+str(ln)+")"
+				err_msg+=" Mismatch (line="+str(ln)+")"
 				raise Exception(err_msg)
+				return None
+			if(not(read_id in read_id_to_count_map)):
+				err_msg+=" READ_ID="+read_id+", not found in map to obtain count value!
+			
 			count_val=read_id_to_count_map[read_id]
-			pieces.append(count_val)
+			pieces.append(str(count_val))
 			writer.write("\t".join(pieces)+"\n")
-			print "just wrote at ln=",ln
+			#print "just wrote at ln=",ln
 		ln+=1
 	reader.close()
-	print "read from ",tsv_path," and wrote to ",new_path
+	#print "read from ",tsv_path," and wrote to ",new_path
 	writer.close()
+	import os
+	import shutil
+	#move the newly created file to write over 
+	#the old file, thus adding the new column
+	os.remove(tsv_path)
+	shutil.move(new_path,tsv_path)
+	
+
+
+	
 
 
 
