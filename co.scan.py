@@ -3,7 +3,8 @@
 from utils import glob_walk,extractAsItemOrFirstFromList
 import os
 from sample_cdr3 import getBatchIDAndSampleIDFromPath
-
+import argparse
+import re
 
 
 #for BS in `find */*.fasta` ; do echo "BS IS $BS" ; BID=`echo $BS|tr "/" "\t"|cut -f1` ; echo "BATCH_ID  IS $BID" ; SID=`echo $BS|tr "/" "\t"|cut -f2|grep -Po '^.+\.'|tr -d "."`; echo "SID IS $SID" ; CODE=`awk -v BATCH=$BID -v SAMP=$SID   '{if($1==BATCH && $2==SAMP ) {   print $1 "\t" $2 "\t" $3} }' ../B.S.SBC.Lookup.tsv|cut -f3` ; echo "the code is $CODE" ; TSV="$BS.igblast.out.rc_out.tsv" ; awk -v code=$CODE   -F"\t" '{if($184=="OK") {print code "\t" $21}}' $TSV >> cdr3_sample_barcode_id.OK.tsv  ;        done ;
@@ -148,24 +149,102 @@ def generate_whittle_down(bc_cdr3_pair_count,cdr3_black_list_set,whittled_down_o
 
 
 
-
+def scanTSVAppendingTripletBSAndCDR3NAAndCountToFile(tsv_file_base,file_to_append_to,batch_sample_barcode_lookup_file):
+	b_s_bs_map=obtainBatchSampleBSMapFromLookupFile(batch_sample_barcode_lookup_file)
+	print "Loaded lookup from ",batch_sample_barcode_lookup_file
+	tsv_glob=tsv_file_base+"/*/*out.tsv"
+	writer=open(file_to_append_to,'w')
+	for tsv in glob_walk(tsv_glob):
+		print "Now to scan TSV ",tsv," to append SB-CDR3-COUNT to file ",file_to_append_to
+		batch_and_sample=getBatchIDAndSampleIDFromPath(tsv)
+		print "Its batch and sample : ",batch_and_sample
+		batch=batch_and_sample[0]
+		sample=batch_and_sample[1]
+		subject_barcode=b_s_bs_map[batch][sample]
+		control_mapped_subject_barcode=mapToControl(subject_barcode)
+		reader=open(tsv,'r')
+		line_num=0
+		for line in reader:
+			if(line_num>=1):
+				temp_line=line.strip()
+				pieces=temp_line.split('\t')
+				cdr3_na=pieces[20]
+				status=pieces[183]
+				count=int(pieces[len(pieces)-1])
+				#print "in file ",tsv,"on line=",line_num," got cdr3=",cdr3_na," status=",status," and count=",str(count)
+				if(status=="OK"):
+					#got OK status!
+					if(re.match(r'^[ACGT]+$',cdr3_na)):
+						#got a good CDR3!
+						line_to_write=control_mapped_subject_barcode+"\t"+cdr3_na+"\t"+str(count)
+						writer.write(line_to_write+"\n")
+			line_num+=1
+		reader.close()
+	writer.close()
+	
 		
+
+
+
+
+
+def obtainBatchSampleBSMapFromLookupFile(lookup_file_path):
+	lu=dict()
+	reader=open(lookup_file_path,'r')
+	for line in reader:
+		temp_line=line.strip()
+		pieces=temp_line.split('\t')
+		if(not(len(pieces)==3)):
+			err_msg="Error, got "+str(len(pieces))+" tab-separated values in file "+lookup_file_path+" but expected 3 : BATCH[TAB]SAMPLE[TAB]SUBJECT_BARCODE !"
+			raise Exception(err_msg)
+			sys.exit(0)
+		batch=pieces[0]
+		sample=pieces[1]
+		bs=pieces[2]
+		if(not(batch in lu)):
+			lu[batch]=dict()
+		lu[batch][sample]=bs
+	reader.close()
+	return lu
+	#/home/esalina2/diogenix_2014_contract/B.S.SBC.Lookup.tsv
+
 
 
 if (__name__=="__main__"):
 	parser=argparse.ArgumentParser(description='Perfrom subject-barcode CDR3 cross-over initial scan writing output of sample-barcode, CDR3 and cross-over percent.  First, scan for CDR3s being contained in multiple barcode-samples.  If a CDR3 is contained in exactly 1 barcode-sample it it NOT blacklisted and does NOT appear in the output.  If a CDR3 DOES appear in two or more barcode-samples then it it \'blacklisted\' and DOES appear in the output.  For each CDR3 blacklisted, for each barcode-sample it appears in, there will be a corresponding line in the output.  Moreover, each of those lines in the output is accompanied by a percentage indicating the relative percent that the CDR3 appears in the sample-barcode as a percentage of all the sample-barcodes it appears in.  NOTE : any one of the 4 : M105,M106,N105,N106 subject-barcodes will be interpeted as CONTROL!')
-	parser.add_argument('cdr3_sample_barcode_OK_tsv',type=str,nargs=1,help="path to a file of occurences of sample-barcode resolved CDR3s conditioned on OK AGS status ; each line has [BARCODE-SAMPLE] [tab] [CDR3 NUCL. ACID SEQ] ; these are extracted from TSVs and a barcode-sample/batch-sample lookup table conditioned on the OK AGS status ; a line may appear multiple times.  these are not counts ; they are instances'
-	parser.add_argument('cdr3_whittle_down',type=str,nargs=1,help="the output file of ordered triples of [sample barcode][tab][CDR3 nucl. acid][tab][percentage]") 
+	#parser.add_argument('cdr3_sample_barcode_OK_tsv',type=str,nargs=1,help="path to a file (which is created by this script) of occurences of sample-barcode resolved CDR3s conditioned on OK AGS status ; each line has [BARCODE-SAMPLE] [tab] [CDR3 NUCL. ACID SEQ] [tab] [COUNT]; these are extracted from TSVs and a barcode-sample/batch-sample lookup table conditioned on the OK AGS status ; a line may appear multiple times.  these are not counts ; they are instances")
+	#parser.add_argument('cdr3_whittle_down',type=str,nargs=1,help="the output file of ordered triples of [sample barcode][tab][CDR3 nucl. acid][tab][percentage]") 
+	parser.add_argument('tsv_base',type=str,nargs=1,help="base directory for TSVs where glog base/*/*out.tsv is used to scan for CDR3s,TSVs, and counts.  In this directory the file cdr3_black_list_whittle_pct.tsv (which is)  will be created by the script as well as cdr3_sample_barcode_id.OK.CONTROL.tsv (which is created by writing instances of triples of SUBJECT_BARCODE[TAB]CDR3_NA(not 'None')[TAB]Count from scanning TSVs)")
+	parser.add_argument('b_s_lookup_path',type=str,nargs=1,help="path to the BATCH_SAMPLE_BARCODESAMPLE lookup file")
 	args=parser.parse_args()
 	if(args):
-		print "success"
+		#success!
+		import os
+		tsv_base=extractAsItemOrFirstFromList(args.tsv_base)
+		bs_lookup=extractAsItemOrFirstFromList(args.b_s_lookup_path)
+		err_state=False
+		if(os.path.exists(tsv_base) and os.path.isdir(tsv_base)):
+			#good
+			if(os.path.isfile(bs_lookup) and os.path.exists(bs_lookup)):
+				#good
+				file_to_append_to=tsv_base+"/cdr3_sample_barcode_id.OK.CONTROL.tsv"
+				if(not(os.path.exists(file_to_append_to))):
+					#good, can't overwrite a non-existing file!! now proceed to generate it!
+					scanTSVAppendingTripletBSAndCDR3NAAndCountToFile(tsv_base,file_to_append_to,bs_lookup)
+				else:
+					print "File ",file_to_append_to," found!  must delete it first to proceed!"
+					parser.print_help()
+			else:
+				print "BATCH/SAMPLE barcode lookup file ",bs_lookup," not found!"
+				parser.print_help()
+		else:
+			print "Directory ",tsv_base," not found!"
+			parser.print_help()
+			
+
 	else:
-		print "failure"
-
-
-
-
-
+		#print "failure"
+		parser.print_help()
 
 
 
