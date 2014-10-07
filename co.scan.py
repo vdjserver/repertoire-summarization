@@ -237,18 +237,23 @@ if (__name__=="__main__"):
 				#good
 				file_to_append_to=tsv_base+"/cdr3_sample_barcode_id.OK.CONTROL.tsv"
 				if(not(os.path.exists(file_to_append_to))):
-					#good, can't overwrite a non-existing file!! now proceed to generate it!
-					scanTSVAppendingTripletBSAndCDR3NAAndCountToFile(tsv_base,file_to_append_to,bs_lookup)
-					ontained_counting_info=get_bccdr3map_cdr3countmap_paircountmap(file_to_append_to)
-					bc_cdr3_dict=ontained_counting_info[0] #map, given a BS, gives a set of CDR3s found in it (not weighted, just an indicator)
-					cdr3_count=ontained_counting_info[1] # map, given a CDR3 NA seq, get how many times it appeared (WEIGHTED)
-					bc_cdr3_pair_count=ontained_counting_info[2]= #WEIGHTED count of BC/CDR3 pairings
-					#given  weighted counts, obtain a mapping where you give it a CDR3, 
-					#it tells/gives you a SET of sample-barcodes that the CDR3 falls in
-					cdr3_bc_dict=create_cdr3_bcset_mapping(bc_cdr3_dict,cdr3_count)
-					#given the CDR3->BS mapping obtain a set of 'blacklisted CDR3s (appearing in more than one sample-barcode)
-					cdr3_black_list_set=getCDR3sBlackListed(cdr3_bc_dict)
-					 generate_whittle_down(bc_cdr3_pair_count,cdr3_black_list_set,whittled_down_output):
+					whittled_down_output=tsv_base+"/cdr3_black_list_whittle_pct.tsv"
+					if(not(os.path.exists(whittled_down_output))):
+						#good
+						#good, can't overwrite a non-existing file!! now proceed to generate it!
+						scanTSVAppendingTripletBSAndCDR3NAAndCountToFile(tsv_base,file_to_append_to,bs_lookup)
+						ontained_counting_info=get_bccdr3map_cdr3countmap_paircountmap(file_to_append_to)
+						bc_cdr3_dict=ontained_counting_info[0] #map, given a BS, gives a set of CDR3s found in it (not weighted, just an indicator)
+						cdr3_count=ontained_counting_info[1] # map, given a CDR3 NA seq, get how many times it appeared (WEIGHTED)
+						bc_cdr3_pair_count=ontained_counting_info[2] #WEIGHTED count of BC/CDR3 pairings
+						#given  weighted counts, obtain a mapping where you give it a CDR3, 
+						#it tells/gives you a SET of sample-barcodes that the CDR3 falls in
+						cdr3_bc_dict=create_cdr3_bcset_mapping(bc_cdr3_dict,cdr3_count)
+						#given the CDR3->BS mapping obtain a set of 'blacklisted CDR3s (appearing in more than one sample-barcode)
+						cdr3_black_list_set=getCDR3sBlackListed(cdr3_bc_dict)					
+						generate_whittle_down(bc_cdr3_pair_count,cdr3_black_list_set,whittled_down_output)
+					else:
+						print "File ",whittled_down_output," found! Must first delete it to proceed!"
 				else:
 					print "File ",file_to_append_to," found!  must delete it first to proceed!"
 					parser.print_help()
