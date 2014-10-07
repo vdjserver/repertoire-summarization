@@ -249,10 +249,15 @@ class codonCounter:
 		if(self.allowGaps):
 			#unimp!
 			sys.exit(0)
-		q_aa=region_info.getCharMap()['AA']
-		q_codons=region_info.getCharMap()['nucleotide read']
-		s_aa=region_info.getCharMap()['AA_ref']
-		s_codons=region_info.getCharMap()['subject_read']
+		q_char_map=region_info.getCharMap()
+		if(q_char_map==None):
+			return False
+		if(not('AA' in q_char_map) or not('nucleotide_read' in q_char_map) or not('AA_ref' in q_char_map) or not('subject_read' in q_char_map)):
+			return False
+		q_aa=q_char_map['AA']
+		q_codons=q_char_map['nucleotide read']
+		s_aa=q_char_map['AA_ref']
+		s_codons=q_char_map['subject_read']
 		join_str=""
 		q_bp=self.getBPFromCodonList(q_codons)
 		s_bp=self.getBPFromCodonList(s_codons)
