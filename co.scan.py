@@ -6,8 +6,13 @@ from sample_cdr3 import getBatchIDAndSampleIDFromPath
 
 
 
-
 #for BS in `find */*.fasta` ; do echo "BS IS $BS" ; BID=`echo $BS|tr "/" "\t"|cut -f1` ; echo "BATCH_ID  IS $BID" ; SID=`echo $BS|tr "/" "\t"|cut -f2|grep -Po '^.+\.'|tr -d "."`; echo "SID IS $SID" ; CODE=`awk -v BATCH=$BID -v SAMP=$SID   '{if($1==BATCH && $2==SAMP ) {   print $1 "\t" $2 "\t" $3} }' ../B.S.SBC.Lookup.tsv|cut -f3` ; echo "the code is $CODE" ; TSV="$BS.igblast.out.rc_out.tsv" ; awk -v code=$CODE   -F"\t" '{if($184=="OK") {print code "\t" $21}}' $TSV >> cdr3_sample_barcode_id.OK.tsv  ;        done ;
+#add filter so that "None" and blank fall off
+#we need to take redundancy into account here..... (we need 3 columsn and the 3rd column is the copy-count)
+
+
+
+
 
 def isControlBC(bc):
 	if(
@@ -50,6 +55,7 @@ def get_bccdr3map_cdr3countmap_paircountmap(bc_cdr3_file):
 		pieces=temp_line.split('\t')
 		code=pieces[0]
 		c=pieces[1]
+		#will look for 3 columns soon
 		pair=str(temp_line)
 		if(not(pair in bc_cdr3_pair_count)):
 			bc_cdr3_pair_count[pair]=0
@@ -65,6 +71,10 @@ def get_bccdr3map_cdr3countmap_paircountmap(bc_cdr3_file):
 		#print "After this line, code "+code+" maps to ",bc_cdr3_dict[code]
 	reader.close()
 	return [bc_cdr3_dict,cdr3_count,bc_cdr3_pair_count]
+
+
+
+
 
 
 
@@ -108,6 +118,9 @@ def getCDR3sBlackListed(cdr3_bc_dict):
 			num_cdr3_in_multiple_code+=1
 	print "The number of CDR3s being found associated with more than one barcode is ",num_cdr3_in_multiple_code
 	return cdr3_black_list_set
+
+
+
 
 
 #generate the whittle down blacklist file of blacklisted CDR3s with sample-barcodes and percent given:
