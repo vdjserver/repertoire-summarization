@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-
+from utils import *
 
 #make a map from a base CSV file
 def create_read_id_count_map(csv_file_path):
@@ -110,14 +110,15 @@ def addExtraCountColToTSV(tsv_path):
 			#print "retreive TSV id is ",read_id
 			ordered_id=csv_read_ids[ln-1]
 			#print "retrived CSV id is ",ordered_id
-			err_msg="Error in file CSV="+csv_path+" TSV="+tsv_path+" at read ID(TSV)="+read_id+" and read ID(CSV)="+ordered_id+
+			err_msg="Error in file CSV="+csv_path+" TSV="+tsv_path+" at read ID(TSV)="+read_id+" and read ID(CSV)="+ordered_id
 			if(not(ordered_id==read_id)):
 				err_msg+=" Mismatch (line="+str(ln)+")"
 				raise Exception(err_msg)
 				return None
 			if(not(read_id in read_id_to_count_map)):
-				err_msg+=" READ_ID="+read_id+", not found in map to obtain count value!
-			
+				err_msg+=" READ_ID="+read_id+", not found in map to obtain count value!"
+				raise Exception(err_msg)
+				return None
 			count_val=read_id_to_count_map[read_id]
 			pieces.append(str(count_val))
 			writer.write("\t".join(pieces)+"\n")
@@ -134,12 +135,13 @@ def addExtraCountColToTSV(tsv_path):
 	shutil.move(new_path,tsv_path)
 	
 
-
+def batch_add_columns_to_TSV_UsingBaseDir(base_dir):
+	glob_str=base_dir+"/*/*out.tsv"
+	#print "glob_str is ",glob_str
+	for tsv in glob_walk(glob_str):
+		print "Now to add column to TSV ",tsv
+		addExtraCountColToTSV(tsv)
+	#print "returning from batch...."
 	
-
-
-
-TSV_PATH="/home/esalina2/diogenix_2014_contract/set2014_su_counts/S1401136_Run1/Sample00001.fasta.igblast.out.rc_out.tsv"
-addExtraCountColToTSV(TSV_PATH)
 
 
