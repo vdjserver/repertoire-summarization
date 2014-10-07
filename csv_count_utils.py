@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 from utils import *
+import argparse
+
 
 #make a map from a base CSV file
 def create_read_id_count_map(csv_file_path):
@@ -135,13 +137,42 @@ def addExtraCountColToTSV(tsv_path):
 	shutil.move(new_path,tsv_path)
 	
 
+
+
+
+
+
 def batch_add_columns_to_TSV_UsingBaseDir(base_dir):
 	glob_str=base_dir+"/*/*out.tsv"
 	#print "glob_str is ",glob_str
 	for tsv in glob_walk(glob_str):
-		print "Now to add column to TSV ",tsv
+		print "Now to add 'Count' column to TSV ",tsv
 		addExtraCountColToTSV(tsv)
 	#print "returning from batch...."
+			
+		
+
+
+
+if (__name__=="__main__"):
+	parser=argparse.ArgumentParser(description="Scan a base directory (using glob BASE/*/*out.tsv) to find TSV files.  Use those paths to find corresponding dup.csv files with count information. Add an additional column to the TSVs with the count for the read")
+	parser.add_argument('base_dir',type=str,nargs=1,help="the base directory to glob with base_dir/*/*out.tsv to look for TSV files")
+	args = parser.parse_args()
+	if(args):
+		base_dir=extractAsItemOrFirstFromList(args.base_dir)
+		import os
+		if(os.path.exists(base_dir) and os.path.isdir(base_dir)):
+			#good!
+			print "Directory ",base_dir," found, now to scan for TSVs and add column....."
+			batch_add_columns_to_TSV_UsingBaseDir(base_dir)
+		else:
+			pass
+			print "Error, directory ",base_dir," not found!"
+	else:
+		#print "error in args!"
+		parser.print_help()
 	
+
+
 
 
