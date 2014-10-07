@@ -448,7 +448,8 @@ class alignment:
 
 
 
-		#do counts that are independent of codons/translations (bsb, indels, and their frequencies)
+		#do counts that are independent of codons/translations 
+		#(bsb, indels, and their frequencies)
 		tot_num_base_to_base_alns=0
 		for i in range(len(self.s_aln)):
 			if(self.s_aln[i]!="-" and self.q_aln[i]!="-"):
@@ -609,6 +610,8 @@ class alignment:
 		char_map['nucleotide read']=codon_list
 		char_map['subject_read']=s_codon_list
 		char_map['length']=abs(int(self.q_start)-int(self.q_end))+1
+		if(len(self.q_aln)==0):
+			char_map['length']=0
 		char_map['silent mutations (codons)']=aa_slnt
 		char_map['replacement mutations (codons)']=aa_reps
 		self.public_char_map=char_map
