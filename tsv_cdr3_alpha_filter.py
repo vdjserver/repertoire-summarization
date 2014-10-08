@@ -117,7 +117,7 @@ def obtain_alpha_filtered_CDR3_barcode_blacklist_mapping(alpha,sb_cdr3_pct_file)
 
 #perform TSV filtering using a alpha-modified CDR3->sample-barcode blacklist (input and output paths are used)
 #a batch->sample=sample_barcode lookup is also required
-def TSV_alpha_filter(input_dir,new_black_list_cdr3_bc,output_dir,filter_report_output_path,batch_sample_bc_loookup):
+def TSV_alpha_filter(input_dir,new_black_list_cdr3_bc,output_dir,filter_report_output_path,batch_sample_bc_loookup,min_count_num):
 	#define the output base
 	output_filtered_base=output_dir
 	if(not(os.path.exists(output_filtered_base))):
@@ -164,7 +164,8 @@ def TSV_alpha_filter(input_dir,new_black_list_cdr3_bc,output_dir,filter_report_o
 				rm_list_str=pieces[185]
 				rm_list=eval(rm_list_str)
 				#print "the rm_list is ",rm_list
-				if(status=="OK"):
+				count_val=int(pieces[len(pieces)-1])
+				if(status=="OK" and count_val>=min_count_num):
 					num_reads_OK+=1
 					if(cdr3=="None"):
 						num_reads_OK_None_CDR3+=1
@@ -216,6 +217,7 @@ if (__name__=="__main__"):
 	parser.add_argument('input_base',type=str,nargs=1,help="path to a directory holding batches (them holding samples)")
 	parser.add_argument('output_base',type=str,nargs=1,help="path to a (non-existent!) directory that will contain the filterd output and the filter report")
 	parser.add_argument('-alpha_cutoff',type=float,nargs=1,default=float(0.95),help="the alpha cutoff for defining false positive of the blacklist (default 0.95)")
+	parser.add_argument('-min_count_num',type=int,default=1,nargs=1,help="required minimum count value that triggers row into aggregtation (default 1)")
 	args=parser.parse_args()
 	if(args):
 		print "success!"
@@ -232,9 +234,16 @@ if (__name__=="__main__"):
 		print "Using output (for post-filtered TSV) : ",output_dir
 		filter_report_output_path=output_dir+"/filter_report.tsv"
 		print "To generate filter_report at ",filter_report_output_path
-		TSV_alpha_filter(input_dir,cdr3_bc_blacklist,output_dir,filter_report_output_path,batch_sample_bc_loookup)
+		min_count_num=extractAsItemOrFirstFromList(args.min_count_num)
+		if(min_count_num<0):
+			print "Error, min_count_num should be a positive integer!"
+			parser.print_help()
+			import sys
+			sys.exit(0)
+		TSV_alpha_filter(input_dir,cdr3_bc_blacklist,output_dir,filter_report_output_path,batch_sample_bc_loookup,min_count_num)
 	else:
-		print "failure!"
+		#print "failure!"
+		parser.print_help()
 
 
 
