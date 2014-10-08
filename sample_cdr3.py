@@ -64,7 +64,7 @@ def cdr3LenStats(dir_base,out_hist,min_len,max_len):
 
 
 
-def cdr3DiverStats(dir_base,out_diva):
+def cdr3DiverStats(dir_base,out_diva,min_count_val):
 	file_num=0
 	for root, dirs, files in sorted(os.walk(dir_base)):
 		for items in sorted(fnmatch.filter(files, "*out.tsv")):
@@ -78,7 +78,8 @@ def cdr3DiverStats(dir_base,out_diva):
 					pass
 					pieces=line.split('\t')
 					status=pieces[183]
-					if(status=="OK"):
+					count_val=int(pieces[len(pieces)-1])
+					if(status=="OK" and count_val>=min_count_val):
 						#19:CDR3 AA (imgt)
 						#20:CDR3 AA length (imgt)
 						#21:CDR3 NA (imgt)
@@ -169,6 +170,7 @@ if (__name__=="__main__"):
 	parser.add_argument('out_hist',type=str,nargs=1,help="output file path for TSV of sample/CDR3 length table")
 	parser.add_argument('out_diva',type=str,nargs=1,help="output file path for TSV of CDR3 length diversity analysis")
 	parser.add_argument('dir_base',type=str,nargs=1,help="base dir for CDR3 length hist")
+	parser.add_argument('-min_count_num',type=int,default=1,nargs=1,help="required minimum count value that triggers row into aggregtation (default 1 ; used in diversity only)")
 	args=parser.parse_args()
 	if(not(args)):
 		parser.print_help()
@@ -176,6 +178,7 @@ if (__name__=="__main__"):
 		out_hist=extractAsItemOrFirstFromList(args.out_hist)
 		out_diva=extractAsItemOrFirstFromList(args.out_diva)
 		dir_base=extractAsItemOrFirstFromList(args.dir_base)
+		min_count_val=extractAsItemOrFirstFromList(args.min_count_num)
 		if(not(os.path.exists(dir_base))):
 			parser.print_help()
 		else:
@@ -186,7 +189,7 @@ if (__name__=="__main__"):
 			print "min/max are :",cdr3_min_max
 			print "Writing histogram to",out_hist
 			cdr3LenStats(dir_base,out_hist,min_len,max_len)
-			cdr3DiverStats(dir_base,out_diva)
+			cdr3DiverStats(dir_base,out_diva,min_count_val)
 
 
 
