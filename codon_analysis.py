@@ -254,7 +254,12 @@ class codonCounter:
 		q_char_map=region_info.getCharMap()
 		if(q_char_map==None):
 			return False
-		if(not('AA' in q_char_map) or not('nucleotide_read' in q_char_map) or not('AA_ref' in q_char_map) or not('subject_read' in q_char_map)):
+		if(not('AA' in q_char_map) or not('nucleotide read' in q_char_map) or not('AA_ref' in q_char_map) or not('subject_read' in q_char_map)):
+			#print "Returning false cause something's not in the map...."
+			#print "AA",('AA' in q_char_map)
+			#print "nucleotide read : ",('nucleotide read' in q_char_map)
+			#print "AA_ref",('AA_ref' in q_char_map)
+			#print "subject_read",('subject_read' in q_char_map)
 			return False
 		q_aa=q_char_map['AA']
 		q_codons=q_char_map['nucleotide read']
@@ -303,7 +308,7 @@ class codonCounter:
 
 	#given the information on the 4 regions (CDR1,FR2,CDR2,FR3), verify
 	#that the alignment is suitable for acquisition of mutation counts
-	def validate_regions_for_completenessLength(self,cdr1_info,fr2_info,cdr2_info,fr3_info):
+	def validate_regions_for_completenessLength(self,cdr1_info,fr2_info,cdr2_info,fr3_info,read_name):
 		#truncation check (equals multiple of 3 check)
 		#check for valid length (given is mult of 3)
 		region_infos=list()
@@ -319,6 +324,11 @@ class codonCounter:
 			valid_lengths=self.getRegionValidLengths(regions_to_analyze[ri])
 			valid_flag=self.validate_region(region_infos[ri],min(valid_lengths),max(valid_lengths))
 			valid_flags.append(valid_flag)
+			#print "Print for region info (",regions_to_analyze[ri],") for read name=",read_name,"got string :"
+			#print region_infos[ri].getNiceString()
+			#print "The valid flag returns : ",valid_flag
+			#print "The valid lengths are : ",valid_lengths
+			#print "\n\n\n\n\n"
 			if(not(valid_flag)):
 				valid_on_all=False
 			else:
@@ -691,7 +701,7 @@ def annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted
 								filterNote="Failure in hybrid alignment"
 							else:
 								#IGHV4, test regions for completeness and length
-								completeRegionsFlags=myCodonCounter.validate_regions_for_completenessLength(kabat_CDR1,kabat_FR2,kabat_CDR2,hybrid_aln)
+								completeRegionsFlags=myCodonCounter.validate_regions_for_completenessLength(kabat_CDR1,kabat_FR2,kabat_CDR2,hybrid_aln,read_rec)
 								completeRegionsNote=completeRegionsFlags[0]
 								completeRegionsFlag=completeRegionsFlags[1]
 								if(completeRegionsFlag):
