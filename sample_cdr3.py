@@ -173,6 +173,7 @@ if (__name__=="__main__"):
 	parser.add_argument('-min_count_num',type=int,default=1,nargs=1,help="required minimum count value that triggers row into aggregtation (default 1 ; used in diversity only)")
 	args=parser.parse_args()
 	if(not(args)):
+		print "Error in parsing arguments!"
 		parser.print_help()
 	else:
 		out_hist=extractAsItemOrFirstFromList(args.out_hist)
@@ -180,6 +181,7 @@ if (__name__=="__main__"):
 		dir_base=extractAsItemOrFirstFromList(args.dir_base)
 		min_count_val=extractAsItemOrFirstFromList(args.min_count_num)
 		if(not(os.path.exists(dir_base))):
+			print "Error, path ",dir_base," not found!"
 			parser.print_help()
 		else:
 			print "using dir_base ",dir_base
