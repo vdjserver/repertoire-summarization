@@ -38,6 +38,7 @@ def mapToControl(bc):
 
 
 
+
 #utility to read the BATCH_SAMPLE_BARCODE file and return a lookup datastructure from it
 def obtainBatchSampleBSMapFromLookupFile(lookup_file_path):
 	lu=dict()
@@ -60,6 +61,42 @@ def obtainBatchSampleBSMapFromLookupFile(lookup_file_path):
 	#/home/esalina2/diogenix_2014_contract/B.S.SBC.Lookup.tsv
 
 
+
+
+def scanTSVAppendingTripletBSAndCDR3NAAndCountToFile(tsv_file_base,file_to_append_to,batch_sample_barcode_lookup_file):
+	b_s_bs_map=obtainBatchSampleBSMapFromLookupFile(batch_sample_barcode_lookup_file)
+	print "Loaded lookup from ",batch_sample_barcode_lookup_file
+	tsv_glob=tsv_file_base+"/*/*out.tsv"
+	writer=open(file_to_append_to,'w')
+	for tsv in glob_walk(tsv_glob):
+		print "Now to scan TSV ",tsv," to append SB-CDR3-COUNT to file ",file_to_append_to
+		batch_and_sample=getBatchIDAndSampleIDFromPath(tsv)
+		print "Its batch and sample : ",batch_and_sample
+		batch=batch_and_sample[0]
+		sample=batch_and_sample[1]
+		subject_barcode=b_s_bs_map[batch][sample]
+		control_mapped_subject_barcode=mapToControl(subject_barcode)
+		reader=open(tsv,'r')
+		line_num=0
+		for line in reader:
+			if(line_num>=1):
+				temp_line=line.strip()
+				pieces=temp_line.split('\t')
+				cdr3_na=pieces[20]
+				status=pieces[183]
+				count=int(pieces[len(pieces)-1])
+				#print "in file ",tsv,"on line=",line_num," got cdr3=",cdr3_na," status=",status," and count=",str(count)
+				if(status=="OK"):
+					#got OK status!
+					if(re.match(r'^[ACGT]+$',cdr3_na)):
+						#got a good CDR3!
+						line_to_write=control_mapped_subject_barcode+"\t"+cdr3_na+"\t"+str(count)
+						writer.write(line_to_write+"\n")
+			line_num+=1
+		reader.close()
+	writer.close()
+	
+		
 
 
 
@@ -176,42 +213,6 @@ def generate_whittle_down(bc_cdr3_pair_count,cdr3_black_list_set,whittled_down_o
 	whittled_writer.close()
 		
 
-
-
-def scanTSVAppendingTripletBSAndCDR3NAAndCountToFile(tsv_file_base,file_to_append_to,batch_sample_barcode_lookup_file):
-	b_s_bs_map=obtainBatchSampleBSMapFromLookupFile(batch_sample_barcode_lookup_file)
-	print "Loaded lookup from ",batch_sample_barcode_lookup_file
-	tsv_glob=tsv_file_base+"/*/*out.tsv"
-	writer=open(file_to_append_to,'w')
-	for tsv in glob_walk(tsv_glob):
-		print "Now to scan TSV ",tsv," to append SB-CDR3-COUNT to file ",file_to_append_to
-		batch_and_sample=getBatchIDAndSampleIDFromPath(tsv)
-		print "Its batch and sample : ",batch_and_sample
-		batch=batch_and_sample[0]
-		sample=batch_and_sample[1]
-		subject_barcode=b_s_bs_map[batch][sample]
-		control_mapped_subject_barcode=mapToControl(subject_barcode)
-		reader=open(tsv,'r')
-		line_num=0
-		for line in reader:
-			if(line_num>=1):
-				temp_line=line.strip()
-				pieces=temp_line.split('\t')
-				cdr3_na=pieces[20]
-				status=pieces[183]
-				count=int(pieces[len(pieces)-1])
-				#print "in file ",tsv,"on line=",line_num," got cdr3=",cdr3_na," status=",status," and count=",str(count)
-				if(status=="OK"):
-					#got OK status!
-					if(re.match(r'^[ACGT]+$',cdr3_na)):
-						#got a good CDR3!
-						line_to_write=control_mapped_subject_barcode+"\t"+cdr3_na+"\t"+str(count)
-						writer.write(line_to_write+"\n")
-			line_num+=1
-		reader.close()
-	writer.close()
-	
-		
 
 
 
