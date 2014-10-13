@@ -146,6 +146,7 @@ def TSV_alpha_filter(input_dir,new_black_list_cdr3_bc,output_dir,filter_report_o
 		tsv_writer=open(output_path,'w')
 		num_reads_OK=0
 		num_reads_OK_None_CDR3=0
+		num_reads_OK_HaveBlankCDR3OrNONACGT=0
 		num_reads_OK_Have_CDR3_ON_black_list=0
 		num_written=0
 		line_num=0
@@ -170,36 +171,40 @@ def TSV_alpha_filter(input_dir,new_black_list_cdr3_bc,output_dir,filter_report_o
 					if(cdr3=="None"):
 						num_reads_OK_None_CDR3+=1
 					else:
-						#the read is OK and the CDR3 isn't none.
-						#see if it's blacklisted for this barcode!
-						if(not(cdr3 in new_black_list_cdr3_bc)):
-							#write out the line, not blacklisted for any barcode
-							num_written+=1
-							tsv_writer.write(line)
-							for rm in rm_list:
-								myAGSMgr.receive_numbered_mut(rm)
-							pass
+						if(not(re.match(r'^[ACGT]+$',cdr3))):
+							#invalid CDR3!
+							num_reads_OK_HaveBlankCDR3OrNONACGT+=1
 						else:
-							if(subject_barcode in new_black_list_cdr3_bc[cdr3]):
-								#it's blacklisted for this barcode!
-								num_reads_OK_Have_CDR3_ON_black_list+=1
-							else:
-								#write out the line cause the subject-barcode isn't blacklisted for this CDR3
-								tsv_writer.write(line)
+							#the read is OK and the CDR3 isn't none.
+							#see if it's blacklisted for this barcode!
+							if(not(cdr3 in new_black_list_cdr3_bc)):
+								#write out the line, not blacklisted for any barcode
 								num_written+=1
+								tsv_writer.write(line)
 								for rm in rm_list:
 									myAGSMgr.receive_numbered_mut(rm)
 								pass
+							else:
+								if(subject_barcode in new_black_list_cdr3_bc[cdr3]):
+									#it's blacklisted for this barcode!
+									num_reads_OK_Have_CDR3_ON_black_list+=1
+								else:
+									#write out the line cause the subject-barcode isn't blacklisted for this CDR3
+									tsv_writer.write(line)
+									num_written+=1
+									for rm in rm_list:
+										myAGSMgr.receive_numbered_mut(rm)
+									pass
 				else:
 					pass
 			line_num+=1
 		ags_6=myAGSMgr.compute_ags("AGS6")
 		ags_5=myAGSMgr.compute_ags("AGS5")
 		if(isFirstTSV):
-			header="BATCH\tSAMPLE\tNUM_READ_OK\tNUM_READ_CDR3_NONE\tNUM_READ_CDR3_BLACKLIST\tNUM_READ_WRITTEN\tAGS6\tAGS6_RM\tTOT_RM\tAGS5\tAGS5_RM\tTOT_RM"
+			header="BATCH\tSAMPLE\tNUM_READ_OK\tNUM_READ_CDR3_NONE\tNUM_READS_OK_HaveBlankCDR3OrNONACGTCDR3\tNUM_READ_CDR3_BLACKLIST\tNUM_READ_WRITTEN\tAGS6\tAGS6_RM\tTOT_RM\tAGS5\tAGS5_RM\tTOT_RM"
 			report_writer.write(header+"\n")
 			
-		report_line=batch+"\t"+sample+"\t"+str(num_reads_OK)+"\t"+str(num_reads_OK_None_CDR3)+"\t"+str(num_reads_OK_Have_CDR3_ON_black_list)+"\t"+str(num_written)+"\t"+niceAGS(ags_6)+"\t"+niceAGS(ags_5)
+		report_line=batch+"\t"+sample+"\t"+str(num_reads_OK)+"\t"+str(num_reads_OK_None_CDR3)+"\t"+num_reads_OK_HaveBlankCDR3OrNONACGT+"\t"+str(num_reads_OK_Have_CDR3_ON_black_list)+"\t"+str(num_written)+"\t"+niceAGS(ags_6)+"\t"+niceAGS(ags_5)
 		report_writer.write(report_line+"\n")
 		isFirstTSV=False
 	return True
