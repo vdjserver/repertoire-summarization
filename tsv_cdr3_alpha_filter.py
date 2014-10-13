@@ -6,6 +6,7 @@ from sample_cdr3 import getBatchIDAndSampleIDFromPath
 from Bio import SeqIO
 from ags_mgr import ags_manager
 import argparse
+import re
 
 
 def isControlBC(bc):
