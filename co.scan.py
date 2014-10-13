@@ -123,7 +123,7 @@ def get_bccdr3map_cdr3countmap_paircountmap(bc_cdr3_count_file):
 		c=pieces[1]
 		this_INPUT_count=int(pieces[2])
 		#will look for 3 columns soon
-		pair=str(temp_line)
+		pair=code+"\t"+c
 		if(not(pair in bc_cdr3_pair_count)):
 			bc_cdr3_pair_count[pair]=0
 		bc_cdr3_pair_count[pair]+=this_INPUT_count
