@@ -205,7 +205,7 @@ def TSV_alpha_filter(input_dir,new_black_list_cdr3_bc,output_dir,filter_report_o
 			header="BATCH\tSAMPLE\tNUM_READ_OK\tNUM_READ_CDR3_NONE\tNUM_READS_OK_HaveBlankCDR3OrNONACGTCDR3\tNUM_READ_CDR3_BLACKLIST\tNUM_READ_WRITTEN\tAGS6\tAGS6_RM\tTOT_RM\tAGS5\tAGS5_RM\tTOT_RM"
 			report_writer.write(header+"\n")
 			
-		report_line=batch+"\t"+sample+"\t"+str(num_reads_OK)+"\t"+str(num_reads_OK_None_CDR3)+"\t"+num_reads_OK_HaveBlankCDR3OrNONACGT+"\t"+str(num_reads_OK_Have_CDR3_ON_black_list)+"\t"+str(num_written)+"\t"+niceAGS(ags_6)+"\t"+niceAGS(ags_5)
+		report_line=batch+"\t"+sample+"\t"+str(num_reads_OK)+"\t"+str(num_reads_OK_None_CDR3)+"\t"+str(num_reads_OK_HaveBlankCDR3OrNONACGT)+"\t"+str(num_reads_OK_Have_CDR3_ON_black_list)+"\t"+str(num_written)+"\t"+niceAGS(ags_6)+"\t"+niceAGS(ags_5)
 		report_writer.write(report_line+"\n")
 		isFirstTSV=False
 	return True
