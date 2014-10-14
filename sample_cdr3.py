@@ -78,14 +78,15 @@ def cdr3DiverStats(dir_base,out_diva,min_count_val):
 					pass
 					pieces=line.split('\t')
 					status=pieces[183]
-					count_val=int(pieces[len(pieces)-1])
+					#count_val=int(pieces[len(pieces)-1])
+					count_val=1
 					if(status=="OK" and count_val>=min_count_val):
 						#19:CDR3 AA (imgt)
 						#20:CDR3 AA length (imgt)
 						#21:CDR3 NA (imgt)
 						#22:CDR3 NA length (imgt)
 						cdr3_na=pieces[20]
-						if(cdr3_na!="None"):
+						if(cdr3_na!="None" and (not('n' in cdr3_na) and not('N' in cdr3_na))):
 							denominator+=1
 							if(cdr3_na in cdr3_na_this_file):
 								cdr3_na_this_file[cdr3_na]+=1
