@@ -121,8 +121,8 @@ def printStats(path,logPath,bid,sid,minCountNum,returnInsteadOfPrint=False):
 	#stat counts
 	stat_list=list()
 	stat_list.append("MinCount_"+str(minCountNum)+"_Fail")
-	stat_list.append("NoVHit")
-	stat_list.append("Not an IGHV4 hit")
+	stat_list.append("NoVHit")##
+	stat_list.append("Not an IGHV4 hit")##
 	stat_list.append("Had Indels!")
 	stat_list.append("Found a stop codon")
 	stat_list.append("VJ Out of Frame")
@@ -131,6 +131,13 @@ def printStats(path,logPath,bid,sid,minCountNum,returnInsteadOfPrint=False):
 	stat_list.append("OK")
 	for stat in stat_list:
 		stat_counts[stat]=0
+	w_stat_list=list()
+	w_stat_list.append("Weighted NoVHit")##
+	w_stat_list.append("Weighted Not an IGHV4 hit")##
+	w_stat_counts=dict()
+	for stat in w_stat_list:
+		w_stat_counts[stat]=0	
+	
 	#V4 counts
 	vList=list()
 	vList.append("IGHV4-4")
@@ -190,6 +197,9 @@ def printStats(path,logPath,bid,sid,minCountNum,returnInsteadOfPrint=False):
 	homology_over_v_thresh=85.00
 	num_homology_over_v_less_than_thresh=0
 	mySampleAGSMGR=ags_manager(str(bid+"."+sid))
+	RMBoundAGSDict=dict()
+	for min_rm in range(2,4):
+		RMBoundAGSDict[min_rm]=ags_manager(str(bid+"."+sid+".MIN_RM_"+str(min_rm)))
 	for line in reader:
 		#print line
 		if(line_num>1):
@@ -200,6 +210,10 @@ def printStats(path,logPath,bid,sid,minCountNum,returnInsteadOfPrint=False):
 			#llsys.exit(0)
 			if(count_val>=minCountNum):
 				stat_counts[status]+=1
+				if(status=="Not an IGHV4 hit"):
+					w_stat_counts["Weighted Not an IGHV4 hit"]+=count_val
+				if(status=="NoVHit"):
+					w_stat_counts["Weighted NoVHit"]+=count_val					
 				if(status=="OK"):
 					#proceed
 					vHit=pieces[2]
@@ -232,11 +246,13 @@ def printStats(path,logPath,bid,sid,minCountNum,returnInsteadOfPrint=False):
 							tot_SM_in_FR+=1
 						else:
 							raise Exception("Error, unplacable silent mutation ",rm," for read="+pieces[1])
-					num_rms_in_this_row=0
+					num_rms_in_this_row=len(rms)
 					for rm in rms:
 						mySampleAGSMGR.receive_numbered_mut(rm)
 						rm_reg=getRegion(rm)
-						num_rms_in_this_row+=1
+						for min_rm in RMBoundAGSDict:
+							if(min_rm<=num_rms_in_this_row):
+								RMBoundAGSDict[min_rm].receive_numbered_mut(rm)
 						if(isCDR(rm_reg)):
 							#print "RM",rm," detected in CDR for ",pieces[1]
 							tot_RM_in_CDR+=1
@@ -306,6 +322,13 @@ def printStats(path,logPath,bid,sid,minCountNum,returnInsteadOfPrint=False):
 		out_pieces_header.append("J GENE "+j+" COUNT")
 		out_pieces.append(jCounts[j])
 
+	#WEIGHTED FILTER COUNTS
+	out_pieces_header.append("Filter Weighted Not an IGHV4 hit")
+	out_pieces.append(w_stat_counts["Weighted Not an IGHV4 hit"])
+	out_pieces_header.append("Filter Weighted NoVHit")
+	out_pieces.append(s_stat_counts["Weighted NoVHit"])
+
+
 	#REPLACE LOG AGS/RM data with AGS_MGR dynamically computed data
 	ags_5_info=mySampleAGSMGR.compute_ags("AGS5")#[ags5_score,sampAGSTot,sampTot]
 	ags_6_info=mySampleAGSMGR.compute_ags("AGS6")#[ags6_score,sampAGSTot,sampTot]
@@ -317,15 +340,43 @@ def printStats(path,logPath,bid,sid,minCountNum,returnInsteadOfPrint=False):
 	log_data['AGS_RM']=ags_6_info[1]
 	log_data['TOT_RM']=ags_6_info[2]
 
+
 	#AGS5 and AGS5RM
 	out_pieces_header.append("AGS5")
 	out_pieces.append(log_data['AGS5'])
 	out_pieces_header.append("AGS5 RM")
 	out_pieces.append(log_data['AGS5_RM'])
+	#ags 5 2+ and 3+
+	for p in range(2,4):
+		the_ags_5_info=RMBoundAGSDict[p].compute_ags("AGS5")
+		the_val=the_ags_5_info[0]
+		the_rms=the_ags_5_info[1]
+		tot_rms=the_ags_5_info[2]
+		prefix="RM"+str(p)+"+ AGS5"
+		out_pieces_header.append(prefix)
+		out_pieces.append(the_val)
+		out_pieces_header.append(prefix+" RM")
+		out_pieces.append(the_rms)
+		out_pieces_header.append(prefix+" TOT RM")
+		out_pieces.append(tot_rms)
 	out_pieces_header.append("AGS6")
 	out_pieces.append(log_data['AGS'])
 	out_pieces_header.append("AGS6 RM")
 	out_pieces.append(log_data['AGS_RM'])
+	#ags 6 2+ and 3+
+	for p in range(2,4):
+		the_ags_6_info=RMBoundAGSDict[p].compute_ags("AGS6")
+		the_val=the_ags_6_info[0]
+		the_rms=the_ags_6_info[1]
+		tot_rms=the_ags_6_info[2]
+		prefix="RM"+str(p)+"+ AGS6"
+		out_pieces_header.append(prefix)
+		out_pieces.append(the_val)
+		out_pieces_header.append(prefix+" RM")
+		out_pieces.append(the_rms)
+		out_pieces_header.append(prefix+" TOT RM")
+		out_pieces.append(tot_rms)
+
 
 	#TOT RM SM
 	out_pieces_header.append("TOT RM")
