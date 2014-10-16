@@ -136,7 +136,9 @@ def printStats(path,logPath,bid,sid,minCountNum,returnInsteadOfPrint=False):
 	w_stat_list.append("Weighted Not an IGHV4 hit")##
 	w_stat_counts=dict()
 	for stat in w_stat_list:
-		w_stat_counts[stat]=0	
+		w_stat_counts[stat]=0
+	w_sum_all=0
+	w_sum_ok=0
 	
 	#V4 counts
 	vList=list()
@@ -210,12 +212,14 @@ def printStats(path,logPath,bid,sid,minCountNum,returnInsteadOfPrint=False):
 			#llsys.exit(0)
 			if(count_val>=minCountNum):
 				stat_counts[status]+=1
+				w_sum_all+=count_val
 				if(status=="Not an IGHV4 hit"):
 					w_stat_counts["Weighted Not an IGHV4 hit"]+=count_val
 				if(status=="NoVHit"):
 					w_stat_counts["Weighted NoVHit"]+=count_val					
 				if(status=="OK"):
 					#proceed
+					w_sum_ok+=count_val
 					vHit=pieces[2]
 					vHitNA=deAllelifyName(vHit)
 					if(vHitNA in vList):
@@ -326,7 +330,13 @@ def printStats(path,logPath,bid,sid,minCountNum,returnInsteadOfPrint=False):
 	out_pieces_header.append("Filter Weighted Not an IGHV4 hit")
 	out_pieces.append(w_stat_counts["Weighted Not an IGHV4 hit"])
 	out_pieces_header.append("Filter Weighted NoVHit")
-	out_pieces.append(s_stat_counts["Weighted NoVHit"])
+	out_pieces.append(w_stat_counts["Weighted NoVHit"])
+	out_pieces_header.append("Weighed Sum ALL")
+	out_pieces.append(w_sum_all)
+	out_pieces_header.append("Weighted Sum OK Only")
+	out_pieces.append(w_sum_ok)
+
+
 
 
 	#REPLACE LOG AGS/RM data with AGS_MGR dynamically computed data
