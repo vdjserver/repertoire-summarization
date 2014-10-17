@@ -105,17 +105,21 @@ do
 			then
 
 				echo "FOUND $QRY" ;
-				echo "Starting IgBLAST with outfmt 7 at "
-				date
-				time $IGBLAST_EXEC  $IGBLAST_GLOBAL_PARAMS   -num_threads 6   -domain_system $DCMODE  -query $QRY -germline_db_V $DB_V -germline_db_D $DB_D -germline_db_J $DB_J  -ig_seqtype $IGB_SEQ_FLAG -auxiliary_data $AUX_PATH -outfmt '7 qseqid qgi qacc qaccver qlen sseqid sallseqid sgi sallgi sacc saccver sallacc slen qstart qend sstart send qseq sseq evalue bitscore score length pident nident mismatch positive gapopen gaps ppos frames qframe sframe btop'  >$OUTPUT
-				echo "IgBLAST with outfmt 7 finished at "
-				date
-				time echo "Now running IgBLAST for human-readable output ..."
-				$IGBLAST_EXEC  $IGBLAST_GLOBAL_PARAMS  -domain_system $DCMODE  -query $QRY -germline_db_V $DB_V -germline_db_D $DB_D -germline_db_J $DB_J  -ig_seqtype $IGB_SEQ_FLAG -auxiliary_data $AUX_PATH -show_translation >$OUTPUT_HUMAN 
-				echo "IgBLAST for human-readable output finished."
-				date
-				echo "Now running repertoire characterization ..."
-				time ../rep_char.py   ${REP_CHAR_OPTS}  -combo_out $RC_COMBO   -json_out $RC_CDR3_SEG_JSON -cdr3_hist_out $RC_CDR3_HIST $RC_IN $RC_VDJML $RC_OUT $RC_DB $QRY $ORGANISM  1>$RC_LOG_OUT 2>$RC_LOG_ERR
+				
+
+				#FORM IGBLAST HR				
+				IGBLAST_HR="$IGBLAST_EXEC  $IGBLAST_GLOBAL_PARAMS  -domain_system $DCMODE  -query $QRY -germline_db_V $DB_V -germline_db_D $DB_D -germline_db_J $DB_J  -ig_seqtype $IGB_SEQ_FLAG -auxiliary_data $AUX_PATH -show_translation" ;
+				#EXECUTE IT
+				$IGBLAST_HR > $OUTPUT_HUMAN & 
+				
+				#FORM REP_CHAR for reading from stdin
+				REP_CHAR_CMD="../rep_char.py   ${REP_CHAR_OPTS}  -combo_out $RC_COMBO   -json_out $RC_CDR3_SEG_JSON -cdr3_hist_out $RC_CDR3_HIST /dev/stdin $RC_VDJML $RC_OUT $RC_DB $QRY $ORGANISM"
+
+				#run the IgBLAST/tee/rep_char pipeline
+				$IGBLAST_EXEC  $IGBLAST_GLOBAL_PARAMS   -num_threads 6   -domain_system $DCMODE  -query $QRY -germline_db_V $DB_V -germline_db_D $DB_D -germline_db_J $DB_J  -ig_seqtype $IGB_SEQ_FLAG -auxiliary_data $AUX_PATH -outfmt '7 qseqid qgi qacc qaccver qlen sseqid sallseqid sgi sallgi sacc saccver sallacc slen qstart qend sstart send qseq sseq evalue bitscore score length pident nident mismatch positive gapopen gaps ppos frames qframe sframe btop' |tee $OUTPUT|$REP_CHAR_CMD   1>$RC_LOG_OUT 2>$RC_LOG_ERR ;
+				echo "IgBLAST and rep_char completed at " ;
+				date ;
+				wait ;
 			else
 				echo "QUERY $QRY NOT FOUND" ;
 				echo 'So no analysis for it being done !'
