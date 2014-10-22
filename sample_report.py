@@ -119,6 +119,7 @@ def printStats(path,logPath,bid,sid,minCountNum,returnInsteadOfPrint=False):
 	reader=open(path,'r')
 	stat_counts=dict()
 	#stat counts
+	total_reads_tsv=0
 	stat_list=list()
 	stat_list.append("MinCount_"+str(minCountNum)+"_Fail")
 	stat_list.append("NoVHit")##
@@ -205,6 +206,7 @@ def printStats(path,logPath,bid,sid,minCountNum,returnInsteadOfPrint=False):
 	for line in reader:
 		#print line
 		if(line_num>1):
+			total_reads_tsv+=1
 			pieces=line.split('\t')
 			status=pieces[183]
 			count_val=int(pieces[len(pieces)-1])
@@ -314,7 +316,7 @@ def printStats(path,logPath,bid,sid,minCountNum,returnInsteadOfPrint=False):
 	out_pieces_header.append("SAMP ID")
 	out_pieces.append(sid)
 	out_pieces_header.append("TOTAL READS")
-	out_pieces.append(log_data['total_reads'])
+	out_pieces.append(total_reads_tsv)
 	for stat in stat_list:
 		#print stat_counts[stat]+"\t"
 		out_pieces_header.append("FILTER "+stat+" COUNT")
