@@ -15,6 +15,17 @@ import glob
 import sys
 
 
+def digit_pad(num,pad_size=8):
+	#math.ceil(3-math.log10(199))
+	num_zeros=int(math.ceil(pad_size-math.log10(num)))
+	zero_str=""
+	for z in range(num_zeros):
+		zero_str+="0"
+	return zero_str+str(num)
+
+
+
+
 
 
 #generator for glob
