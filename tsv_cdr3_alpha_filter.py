@@ -109,7 +109,7 @@ def obtain_alpha_filtered_CDR3_barcode_blacklist_mapping(alpha,sb_cdr3_pct_file)
 	for bcdr3 in new_black_list_cdr3_bc:
 		for bbs in new_black_list_cdr3_bc[bcdr3]:
 			pair_count+=1
-	print "The number of CDR3-sample-barcode pairse (post-alpha filtered at alpha="+str(alpha)+" ) is ",pair_count
+	print "The number of CDR3-sample-barcode pairs (post-alpha filtered at alpha="+str(alpha)+" ) is ",pair_count
 	return new_black_list_cdr3_bc
 
 
