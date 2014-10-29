@@ -3,8 +3,9 @@ NUM_SIM=${1:-0}
 echo "Using NUM_SIM ${NUM_SIM}"
 #export VDJSERVER_ROOT=`dirname /home/data/vdj_server/repertoire-summarization/rep_char.py`
 #get this from the existing environment . put in bashrc
-VDJ_DB_ROOT=/home/data/DATABASE/07_11_2014
-IGDATA=/usr/local/igblast-1.3.0
+#VDJ_DB_ROOT=/home/data/DATABASE/07_11_2014
+VDJ_DB_ROOT=/home/data/DATABASE/10_29_2014
+IGDATA=/usr/local/igblast-1.4.0
 NEW_PYTHONPATH=/home/data/vdj_server/vdjml/python/
 echo "Adding new PYTHON PATH $NEW_PYTHONPATH"
 export PYTHONPATH=$PYTHONPATH:$NEW_PYTHONPATH
@@ -94,7 +95,7 @@ do
 			SIM_RC_OUT=$SIM_B_OUT.rc_out.tsv
 			SIM_RC_OUT_LOG=${SIM_RC_OUT}.log
 			SIM_RC_OUT_ERR=${SIM_RC_OUT}.err
-			REP_CHAR_OPTS=" -db_species_vdjml $ORGANISM   -igblast_version igblast-1.3.0 -db_uri file://${VDJ_DB_ROOT} "
+			REP_CHAR_OPTS=" -db_species_vdjml $ORGANISM   -igblast_version igblast-1.4.0 -db_uri file://${VDJ_DB_ROOT} "
 			if [ "$NUM_SIM" -eq "0" ] ;
 			then 
 				echo "Skipping rep_char on $SIM_B_OUT because the number of simulated sequences is $NUM_SIM" ;
