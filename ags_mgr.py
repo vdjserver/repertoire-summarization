@@ -80,29 +80,18 @@ class ags_manager:
 
 if (__name__=="__main__"):
 	#myCounter=codonCounter("/home/data/vdj_server/repertoire-summarization/codon_data/codon_pos_IGHV4")
-	import random
-	myAGSMgr=ags_manager("test")
-	print "Enter in RM data "
-	myFirstAGSMgr=ags_manager("test1")
-	mySecndAGSMgr=ags_manager("test2")
+	myAGSMgr=ags_manager("stdin")
+	#print "Enter in RM data "
 	for line in fileinput.input():
     		#print "got '"+line.strip()+"'"
 		pm=line.strip()
 		if(myAGSMgr.appearsToBeNumberedMut(pm)):
 			#print "got a pm ",pm," ",myAGSMgr.appearsToBeNumberedMut(pm)
-			if(random.random()>=0.5):
-				print "Given to 2nd..."
-				mySecndAGSMgr.receive_numbered_mut(pm)
-			else:
-				print "Given to first"
-				myFirstAGSMgr.receive_numbered_mut(pm)
+			myAGSMgr.receive_numbered_mut(pm)
 		else:
 			#print "not a pm"
 			pass
-	#print myAGSMgr.compute_ags()
-	print "First : ",myFirstAGSMgr.compute_ags()
-	print "Secnd : ",mySecndAGSMgr.compute_ags()
-
+	print myAGSMgr.compute_ags()
 
 
 
