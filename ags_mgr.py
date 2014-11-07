@@ -91,7 +91,8 @@ if (__name__=="__main__"):
 		else:
 			#print "not a pm"
 			pass
-	print myAGSMgr.compute_ags()
+	print "AGS5",myAGSMgr.compute_ags("AGS5")
+	print "AGS6",myAGSMgr.compute_ags("AGS5")
 
 
 
