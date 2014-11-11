@@ -171,19 +171,21 @@ def create_cdr3_bcset_mapping(bc_cdr3_dict,cdr3_count):
 
 #given a CDR3->sample-barcode (one-many) mapping, obtain a set of 'blacklisted' CDR3s
 #which, by definition, belong in more than one sample-barcode
-def getCDR3sBlackListed(cdr3_bc_dict):
+def getCDR3sBlackListed(cdr3_bc_dict,co_scan_log):
 	#NOW, scan each CDR3 and print a message if it is in more than one barcode!
 	#simultaneously create a 'black-listed' set of CDR3s.....
 	cdr3_black_list_set=set()
 	num_cdr3_in_multiple_code=0
 	print "now in final scan...."
+	logger=open(co_scan_log,'a')
 	for cdr3 in cdr3_bc_dict:
 		bc_set=cdr3_bc_dict[cdr3]
 		if(len(bc_set)>1):
 			cdr3_black_list_set.add(cdr3)
-			print "CDR3 ",cdr3," belongs in more than one barcode : ",bc_set
+			logger.write("CDR3 "+cdr3+" belongs in more than one barcode : "+bc_set+"\n")
 			num_cdr3_in_multiple_code+=1
-	print "The number of CDR3s being found associated with more than one barcode is ",num_cdr3_in_multiple_code
+	logger.write("The number of CDR3s being found associated with more than one barcode is "+str(num_cdr3_in_multiple_code)+"\n")
+	logger.close()
 	return cdr3_black_list_set
 
 
@@ -241,6 +243,7 @@ if (__name__=="__main__"):
 					whittled_down_output=tsv_base+"/cdr3_black_list_whittle_pct.tsv"
 					if(not(os.path.exists(whittled_down_output))):
 						#good
+						co_scan_log=tsv_base+"/co.scan.log"
 						#good, can't overwrite a non-existing file!! now proceed to generate it!
 						scanTSVAppendingTripletBSAndCDR3NAAndCountToFile(tsv_base,file_to_append_to,bs_lookup)
 						ontained_counting_info=get_bccdr3map_cdr3countmap_paircountmap(file_to_append_to)
@@ -251,7 +254,7 @@ if (__name__=="__main__"):
 						#it tells/gives you a SET of sample-barcodes that the CDR3 falls in
 						cdr3_bc_dict=create_cdr3_bcset_mapping(bc_cdr3_dict,cdr3_count)
 						#given the CDR3->BS mapping obtain a set of 'blacklisted CDR3s (appearing in more than one sample-barcode)
-						cdr3_black_list_set=getCDR3sBlackListed(cdr3_bc_dict)					
+						cdr3_black_list_set=getCDR3sBlackListed(cdr3_bc_dict,co_scan_log)					
 						generate_whittle_down(bc_cdr3_pair_count,cdr3_black_list_set,whittled_down_output)
 					else:
 						print "File ",whittled_down_output," found! Must first delete it to proceed!"
