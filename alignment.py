@@ -73,13 +73,16 @@ class CodonAnalysis:
 
 
 
-	#test for codon ambiguity
+	#test for a codon's ambiguity
 	#by testing individual bases for ambiguity
 	def is_unambiguous_codon(self,c):
 		if(c in self.unambiguous_codon_dict):
 			return self.unambiguous_codon_dict[c]
 		#if a list of bases
 		if(type(c)==list):
+			if(len(c)!=3):
+				self.unambiguous_codon_dict[c]=False
+				return self.is_unambiguous_codon(c)
 			for base in c:
 				ba=self.is_unambiguous_base(base)
 				if(not(ba)):
@@ -87,6 +90,9 @@ class CodonAnalysis:
 					return self.is_unambiguous_codon(c)
 		#if a single string of 3 bases
 		elif(type(c)==str):
+			if(len(c)!=3):
+				self.unambiguous_codon_dict[c]=False
+				return self.is_unambiguous_codon(c)
 			for bi in range(len(c)):
 				base=c[bi]
 				ba=self.is_unambiguous_base(base)
