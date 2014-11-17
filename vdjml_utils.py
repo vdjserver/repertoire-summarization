@@ -305,6 +305,7 @@ def getVDJServerRegionAlignmentFromLargerVAlignmentPyObj(read_result_obj,meta,or
 #map VDJ to True or False indicating a tie or not in the scores
 def getVDJTieMap(t_map,topVDJ):
 	#print "t_map is ",t_map
+	#print "top is ",topVDJ
 	tie_map=dict()
 	for seg in t_map:
 		#print "current seg : ",seg
@@ -323,6 +324,27 @@ def getVDJTieMap(t_map,topVDJ):
 					tie_map[seg]=True
 	return tie_map
 
+
+
+def getVDJAltMap(t_map,topVDJ):
+	alt_map=dict()
+	alt_map['V']=list()
+	alt_map['J']=list()
+	alt_map['D']=list()
+	for seg in alt_map:
+		if(seg in t_map):
+			hit_score_map=t_map[seg]
+			top_hit=topVDJ[seg]
+			for hit in hit_score_map:
+				if(hit!=top_hit):
+					top_score=int(hit_score_map[top_hit])
+					alt_score=int(hit_score_map[hit])
+					if(top_score==alt_score):
+						alt_map[seg].append(hit)
+	#print "ALT_MAP=",alt_map
+	#print "\n\n\n"				
+	#return tie_map
+	return alt_map
 
 
 
