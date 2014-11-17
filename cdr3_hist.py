@@ -11,6 +11,7 @@ import vdjml
 from vdjml_utils import getTopVDJItems,getHitInfo
 from igblast_parse import rev_comp_dna
 import argparse
+from alignment import alignment,CodonAnalysis,codonAnalyzer
 
 
 
@@ -299,6 +300,8 @@ def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
 	currentV=vMap['subject ids']
 	currentJ=jMap['subject ids']
 	cdr3_hist=getEmptyCDR3Map()
+	cdr3_hist['CYS']=False
+	cdr3_hist['TRPPHE']=False
 	if(vMap['query id'].find("reversed|")==0):
 		cdr3_hist['qry_rev']=True
 	else:
@@ -320,6 +323,7 @@ def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
 				rsmap[dm][currentV]=ref_cdr3_start
 			else:
 				ref_cdr3_start=rsmap[dm][currentV]
+			#print "After initial retrieval, the ref CDR3 start for ",currentV," is ",ref_cdr3_start
 			if(not currentJ in remap[dm]):
 				#print currentJ,"not in lookup for dm=",dm
 				ref_cdr3_end=getADJCDR3EndFromJAllele(currentJ,imgtdb_obj,organism,dm)
@@ -343,9 +347,45 @@ def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
 				qry_cdr3_start=getQueryIndexGivenSubjectIndexAndAlignment(vq_aln,vs_aln,vq_f,vq_t,vs_f,vs_t,ref_cdr3_start)
 				if(qry_cdr3_start!=(-1)):
 					qry_cdr3_start+=1
+				if(qry_cdr3_start!=(-1) and dm=='imgt'):
+					#code for test for CYS-104 found
+					#print "For ",currentV," the ref CDR3 start is ",ref_cdr3_start
+					ref_cys_start=ref_cdr3_start-2
+					ref_cys_end=ref_cdr3_start
+					v_aln_obj=alignment(vq_aln,vs_aln,vq_f,vq_t,vs_f,vs_t)
+					cys_aln=v_aln_obj.getSubAlnInc(ref_cys_start,ref_cys_end,"subject")
+					#print "CYS ALN="
+					#print "\n",cys_aln.getNiceString()
+					query_cys_na=cys_aln.q_aln
+					ref_cys_na=cys_aln.s_aln
+					if(len(query_cys_na)==3  and len(ref_cys_na)==3):
+						if(codonAnalyzer.is_unambiguous_codon(query_cys_na)==True):
+							query_cys_trx=codonAnalyzer.fastTrans(query_cys_na)
+							#print "The fast trans (with query=",vMap['query id']," and ref=",currentV,")=",query_cys_trx
+							#print "\n\n\n\n\n\n\n===========================================================\n\n\n\n\n\n\n"
+							#cdr3_hist['CYS']=true
+							if(query_cys_trx=='C'):
+								cdr3_hist['CYS']=True
 				ref_cdr3_end+=1
 				qry_cdr3_end=getQueryIndexGivenSubjectIndexAndAlignment(jq_aln,js_aln,jq_f,jq_t,js_f,js_t,ref_cdr3_end,"left")
 				if(qry_cdr3_end!=(-1)):
+					if(dm=='imgt'):
+						#code for test for J-TRP/J-PHE found
+						ref_trp_start=ref_cdr3_end
+						ref_trp_end=ref_trp_start+2
+						j_aln=alignment(jq_aln,js_aln,jq_f,jq_t,js_f,js_t)
+						trp_aln=j_aln.getSubAlnInc(ref_trp_start,ref_trp_end,"subject")
+						trp_q_na=trp_aln.q_aln
+						trp_s_na=trp_aln.s_aln
+						if(len(trp_q_na)==3 and len(trp_s_na)==3):
+							#print "For ",vMap['query id']," got TRP-ALN : "
+							#print "\n",trp_aln.getNiceString()
+							qry_trp_trx=codonAnalyzer.fastTrans(trp_q_na)
+							#print "Fast trans=",qry_trp_trx
+							#print 
+							#print "\n"
+							if(qry_trp_trx=='W' or qry_trp_trx=='F'):
+								cdr3_hist['TRPPHE']=True
 					qry_cdr3_end-=1
 				if(qry_cdr3_start!=(-1) and qry_cdr3_end!=(-1)):
 					#query_coding_seq=query_seq_map[currentQueryName]
