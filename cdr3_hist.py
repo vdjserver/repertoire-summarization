@@ -4,7 +4,7 @@ import os
 import re
 import glob
 from os.path import basename
-from segment_utils import getFastaListOfDescs,getQueryIndexGivenSubjectIndexAndAlignment,getAdjustedCDR3StartFromRefDirSetAllele,getADJCDR3EndFromJAllele,getEmptyRegCharMap,alleleIsTR
+from segment_utils import getFastaListOfDescs,getQueryIndexGivenSubjectIndexAndAlignment,getAdjustedCDR3StartFromRefDirSetAllele,getADJCDR3EndFromJAllele,getEmptyRegCharMap,alleleIsTR,getTheFrameForThisReferenceAtThisPosition,getTheFrameForThisJReferenceAtThisPosition
 from imgt_utils import imgt_db
 from utils import *
 import vdjml
@@ -293,6 +293,48 @@ def getEmptyCDR3Map():
 
 
 
+
+
+
+
+def VJRearrangementInFrameTest(vInfo,jInfo,imgtdb_obj,organism):
+	if(vInfo==None or jInfo==None):
+		#need valid data to test. return false in this case
+		return False
+	#use V and J frame
+	if(jInfo==None):
+		#no J means no prod. rearrangment???
+		return False
+	s_end=vInfo['s. end']
+	q_end=vInfo['q. end']
+	refName=vInfo['subject ids']
+	s_end_frame=getTheFrameForThisReferenceAtThisPosition(refName,organism,imgtdb_obj,s_end)
+	q_end_frame=s_end_frame
+	#print vInfo['query id']
+	#print "q_start_frame (spos=",s_start,") ",q_start_frame
+	q_end_j=jInfo['q. end']
+	q_bgn_j=jInfo['q. start']
+	if(q_end_j<=q_end):
+		#WAY TOO SHORT or BAD ALIGNMENT
+		#IF Q END IN J IS LESS THAN OR EQUAL TO Q END IN V
+		return False
+	else:
+		j_bgn_j=jInfo['s. start']
+		j_bgn_frame=getTheFrameForThisJReferenceAtThisPosition(jInfo['subject ids'],organism,imgtdb_obj,j_bgn_j)
+		expected_frame_based_on_V=(q_end_frame+(q_bgn_j-q_end))%3
+		#print "expected_frame_based_on_V=",expected_frame_based_on_V
+		expected_frame_based_on_J=j_bgn_frame
+		#print "expected_frame_based_on_J=",expected_frame_based_on_J
+		if(expected_frame_based_on_J==expected_frame_based_on_V):
+			#if both V and J impose the same frame, then the read should NOT be filtered
+			return True
+		else:
+			return False
+
+
+
+
+
 #given info maps for V and J and the returnd a 
 #dictionary with kabat and imgt lengths
 def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
@@ -302,6 +344,7 @@ def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
 	cdr3_hist=getEmptyCDR3Map()
 	cdr3_hist['CYS']=False
 	cdr3_hist['TRPPHE']=False
+	cdr3_hist['JuncFrame']=False
 	if(vMap['query id'].find("reversed|")==0):
 		cdr3_hist['qry_rev']=True
 	else:
@@ -331,6 +374,7 @@ def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
 			else:
 				ref_cdr3_end=remap[dm][currentJ]
 			if(ref_cdr3_start!=(-1) and ref_cdr3_end!=(-1)):
+				cdr3_hist['JuncFrame']=VJRearrangementInFrameTest(vMap,jMap,imgtdb_obj,organism)
 				vq_aln=vMap['query seq']
 				vs_aln=vMap['subject seq']
 				vq_f=int(vMap['q. start'])
