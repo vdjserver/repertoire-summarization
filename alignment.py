@@ -882,6 +882,20 @@ class alignment:
 		merged_aln_2=j_aln.logical2WayMerge(v_aln,juncSeq)
 		print "m1\n",merged_aln_1.getNiceString()
 		print "\nm2\n",merged_aln_2.getNiceString()
+		print "\n\n\n\n\n"
+		q_s=1
+		q_e=5
+		q_aln="ACGTA"
+		s_aln="--GTA"
+		s_s=1
+		s_e=3
+		print "\n\n\n\n\n"
+		print "Test of getGEQAlignmentFirstNonGap"
+		alnObj=alignment(q_aln,s_aln,q_s,q_e,s_s,s_e)
+		print alnObj.getNiceString()
+		alnObj=alnObj.getGEQAlignmentFirstNonGap()
+		print alnObj.getNiceString()		
+		
 
 
 
@@ -928,7 +942,8 @@ def threeWayOverlapTest(aln0,aln1,aln2):
 
 
 if (__name__=="__main__"):
-	alignment.test()
+	#alignment.test()
+	pass
 
 
 
