@@ -99,7 +99,7 @@ do
 				echo "Running IgBLAST for sim data $SIM_DATA ..."
 				echo "First in human-readable form..."
 				$IGBLAST_EXEC  $IGBLAST_GLOBAL_PARAMS  -num_threads 6   -domain_system $DCMODE  -query ${SIM_DATA} -germline_db_V $DB_V -germline_db_D $DB_D -germline_db_J $DB_J  -ig_seqtype $IGB_SEQ_FLAG -auxiliary_data $AUX_PATH  -show_translation   > $SIM_B_OUT_HR &
-				$IGBLAST_EXEC $IGBLAST_GLOBAL_PARAMS   -num_threads 6   -domain_system $DCMODE  -query ${SIM_DATA} -germline_db_V $DB_V -germline_db_D $DB_D -germline_db_J $DB_J  -ig_seqtype $IGB_SEQ_FLAG -auxiliary_data $AUX_PATH -outfmt '7 qseqid qgi qacc qaccver qlen sseqid sallseqid sgi sallgi sacc saccver sallacc slen qstart qend sstart send qseq sseq evalue bitscore score length pident nident mismatch positive gapopen gaps ppos frames qframe sframe btop'  |tee $OUTPUT| ../rep_char.py  ${REP_CHAR_OPTS}  -combo_out $SIM_COMBO     -json_out $SIM_JSON -cdr3_hist_out $SIM_CDR3 /dev/stdin $SIM_VDJML $SIM_RC_OUT $RC_DB ${SIM_DATA} $ORGANISM  1>$SIM_RC_OUT_LOG 2>$SIM_RC_OUT_ERR
+				$IGBLAST_EXEC $IGBLAST_GLOBAL_PARAMS   -num_threads 6   -domain_system $DCMODE  -query ${SIM_DATA} -germline_db_V $DB_V -germline_db_D $DB_D -germline_db_J $DB_J  -ig_seqtype $IGB_SEQ_FLAG -auxiliary_data $AUX_PATH -outfmt '7 qseqid qgi qacc qaccver qlen sseqid sallseqid sgi sallgi sacc saccver sallacc slen qstart qend sstart send qseq sseq evalue bitscore score length pident nident mismatch positive gapopen gaps ppos frames qframe sframe btop'  |tee $SIM_B_OUT| ../rep_char.py  ${REP_CHAR_OPTS}  -combo_out $SIM_COMBO     -json_out $SIM_JSON -cdr3_hist_out $SIM_CDR3 /dev/stdin $SIM_VDJML $SIM_RC_OUT $RC_DB ${SIM_DATA} $ORGANISM  1>$SIM_RC_OUT_LOG 2>$SIM_RC_OUT_ERR
 				wait
 			fi ;
 			if [ -f "$QRY" ]  ;
