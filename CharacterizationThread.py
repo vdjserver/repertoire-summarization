@@ -82,6 +82,7 @@ class CharacterizationThread(threading.Thread):
 						annMap[key_base+region+'_frm_msk']=regionAlignment.s_frame_mask
 						annMap[key_base+region+'_ref_srt']=int(s_start)
 						annMap[key_base+region+'_ref_end']=int(s_end)
+						annMap['readName']=readName
 						#annMap[key_base+region+'_partial']=partialFlag
 						self.result=annMap
 				#print "to call CHAR_QUEUE task_done..."
