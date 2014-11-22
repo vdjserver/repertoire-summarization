@@ -321,15 +321,17 @@ def VJRearrangementInFrameTest(vInfo,jInfo,imgtdb_obj,organism):
 	else:
 		j_bgn_j=jInfo['s. start']
 		j_bgn_frame=getTheFrameForThisJReferenceAtThisPosition(jInfo['subject ids'],organism,imgtdb_obj,j_bgn_j)
-		expected_frame_based_on_V=(q_end_frame+(q_bgn_j-q_end))%3
-		#print "expected_frame_based_on_V=",expected_frame_based_on_V
-		expected_frame_based_on_J=j_bgn_frame
-		#print "expected_frame_based_on_J=",expected_frame_based_on_J
-		if(expected_frame_based_on_J==expected_frame_based_on_V):
-			#if both V and J impose the same frame, then the read should NOT be filtered
-			return True
-		else:
-			return False
+		if(not(j_bgn_frame)):
+			expected_frame_based_on_V=(q_end_frame+(q_bgn_j-q_end))%3
+			#print "expected_frame_based_on_V=",expected_frame_based_on_V
+			expected_frame_based_on_J=j_bgn_frame
+			#print "expected_frame_based_on_J=",expected_frame_based_on_J
+			if(expected_frame_based_on_J==expected_frame_based_on_V):
+				#if both V and J impose the same frame, then the read should NOT be filtered
+				return True
+			else:
+				return False
+		return None
 
 
 
