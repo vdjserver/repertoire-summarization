@@ -121,6 +121,51 @@ def stringContainsAStar(s):
 		return True
 
 
+
+def getIndelsFlags(vInfo,dInfo,jInfo):
+	strs_to_analyze=list()
+	basicIndelsFlags=False
+	framePreservingIndelsFlag=True
+	#printMap(vInfo)
+	if(vInfo!=None):
+		v_q_seq=vInfo['query seq']
+		v_s_seq=vInfo['subject seq']
+		strs_to_analyze.append(v_q_seq)
+		strs_to_analyze.append(v_s_seq)
+	if(dInfo!=None):
+		d_q_seq=vInfo['query seq']
+		d_s_seq=vInfo['subject seq']
+		strs_to_analyze.append(d_q_seq)
+		strs_to_analyze.append(d_s_seq)
+	if(jInfo!=None):
+		j_q_seq=vInfo['query seq']
+		j_s_seq=vInfo['subject seq']
+		strs_to_analyze.append(j_q_seq)
+		strs_to_analyze.append(j_s_seq)
+	gap_re=re.compile(r'([\-]{1,})')	
+	for s in strs_to_analyze:
+		if(s.find("-")!=(-1)):
+			#found a gap!
+			basicIndelsFlags=True
+		gap_groups=re.findall(gap_re,s)
+		for gap_group in gap_groups:
+			gap_len=len(gap_group)
+			if(gap_len%3==0):
+				#it's frame preserving!
+				pass
+			else:
+				#found at least one non-frame preserving gap!
+				framePreservingIndelsFlag=False
+	gap_ret_package=[basicIndelsFlags,framePreservingIndelsFlag]
+	return gap_ret_package
+
+
+
+
+
+
+
+
 def getValnWholeSeqStopFlag(vInfo,dInfo,jInfo,imgtdb_obj,organism,annMap,seq_rec):
 	if(vInfo==None):
 		#if no V alignment how can there be a frame, a J alignment, or a stop codon?
@@ -429,7 +474,9 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 	#annotations such as NA and AA from CDR3 from cdr3_map
 	annMap=readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,annMap,cdr3_map)
 
-
+	gap_ret_package=getBasicIndelsFoundFlag(vInfo,dInfo,jInfo)
+	annMap['Indels Found']=gap_ret_package[0]
+	annMap['Frame-Preserving Indels Only']=gap_ret_package[1]
 
 
 	#characterization beside segments/CDR3
@@ -707,29 +754,40 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None",log
 	#apapend intro data
 	keys_to_append=[
 
-	#PART 1 EVERYBODY
-	"Read sequence #",
+	#PART 1 : basic alignment/germline data
 	"Read identifier",
-	"V gene (highest score)",
-	"J gene (highest score)",
-	"D gene (highest score)",
+	"V gene",
+	"J gene",
+	"D gene",
 	"Homology% (over V)",
-	"Stop codons? (over V and J)",
-	"Productive CDR3 rearrangement (T/F)",
-	"Base substitution freq% (over V)",
-	"Base substitutions (over V)",
-	"Length (over V)",
-	"Replacement mutation freq% (over V)",
-	"Replacement mutations (codons) (over V)",
-	"Silent mutation freq% (over V)",
-	"Silent mutations (codons) (over V)",
-	"Indel frequency (over V and J)",
-	"Insertion count (over V and J)",
-	"Deletion count (over V and J)"]
+
+
+	#PART 2 : post-alignment filter reports for standard use
+	"Out-of-frame junction",
+	"Missing CYS",
+	"Missing TRP/PHE",
+	"Stop Codon?"
+	"Indels Found",
+	"Only Frame-Preserving Indels Found"
+	]
+
+
+	#"Stop codons? (over V and J)",
+	#"Productive CDR3 rearrangement (T/F)",
+	#"Base substitution freq% (over V)",
+	#"Base substitutions (over V)",
+	#"Length (over V)",
+	#"Replacement mutation freq% (over V)",
+	#"Replacement mutations (codons) (over V)",
+	#"Silent mutation freq% (over V)",
+	#"Silent mutations (codons) (over V)",
+	#"Indel frequency (over V and J)",
+	#"Insertion count (over V and J)",
+	#"Deletion count (over V and J)"]
 	
 
 	
-	#PART 2 IMGT/KABAT
+	#PART 3 IMGT/KABAT
 	#append IMGT/KABAT region data
 	modes=get_domain_modes()
 	modes.sort()
@@ -739,70 +797,70 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None",log
 		keys_to_append.append("CDR3 NA ("+mode+")")
 		keys_to_append.append("CDR3 NA length ("+mode+")")
 		#Base substition totals
-		keys_to_append.append("Total base substitution freq(%) over regions ("+mode+")") 	#a/b
-		keys_to_append.append("Total base substitutions over regions ("+mode+")") 		#a
-		keys_to_append.append("Total germline length (bp) over regions ("+mode+")") 		#b
-		keys_to_append.append("Total R:S ratio over all regions ("+mode+")") 			#c/e
-		keys_to_append.append("Total replacement (codon) freq(%) over regions ("+mode+")") 	#c/d
-		keys_to_append.append("Total replacements (codon) over regions ("+mode+")")		#c
-		#keys_to_append.append("Total codons over regions ("+mode+")")				#d,f
-		keys_to_append.append("Total silent (codon) freq(%) over regions ("+mode+")")		#e/f
-		keys_to_append.append("Total silent (codon) over regions ("+mode+")")			#e		
+		#keys_to_append.append("Total base substitution freq(%) over regions ("+mode+")") 	#a/b
+		#keys_to_append.append("Total base substitutions over regions ("+mode+")") 		#a
+		#keys_to_append.append("Total germline length (bp) over regions ("+mode+")") 		#b
+		#keys_to_append.append("Total R:S ratio over all regions ("+mode+")") 			#c/e
+		#keys_to_append.append("Total replacement (codon) freq(%) over regions ("+mode+")") 	#c/d
+		#keys_to_append.append("Total replacements (codon) over regions ("+mode+")")		#c
+		##keys_to_append.append("Total codons over regions ("+mode+")")				#d,f
+		#keys_to_append.append("Total silent (codon) freq(%) over regions ("+mode+")")		#e/f
+		#keys_to_append.append("Total silent (codon) over regions ("+mode+")")			#e		
 		regions=getVRegionsList()
 		for region in regions:
-			keys_to_append.append(region+" base substitution freq% ("+mode+")")
-			keys_to_append.append(region+" base substitutions ("+mode+")")
+			#keys_to_append.append(region+" base substitution freq% ("+mode+")")
 			keys_to_append.append(region+" length ("+mode+")")
-			keys_to_append.append(region+" R:S ratio ("+mode+")")
-			keys_to_append.append(region+" replacement mutation freq% ("+mode+")")
+			keys_to_append.append(region+" base substitutions ("+mode+")")
+			#keys_to_append.append(region+" R:S ratio ("+mode+")")
+			#keys_to_append.append(region+" replacement mutation freq% ("+mode+")")
 			keys_to_append.append(region+" replacement mutations (codons) ("+mode+")")
-			keys_to_append.append(region+" silent mutation freq% ("+mode+")")
+			#keys_to_append.append(region+" silent mutation freq% ("+mode+")")
 			keys_to_append.append(region+" silent mutations (codons) ("+mode+")")
-			keys_to_append.append(region+" indel frequency ("+mode+")")
-			keys_to_append.append(region+" insertion count ("+mode+")")
-			keys_to_append.append(region+" deletion count ("+mode+")")
+			#keys_to_append.append(region+" indel frequency ("+mode+")")
+			#keys_to_append.append(region+" insertion count ("+mode+")")
+			#keys_to_append.append(region+" deletion count ("+mode+")")
 
 
 
 	
-	keys_to_append.append("Homology% (over V and J)")
-	keys_to_append.append("Indel frequency (over V)")
-	keys_to_append.append("Insertion count (over V)")
-	keys_to_append.append("Length (over V and J)")
-	keys_to_append.append("Mutations (over V and J)")
-	keys_to_append.append("Mutations (over V)")
-	keys_to_append.append("Nonsynonymous base substitutions (over V and J)")
-	keys_to_append.append("Nonsynonymous base substitutions (over V)")
-	keys_to_append.append("AA (over V and J)")
-	keys_to_append.append("AA (over V)")
-	keys_to_append.append("Nucleotide read (over V and J)")
-	keys_to_append.append("Nucleotide read (over V)")
-	keys_to_append.append("R:S ratio (over V and J)")
-	keys_to_append.append("R:S ratio (over V)")
-	keys_to_append.append("Replacement mutation freq% (over V and J)")
-	keys_to_append.append("Replacement mutations (codons) (over V and J)")
-	keys_to_append.append("Base substitutions (over V and J)")
-	keys_to_append.append("CDR3 Stop codon? (over V and J)")
-	keys_to_append.append("Deletion count (over V)")
-	keys_to_append.append("Silent mutation freq% (over V and J)")
-	keys_to_append.append("Silent mutations (codons) (over V and J)")
-	keys_to_append.append("Base substitution freq% (over V and J)")
-	keys_to_append.append("Stop codons? (over V)")
-	keys_to_append.append("Synonymous base substitutions (over V and J)")
-	keys_to_append.append("Synonymous base substitutions (over V)")
-	keys_to_append.append("V gene hit/score list")
-	keys_to_append.append("V gene tie")
-	keys_to_append.append("D gene hit/score list")
-	keys_to_append.append("D gene tie")
-	keys_to_append.append("J gene hit/score list")
-	keys_to_append.append("J gene tie")
-	keys_to_append.append("AGS Q Note")
-	keys_to_append.append("AGS Codon Muts")
-	keys_to_append.append("AGS Amino Muts")
-	keys_to_append.append("AGS Silent Codon Muts")
-	keys_to_append.append("AGS Silent Amino Muts")
-	keys_to_append.append("Release Version Tag")
-	keys_to_append.append("Release Version Hash")
+	#keys_to_append.append("Homology% (over V and J)")
+	#keys_to_append.append("Indel frequency (over V)")
+	#keys_to_append.append("Insertion count (over V)")
+	#keys_to_append.append("Length (over V and J)")
+	#keys_to_append.append("Mutations (over V and J)")
+	#keys_to_append.append("Mutations (over V)")
+	#keys_to_append.append("Nonsynonymous base substitutions (over V and J)")
+	#keys_to_append.append("Nonsynonymous base substitutions (over V)")
+	#keys_to_append.append("AA (over V and J)")
+	#keys_to_append.append("AA (over V)")
+	#keys_to_append.append("Nucleotide read (over V and J)")
+	#keys_to_append.append("Nucleotide read (over V)")
+	#keys_to_append.append("R:S ratio (over V and J)")
+	#keys_to_append.append("R:S ratio (over V)")
+	#keys_to_append.append("Replacement mutation freq% (over V and J)")
+	#keys_to_append.append("Replacement mutations (codons) (over V and J)")
+	#keys_to_append.append("Base substitutions (over V and J)")
+	#keys_to_append.append("CDR3 Stop codon? (over V and J)")
+	#keys_to_append.append("Deletion count (over V)")
+	#keys_to_append.append("Silent mutation freq% (over V and J)")
+	#keys_to_append.append("Silent mutations (codons) (over V and J)")
+	#keys_to_append.append("Base substitution freq% (over V and J)")
+	#keys_to_append.append("Stop codons? (over V)")
+	#keys_to_append.append("Synonymous base substitutions (over V and J)")
+	#keys_to_append.append("Synonymous base substitutions (over V)")
+	#keys_to_append.append("V gene hit/score list")
+	#keys_to_append.append("V gene tie")
+	#keys_to_append.append("D gene hit/score list")
+	#keys_to_append.append("D gene tie")
+	#keys_to_append.append("J gene hit/score list")
+	#keys_to_append.append("J gene tie")
+	#keys_to_append.append("AGS Q Note")
+	#keys_to_append.append("AGS Codon Muts")
+	#keys_to_append.append("AGS Amino Muts")
+	#keys_to_append.append("AGS Silent Codon Muts")
+	#keys_to_append.append("AGS Silent Amino Muts")
+	#keys_to_append.append("Release Version Tag")
+	#keys_to_append.append("Release Version Hash")
 
 
 
