@@ -1306,23 +1306,38 @@ def getHierarchyBy(geneTablesDirectoryOfHTMLFiles,org_name,filterbyFastaAlleles=
 
 
 
+def testAcquireRegionInfo():
+	imgtdb_obj=imgt_db("/home/data/DATABASE/10_29_2014/")
+	orgs=imgtdb_obj.getOrganismList()
+	for organism in orgs:
+		#vsegs
+		types=["IG","TR"]
+		for seq_type in types:
+			v_segs=getAlleles("V",organism,seq_type)
+			regions="FR1","FR2","FR3","CDR1","CDR2"
+			
+
+
+
+
 if (__name__=="__main__"):
+	pass
 	#getQueryIndexGivenSubjectIndexAndAlignment
 	#getQueryIndexGivenSubjectIndexAndAlignment(query_aln,subject_aln,q_start,q_stop,s_start,s_stop,subject_pos):
-	query_aln="AC-XN-GT"
-	sbjct_aln="-GAT-ACA"
-	query_from=2
-	query_to=7
-	sbjct_f=3
-	sbjct_t=8
-	for i in range(3,8+1):
-		print "\n\n\n"
-		print "Now analyzing (s at top, q at bottom):"
-		print sbjct_f,sbjct_aln,sbjct_t
-		print query_from,query_aln,query_to
-		print "q_from=",query_from," query_to=",query_to,",s_from=",sbjct_f,", s_to=",sbjct_t," At subject position=",i
-		#print "The corresponding query position is "+str(getQueryIndexGivenSubjectIndexAndAlignment(query_aln,sbjct_aln,query_from,query_to,sbjct_f,sbjct_t,i))
-		#print "The corresponding (lean_left) query position is "+str(getQueryIndexGivenSubjectIndexAndAlignment(query_aln,sbjct_aln,query_from,query_to,sbjct_f,sbjct_t,i,"left"))
+	#query_aln="AC-XN-GT"
+	#sbjct_aln="-GAT-ACA"
+	#query_from=2
+	#query_to=7
+	#sbjct_f=3
+	#sbjct_t=8
+	#for i in range(3,8+1):
+	#	print "\n\n\n"
+	#	print "Now analyzing (s at top, q at bottom):"
+	#	print sbjct_f,sbjct_aln,sbjct_t
+	#	print query_from,query_aln,query_to
+	#	print "q_from=",query_from," query_to=",query_to,",s_from=",sbjct_f,", s_to=",sbjct_t," At subject position=",i
+	#	#print "The corresponding query position is "+str(getQueryIndexGivenSubjectIndexAndAlignment(query_aln,sbjct_aln,query_from,query_to,sbjct_f,sbjct_t,i))
+	#	#print "The corresponding (lean_left) query position is "+str(getQueryIndexGivenSubjectIndexAndAlignment(query_aln,sbjct_aln,query_from,query_to,sbjct_f,sbjct_t,i,"left"))
 
 
 
