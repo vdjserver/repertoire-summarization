@@ -91,6 +91,11 @@ def getNumPosArr():
 	return np_list
 
 
+def getNMONumPos():
+	nmo_nums=["36","39","45","46","50","59","61","65","67","70","86","90"]
+	return nmo_nums
+
+
 def writeRMInfoToTable(dir_base,out_tbl,minCountNum,num_rm_filter_thresh="0+"):
 	file_num=0
 	validation_res=validate_filter_stat_arg(num_rm_filter_thresh)
@@ -107,6 +112,7 @@ def writeRMInfoToTable(dir_base,out_tbl,minCountNum,num_rm_filter_thresh="0+"):
 			reader=open(full_tsv_path,'r')
 			line_num=1
 			rm_count_map=initNMCountMap()
+			nmo_numerator=0
 			for line in reader:
 				if(line_num>1):
 					pieces=line.split('\t')
@@ -118,6 +124,7 @@ def writeRMInfoToTable(dir_base,out_tbl,minCountNum,num_rm_filter_thresh="0+"):
 						cdr1_amino_len=CDR1_len/3
 						cdr1_lens[cdr1_amino_len-5]+=1
 						rms=eval(pieces[185])
+						non_sym_codon=eval(pieces[184])
 						num_rms_in_this_row=len(rms)
 						examine_counts_for_this_row=False
 						if(num_plus and num_rms_in_this_row>=thresh_num):
@@ -125,6 +132,17 @@ def writeRMInfoToTable(dir_base,out_tbl,minCountNum,num_rm_filter_thresh="0+"):
 						if(not(num_plus) and num_rms_in_this_row==thresh_num):
 							examine_counts_for_this_row=True
 						if(examine_counts_for_this_row):
+							for nsc in non_sym_codon:
+								#we have a codon
+								codon_str_len=len(nsc)
+								if(codon_str_len==8):
+									from_na=nsc[:3]
+									to_na=nsc[5:]
+									pos=nsc[3:5]
+									if(pos in getNMONumPos()):
+										for bp in range(3):									
+											if(from_na[bp]!=to_na[bp]):
+												nmo_numerator+=1
 							for rm in rms:
 								rm_str_len=len(rm)
 								if(rm_str_len==4):
@@ -149,6 +167,8 @@ def writeRMInfoToTable(dir_base,out_tbl,minCountNum,num_rm_filter_thresh="0+"):
 				writer.write("BATCH\tSAMPLE\tCDR1_5_NUM\tCDR1_6_NUM\tCDR1_7_NUM\tNUM_PASS")
 				for n in range(len(nPos_arr)):
 					writer.write("\t"+nPos_arr[n])
+				writer.write("\t")
+				writer.write("NMO_NUM")
 				writer.write("\n")
 				writer.close()
 			bs=getBatchIDAndSampleIDFromPath(full_tsv_path)
@@ -162,6 +182,8 @@ def writeRMInfoToTable(dir_base,out_tbl,minCountNum,num_rm_filter_thresh="0+"):
 			writer.write("\t"+str(num_pass_filter))
 			for npi in range(len(nPos_arr)):
 				writer.write("\t"+str(rm_count_map[nPos_arr[npi]]))
+			writer.write("\t")
+			writer.write(str(nmo_numerator))
 			writer.write("\n")
 			writer.close()
 			file_num+=1
