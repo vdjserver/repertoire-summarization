@@ -310,27 +310,32 @@ def VJRearrangementInFrameTest(vInfo,jInfo,imgtdb_obj,organism):
 	refName=vInfo['subject ids']
 	s_end_frame=getTheFrameForThisReferenceAtThisPosition(refName,organism,imgtdb_obj,s_end)
 	q_end_frame=s_end_frame
-	#print vInfo['query id']
-	#print "q_start_frame (spos=",s_start,") ",q_start_frame
+	print "Looking at ",vInfo['query id']
+	print "q_start_frame (spos=",s_end,") ",q_end_frame
 	q_end_j=jInfo['q. end']
 	q_bgn_j=jInfo['q. start']
+	print "First test...."
 	if(q_end_j<=q_end):
-		#WAY TOO SHORT or BAD ALIGNMENT
-		#IF Q END IN J IS LESS THAN OR EQUAL TO Q END IN V
+		print "WAY TOO SHORT or BAD ALIGNMENT"
+		print "IF Q END IN J IS LESS THAN OR EQUAL TO Q END IN V\n\n\n"
 		return False
 	else:
+		print "Second test"
 		j_bgn_j=jInfo['s. start']
 		j_bgn_frame=getTheFrameForThisJReferenceAtThisPosition(jInfo['subject ids'],organism,imgtdb_obj,j_bgn_j)
-		if(not(j_bgn_frame)):
+		print "j_bgn_frame is ",j_bgn_frame
+		if(j_bgn_frame!=None):
+			print "passed into final...."
 			expected_frame_based_on_V=(q_end_frame+(q_bgn_j-q_end))%3
-			#print "expected_frame_based_on_V=",expected_frame_based_on_V
+			print "expected_frame_based_on_V=",expected_frame_based_on_V
 			expected_frame_based_on_J=j_bgn_frame
-			#print "expected_frame_based_on_J=",expected_frame_based_on_J
+			print "expected_frame_based_on_J=",expected_frame_based_on_J,"\n\n\n\n\n"
 			if(expected_frame_based_on_J==expected_frame_based_on_V):
 				#if both V and J impose the same frame, then the read should NOT be filtered
 				return True
 			else:
 				return False
+		print "Returning none??????"
 		return None
 
 
@@ -344,9 +349,10 @@ def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
 	currentV=vMap['subject ids']
 	currentJ=jMap['subject ids']
 	cdr3_hist=getEmptyCDR3Map()
-	cdr3_hist['CYS']=False
-	cdr3_hist['TRPPHE']=False
-	cdr3_hist['JuncFrame']=False
+	cdr3_hist['Missing CYS']=True
+	cdr3_hist['Missing TRP/PHE']=True
+	cdr3_hist['Out-of-frame junction']=None
+	cdr3_hist['Out-of-frame CDR3']=None
 	if(vMap['query id'].find("reversed|")==0):
 		cdr3_hist['qry_rev']=True
 	else:
@@ -376,7 +382,8 @@ def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
 			else:
 				ref_cdr3_end=remap[dm][currentJ]
 			if(ref_cdr3_start!=(-1) and ref_cdr3_end!=(-1)):
-				cdr3_hist['JuncFrame']=VJRearrangementInFrameTest(vMap,jMap,imgtdb_obj,organism)
+				if(dm=="imgt"):
+					cdr3_hist['Out-of-frame junction']=not(VJRearrangementInFrameTest(vMap,jMap,imgtdb_obj,organism))
 				vq_aln=vMap['query seq']
 				vs_aln=vMap['subject seq']
 				vq_f=int(vMap['q. start'])
@@ -411,7 +418,9 @@ def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
 							#print "\n\n\n\n\n\n\n===========================================================\n\n\n\n\n\n\n"
 							#cdr3_hist['CYS']=true
 							if(query_cys_trx=='C'):
-								cdr3_hist['CYS']=True
+								cdr3_hist['Missing CYS']=False
+							else:
+								cdr3_hist['Missing CYS']=True
 				ref_cdr3_end+=1
 				qry_cdr3_end=getQueryIndexGivenSubjectIndexAndAlignment(jq_aln,js_aln,jq_f,jq_t,js_f,js_t,ref_cdr3_end,"left")
 				if(qry_cdr3_end!=(-1)):
@@ -431,9 +440,16 @@ def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
 							#print 
 							#print "\n"
 							if(qry_trp_trx=='W' or qry_trp_trx=='F'):
-								cdr3_hist['TRPPHE']=True
+								cdr3_hist['Missing TRP/PHE']=False
+							else:
+								cdr3_hist['Missing TRP/PHE']=True
 					qry_cdr3_end-=1
 				if(qry_cdr3_start!=(-1) and qry_cdr3_end!=(-1)):
+					if(dm=="imgt"):
+						if(((qry_cdr3_end-qry_cdr3_start+1)%3)==0):
+							cdr3_hist['Out-of-frame CDR3']=False
+						else:
+							cdr3_hist['Out-of-frame CDR3']=True
 					#query_coding_seq=query_seq_map[currentQueryName]
 					#coding_seq=query_coding_seq[(qry_cdr3_start-1):(qry_cdr3_end-1)]
 					if(qry_cdr3_start<=qry_cdr3_end):
