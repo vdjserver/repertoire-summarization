@@ -71,6 +71,25 @@ def rep_char_read(read_result_obj,meta,organism,imgtdb_obj,read_rec,skip_char=Fa
 #specialized annotation for CDR3 region!
 def readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,read_ann_map,cdr3_length_results):
 	global global_key_base
+	#print "SOME CDR3LEN RES"
+	#printMap(cdr3_length_results)
+	#print "\n\n\n\n\n"
+	if('Out-of-frame junction' in cdr3_length_results):
+		read_ann_map['Out-of-frame junction']=cdr3_length_results['Out-of-frame junction']
+	else:
+		read_ann_map['Out-of-frame junction']=None
+	if('Out-of-frame CDR3' in cdr3_length_results):
+		read_ann_map['Out-of-frame CDR3']=cdr3_length_results['Out-of-frame CDR3']
+	else:
+		read_ann_map['Out-of-frame CDR3']=None
+	if('Missing CYS' in cdr3_length_results):
+		read_ann_map["Missing CYS"]=cdr3_length_results['Missing CYS']
+	else:
+		read_ann_map["Missing CYS"]=None
+	if('Missing TRP/PHE' in cdr3_length_results):
+		read_ann_map["Missing TRP/PHE"]=cdr3_length_results['Missing TRP/PHE']
+	else:
+		read_ann_map["Missing TRP/PHE"]=None
 	for mode in get_domain_modes():
 		f=cdr3_length_results[mode+'_from']
 		t=cdr3_length_results[mode+'_to']
@@ -444,7 +463,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 	topVDJ=getTopVDJItems(read_result_obj,meta)
 	annMap=dict()
 	for seg in topVDJ:
-		topkey=seg+" gene (highest score)"
+		topkey=seg+" gene"
 		if(topVDJ[seg] is not None):
 			annMap[topkey]=topVDJ[seg]
 		else:
@@ -474,9 +493,9 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 	#annotations such as NA and AA from CDR3 from cdr3_map
 	annMap=readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,annMap,cdr3_map)
 
-	gap_ret_package=getBasicIndelsFoundFlag(vInfo,dInfo,jInfo)
+	gap_ret_package=getIndelsFlags(vInfo,dInfo,jInfo)
 	annMap['Indels Found']=gap_ret_package[0]
-	annMap['Frame-Preserving Indels Only']=gap_ret_package[1]
+	annMap['Only Frame-Preserving Indels Found']=gap_ret_package[1]
 
 
 	#characterization beside segments/CDR3
@@ -748,7 +767,7 @@ def prodRearrangmentVJ(vInfo,jInfo,imgtdb_obj,organism):
 
 
 
-def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None",logHandle=None):
+def appendAnnToFileWithMap(fHandl,m,rid,read_name,desiredKeys=None,defaultValue="None",logHandle=None):
 
 
 	#apapend intro data
@@ -761,12 +780,12 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None",log
 	"D gene",
 	"Homology% (over V)",
 
-
 	#PART 2 : post-alignment filter reports for standard use
 	"Out-of-frame junction",
+	"Out-of-frame CDR3",
 	"Missing CYS",
 	"Missing TRP/PHE",
-	"Stop Codon?"
+	"Stop Codon?",
 	"Indels Found",
 	"Only Frame-Preserving Indels Found"
 	]
@@ -878,7 +897,7 @@ def appendAnnToFileWithMap(fHandl,m,rid,desiredKeys=None,defaultValue="None",log
 	for ki in range(len(keys_to_append)):
 		keys.append(keys_to_append[ki])
 	#set the READ ID in the map
-	m[keys[0]]=rid
+	m[keys[0]]=read_name
 	global release_info_tag
 	global release_info_hash	
 	m[keys[len(keys)-2]]=release_info_tag
@@ -1038,7 +1057,7 @@ if (__name__=="__main__"):
 			rrw(read_result_obj)
 
 			#write rep-char
-			appendAnnToFileWithMap(fHandle,read_analysis_results['ann_map'],read_num,None,"None",logHandle)
+			appendAnnToFileWithMap(fHandle,read_analysis_results['ann_map'],read_num,query_record.id,None,"None",logHandle)
 
 			#increment the read number
 			read_num+=1
