@@ -132,13 +132,6 @@ def readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,read_ann
 
 
 
-def stringContainsAStar(s):
-	starIndex=s.find("*")
-	if(starIndex==(-1)):
-		return False
-	else:
-		return True
-
 
 
 def getIndelsFlags(vInfo,dInfo,jInfo):

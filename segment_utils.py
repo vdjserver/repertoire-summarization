@@ -15,8 +15,6 @@ import os
 
 
 
-
-
 #pretty print a tree
 def prettyPrintTree(t):
 	pp = pprint.PrettyPrinter()

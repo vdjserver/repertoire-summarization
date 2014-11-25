@@ -27,6 +27,15 @@ def digit_pad(num,pad_size=8):
 
 
 
+def stringContainsAStar(s):
+	starIndex=s.find("*")
+	if(starIndex==(-1)):
+		return False
+	else:
+		return True
+
+
+
 
 #generator for glob
 def glob_walk(glob_str,sort_it=True):
