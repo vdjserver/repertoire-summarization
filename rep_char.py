@@ -819,8 +819,8 @@ def appendAnnToFileWithMap(fHandl,m,rid,read_name,desiredKeys=None,defaultValue=
 	#keys_to_append.append("AGS Amino Muts")
 	#keys_to_append.append("AGS Silent Codon Muts")
 	#keys_to_append.append("AGS Silent Amino Muts")
-	#keys_to_append.append("Release Version Tag")
-	#keys_to_append.append("Release Version Hash")
+	keys_to_append.append("Release Version Tag")
+	keys_to_append.append("Release Version Hash")
 
 
 
