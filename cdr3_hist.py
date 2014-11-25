@@ -310,32 +310,31 @@ def VJRearrangementInFrameTest(vInfo,jInfo,imgtdb_obj,organism):
 	refName=vInfo['subject ids']
 	s_end_frame=getTheFrameForThisReferenceAtThisPosition(refName,organism,imgtdb_obj,s_end)
 	q_end_frame=s_end_frame
-	print "Looking at ",vInfo['query id']
-	print "q_start_frame (spos=",s_end,") ",q_end_frame
+	#print "Looking at ",vInfo['query id']
+	#print "q_start_frame (spos=",s_end,") ",q_end_frame
 	q_end_j=jInfo['q. end']
 	q_bgn_j=jInfo['q. start']
-	print "First test...."
+	#print "First test...."
 	if(q_end_j<=q_end):
-		print "WAY TOO SHORT or BAD ALIGNMENT"
-		print "IF Q END IN J IS LESS THAN OR EQUAL TO Q END IN V\n\n\n"
+		#print "WAY TOO SHORT or BAD ALIGNMENT"
+		#print "IF Q END IN J IS LESS THAN OR EQUAL TO Q END IN V\n\n\n"
 		return False
 	else:
-		print "Second test"
+		#print "Second test"
 		j_bgn_j=jInfo['s. start']
 		j_bgn_frame=getTheFrameForThisJReferenceAtThisPosition(jInfo['subject ids'],organism,imgtdb_obj,j_bgn_j)
-		print "j_bgn_frame is ",j_bgn_frame
+		#print "j_bgn_frame is ",j_bgn_frame
 		if(j_bgn_frame!=None):
-			print "passed into final...."
+			#print "passed into final...."
 			expected_frame_based_on_V=(q_end_frame+(q_bgn_j-q_end))%3
-			print "expected_frame_based_on_V=",expected_frame_based_on_V
+			#print "expected_frame_based_on_V=",expected_frame_based_on_V
 			expected_frame_based_on_J=j_bgn_frame
-			print "expected_frame_based_on_J=",expected_frame_based_on_J,"\n\n\n\n\n"
+			#print "expected_frame_based_on_J=",expected_frame_based_on_J,"\n\n\n\n\n"
 			if(expected_frame_based_on_J==expected_frame_based_on_V):
 				#if both V and J impose the same frame, then the read should NOT be filtered
 				return True
 			else:
 				return False
-		print "Returning none??????"
 		return None
 
 
