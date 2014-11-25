@@ -204,8 +204,9 @@ def getValnWholeSeqStopFlag(vInfo,dInfo,jInfo,imgtdb_obj,organism,annMap,seq_rec
 		else:
 			proper=rev_comp_dna(str(seq_rec.seq))
 			to_trans=str(proper[q_start-1:q_end]).upper()
+		#print "s_start_frame is ",s_start_frame
 		if(s_start_frame!=0):
-			to_trans=to_trans[s_start_frame-1:]
+			to_trans=to_trans[(3-s_start_frame):]
 		#print "To be translated for read=",str(seq_rec.id)," is ",to_trans
 		to_trans_len=len(to_trans)
 		if((to_trans_len%3)!=0):
@@ -216,8 +217,9 @@ def getValnWholeSeqStopFlag(vInfo,dInfo,jInfo,imgtdb_obj,organism,annMap,seq_rec
 		#print "The trim_to_trans is ",trim_to_trans
 		translation=codonAnalyzer.fastTransStr(trim_to_trans)
 		stopFlag=stringContainsAStar(translation)
-		return stopFlag
 		#print "The translation : ",translation
+		#print "\n\n\n\n"
+		return stopFlag
 		#return False
 		
 		
@@ -462,7 +464,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 		#	new_key=new_key[0].upper()+new_key[1:]
 		#	annMap[new_key]=whole_char_map[w]
 		whole_seq_stp_cdn_Tot_flag=getValnWholeSeqStopFlag(vInfo,dInfo,jInfo,imgtdb_obj,organism,annMap,read_rec)
-		annMap['vdj_server_whole_vj_stp_cdn']=whole_seq_stp_cdn_Tot_flag
+		annMap['Stop Codon?']=whole_seq_stp_cdn_Tot_flag
 
 
 		#productive rearrangement 
@@ -722,7 +724,6 @@ def appendAnnToFileWithMap(fHandl,m,rid,read_name,desiredKeys=None,defaultValue=
 
 	#PART 2 : post-alignment filter reports for standard use
 	"Out-of-frame junction",
-	"Out-of-frame CDR3",
 	"Missing CYS",
 	"Missing TRP/PHE",
 	"Stop Codon?",
