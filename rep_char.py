@@ -189,97 +189,44 @@ def getValnWholeSeqStopFlag(vInfo,dInfo,jInfo,imgtdb_obj,organism,annMap,seq_rec
 	if(vInfo==None):
 		#if no V alignment how can there be a frame, a J alignment, or a stop codon?
 		return None
-	if(not(vInfo==None)):
-		vAlnObj=alignment(vInfo['query seq'],vInfo['subject seq'],vInfo['q. start'],vInfo['q. end'],vInfo['s. start'],vInfo['s. end'])
-		vAlnNoGapStart=vAlnObj.getGEQAlignmentFirstNonGap()
-		s_start=int(vAlnNoGapStart.s_start)
-		s_start_frame=getTheFrameForThisReferenceAtThisPosition(vInfo['subject ids'],organism,imgtdb_obj,s_start)
-		vAlnNoGapStart.setSFM(s_start_frame)
-		v_char_map=vAlnNoGapStart.characterize()
-		#print "\n\n\n\n\n\n\n\n\nV_CHAR_MAP for ",seq_rec.id
-		#printMap(v_char_map)
-		#print "\n\n\n\n\n"
-		v_stop=v_char_map['Stop codons?']
-		if(v_stop):
-			return True
-		if(not(jInfo==None)):
-			if(int(jInfo['q. end'])<=int(vInfo['q. end'])):
-				#if J completely within or before, then return v_stop!
-				#this indicates a screwed-up alignment!!!!!!!!!!!!!!!!
-				return v_stop
-			jAlnObj=alignment(jInfo['query seq'],jInfo['subject seq'],jInfo['q. start'],jInfo['q. end'],jInfo['s. start'],jInfo['s. end'])
-			jAlnObj=jAlnObj.getGEQAlignmentFirstNonGap()
-			j_aln_frame_start=getTheFrameForThisJReferenceAtThisPosition(jInfo['subject ids'],organism,imgtdb_obj,int(jAlnObj.s_start))
-			if(j_aln_frame_start==None):
-				#if j_aln_frame_start is None, then no CDR3 was found for sure! :(
-				#maybe J is an ORF? with no frame?
-				#print "NO FRAME DATA FOR ",jInfo['subject ids']," in analyzing with read=",seq_rec.id," ??????"
-				#use V frame to complete the task
-				v_frame_end=getTheFrameForThisReferenceAtThisPosition(vInfo['subject ids'],organism,imgtdb_obj,vInfo['s. end'])
-				v_q_end=int(vInfo['q. end'])
-				v_q_end_frame=v_q_end-v_frame_end
-				#print "v_q_end_frame  (",seq_rec.id,") with ",vInfo['subject ids']," is ",v_q_end_frame
-				#printMap(vInfo)
-				if(not(vInfo['is_inverted'])):
-					to_trans=str(seq_rec.seq)[v_q_end_frame:]
-				else:
-					proper=rev_comp_dna(str(seq_rec.seq))
-					to_trans=proper[v_q_end_frame:]
-				#print "to_trans is ",to_trans
-				cdr3_and_jTrans=codonAnalyzer.fastTransStr(to_trans)
-				#print "The result : ",cdr3_and_jTrans
-				cdr3_j_stop_flag=stringContainsAStar(cdr3_and_jTrans)
-				#print "Flag to be returned is ",cdr3_j_stop_flag
-				return cdr3_j_stop_flag
-				#return False
-				#inherit frame from V if J frame is not in the DB????
-				#only observed on a small number of MOUSE TCR J sequences (insufficient similarity to known data?)?????
-				#sys.exit(0)
-				#v_q_end=int(vAlnObj['q. end'])
-				#j_alnStart=int(jAlnObj['q. start'])
-				#j_aln_frame_start=(j_alnStart-v_q_end+v_frame_end)%3
-			else:
-				jAlnObj.setSFM(j_aln_frame_start)
-				j_char_map=jAlnObj.characterize()
-				#Up to here, V and J have had alignments characterized and 
-				#neither has yielded a stop codon
-				#So here, the remaining todo is to examine the junction/CDR3 for stop codons
-				#print "The j_aln_frame_start is ",j_aln_frame_start
-				#print "\n\n\n\n\n\n\n\n\nJ_CHAR_MAP for ",seq_rec.id
-				#printMap(j_char_map)
-				#print "\n\n\n\n\n"			
-				j_stop=j_char_map['Stop codons?']
-				if(v_stop or j_stop):
-					return True
-				else:
-					#okay so neither V nor J yielded a stop codon
-					#so now examine CDR3 for a stop codon and use it to return the result
-					#cdr3_start=
-					#return False
-					#print "*********************************ANNMAP\n\n\n"
-					#printMap(annMap)
-					#print "\n\n\n\n\n\n\n\nBEFE****************************\n"
-					if(annMap['imgt_from']!=(-1) and annMap['imgt_to']!=(-1)):
-						cdr3_aa_key="CDR3 AA (imgt)"
-						cdr3_aa=annMap[cdr3_aa_key]
-						cdr3StopFlag=stringContainsAStar(cdr3_aa)
-						return cdr3StopFlag
-					else:
-						#no CDR3! :(
-						return (v_stop or j_stop)
-		else:
-			return v_stop
-			#no J alignment so try to get end of D alignment
-			#if(not(dInfo==None)):
-			#	dAlnObj=alignment(dInfo['query seq'],dInfo['subject seq'],dInfo['q. start'],dInfo['q. end'],dInfo['s. start'],dInfo['s. end'])
-			#	d_q_end=dAlnObj.q_end
-			#	#print "Initial q_end from d",d_q_end
-			#	q_end=max(q_end,d_q_end)
-			#else:
-			#	#d is none
-			#	pass
 	else:
-		return None
+		#vAlnObj=alignment(vInfo['query seq'],vInfo['subject seq'],vInfo['q. start'],vInfo['q. end'],vInfo['s. start'],vInfo['s. end'])
+		#vAlnNoGapStart=vAlnObj.getGEQAlignmentFirstNonGap()
+		s_start=int(vInfo['s. start'])
+		q_start=int(vInfo['q. start'])
+		s_start_frame=getTheFrameForThisReferenceAtThisPosition(vInfo['subject ids'],organism,imgtdb_obj,s_start)
+		info_to_use=None
+		if(jInfo==None):
+			#see if D is available
+			if(dInfo==None):
+				info_to_use=vInfo
+			else:
+				info_to_use=dInfo
+		else:
+			info_to_use=jInfo
+		#use max in case there is germline alignment overlap
+		q_end=max(int(info_to_use['q. end']),int(vInfo['q. end']))
+		if(not(vInfo['is_inverted'])):
+			to_trans=str(seq_rec.seq)[(q_start-1):q_end].upper()
+		else:
+			proper=rev_comp_dna(str(seq_rec.seq))
+			to_trans=str(proper[q_start-1:q_end]).upper()
+		if(s_start_frame!=0):
+			to_trans=to_trans[s_start_frame-1:]
+		#print "To be translated for read=",str(seq_rec.id)," is ",to_trans
+		to_trans_len=len(to_trans)
+		if((to_trans_len%3)!=0):
+			necessary_trim=(to_trans_len%3)
+			trim_to_trans=to_trans[:to_trans_len-necessary_trim]
+		else:
+			trim_to_trans=to_trans
+		#print "The trim_to_trans is ",trim_to_trans
+		translation=codonAnalyzer.fastTransStr(trim_to_trans)
+		stopFlag=stringContainsAStar(translation)
+		return stopFlag
+		#print "The translation : ",translation
+		#return False
+		
 		
 
 
