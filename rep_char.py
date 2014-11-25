@@ -657,21 +657,18 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 
 
 	t_map=getTypeNameScoreMap(read_result_obj,meta)
-	tie_map=getVDJTieMap(t_map,topVDJ)
+
+	alt_map=getVDJAltMap(t_map,topVDJ)
 	segments=get_segment_list()
 	for segment in segments:
-		#key=global_key_base+segment+'_hitscorelist'
-		key=segment+" gene hit/score list"
-		if(segment in t_map):
-			annMap[key]=t_map[segment]
+		alt_key="Alternate "+segment+" gene"
+		alt_list=alt_map[segment]
+		if(len(alt_list)>0):
+			alt_str=",".join(alt_list)
+			annMap[alt_key]=alt_str
 		else:
-			annMap[key]=None
-		#key=global_key_base+segment+'_tie'
-		key=segment+" gene tie"
-		if(segment in tie_map):
-			annMap[key]=tie_map[segment]
-		else:
-			annMap[key]="None"
+			annMap[alt_key]=None
+			
 
 	return annMap
 
@@ -753,9 +750,9 @@ def appendAnnToFileWithMap(fHandl,m,rid,read_name,desiredKeys=None,defaultValue=
 	modes.sort()
 	for mode in modes:
 		keys_to_append.append("CDR3 AA ("+mode+")")
-		keys_to_append.append("CDR3 AA length ("+mode+")")
+		#keys_to_append.append("CDR3 AA length ("+mode+")")
 		keys_to_append.append("CDR3 NA ("+mode+")")
-		keys_to_append.append("CDR3 NA length ("+mode+")")
+		#keys_to_append.append("CDR3 NA length ("+mode+")")
 		#Base substition totals
 		#keys_to_append.append("Total base substitution freq(%) over regions ("+mode+")") 	#a/b
 		#keys_to_append.append("Total base substitutions over regions ("+mode+")") 		#a
@@ -768,14 +765,18 @@ def appendAnnToFileWithMap(fHandl,m,rid,read_name,desiredKeys=None,defaultValue=
 		#keys_to_append.append("Total silent (codon) over regions ("+mode+")")			#e		
 		regions=getVRegionsList()
 		for region in regions:
+			keys_to_append.append(region.upper()+" aligned bases ("+mode+")")
+			keys_to_append.append(region.upper()+" base subst. ("+mode+")")
+			keys_to_append.append(region.upper()+" AA subst. ("+mode+")")
+			keys_to_append.append(region.upper()+" codons with silent mut. ("+mode+")")
 			#keys_to_append.append(region+" base substitution freq% ("+mode+")")
-			keys_to_append.append(region+" length ("+mode+")")
-			keys_to_append.append(region+" base substitutions ("+mode+")")
+			#keys_to_append.append(region+" length ("+mode+")")
+			#keys_to_append.append(region+" base substitutions ("+mode+")")
 			#keys_to_append.append(region+" R:S ratio ("+mode+")")
 			#keys_to_append.append(region+" replacement mutation freq% ("+mode+")")
-			keys_to_append.append(region+" replacement mutations (codons) ("+mode+")")
+			#keys_to_append.append(region+" replacement mutations (codons) ("+mode+")")
 			#keys_to_append.append(region+" silent mutation freq% ("+mode+")")
-			keys_to_append.append(region+" silent mutations (codons) ("+mode+")")
+			#keys_to_append.append(region+" silent mutations (codons) ("+mode+")")
 			#keys_to_append.append(region+" indel frequency ("+mode+")")
 			#keys_to_append.append(region+" insertion count ("+mode+")")
 			#keys_to_append.append(region+" deletion count ("+mode+")")
@@ -808,12 +809,11 @@ def appendAnnToFileWithMap(fHandl,m,rid,read_name,desiredKeys=None,defaultValue=
 	#keys_to_append.append("Stop codons? (over V)")
 	#keys_to_append.append("Synonymous base substitutions (over V and J)")
 	#keys_to_append.append("Synonymous base substitutions (over V)")
-	#keys_to_append.append("V gene hit/score list")
-	#keys_to_append.append("V gene tie")
-	#keys_to_append.append("D gene hit/score list")
-	#keys_to_append.append("D gene tie")
-	#keys_to_append.append("J gene hit/score list")
-	#keys_to_append.append("J gene tie")
+	segments=get_segment_list()
+	for segment in sorted(segments,reverse=True):
+		alt_key="Alternate "+segment+" gene"
+		keys_to_append.append(alt_key)
+
 	#keys_to_append.append("AGS Q Note")
 	#keys_to_append.append("AGS Codon Muts")
 	#keys_to_append.append("AGS Amino Muts")

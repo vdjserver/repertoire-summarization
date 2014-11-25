@@ -75,6 +75,14 @@ class CharacterizationThread(threading.Thread):
 						for key in reg_ann:
 							#annMap[key_base+region+"_"+key]=reg_ann[key]
 							annMap[region.upper()+" "+key+" ("+mode+")"]=reg_ann[key]
+							if(key=='length'):
+								annMap[region.upper()+" aligned bases ("+mode+")"]=reg_ann[key]								
+							if(key=='base substitutions'):
+								annMap[region.upper()+" base subst. ("+mode+")"]=reg_ann[key]
+							if(key=='replacement mutations (codons)'):
+								annMap[region.upper()+" AA subst. ("+mode+")"]=reg_ann[key]
+							if(key=='silent mutations (codons)'):
+								annMap[region.upper()+" codons with silent mut. ("+mode+")"]=reg_ann[key]
 						annMap[key_base+region+'_qry_aln']=regionAlignment.q_aln
 						annMap[key_base+region+'_qry_srt']=regionAlignment.q_start
 						annMap[key_base+region+'_qry_end']=regionAlignment.q_end
