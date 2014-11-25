@@ -312,6 +312,8 @@ def returnVAlnAllCharMap(vInfo,imgtdb_obj,read_result_obj=None,meta=None):
 			newKey=k
 			newKey=newKey[0].upper()+newKey[1:]
 			new_map[newKey+ " (over V)"]=vCharMap[k]
+			if(k=="homology%"):
+				new_map['Sequence similarity']=vCharMap[k]
 		new_map['V length (nucleotides)']=abs(vInfo['q. start']-vInfo['q. end'])
 		return new_map
 
@@ -717,7 +719,7 @@ def appendAnnToFileWithMap(fHandl,m,rid,read_name,desiredKeys=None,defaultValue=
 	"V gene",
 	"J gene",
 	"D gene",
-	"Homology% (over V)",
+	"Sequence similarity",
 
 	#PART 2 : post-alignment filter reports for standard use
 	"Out-of-frame junction",
