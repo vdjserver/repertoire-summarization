@@ -190,6 +190,33 @@ def printStats(path,logPath,bid,sid,minCountNum,returnInsteadOfPrint=False):
 	homology_over_v_thresh=85.00
 	num_homology_over_v_less_than_thresh=0
 	mySampleAGSMGR=ags_manager(str(bid+"."+sid))
+
+	#per GENE AGS managers
+	per_gene_ags_init_list=list()
+	per_gene_ags_init_list.append("IGHJ1")
+	per_gene_ags_init_list.append("IGHJ2")
+	per_gene_ags_init_list.append("IGHJ3")
+	per_gene_ags_init_list.append("IGHJ4")
+	per_gene_ags_init_list.append("IGHJ5")
+	per_gene_ags_init_list.append("IGHJ6")
+	per_gene_ags_init_list.append("IGHV4-4")
+	per_gene_ags_init_list.append("IGHV4-61")
+	per_gene_ags_init_list.append("IGHV4-38")
+	per_gene_ags_init_list.append("IGHV4-39")
+	per_gene_ags_init_list.append("IGHV4-34")
+	per_gene_ags_init_list.append("IGHV4-59")
+	per_gene_ags_init_list.append("IGHV4-30")
+	per_gene_ags_init_list.append("IGHV4-31")
+	ags_by_gene=dict()
+	for gene in per_gene_ags_init_list:
+		ags_by_gene[gene]=ags_manager(gene)
+
+
+	#per RM+ mgr
+	ags_by_rmp=dict()
+	ags_by_rmp[2]=ags_manager(str(2))
+	ags_by_rmp[3]=ags_manager(str(3))
+
 	for line in reader:
 		#print line
 		if(line_num>1):
@@ -235,6 +262,11 @@ def printStats(path,logPath,bid,sid,minCountNum,returnInsteadOfPrint=False):
 					num_rms_in_this_row=0
 					for rm in rms:
 						mySampleAGSMGR.receive_numbered_mut(rm)
+						for gene in per_gene_ags_init_list:
+							if(jHit.startswith(gene)):
+								ags_by_gene[gene].receive_numbered_mut(rm)
+							if(vHit.startswith(gene)):
+								ags_by_gene[gene].receive_numbered_mut(rm)
 						rm_reg=getRegion(rm)
 						num_rms_in_this_row+=1
 						if(isCDR(rm_reg)):
@@ -305,6 +337,34 @@ def printStats(path,logPath,bid,sid,minCountNum,returnInsteadOfPrint=False):
 	for j in jList:
 		out_pieces_header.append("J GENE "+j+" COUNT")
 		out_pieces.append(jCounts[j])
+
+	#PER GENE AGS data
+	for gene in per_gene_ags_init_list:
+		types=[5,6]
+		for ags_type in types:
+			if(gene.startswith("IGHV")):
+				gene_ags_info=ags_by_gene[gene].compute_ags("AGS"+str(ags_type))
+				#AGS score
+				out_pieces_header.append(gene+"_AGS"+str(ags_type))
+				out_pieces.append(gene_ags_info[0])
+				#AGS AGS TOT	
+				out_pieces_header.append(gene+"_AGS"+str(ags_type)+"_TOT")
+				out_pieces.append(gene_ags_info[0])
+				#TOT	
+				out_pieces_header.append(gene+"_AGS"+str(ags_type)+"_SAMPTOT")
+				out_pieces.append(gene_ags_info[0])
+			else:
+				gene_ags_info=ags_by_gene[gene].compute_ags("AGS"+str(ags_type))
+				#AGS score
+				out_pieces_header.append(gene+"_AGS"+str(ags_type))
+				out_pieces.append(gene_ags_info[0])
+				#AGS AGS TOT	
+				out_pieces_header.append(gene+"_AGS"+str(ags_type)+"_AGSTOT")
+				out_pieces.append(gene_ags_info[0])
+				#TOT	
+				out_pieces_header.append(gene+"_AGS"+str(ags_type)+"_TOT")
+				out_pieces.append(gene_ags_info[0])				
+
 
 	#REPLACE LOG AGS/RM data with AGS_MGR dynamically computed data
 	ags_5_info=mySampleAGSMGR.compute_ags("AGS5")#[ags5_score,sampAGSTot,sampTot]
