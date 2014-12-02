@@ -30,6 +30,21 @@ release_info_tag=None
 release_info_hash=None
 
 
+
+
+#initialize the sums to 0 for accumulation during execution
+#and output at program termination
+framework_r_sum_imgt=0
+framework_s_sum_imgt=0
+cdr_r_sum_imgt=0
+cdr_s_sum_imgt=0
+framework_r_sum_kabat=0
+framework_s_sum_kabat=0
+cdr_r_sum_kabat=0
+cdr_s_sum_kabat=0	
+
+
+
 def loadReleaseInfoTagAndHash():
 	global release_info_tag
 	global release_info_hash
@@ -328,7 +343,7 @@ def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap):
 	preCDR3Aln=cdr3_surround_aln[0]
 	postCDR3AlnObj=cdr3_surround_aln[1]
 	emptyMap=getEmptyRegCharMap()
-	if(preCDR3Aln==None and postCDR3AlnObj==None):
+	if(preCDR3Aln==None and pfreqostCDR3AlnObj==None):
 		return emptyMap
 	elif(preCDR3Aln!=None and postCDR3AlnObj==None):
 		return preCDR3Aln.characterize()
@@ -560,94 +575,62 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 	annMap["AGS Silent Amino Muts"]=amino_silent_map
 
 
-	#here, compute the region total BSB, REPLACEMENTS, SILENTS
-	#retrieve the mode/region results from the annMap
-	for mode in mode_list:
-		bsb_reg_tot=0
-		rplcmt_reg_tot=0
-		silent_reg_tot=0
-		ref_reg_len_tot=0
-		ref_reg_len_cdn_tot=0
-		temp_len_codons=0
-		for region in getVRegionsList():
-			bsb_key=region+" base substitutions ("+mode+")"
-			ref_reg_srt_key=global_key_base+mode+"_"+region+"_ref_srt"
-			ref_reg_end_key=global_key_base+mode+"_"+region+"_ref_end"
-			rplcmt_key=region+" replacement mutations (codons) ("+mode+")"
-			silent_key=region+" silent mutations (codons) ("+mode+")"
-			#replacement/silent ref germline increment
-			if((ref_reg_srt_key in annMap) and (ref_reg_end_key in annMap)):
-				#base pairs length
-				this_region_na_len=int(annMap[ref_reg_end_key])-int(annMap[ref_reg_srt_key])+1
-				ref_reg_len_tot=ref_reg_len_tot+(this_region_na_len)
-				#codon length (first na, then divide by 3, then increment total)
-				temp_len_codons=int(math.floor(float(this_region_na_len)/float(3.0)))
-				#print "temp_len_codons=",temp_len_codons,"mode=",mode,"region=",region,"read=",read_rec.id
-				#print "this_region_na_len=",this_region_na_len
-				ref_reg_len_cdn_tot+=temp_len_codons
-				#print "ref_reg_len_cdn_tot=",ref_reg_len_cdn_tot,"mode=",mode
-			else:
-				#print "at least one of "+ref_reg_srt_key+" or "+ref_reg_end_key+" missing in "+read_rec.id
-				pass
-			#BSB totals incrementing
-			if(bsb_key in annMap):
-				bsb_reg_tot+=annMap[bsb_key]
-			else:
-				#print bsb_key+" not found for "+read_rec.id
-				pass
-			#replacement totals incrementing
-			if(rplcmt_key in annMap):
-				rplcmt_reg_tot+=annMap[rplcmt_key]
-			else:
-				#print rplcmt_key+" not found "+read_rec.id
-				pass
-			#silent totals incrementing
-			if(silent_key in annMap):
-				silent_reg_tot+=annMap[silent_key]
-			else:
-				#print silent_key+" not found for "+read_rec.id
-				pass
-				
-		#having accumulated totals for the regions, compute mode values
-		#Base substitutions
-		sum_bsb_overregion_key_num="Total base substitutions over regions ("+mode+")"
-		sum_bsb_overregion_key_dnm="Total germline length (bp) over regions ("+mode+")"
-		annMap[sum_bsb_overregion_key_dnm]=ref_reg_len_tot
-		annMap[sum_bsb_overregion_key_num]=bsb_reg_tot
-		if(ref_reg_len_tot!=0):
-			
-			reg_bsb_tot=float(bsb_reg_tot)/float(ref_reg_len_tot)
+
+	print "***************************************\n\n  A READ\n"
+	printMap(annMap)
+	print "***************************************\n\n\n"
+
+
+
+	
+	#here, compute the region total REPLACEMENTS, SILENTS
+	#for computation of CDR R:S ratio and FR R:S ratio
+	#Out-of-frame junction	Missing CYS	Missing TRP/PHE	Stop Codon?	Indels Found	Only Frame-Preserving Indels Found
+	if(annMap['Out-of-frame junction']==False and annMap['Missing CYS']==False and annMap['Missing TRP/PHE']==False and annMap['Stop Codon?']==False):
+		indelComposite=True
+		if(annMap['Indels Found']==False):
+			#no indels so pass filter
+			indelComposite=True
 		else:
-			reg_bsb_tot=None
-		bsb_overregion_tot_key="Total base substitution freq(%) over regions ("+mode+")"
-		annMap[bsb_overregion_tot_key]=reg_bsb_tot
-		#Codon/AA replacements (and silents)
-		sum_repl_overregion_key_num="Total replacements (codon) over regions ("+mode+")"
-		sum_slnt_overregion_key_num="Total silent (codon) over regions ("+mode+")"
-		sum_gl_overregion_key_dnm="Total codons over regions ("+mode+")"
-		annMap[sum_repl_overregion_key_num]=rplcmt_reg_tot
-		annMap[sum_slnt_overregion_key_num]=silent_reg_tot
-		annMap[sum_gl_overregion_key_dnm]=ref_reg_len_cdn_tot
-		#print "ref_reg_len_cdn_tot=",ref_reg_len_cdn_tot
-		if(ref_reg_len_cdn_tot!=0):
-			rep_over_region=float(rplcmt_reg_tot)/float(ref_reg_len_cdn_tot)
-			silent_over_region=float(silent_reg_tot)/float(ref_reg_len_cdn_tot)
-		else:
-			rep_over_region=None
-			silent_over_region=None
-		rep_overregion_tot_key="Total replacement (codon) freq(%) over regions ("+mode+")"
-		annMap[rep_overregion_tot_key]=rep_over_region
-		silent_overregion_tot_key="Total silent (codon) freq(%) over regions ("+mode+")"
-		annMap[silent_overregion_tot_key]=silent_over_region
-		total_rs_key="Total R:S ratio over all regions ("+mode+")"
-		if(annMap[sum_slnt_overregion_key_num]!=0):
-			#print "TOTAL R: RATIO HERE"
-			#print "NUM=",float(annMap[sum_repl_overregion_key_num]),"key=",sum_repl_overregion_key_num
-			#print "DNM=",float(annMap[sum_slnt_overregion_key_num]),"key=",sum_slnt_overregion_key_num
-			#print "RTO=",float(float(annMap[sum_repl_overregion_key_num])/float(annMap[sum_slnt_overregion_key_num])),"key=",total_rs_key
-			annMap[total_rs_key]=float(float(annMap[sum_repl_overregion_key_num])/float(annMap[sum_slnt_overregion_key_num]))
-		else:
-			annMap[total_rs_key]=None
+			#indels found
+			if(annMap['Only Frame-Preserving Indels Found']==True):
+				#they're frame preserving!
+				indelComposite=True
+			else:
+				indelComposite=False
+		if(indelComposite):
+			global framework_r_sum_imgt
+			global framework_s_sum_imgt
+			global cdr_r_sum_imgt
+			global cdr_s_sum_imgt
+			global framework_r_sum_kabat
+			global framework_s_sum_kabat
+			global cdr_r_sum_kabat
+			global cdr_s_sum_kabat
+			for mode in mode_list:
+				for region in getVRegionsList(False):
+					#print "Got a region ",region,"\n\n"
+					r_key=region+" AA subst. ("+mode+")"
+					s_key=region+" codons with silent mut. ("+mode+")"
+					if((r_key in annMap) and (s_key in annMap)):
+						if(region.startswith("F")):
+							#is a framework
+							if(mode=="imgt"):
+								framework_r_sum_imgt+=annMap[r_key]
+								framework_s_sum_imgt+=annMap[s_key]
+							else:
+								framework_r_sum_kabat+=annMap[r_key]
+								framework_s_sum_kabat+=annMap[s_key]
+						elif(region.startswith("C")):
+							#is a CDR
+							if(mode=="imgt"):
+								cdr_r_sum_imgt+=annMap[r_key]
+								cdr_s_sum_imgt+=annMap[s_key]
+							else:
+								cdr_r_sum_kabat+=annMap[r_key]
+								cdr_s_sum_kabat+=annMap[s_key]
+
+
 			
 
 	#print "SHOWING MAP WITH OVER REGION TOTALS"
@@ -907,8 +890,7 @@ def add_rep_char_args_to_parser(parser):
 	parser.add_argument('db_organism',type=str,nargs=1,default="human",help="the organism IgBLASTed against;must exist under vdj_db_root",choices=["human","Mus_musculus"])
 	return parser
 
-
-		
+	
 
 
 if (__name__=="__main__"):
@@ -1046,9 +1028,17 @@ if (__name__=="__main__"):
 		print "Writing JSONS segment combination frequency data to ",recomb_out_file
 		combo_counter.writeJSONToFile(recomb_out_file)
 		
+		global framework_r_sum_imgt
+		global framework_s_sum_imgt
+		global cdr_r_sum_imgt
+		global cdr_s_sum_imgt
 
-
-
+		print "F_R_SUM=",framework_r_sum_imgt
+		print "F_S_SUM=",framework_s_sum_imgt
+		print "C_R_SUM=",cdr_r_sum_imgt
+		print "C_S_SUM=",cdr_s_sum_imgt
+		print "F R:S",float(framework_r_sum_imgt)/float(framework_s_sum_imgt)
+		print "C R:S",float(cdr_r_sum_imgt)/float(cdr_s_sum_imgt)
 
 	else:
 		#print "error in args!"
