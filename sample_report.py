@@ -217,6 +217,13 @@ def printStats(path,logPath,bid,sid,minCountNum,returnInsteadOfPrint=False):
 	ags_by_rmp[2]=ags_manager(str(2))
 	ags_by_rmp[3]=ags_manager(str(3))
 
+	#counts for weighted filtering
+	weightedNoIGHV4Hit=0
+	weightedNoVHit=0
+	weightedSumAll=0
+	weightedSumOKOnly=0
+
+
 	for line in reader:
 		#print line
 		if(line_num>1):
@@ -227,8 +234,14 @@ def printStats(path,logPath,bid,sid,minCountNum,returnInsteadOfPrint=False):
 			#llsys.exit(0)
 			if(count_val>=minCountNum):
 				stat_counts[status]+=1
+				weightedSumAll+=count_val
+				if(status=="NoVHit"):
+					weightedNoVHit+=count_val
+				if(status=="Not an IGHV4 hit"):
+					weightedNoIGHV4Hit+=count_val
 				if(status=="OK"):
 					#proceed
+					weightedSumOKOnly+=1
 					vHit=pieces[2]
 					vHitNA=deAllelifyName(vHit)
 					if(vHitNA in vList):
@@ -267,6 +280,10 @@ def printStats(path,logPath,bid,sid,minCountNum,returnInsteadOfPrint=False):
 								ags_by_gene[gene].receive_numbered_mut(rm)
 							if(vHit.startswith(gene)):
 								ags_by_gene[gene].receive_numbered_mut(rm)
+						if(len(rms)>=2):
+							ags_by_rmp[2].receive_numbered_mut(rm)
+							if(len(rms)>=3):
+								ags_by_rmp[3].receive_numbered_mut(rm)
 						rm_reg=getRegion(rm)
 						num_rms_in_this_row+=1
 						if(isCDR(rm_reg)):
@@ -382,10 +399,31 @@ def printStats(path,logPath,bid,sid,minCountNum,returnInsteadOfPrint=False):
 	out_pieces.append(log_data['AGS5'])
 	out_pieces_header.append("AGS5 RM")
 	out_pieces.append(log_data['AGS5_RM'])
+	#do AGS5 RM2+,RM3+ scores
+	for rmp in range(2,4):
+		agss_rm_info=ags_by_rmp[rmp].compute_ags("AGS5")
+		out_pieces_header.append("RM"+str(rmp)+"+ AGS5")
+		out_pieces.append(agss_rm_info[0])
+		out_pieces_header.append("RM"+str(rmp)+"+ AGS5 RM")
+		out_pieces.append(agss_rm_info[1])
+		out_pieces_header.append("RM"+str(rmp)+"+ AGS5 TOT RM")
+		out_pieces.append(agss_rm_info[2])
+
+
 	out_pieces_header.append("AGS6")
 	out_pieces.append(log_data['AGS'])
 	out_pieces_header.append("AGS6 RM")
 	out_pieces.append(log_data['AGS_RM'])
+	#do AGS5 RM2+,RM3+ scores
+	for rmp in range(2,4):
+		agss_rm_info=ags_by_rmp[rmp].compute_ags("AGS6")
+		out_pieces_header.append("RM"+str(rmp)+"+ AGS6")
+		out_pieces.append(agss_rm_info[0])
+		out_pieces_header.append("RM"+str(rmp)+"+ AGS6 RM")
+		out_pieces.append(agss_rm_info[1])
+		out_pieces_header.append("RM"+str(rmp)+"+ AGS6 TOT RM")
+		out_pieces.append(agss_rm_info[2])
+
 
 	#TOT RM SM
 	out_pieces_header.append("TOT RM")
