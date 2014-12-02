@@ -241,7 +241,7 @@ def printStats(path,logPath,bid,sid,minCountNum,returnInsteadOfPrint=False):
 					weightedNoIGHV4Hit+=count_val
 				if(status=="OK"):
 					#proceed
-					weightedSumOKOnly+=1
+					weightedSumOKOnly+=count_val
 					vHit=pieces[2]
 					vHitNA=deAllelifyName(vHit)
 					if(vHitNA in vList):
@@ -366,10 +366,10 @@ def printStats(path,logPath,bid,sid,minCountNum,returnInsteadOfPrint=False):
 				out_pieces.append(gene_ags_info[0])
 				#AGS AGS TOT	
 				out_pieces_header.append(gene+"_AGS"+str(ags_type)+"_TOT")
-				out_pieces.append(gene_ags_info[0])
+				out_pieces.append(gene_ags_info[1])
 				#TOT	
 				out_pieces_header.append(gene+"_AGS"+str(ags_type)+"_SAMPTOT")
-				out_pieces.append(gene_ags_info[0])
+				out_pieces.append(gene_ags_info[2])
 			else:
 				gene_ags_info=ags_by_gene[gene].compute_ags("AGS"+str(ags_type))
 				#AGS score
@@ -377,11 +377,21 @@ def printStats(path,logPath,bid,sid,minCountNum,returnInsteadOfPrint=False):
 				out_pieces.append(gene_ags_info[0])
 				#AGS AGS TOT	
 				out_pieces_header.append(gene+"_AGS"+str(ags_type)+"_AGSTOT")
-				out_pieces.append(gene_ags_info[0])
+				out_pieces.append(gene_ags_info[1])
 				#TOT	
 				out_pieces_header.append(gene+"_AGS"+str(ags_type)+"_TOT")
-				out_pieces.append(gene_ags_info[0])				
+				out_pieces.append(gene_ags_info[2])				
 
+
+	#weighted filtering counts
+	out_pieces_header.append("Filter Weighted Not an IGHV4 hit")
+	out_pieces.append(weightedNoIGHV4Hit)
+	out_pieces_header.append("Filter Weighted NoVHit")
+	out_pieces.append(weightedNoVHit)
+	out_pieces_header.append("Weighed Sum ALL")
+	out_pieces.append(weightedSumAll)
+	out_pieces_header.append("Weighted Sum OK Only")
+	out_pieces.append(weightedSumOKOnly)
 
 	#REPLACE LOG AGS/RM data with AGS_MGR dynamically computed data
 	ags_5_info=mySampleAGSMGR.compute_ags("AGS5")#[ags5_score,sampAGSTot,sampTot]
