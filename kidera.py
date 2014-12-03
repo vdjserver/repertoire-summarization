@@ -342,11 +342,12 @@ def kidera_analyze(f1,f2,lab1,lab2,num_permuts,fs_are_files=True):
 	for pl in randomPermuter(labels,num_permuts):
 		if(permID%1000==0):
 			print "On permutation #",permID
-		perm_merged_and_labeled=permute_merged_and_labeled(merged,labels)
-		perm_merged=perm_merged_and_labeled[0]
-		perm_merged_dist_matrix=computeEuclideanDistMatrix(perm_merged,perm_merged)
-		perm_merged_rank_matrix=constructRankMatrixGivenDistMatrix(perm_merged_dist_matrix)
-		temp_r=computeRStat(perm_merged_rank_matrix,perm_merged_and_labeled[1])
+		#perm_merged_and_labeled=permute_merged_and_labeled(merged,labels)
+		#perm_merged=perm_merged_and_labeled[0]
+		#perm_merged_dist_matrix=computeEuclideanDistMatrix(perm_merged,perm_merged)
+		#perm_merged_rank_matrix=constructRankMatrixGivenDistMatrix(perm_merged_dist_matrix)
+		#temp_r=computeRStat(perm_merged_rank_matrix,pl)
+		temp_r=computeRStat(merged_rank_matrix,pl)
 		if(r_stat<0):
 			if(r_stat<temp_r):
 				num_pass+=1
@@ -494,7 +495,7 @@ f1="/home/data/Mei/TST-_Delta2.txt.CDR3.aa"
 f2="/home/data/Mei/TST+_Delta2.txt.CDR3.aa"
 lab1="neg"
 lab2="poz"
-num_permuts=1000
+num_permuts=10000
 
 
 #kidera_dist_print(f1,f2)
