@@ -110,6 +110,7 @@ def createAAKideraMap():
 
 
 #from an array of CDR3 strings, return a list of as many kidera vectors
+#or their average (if desired, default NOT)
 def convertListOfCDR3sToListOfKideras(cdr3_list,getAvg=False):
 	kidera_list=list()
 	for cdr3 in cdr3_list:
@@ -266,24 +267,22 @@ def getPctStr(num,tot_poss):
 
 
 
-
+#given a list of items
+#return a random permutation of the list of items
+#return it as a list
 def randomPermutation(m_list):
 	import random
-	num_swaps=len(m_list)
-	temp_list=list(m_list)
-	for i in range(num_swaps):
-		a=i
-		b=a
-		while(b==a):
-			b=int(random.random()*len(m_list))
-			if(b>=len(m_list)):
-				b=len(m_list)-1
-		c=temp_list[a]
-		temp_list[a]=temp_list[b]
-		temp_list[b]=c
-	return temp_list
+	import numpy as np
+	p_order=np.random.permutation(len(m_list))
+	rand_permutation=list()
+	for i in range(len(p_order)):
+		rand_permutation.append(m_list[p_order[i]])
+	return rand_permutation
 	
 
+#given a list of items have a generator
+#that returns a given number (default 10)
+#of permutations
 def randomPermuter(m_list,numPermutations=10):
 	t_list=m_list
 	for p in range(numPermutations):
@@ -291,7 +290,7 @@ def randomPermuter(m_list,numPermutations=10):
 		yield t_list
 
 
-
+#get the dimenstions of a matrix (rows,columns)
 def getMatrixDim(m):
 	num_rows=len(m)
 	if(num_rows==0):
@@ -301,6 +300,9 @@ def getMatrixDim(m):
 		return [num_rows,num_cols]
 
 
+#create a merged list of kideras
+#create a merged list of labels
+#return them as a pair
 def joinKideraListsAndMakeLabels(l1,l2,lab1="first",lab2="second"):
 	merged=list()
 	labels=list()
@@ -313,6 +315,7 @@ def joinKideraListsAndMakeLabels(l1,l2,lab1="first",lab2="second"):
 	return [merged,labels]
 
 
+#pretty print a matrix
 def printMatrixNice(m):
 	print "The dim of a matrix is ",getMatrixDim(m)
 	for r in range(len(m)):
@@ -322,6 +325,13 @@ def printMatrixNice(m):
 			else:
 				print str(round(m[r][c],2))
 			
+
+
+
+
+
+
+
 
 
 tstnegD2=readCDR3FileOnePerLineAsCDR3List("/home/data/Mei/TST-_Delta2.txt.CDR3.aa")
