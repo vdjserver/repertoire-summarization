@@ -431,18 +431,28 @@ def test_r_stat_computing():
 		raise Exception("Error, test r_stat 1 not equal to zero!")
 
 
-
+tstnegD2=readCDR3FileOnePerLineAsCDR3List()
+tstpozD2=readCDR3FileOnePerLineAsCDR3List()
+print "TST neg : ",tstnegD2
+print "TST poz : ",tstpozD2
+print "num neg ",len(tstnegD2)
+print "num poz ",len(tstpozD2)
 
 
 
 #test_r_stat_computing()
-f1="blah"
-f2="blah"
-lab1="poz"
-lab2="neg"
+f1="/home/data/Mei/TST-_Delta2.txt.CDR3.aa"
+f2="/home/data/Mei/TST+_Delta2.txt.CDR3.aa"
+lab1="neg"
+lab2="poz"
 num_permuts=100000
 
-kidera_analyze(f1,f2,lab1,lab2,num_permuts)
+ret_package=kidera_analyze(f1,f2,lab1,lab2,num_permuts)
+r_stat=ret_package[0]
+p_val=ret_package[1]
+print "The r_stat is ",r_stat
+print "The p-value is ",p_val
+print "num permutations is ",num_permuts
 
 
 
