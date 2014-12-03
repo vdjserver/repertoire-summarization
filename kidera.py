@@ -137,7 +137,7 @@ def computeAverageKideraFromCDR3(cdr3):
 	kidera=[0,0,0,0,0,0,0,0,0,0]
 	num_aminos=0
 	for aa in cdr3:
-		#get the kidera for the AA
+		#get the 10D kidera for the AA
 		aa_kidera=aa_k_m[aa]
 		#add it to the aggregate kidera
 		for d in range(len(kidera)):
@@ -164,6 +164,20 @@ def computeAverageKideraFromKideraList(kidera_list):
 
 
 
+#compute euclidean distance between two vectors
+def computeEuclidean(v1,v2):
+	#sum of squares of differences
+	sos=0
+	for d in range(len(v1)):
+		sos+=(abs(v1[d]-v2[d]))**2
+	#ed gets computed as the square root of sos
+	ed=sos**(0.5)
+	return ed
+
+
+
+
+
 
 #given two lists of kidera factors, return a distance matrix
 def computeEuclideanDistMatrix(kidera_1,kidera_2):
@@ -171,6 +185,8 @@ def computeEuclideanDistMatrix(kidera_1,kidera_2):
 	dist_matrix = [[None for x in xrange(len(kidera_2))] for x in xrange(len(kidera_1))]
 	for k1 in range(len(kidera_1)):
 		for k2 in range(len(kidera_2)):
+			#dist=computeEuclidean(kidera_1[k1],kidera_2[k2])
+			#dist_matrix[k1][k2]=dist
 			if(k1<=k2):
 				dist=computeEuclidean(kidera_1[k1],kidera_2[k2])
 				dist_matrix[k1][k2]=dist
@@ -188,27 +204,26 @@ def constructRankMatrixGivenDistMatrix(dist_matrix):
 	data_list=list()
 	for r in range(len(dist_matrix)):
 		for c in range(len(dist_matrix[r])):
-			data_list.append(dist_matrix[r][c])
+			if(r<c):
+				#ignore diagonals
+				data_list.append(dist_matrix[r][c])
 	data_list_ranking=ss.rankdata(data_list)
 	rank_mat=[[None for x in xrange(len(dist_matrix[0]))] for x in xrange(len(dist_matrix))]
 	temp_i=0
 	for r in range(len(dist_matrix)):
 		for c in range(len(dist_matrix[r])):
-			rank_mat[r][c]=data_list_ranking[temp_i]
-			temp_i+=1
+			if(r<c):
+				rank_mat[r][c]=data_list_ranking[temp_i]
+				temp_i+=1
+	for r in range(len(dist_matrix)):
+		for c in range(len(dist_matrix[r])):
+			if(r>c):
+				rank_mat[r][c]=rank_mat[c][r]
+
 	return rank_mat
 
 
 
-#compute euclidean distance between two vectors
-def computeEuclidean(v1,v2):
-	#sum of squares of differences
-	sos=0
-	for d in range(len(v1)):
-		sos=(abs(v1[d]-v2[d]))**2
-	#ed gets computed as the square root of sos
-	ed=sos**(0.5)
-	return ed
 
 #given a group assignment array compute the number of possible permutations
 #it's a factorial
@@ -323,18 +338,22 @@ def kidera_analyze(f1,f2,lab1,lab2,num_permuts,fs_are_files=True):
 	r_stat=computeRStat(merged_rank_matrix,labels)
 	r_stats=list()
 	num_pass=0
+	permID=1
 	for pl in randomPermuter(labels,num_permuts):
+		if(permID%1000==0):
+			print "On permutation #",permID
 		perm_merged_and_labeled=permute_merged_and_labeled(merged,labels)
 		perm_merged=perm_merged_and_labeled[0]
 		perm_merged_dist_matrix=computeEuclideanDistMatrix(perm_merged,perm_merged)
 		perm_merged_rank_matrix=constructRankMatrixGivenDistMatrix(perm_merged_dist_matrix)
-		temp_r=computeRStat(perm_merged_rank_matrix,perm_merged_and_labeled[0])
+		temp_r=computeRStat(perm_merged_rank_matrix,perm_merged_and_labeled[1])
 		if(r_stat<0):
 			if(r_stat<temp_r):
 				num_pass+=1
 		elif(r_stat>0):
 			if(r_stat>temp_r):
 				num_pass+=1
+		permID+=1
 	p_val=1.0-(float(num_pass)/float(num_permuts))
 	#return the empirical r_stat, the p-value, then the permuted r_stats upon which the p-value is based
 	ret_package=[r_stat,p_val,r_stats]
@@ -431,12 +450,42 @@ def test_r_stat_computing():
 		raise Exception("Error, test r_stat 1 not equal to zero!")
 
 
-tstnegD2=readCDR3FileOnePerLineAsCDR3List()
-tstpozD2=readCDR3FileOnePerLineAsCDR3List()
-print "TST neg : ",tstnegD2
-print "TST poz : ",tstpozD2
-print "num neg ",len(tstnegD2)
-print "num poz ",len(tstpozD2)
+
+def kidera_dist_print(f1,f2,fs_are_files=True):
+	#load the input data first
+	if(fs_are_files):
+		#read two files of CDR3 polypeptides (one per line)
+		cdr31=readCDR3FileOnePerLineAsCDR3List(f1)
+		cdr32=readCDR3FileOnePerLineAsCDR3List(f2)
+	else:
+		#just load the data passed in
+		cdr31=f1
+		cdr32=f2
+	#get corresponding kidera lists (one per polypeptide string)
+	k1=convertListOfCDR3sToListOfKideras(cdr31)
+	k2=convertListOfCDR3sToListOfKideras(cdr32)
+	for i in k1:
+		print i
+	for i in k2:
+		print i
+	print "num k1 is ",len(k1)
+	print "num k2 is ",len(k2)
+	#merge them for subsequent use with a matrix
+	merged_and_labels=joinKideraListsAndMakeLabels(k1,k2,lab1,lab2)
+	merged=merged_and_labels[0]
+	labels=merged_and_labels[1]
+	#compute a euclidian distance matrix
+	merged_dist_matrix=computeEuclideanDistMatrix(merged,merged)
+	for r in range(len(merged_dist_matrix)):
+		#print merged_dist_matrix[i]
+		for c in range(len(merged_dist_matrix[r])):
+			if(c<len(merged_dist_matrix[r])-1):
+				#print str(merged_dist_matrix[r][c])+",",
+				pass
+			else:
+				#print str(merged_dist_matrix[r][c])
+				pass
+
 
 
 
@@ -445,8 +494,10 @@ f1="/home/data/Mei/TST-_Delta2.txt.CDR3.aa"
 f2="/home/data/Mei/TST+_Delta2.txt.CDR3.aa"
 lab1="neg"
 lab2="poz"
-num_permuts=100000
+num_permuts=1000
 
+
+#kidera_dist_print(f1,f2)
 ret_package=kidera_analyze(f1,f2,lab1,lab2,num_permuts)
 r_stat=ret_package[0]
 p_val=ret_package[1]
