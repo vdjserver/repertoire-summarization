@@ -671,6 +671,21 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 
 
 
+def computeSmartRatio(num,denom):
+	if(denom!=None):
+		if(num!=None):
+			s_num=float(num)
+			s_dnm=float(denom)
+			if(s_dnm!=0):
+				ratio=s_num/s_dnm
+				return ratio
+			else:
+				return None
+		else:
+			return None
+	else:
+		return None
+
 
 
 
@@ -1040,17 +1055,17 @@ if (__name__=="__main__"):
 		print "Writing JSONS segment combination frequency data to ",recomb_out_file
 		combo_counter.writeJSONToFile(recomb_out_file)
 		
-		global framework_r_sum_imgt
-		global framework_s_sum_imgt
-		global cdr_r_sum_imgt
-		global cdr_s_sum_imgt
+		#global framework_r_sum_imgt
+		#global framework_s_sum_imgt
+		#global cdr_r_sum_imgt
+		#global cdr_s_sum_imgt
 
 		print "F_R_SUM=",framework_r_sum_imgt
 		print "F_S_SUM=",framework_s_sum_imgt
 		print "C_R_SUM=",cdr_r_sum_imgt
 		print "C_S_SUM=",cdr_s_sum_imgt
-		print "F R:S",float(framework_r_sum_imgt)/float(framework_s_sum_imgt)
-		print "C R:S",float(cdr_r_sum_imgt)/float(cdr_s_sum_imgt)
+		print "F R:S",computeSmartRatio(framework_r_sum_imgt,framework_s_sum_imgt)
+		print "C R:S",computeSmartRatio(cdr_r_sum_imgt,cdr_s_sum_imgt)
 
 	else:
 		#print "error in args!"
