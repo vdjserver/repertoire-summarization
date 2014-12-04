@@ -34,6 +34,18 @@ release_info_hash=None
 
 #initialize the sums to 0 for accumulation during execution
 #and output at program termination
+
+#b2b region values
+framework_b2b_aln_imgt=0
+framework_b2b_sbst_imgt=0
+cdr_b2b_aln_imgt=0
+cdr_b2b_subst_imgt=0
+framework_b2b_aln_kabat=0
+framework_b2b_sbst_kabat=0
+cdr_b2b_aln_kabat=0
+cdr_b2b_subst_kabat=0
+
+#r:s for region variables
 framework_r_sum_imgt=0
 framework_s_sum_imgt=0
 cdr_r_sum_imgt=0
