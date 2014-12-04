@@ -469,6 +469,7 @@ class alignment:
 					#make sure  that the base is unambiguous
 					num_bsb+=1
 		num_indels=num_ins+num_del
+		char_map['Number base-to-base aligned']=tot_num_base_to_base_alns
 		if(tot_num_base_to_base_alns>0):
 			char_map['base substitution freq%']=float(num_bsb)/float(tot_num_base_to_base_alns)
 			id_tot_rto=float(tot_num_base_to_base_alns-num_bsb)/float(tot_num_base_to_base_alns)
