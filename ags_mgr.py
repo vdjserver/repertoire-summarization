@@ -41,7 +41,7 @@ class ags_manager:
 	
 	
 	
-	def compute_ags(self,mode="AGS6",returnThreeZeroesIfDivByZero=True):
+	def compute_ags(self,mode="AGS6",returnThreeZeroesIfDivByZero=False):
 		#print "mgr named ",self.name,"giving ags from counter obj named ",self.codonCounterObj.name
 		if(mode=="AGS6"):
 			sampTot=self.rm_count
@@ -49,7 +49,7 @@ class ags_manager:
 				#avoid division by zero error
 				if(returnThreeZeroesIfDivByZero):
 					return [0,0,0]
-				return None			
+				return ["NA",0,0]			
 			sampAGSTot=float(self.ags6_count)
 			pct_ags6=(sampAGSTot/sampTot)*100.0
 			ags_numerator=pct_ags6-1.6*6.0
@@ -62,7 +62,7 @@ class ags_manager:
 				#avoid division by zero error
 				if(returnThreeZeroesIfDivByZero):
 					return [0,0,0]
-				return None	
+				return ["NA",0,0]	
 			sampAGSTot=float(self.ags5_count)
 			pct_ags5=(sampAGSTot/sampTot)*100.0
 			ags_numerator=pct_ags5-1.6*5.0
