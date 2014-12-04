@@ -1,28 +1,51 @@
 #!/usr/bin/env python
 
-
-from utils import readFileIntoArrayOneLinePerArrayElement
+import argparse
+from utils import readFileIntoArrayOneLinePerArrayElement,extractAsItemOrFirstFromList
 
 
 
 
 #read a file of CDR3s into an array
-def readCDR3FileOnePerLineAsCDR3List(path,filterOutStop=True,filterOutX=True):
+def readCDR3FileOnePerLineAsCDR3List(path,filterOutSeqStop=True,filterOutSeqX=True):
 	import re
+	new_list=list()
+	tot_fail_seq_stop=0
+	tot_fail_seq_X=0
+	tot_in_seq=0
 	cdr3_list=readFileIntoArrayOneLinePerArrayElement(path)
-	if(filterOutStop):
-		new_list=list()
-		for c in cdr3_list:
+	for c in cdr3_list:
+		tot_in_seq+=1
+		passedStopSeqFilter=False
+		passedXSeqFilter=False
+		if(filterOutSeqStop):
 			if(re.search("\*",c)):
+				passedStopSeqFilter=False
 				#it has a stop, don't add it!
-				pass
-			elif(re.search("X",c)):
-				#filter out the X amino
-				pass
+				print "Passing over CDR3 sequence ",c," for *"
+				tot_fail_seq_stop+=1
 			else:
-				#print "adding ",c," from ",path
-				new_list.append(c)
-		cdr3_list=new_list
+				passedStopSeqFilter=True
+		else:
+			passedStopSeqFilter=True
+		if(filterOutSeqX):
+			if(re.search("X",c)):
+				passedXSeqFilter=False
+				#filter out the X amino
+				tot_fail_seq_X+=1
+				print "Passing over CDR3 sequence ",c," for X"
+			else:
+				passedXSeqFilter=True
+		else:
+			passedXSeqFilter=True
+		if(passedXSeqFilter and passedStopSeqFilter):
+			new_list.append(c)
+	print "From file=",path,":"
+	print tot_fail_seq_X," sequences failed X seq filter, ",tot_fail_seq_stop," sequences failed * seq filter."
+	tot_seq_fail_filter=tot_fail_seq_X+tot_fail_seq_stop
+	print "Total sequences passed over from file ",path," : ",tot_seq_fail_filter
+	print "Total sequences read in from file ",path,":",len(new_list)
+	cdr3_list=new_list
 	return cdr3_list
 	
 
@@ -114,11 +137,14 @@ def createAAKideraMap():
 def convertListOfCDR3sToListOfKideras(cdr3_list,getAvg=False):
 	kidera_list=list()
 	for cdr3 in cdr3_list:
-		kidera_list.append(computeAverageKideraFromCDR3(cdr3))
+		the_avg_kidera=computeAverageKideraFromCDR3(cdr3)
+		kidera_list.append(the_avg_kidera)
 	if(getAvg):
 		return computeAverageKideraFromKideraList(kidera_list)
 	else:
 		return kidera_list
+
+
 
 
 
@@ -136,16 +162,31 @@ def computeAverageKideraFromCDR3(cdr3):
 	aa_k_m=createAAKideraMap()
 	kidera=[0,0,0,0,0,0,0,0,0,0]
 	num_aminos=0
+	#print "Examining CDR3",cdr3
 	for aa in cdr3:
-		#get the 10D kidera for the AA
-		aa_kidera=aa_k_m[aa]
-		#add it to the aggregate kidera
-		for d in range(len(kidera)):
-			kidera[d]+=aa_kidera[d]
+		#if the AA is a * or X, then pass over it
+		if(not(aa=="X") and not(aa=="*")):
+			#get the 10D kidera for the AA
+			aa_kidera=aa_k_m[aa]
+			#since it's not a * or X, then increment the num_aminos
+			num_aminos+=1
+			#add it to the aggregate kidera
+			for d in range(len(kidera)):
+				kidera[d]+=aa_kidera[d]
+			#print "After ",aa," kidera is ",kidera
+		else:
+			#if the AA is a * or X, then pass over it
+			#print "Skipping ",aa," it's ",aa
+			pass
+	#print "Found ",num_aminos," AA in it."
+	#print "FINAL kidera (BA)",kidera
 	if(num_aminos!=0):
 		for d in range(len(kidera)):
 			kidera[d]=kidera[d]/num_aminos
-	return kidera
+		#print "RET kidera ",kidera
+		return kidera
+	else:
+		return None
 		
 
 
@@ -185,13 +226,8 @@ def computeEuclideanDistMatrix(kidera_1,kidera_2):
 	dist_matrix = [[None for x in xrange(len(kidera_2))] for x in xrange(len(kidera_1))]
 	for k1 in range(len(kidera_1)):
 		for k2 in range(len(kidera_2)):
-			#dist=computeEuclidean(kidera_1[k1],kidera_2[k2])
-			#dist_matrix[k1][k2]=dist
-			if(k1<=k2):
-				dist=computeEuclidean(kidera_1[k1],kidera_2[k2])
-				dist_matrix[k1][k2]=dist
-			else:
-				dist_matrix[k1][k2]=dist_matrix[k2][k1]
+			dist=computeEuclidean(kidera_1[k1],kidera_2[k2])
+			dist_matrix[k1][k2]=dist
 	return dist_matrix
 
 
@@ -313,55 +349,6 @@ def printMatrixNice(m):
 			
 
 
-def kidera_analyze(f1,f2,lab1,lab2,num_permuts,fs_are_files=True):
-	#load the input data first
-	if(fs_are_files):
-		#read two files of CDR3 polypeptides (one per line)
-		cdr31=readCDR3FileOnePerLineAsCDR3List(f1)
-		cdr32=readCDR3FileOnePerLineAsCDR3List(f2)
-	else:
-		#just load the data passed in
-		cdr31=f1
-		cdr32=f2
-	#get corresponding kidera lists (one per polypeptide string)
-	k1=convertListOfCDR3sToListOfKideras(cdr31)
-	k2=convertListOfCDR3sToListOfKideras(cdr32)
-	#merge them for subsequent use with a matrix
-	merged_and_labels=joinKideraListsAndMakeLabels(k1,k2,lab1,lab2)
-	merged=merged_and_labels[0]
-	labels=merged_and_labels[1]
-	#compute a euclidian distance matrix
-	merged_dist_matrix=computeEuclideanDistMatrix(merged,merged)
-	#rank it
-	merged_rank_matrix=constructRankMatrixGivenDistMatrix(merged_dist_matrix)
-	#compute the r statistic
-	r_stat=computeRStat(merged_rank_matrix,labels)
-	r_stats=list()
-	num_pass=0
-	permID=1
-	for pl in randomPermuter(labels,num_permuts):
-		if(permID%1000==0):
-			print "On permutation #",permID
-		#perm_merged_and_labeled=permute_merged_and_labeled(merged,labels)
-		#perm_merged=perm_merged_and_labeled[0]
-		#perm_merged_dist_matrix=computeEuclideanDistMatrix(perm_merged,perm_merged)
-		#perm_merged_rank_matrix=constructRankMatrixGivenDistMatrix(perm_merged_dist_matrix)
-		#temp_r=computeRStat(perm_merged_rank_matrix,pl)
-		temp_r=computeRStat(merged_rank_matrix,pl)
-		if(r_stat<0):
-			if(r_stat<temp_r):
-				num_pass+=1
-		elif(r_stat>0):
-			if(r_stat>temp_r):
-				num_pass+=1
-		permID+=1
-	p_val=1.0-(float(num_pass)/float(num_permuts))
-	#return the empirical r_stat, the p-value, then the permuted r_stats upon which the p-value is based
-	ret_package=[r_stat,p_val,r_stats]
-	return ret_package
-
-
-
 def fix_matrix(m):
 	for r in range(len(m)):
 		for c in range(len(m[r])):
@@ -446,6 +433,7 @@ def test_r_stat_computing():
 	#print "it's ",r_stat_1
 	if(r_stat_1==0.0):
 		#should be zero
+		#print "passed 0"
 		pass
 	else:
 		raise Exception("Error, test r_stat 1 not equal to zero!")
@@ -469,8 +457,8 @@ def kidera_dist_print(f1,f2,fs_are_files=True):
 		print i
 	for i in k2:
 		print i
-	print "num k1 is ",len(k1)
-	print "num k2 is ",len(k2)
+	print "num k1 is ",len(k1),"with f=",f1
+	print "num k2 is ",len(k2),"with f=",f2
 	#merge them for subsequent use with a matrix
 	merged_and_labels=joinKideraListsAndMakeLabels(k1,k2,lab1,lab2)
 	merged=merged_and_labels[0]
@@ -490,21 +478,148 @@ def kidera_dist_print(f1,f2,fs_are_files=True):
 
 
 
-#test_r_stat_computing()
-f1="/home/data/Mei/TST-_Delta2.txt.CDR3.aa"
-f2="/home/data/Mei/TST+_Delta2.txt.CDR3.aa"
-lab1="neg"
-lab2="poz"
-num_permuts=10000
 
 
-#kidera_dist_print(f1,f2)
-ret_package=kidera_analyze(f1,f2,lab1,lab2,num_permuts)
-r_stat=ret_package[0]
-p_val=ret_package[1]
-print "The r_stat is ",r_stat
-print "The p-value is ",p_val
-print "num permutations is ",num_permuts
+def kidera_analyze(f1,f2,lab1,lab2,num_permuts,skip_stop=True,skip_X=True,fs_are_files=True):
+	#load the input data first
+	if(fs_are_files):
+		#read two files of CDR3 polypeptides (one per line)
+		cdr31=readCDR3FileOnePerLineAsCDR3List(f1,skip_stop,skip_X)
+		cdr32=readCDR3FileOnePerLineAsCDR3List(f2,skip_stop,skip_X)
+	else:
+		#just load the data passed in
+		cdr31=f1
+		cdr32=f2
+	#get corresponding kidera lists (one per polypeptide string)
+	k1=convertListOfCDR3sToListOfKideras(cdr31)
+	k2=convertListOfCDR3sToListOfKideras(cdr32)
+	#print "First k1 is ",k1[0]
+	#sys.exit(0)
+	#merge them for subsequent use with a matrix
+	merged_and_labels=joinKideraListsAndMakeLabels(k1,k2,lab1,lab2)
+	merged=merged_and_labels[0]
+	labels=merged_and_labels[1]
+	#compute a euclidian distance matrix
+	merged_dist_matrix=computeEuclideanDistMatrix(merged,merged)
+	#print "1,2 dist is ",merged_dist_matrix[0][1]
+	#sys.exit(0)
+	#rank it
+	merged_rank_matrix=constructRankMatrixGivenDistMatrix(merged_dist_matrix)
+	#compute the r statistic
+	r_stat=computeRStat(merged_rank_matrix,labels)
+	r_stats=list()
+	num_pass=0
+	permID=1
+	for pl in randomPermuter(labels,num_permuts):
+		if(permID%1000==0):
+			print "On permutation #",permID
+		#perm_merged_and_labeled=permute_merged_and_labeled(merged,labels)
+		#perm_merged=perm_merged_and_labeled[0]
+		#perm_merged_dist_matrix=computeEuclideanDistMatrix(perm_merged,perm_merged)
+		#perm_merged_rank_matrix=constructRankMatrixGivenDistMatrix(perm_merged_dist_matrix)
+		#temp_r=computeRStat(perm_merged_rank_matrix,pl)
+		temp_r=computeRStat(merged_rank_matrix,pl)
+		if(r_stat<0):
+			if(r_stat<temp_r):
+				num_pass+=1
+		elif(r_stat>0):
+			if(r_stat>temp_r):
+				num_pass+=1
+		permID+=1
+	p_val=1.0-(float(num_pass)/float(num_permuts))
+	#return the empirical r_stat, the p-value, then the permuted r_stats upon which the p-value is based
+	ret_package=[r_stat,p_val,r_stats]
+	return ret_package
 
 
+
+
+
+
+def writeRAnosimScript(f1,f2,g1,g2,num_permuts,stop_flag,x_flag,R_out,fs_are_files=True):
+	#load the input data first
+	if(fs_are_files):
+		#read two files of CDR3 polypeptides (one per line)
+		cdr31=readCDR3FileOnePerLineAsCDR3List(f1)
+		cdr32=readCDR3FileOnePerLineAsCDR3List(f2)
+	else:
+		#just load the data passed in
+		cdr31=f1
+		cdr32=f2
+	#get corresponding kidera lists (one per polypeptide string)
+	k1=convertListOfCDR3sToListOfKideras(cdr31)
+	k2=convertListOfCDR3sToListOfKideras(cdr32)
+	n_rows=len(k1)+len(k2)
+	#r_code="#!/bin/Rscript\n"
+	r_code=""
+	r_code+="data_data=c(\n"
+	for ki in range(len(k1)):
+		a_kidera=k1[ki]
+		r_code+="\nc("
+		for v in range(10):
+			r_code+=str(a_kidera[v])
+			if(v<9):
+				r_code+=","
+		r_code+="),"
+	for ki in range(len(k2)):
+		a_kidera=k2[ki]
+		r_code+="\nc("
+		for v in range(10):
+			r_code+=str(a_kidera[v])
+			if(v<9):
+				r_code+=","
+		r_code+=")\n"
+		if(ki<len(k2)-1):
+			r_code+=","
+	r_code+="\n)\n"
+	r_code+="data_matrix=matrix(nrow="+str(n_rows)+",ncol=10,data=data_data)\n"
+	r_code+="dim(data_matrix)\n"
+	r_code+="data_matrix_dists=dist(data_matrix,method=\"euclidean\")\n"
+	r_code+="data_factors=c(rep(\""+g1+"\","+str(len(k1))+"),rep(\""+g2+"\","+str(len(k2))+"))\n"
+	r_code+="library(vegan)\n"
+	r_code+="anosim(data_matrix_dists,data_factors,"+str(num_permuts)+")\n\n\n"
+	writer=open(R_out,'w')
+	writer.write(r_code)
+	writer.close()
+	
+		
+
+
+
+
+#program for KIDERA analysis
+if (__name__=="__main__"):
+	test_r_stat_computing()
+	parser=argparse.ArgumentParser(description='Run KIDERA-ANOSIM analysis on two files of CDR3 sequences')
+	parser.add_argument('cdr3_in_g1',type=str,nargs=1,help="path to a file of CDR3 strings (1 per line), group 1")
+	parser.add_argument('cdr3_in_g2',type=str,nargs=1,help="path to a file of CDR3 strings (1 per line), group 2")
+	parser.add_argument('-num_permutations',type=int,nargs=1,default=10000,help="number of permutations for ANOSIM")
+	parser.add_argument('-skip_stop', action='store_true',default=False,help="pass over sequences with stop codons (*)")
+	parser.add_argument('-skip_X',action='store_true',default=False,help="pass over sequences with X as an amino")
+	parser.add_argument('-skip_anosim',action='store_true',default=False,help="Skip the anosim test")
+	parser.add_argument('-write_r_script',type=str,default=None,help="path to write to for an R script to perform the ANOSIM test")
+	args=parser.parse_args()
+	if(args):
+		f1=extractAsItemOrFirstFromList(args.cdr3_in_g1)
+		f2=extractAsItemOrFirstFromList(args.cdr3_in_g2)
+		stop_flag=extractAsItemOrFirstFromList(args.skip_stop)
+		x_flag=extractAsItemOrFirstFromList(args.skip_X)
+		num_permuts=extractAsItemOrFirstFromList(args.num_permutations)
+		skip_anosim=extractAsItemOrFirstFromList(args.skip_anosim)
+		r_out=extractAsItemOrFirstFromList(args.write_r_script)
+		if(not(skip_anosim)):
+			kidera_results=kidera_analyze(f1,f2,"g1","g2",num_permuts,stop_flag,x_flag)
+			r_stat=kidera_results[0]
+			p_value=kidera_results[1]
+			print "ANOSIM results : "
+			print "R_statistic : ",r_stat
+			print "P-value : ",p_value
+			print "Permutations : ",num_permuts
+		else:
+			print "Skipping anosim analysis."
+		if(r_out!=None):
+			print "To write an RScript to ",r_out
+			writeRAnosimScript(f1,f2,"g1","g2",num_permuts,stop_flag,x_flag,r_out)
+	else:
+		parser.print_help()
 
