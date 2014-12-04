@@ -35,6 +35,10 @@ release_info_hash=None
 #initialize the sums to 0 for accumulation during execution
 #and output at program termination
 
+#whole read
+whole_read_b2b_aln=0
+whole_read_b2b_sbst=0
+
 #b2b region values
 framework_b2b_aln_imgt=0
 framework_b2b_sbst_imgt=0
@@ -617,6 +621,20 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 				indelComposite=False
 		if(indelComposite):
 
+			#whole read
+			whole_read_num_key="Base substitutions (over V)"
+			whole_read_dnm_key="Number base-to-base aligned (over V)"
+			if(whole_read_num_key in annMap and whole_read_dnm_key in annMap):
+				whole_num=annMap[whole_read_num_key]
+				whole_dnm=annMap[whole_read_dnm_key]
+				if(whole_num!=None and whole_dnm!=None):
+					if(whole_dnm>=0):
+						#whole read
+						whole_read_b2b_aln+=whole_dnm
+						whole_read_b2b_sbst+=whole_num
+
+
+
 			#b2b region values
 			global framework_b2b_aln_imgt
 			global framework_b2b_sbst_imgt
@@ -781,19 +799,7 @@ def appendAnnToFileWithMap(fHandl,m,rid,read_name,desiredKeys=None,defaultValue=
 	]
 
 
-	#"Stop codons? (over V and J)",
-	#"Productive CDR3 rearrangement (T/F)",
-	#"Base substitution freq% (over V)",
-	#"Base substitutions (over V)",
-	#"Length (over V)",
-	#"Replacement mutation freq% (over V)",
-	#"Replacement mutations (codons) (over V)",
-	#"Silent mutation freq% (over V)",
-	#"Silent mutations (codons) (over V)",
-	#"Indel frequency (over V and J)",
-	#"Insertion count (over V and J)",
-	#"Deletion count (over V and J)"]
-	
+
 
 	
 	#PART 3 IMGT/KABAT
@@ -1118,7 +1124,9 @@ if (__name__=="__main__"):
 		print "C B2B KBT=",cdr_b2b_aln_kabat
 		print "C BSB KBT=",cdr_b2b_subst_kabat
 		print "C BSB KBT F=",computeSmartRatio(cdr_b2b_subst_kabat,cdr_b2b_aln_kabat)
-
+		print "WHOLE BSB =",whole_read_b2b_sbst
+		print "WHOLE B2B ALN=",whole_read_b2b_aln
+		print "WHOLE SEQS BSB F=",computeSmartRatio(whole_read_b2b_sbst,whole_read_b2b_aln)
 
 
 
