@@ -611,6 +611,18 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 			else:
 				indelComposite=False
 		if(indelComposite):
+
+			#b2b region values
+			global framework_b2b_aln_imgt
+			global framework_b2b_sbst_imgt
+			global cdr_b2b_aln_imgt
+			global cdr_b2b_subst_imgt
+			global framework_b2b_aln_kabat
+			global framework_b2b_sbst_kabat
+			global cdr_b2b_aln_kabat
+			global cdr_b2b_subst_kabat
+
+			#r:s for region variables
 			global framework_r_sum_imgt
 			global framework_s_sum_imgt
 			global cdr_r_sum_imgt
@@ -619,6 +631,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 			global framework_s_sum_kabat
 			global cdr_r_sum_kabat
 			global cdr_s_sum_kabat
+
 			for mode in mode_list:
 				for region in getVRegionsList(False):
 					#print "Got a region ",region,"\n\n"
@@ -641,7 +654,29 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 							else:
 								cdr_r_sum_kabat+=annMap[r_key]
 								cdr_s_sum_kabat+=annMap[s_key]
-
+					b_num_key=region+" base substitutions ("+mode+")"
+					b_dnm_key=region+" Number base-to-base aligned ("+mode+")"
+					if(b_dnm_key in annMap and b_num_key in annMap):
+						#make sure the keys are there
+						num=annMap[b_num_key]
+						dnm=annMap[b_dnm_key]
+						if(num!=None and dnm!=None):
+							if(region.startswith("F")):
+								#is a framework
+								if(mode=="imgt"):
+									framework_b2b_aln_imgt+=dnm
+									framework_b2b_sbst_imgt+=num
+								else:
+									framework_b2b_aln_kabat+=dnm
+									framework_b2b_sbst_kabat+=num									
+							else:
+								#is a CDR
+								if(mode=="imgt"):
+									cdr_b2b_aln_imgt+=dnm
+									cdr_b2b_subst_imgt+=num
+								else:
+									cdr_b2b_aln_kabat+=dnm
+									cdr_b2b_subst_kabat+=num	
 
 			
 
@@ -1066,6 +1101,22 @@ if (__name__=="__main__"):
 		print "C_S_SUM=",cdr_s_sum_imgt
 		print "F R:S",computeSmartRatio(framework_r_sum_imgt,framework_s_sum_imgt)
 		print "C R:S",computeSmartRatio(cdr_r_sum_imgt,cdr_s_sum_imgt)
+		print "F B2B IMGT=",framework_b2b_aln_imgt
+		print "F BSB IMGT=",framework_b2b_sbst_imgt
+		print "F BSB IMGT F=",computeSmartRatio(framework_b2b_sbst_imgt,framework_b2b_aln_imgt)
+		print "C B2B IMGT=",cdr_b2b_aln_imgt
+		print "C BSB IMGT=",cdr_b2b_subst_imgt
+		print "C BSB IMGT F=",computeSmartRatio(cdr_b2b_subst_imgt,cdr_b2b_aln_imgt)
+		print "F B2B KBT=",framework_b2b_aln_kabat
+		print "F BSB KBT=",framework_b2b_sbst_kabat
+		print "F BSB KBT F=",computeSmartRatio(framework_b2b_sbst_kabat,framework_b2b_aln_kabat)
+		print "C B2B KBT=",cdr_b2b_aln_kabat
+		print "C BSB KBT=",cdr_b2b_subst_kabat
+		print "C BSB KBT F=",computeSmartRatio(cdr_b2b_subst_kabat,cdr_b2b_aln_kabat)
+
+
+
+
 
 	else:
 		#print "error in args!"
