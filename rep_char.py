@@ -598,7 +598,12 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 	#here, compute the region total REPLACEMENTS, SILENTS
 	#for computation of CDR R:S ratio and FR R:S ratio
 	#Out-of-frame junction	Missing CYS	Missing TRP/PHE	Stop Codon?	Indels Found	Only Frame-Preserving Indels Found
-	if(annMap['Out-of-frame junction']==False and annMap['Missing CYS']==False and annMap['Missing TRP/PHE']==False and annMap['Stop Codon?']==False):
+	if(
+		annMap['Out-of-frame junction']==False and 
+		annMap['Missing CYS']==False and 
+		annMap['Missing TRP/PHE']==False 
+		and annMap['Stop Codon?']==False
+		):
 		indelComposite=True
 		if(annMap['Indels Found']==False):
 			#no indels so pass filter
