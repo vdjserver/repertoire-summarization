@@ -948,6 +948,55 @@ def appendAnnToFileWithMap(fHandl,m,rid,read_name,desiredKeys=None,defaultValue=
 		
 
 
+def generateSampleLevelStatsJSON():
+
+		#IMGT_BASED		
+		imgt_json="{\n"
+		imgt_json+="F_R_SUM : "+str(framework_r_sum_imgt)+",\n"
+		imgt_json+="F_S_SUM : "+str(framework_s_sum_imgt)+",\n"
+		imgt_json+="C_R_SUM : "+str(cdr_r_sum_imgt)+",\n"
+		imgt_json+="C_S_SUM : "+str(cdr_s_sum_imgt)+",\n"
+		imgt_json+="F_RS : "+str(computeSmartRatio(framework_r_sum_imgt,framework_s_sum_imgt))+",\n"
+		imgt_json+="C_RS : "+str(computeSmartRatio(cdr_r_sum_imgt,cdr_s_sum_imgt)+",\n"
+		imgt_json+="F_B2B : "+str(framework_b2b_aln_imgt)+",\n"
+		imgt_json+="F_BSB : "+str(framework_b2b_sbst_imgt)+",\n"
+		imgt_json+="F_BSB_F : "+str(computeSmartRatio(framework_b2b_sbst_imgt,framework_b2b_aln_imgt)+",\n"
+		imgt_json+="C_B2B : "+str(cdr_b2b_aln_imgt)+",\n"
+		imgt_json+="C_BSB : "+str(cdr_b2b_subst_imgt)+",\n"
+		imgt_json+="C_BSB_F : "+str(computeSmartRatio(cdr_b2b_subst_imgt,cdr_b2b_aln_imgt))+"\n"
+		imgt_json+="}"
+
+		#KABAT_BASED
+		kabat_json="{\n";
+		kabat_json+="F_R_SUM : "+str(framework_r_sum_kabat)+",\n"
+		kabat_json+="F_S_SUM : "+str(framework_s_sum_kabat)+",\n"
+		kabat_json+="C_R_SUM : "+str(cdr_r_sum_kabat)+",\n"
+		kabat_json+="C_S_SUM : "+str(cdr_s_sum_kabat)+",\n"
+		kabat_json+="F_RS : "+str(computeSmartRatio(framework_r_sum_kabat,framework_s_sum_kabat))+",\n"
+		kabat_json+="C_RS : "+str(computeSmartRatio(cdr_r_sum_kabat,cdr_s_sum_kabat)+",\n"
+		kabat_json+="F_B2B : "+str(framework_b2b_aln_kabat)+",\n"
+		kabat_json+="F_BSB : "+str(framework_b2b_sbst_kabat)+",\n"
+		kabat_json+="F_BSB_F : "+str(computeSmartRatio(framework_b2b_sbst_kabat,framework_b2b_aln_kabat)+",\n"
+		kabat_json+="C_B2B : "+str(cdr_b2b_aln_kabat)+",\n"
+		kabat_json+="C_BSB : "+str(cdr_b2b_subst_kabat)+",\n"
+		kabat_json+="C_BSB_F : "+str(computeSmartRatio(cdr_b2b_subst_kabat,cdr_b2b_aln_kabat))+"\n"
+		kabat_json+="}"
+		
+		#WHOLE json
+		whole_json="{\n"
+		whole_json+="WHOLE_BSB : "+str(whole_read_b2b_sbst)+",\n"
+		whole_json+="WHOLE_B2B : "+str(whole_read_b2b_aln)+",\n"
+		whole_json+="WHOLE_BSB_F : "+str(computeSmartRatio(whole_read_b2b_sbst,whole_read_b2b_aln))+",\n"
+		whole_json+=imgt_json+",\n"
+		whole_json+=kabat_json+"\n"
+		whole_json+="}\n"
+		
+		return whole_json
+		
+
+
+
+
 #add on the kinds of arguments this program accepts
 def add_rep_char_args_to_parser(parser):
 	version_info=getVersionInfo()
@@ -1101,32 +1150,6 @@ if (__name__=="__main__"):
 		print "Writing JSONS segment combination frequency data to ",recomb_out_file
 		combo_counter.writeJSONToFile(recomb_out_file)
 		
-		#global framework_r_sum_imgt
-		#global framework_s_sum_imgt
-		#global cdr_r_sum_imgt
-		#global cdr_s_sum_imgt
-
-		print "F_R_SUM=",framework_r_sum_imgt
-		print "F_S_SUM=",framework_s_sum_imgt
-		print "C_R_SUM=",cdr_r_sum_imgt
-		print "C_S_SUM=",cdr_s_sum_imgt
-		print "F R:S",computeSmartRatio(framework_r_sum_imgt,framework_s_sum_imgt)
-		print "C R:S",computeSmartRatio(cdr_r_sum_imgt,cdr_s_sum_imgt)
-		print "F B2B IMGT=",framework_b2b_aln_imgt
-		print "F BSB IMGT=",framework_b2b_sbst_imgt
-		print "F BSB IMGT F=",computeSmartRatio(framework_b2b_sbst_imgt,framework_b2b_aln_imgt)
-		print "C B2B IMGT=",cdr_b2b_aln_imgt
-		print "C BSB IMGT=",cdr_b2b_subst_imgt
-		print "C BSB IMGT F=",computeSmartRatio(cdr_b2b_subst_imgt,cdr_b2b_aln_imgt)
-		print "F B2B KBT=",framework_b2b_aln_kabat
-		print "F BSB KBT=",framework_b2b_sbst_kabat
-		print "F BSB KBT F=",computeSmartRatio(framework_b2b_sbst_kabat,framework_b2b_aln_kabat)
-		print "C B2B KBT=",cdr_b2b_aln_kabat
-		print "C BSB KBT=",cdr_b2b_subst_kabat
-		print "C BSB KBT F=",computeSmartRatio(cdr_b2b_subst_kabat,cdr_b2b_aln_kabat)
-		print "WHOLE BSB =",whole_read_b2b_sbst
-		print "WHOLE B2B ALN=",whole_read_b2b_aln
-		print "WHOLE SEQS BSB F=",computeSmartRatio(whole_read_b2b_sbst,whole_read_b2b_aln)
 
 
 
