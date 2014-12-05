@@ -592,9 +592,9 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 
 
 
-	print "***************************************\n\n  A READ\n"
-	printMap(annMap)
-	print "***************************************\n\n\n"
+	#print "***************************************\n\n  A READ\n"
+	#printMap(annMap)
+	#print "***************************************\n\n\n"
 
 
 
@@ -620,6 +620,9 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 			else:
 				indelComposite=False
 		if(indelComposite):
+
+			global whole_read_b2b_aln
+			global whole_read_b2b_sbst
 
 			#whole read
 			whole_read_num_key="Base substitutions (over V)"
@@ -948,50 +951,51 @@ def appendAnnToFileWithMap(fHandl,m,rid,read_name,desiredKeys=None,defaultValue=
 		
 
 
+
 def generateSampleLevelStatsJSON():
 
-		#IMGT_BASED		
-		imgt_json="{\n"
-		imgt_json+="F_R_SUM : "+str(framework_r_sum_imgt)+",\n"
-		imgt_json+="F_S_SUM : "+str(framework_s_sum_imgt)+",\n"
-		imgt_json+="C_R_SUM : "+str(cdr_r_sum_imgt)+",\n"
-		imgt_json+="C_S_SUM : "+str(cdr_s_sum_imgt)+",\n"
-		imgt_json+="F_RS : "+str(computeSmartRatio(framework_r_sum_imgt,framework_s_sum_imgt))+",\n"
-		imgt_json+="C_RS : "+str(computeSmartRatio(cdr_r_sum_imgt,cdr_s_sum_imgt)+",\n"
-		imgt_json+="F_B2B : "+str(framework_b2b_aln_imgt)+",\n"
-		imgt_json+="F_BSB : "+str(framework_b2b_sbst_imgt)+",\n"
-		imgt_json+="F_BSB_F : "+str(computeSmartRatio(framework_b2b_sbst_imgt,framework_b2b_aln_imgt)+",\n"
-		imgt_json+="C_B2B : "+str(cdr_b2b_aln_imgt)+",\n"
-		imgt_json+="C_BSB : "+str(cdr_b2b_subst_imgt)+",\n"
-		imgt_json+="C_BSB_F : "+str(computeSmartRatio(cdr_b2b_subst_imgt,cdr_b2b_aln_imgt))+"\n"
-		imgt_json+="}"
+	#IMGT_BASED		
+	imgt_json="{\n"
+	imgt_json+="F_R_SUM : "+jsonOptWrapVal(framework_r_sum_imgt)+",\n"
+	imgt_json+="F_S_SUM : "+jsonOptWrapVal(framework_s_sum_imgt)+",\n"
+	imgt_json+="C_R_SUM : "+jsonOptWrapVal(cdr_r_sum_imgt)+",\n"
+	imgt_json+="C_S_SUM : "+jsonOptWrapVal(cdr_s_sum_imgt)+",\n"
+	imgt_json+="F_RS : "+jsonOptWrapVal(computeSmartRatio(framework_r_sum_imgt,framework_s_sum_imgt))+",\n"
+	imgt_json+="C_RS : "+jsonOptWrapVal(computeSmartRatio(cdr_r_sum_imgt,cdr_s_sum_imgt))+",\n"
+	imgt_json+="F_B2B : "+jsonOptWrapVal(framework_b2b_aln_imgt)+",\n"
+	imgt_json+="F_BSB : "+jsonOptWrapVal(framework_b2b_sbst_imgt)+",\n"
+	imgt_json+="F_BSB_F : "+jsonOptWrapVal(computeSmartRatio(framework_b2b_sbst_imgt,framework_b2b_aln_imgt))+",\n"
+	imgt_json+="C_B2B : "+jsonOptWrapVal(cdr_b2b_aln_imgt)+",\n"
+	imgt_json+="C_BSB : "+jsonOptWrapVal(cdr_b2b_subst_imgt)+",\n"
+	imgt_json+="C_BSB_F : "+jsonOptWrapVal(computeSmartRatio(cdr_b2b_subst_imgt,cdr_b2b_aln_imgt))+"\n"
+	imgt_json+="}"
 
-		#KABAT_BASED
-		kabat_json="{\n";
-		kabat_json+="F_R_SUM : "+str(framework_r_sum_kabat)+",\n"
-		kabat_json+="F_S_SUM : "+str(framework_s_sum_kabat)+",\n"
-		kabat_json+="C_R_SUM : "+str(cdr_r_sum_kabat)+",\n"
-		kabat_json+="C_S_SUM : "+str(cdr_s_sum_kabat)+",\n"
-		kabat_json+="F_RS : "+str(computeSmartRatio(framework_r_sum_kabat,framework_s_sum_kabat))+",\n"
-		kabat_json+="C_RS : "+str(computeSmartRatio(cdr_r_sum_kabat,cdr_s_sum_kabat)+",\n"
-		kabat_json+="F_B2B : "+str(framework_b2b_aln_kabat)+",\n"
-		kabat_json+="F_BSB : "+str(framework_b2b_sbst_kabat)+",\n"
-		kabat_json+="F_BSB_F : "+str(computeSmartRatio(framework_b2b_sbst_kabat,framework_b2b_aln_kabat)+",\n"
-		kabat_json+="C_B2B : "+str(cdr_b2b_aln_kabat)+",\n"
-		kabat_json+="C_BSB : "+str(cdr_b2b_subst_kabat)+",\n"
-		kabat_json+="C_BSB_F : "+str(computeSmartRatio(cdr_b2b_subst_kabat,cdr_b2b_aln_kabat))+"\n"
-		kabat_json+="}"
-		
-		#WHOLE json
-		whole_json="{\n"
-		whole_json+="WHOLE_BSB : "+str(whole_read_b2b_sbst)+",\n"
-		whole_json+="WHOLE_B2B : "+str(whole_read_b2b_aln)+",\n"
-		whole_json+="WHOLE_BSB_F : "+str(computeSmartRatio(whole_read_b2b_sbst,whole_read_b2b_aln))+",\n"
-		whole_json+=imgt_json+",\n"
-		whole_json+=kabat_json+"\n"
-		whole_json+="}\n"
-		
-		return whole_json
+	#KABAT_BASED
+	kabat_json="{\n";
+	kabat_json+="F_R_SUM : "+jsonOptWrapVal(framework_r_sum_kabat)+",\n"
+	kabat_json+="F_S_SUM : "+jsonOptWrapVal(framework_s_sum_kabat)+",\n"
+	kabat_json+="C_R_SUM : "+jsonOptWrapVal(cdr_r_sum_kabat)+",\n"
+	kabat_json+="C_S_SUM : "+jsonOptWrapVal(cdr_s_sum_kabat)+",\n"
+	kabat_json+="F_RS : "+jsonOptWrapVal(computeSmartRatio(framework_r_sum_kabat,framework_s_sum_kabat))+",\n"
+	kabat_json+="C_RS : "+jsonOptWrapVal(computeSmartRatio(cdr_r_sum_kabat,cdr_s_sum_kabat))+",\n"
+	kabat_json+="F_B2B : "+jsonOptWrapVal(framework_b2b_aln_kabat)+",\n"
+	kabat_json+="F_BSB : "+jsonOptWrapVal(framework_b2b_sbst_kabat)+",\n"
+	kabat_json+="F_BSB_F : "+jsonOptWrapVal(computeSmartRatio(framework_b2b_sbst_kabat,framework_b2b_aln_kabat))+",\n"
+	kabat_json+="C_B2B : "+jsonOptWrapVal(cdr_b2b_aln_kabat)+",\n"
+	kabat_json+="C_BSB : "+jsonOptWrapVal(cdr_b2b_subst_kabat)+",\n"
+	kabat_json+="C_BSB_F : "+jsonOptWrapVal(computeSmartRatio(cdr_b2b_subst_kabat,cdr_b2b_aln_kabat))+"\n"
+	kabat_json+="}"
+	
+	#WHOLE json
+	whole_json="{\n"
+	whole_json+="WHOLE_BSB : "+jsonOptWrapVal(whole_read_b2b_sbst)+",\n"
+	whole_json+="WHOLE_B2B : "+jsonOptWrapVal(whole_read_b2b_aln)+",\n"
+	whole_json+="WHOLE_BSB_F : "+jsonOptWrapVal(computeSmartRatio(whole_read_b2b_sbst,whole_read_b2b_aln))+",\n"
+	whole_json+="IMGT : "+imgt_json+",\n"
+	whole_json+="KABAT : "+kabat_json+"\n"
+	whole_json+="}\n"
+
+	return whole_json
 		
 
 
@@ -1150,7 +1154,8 @@ if (__name__=="__main__"):
 		print "Writing JSONS segment combination frequency data to ",recomb_out_file
 		combo_counter.writeJSONToFile(recomb_out_file)
 		
-
+		samp_json=generateSampleLevelStatsJSON()
+		print samp_json
 
 
 
