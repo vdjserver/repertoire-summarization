@@ -496,6 +496,22 @@ def kidera_analyze(f1,f2,lab1,lab2,num_permuts,skip_stop=True,skip_X=True,fs_are
 	#print "First k1 is ",k1[0]
 	#sys.exit(0)
 	#merge them for subsequent use with a matrix
+	#print "k1 len is ",len(k1)
+	#print "k2 len is ",len(k2)
+	#for i in range(len(k1)):
+	#	vec=k1[i]
+	#	for v in range(len(vec)):
+	#		print vec[v],
+	#		if(v<len(vec)-1):
+	#			print ",",
+	#	print ""
+	#for i in range(len(k2)):
+	#	vec=k2[i]
+	#	for v in range(len(vec)):
+	#		print vec[v],
+	#		if(v<len(vec)-1):
+	#			print ",",
+	#	print ""
 	merged_and_labels=joinKideraListsAndMakeLabels(k1,k2,lab1,lab2)
 	merged=merged_and_labels[0]
 	labels=merged_and_labels[1]
@@ -540,8 +556,8 @@ def writeRAnosimScript(f1,f2,g1,g2,num_permuts,stop_flag,x_flag,R_out,fs_are_fil
 	#load the input data first
 	if(fs_are_files):
 		#read two files of CDR3 polypeptides (one per line)
-		cdr31=readCDR3FileOnePerLineAsCDR3List(f1)
-		cdr32=readCDR3FileOnePerLineAsCDR3List(f2)
+		cdr31=readCDR3FileOnePerLineAsCDR3List(f1,stop_flag,x_flag)
+		cdr32=readCDR3FileOnePerLineAsCDR3List(f2,stop_flag,x_flag)
 	else:
 		#just load the data passed in
 		cdr31=f1
@@ -551,7 +567,7 @@ def writeRAnosimScript(f1,f2,g1,g2,num_permuts,stop_flag,x_flag,R_out,fs_are_fil
 	k2=convertListOfCDR3sToListOfKideras(cdr32)
 	n_rows=len(k1)+len(k2)
 	#r_code="#!/bin/Rscript\n"
-	r_code=""
+	r_code="#!/bin/env R\n"
 	r_code+="data_data=c(\n"
 	for ki in range(len(k1)):
 		a_kidera=k1[ki]
@@ -572,7 +588,8 @@ def writeRAnosimScript(f1,f2,g1,g2,num_permuts,stop_flag,x_flag,R_out,fs_are_fil
 		if(ki<len(k2)-1):
 			r_code+=","
 	r_code+="\n)\n"
-	r_code+="data_matrix=matrix(nrow="+str(n_rows)+",ncol=10,data=data_data)\n"
+	r_code+="data_matrix=matrix(nrow="+str(n_rows)+",ncol=10,data=data_data,byrow=TRUE)\n"
+	r_code+="print(\"The dimensions of the data :\")\n"
 	r_code+="dim(data_matrix)\n"
 	r_code+="data_matrix_dists=dist(data_matrix,method=\"euclidean\")\n"
 	r_code+="data_factors=c(rep(\""+g1+"\","+str(len(k1))+"),rep(\""+g2+"\","+str(len(k2))+"))\n"
@@ -595,7 +612,7 @@ if (__name__=="__main__"):
 	parser.add_argument('cdr3_in_g2',type=str,nargs=1,help="path to a file of CDR3 strings (1 per line), group 2")
 	parser.add_argument('-num_permutations',type=int,nargs=1,default=10000,help="number of permutations for ANOSIM")
 	parser.add_argument('-skip_stop', action='store_true',default=False,help="pass over sequences with stop codons (*)")
-	parser.add_argument('-skip_X',action='store_true',default=False,help="pass over sequences with X as an amino")
+	parser.add_argument('-skip_x',action='store_true',default=False,help="pass over sequences with X as an amino")
 	parser.add_argument('-skip_anosim',action='store_true',default=False,help="Skip the anosim test")
 	parser.add_argument('-write_r_script',type=str,default=None,help="path to write to for an R script to perform the ANOSIM test")
 	args=parser.parse_args()
@@ -603,7 +620,7 @@ if (__name__=="__main__"):
 		f1=extractAsItemOrFirstFromList(args.cdr3_in_g1)
 		f2=extractAsItemOrFirstFromList(args.cdr3_in_g2)
 		stop_flag=extractAsItemOrFirstFromList(args.skip_stop)
-		x_flag=extractAsItemOrFirstFromList(args.skip_X)
+		x_flag=extractAsItemOrFirstFromList(args.skip_x)
 		num_permuts=extractAsItemOrFirstFromList(args.num_permutations)
 		skip_anosim=extractAsItemOrFirstFromList(args.skip_anosim)
 		r_out=extractAsItemOrFirstFromList(args.write_r_script)
