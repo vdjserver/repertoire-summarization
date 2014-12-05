@@ -36,6 +36,7 @@ release_info_hash=None
 #and output at program termination
 
 #whole read
+num_seqs_pf=0
 whole_read_b2b_aln=0
 whole_read_b2b_sbst=0
 
@@ -621,10 +622,12 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 				indelComposite=False
 		if(indelComposite):
 
+			global num_seqs_pf
 			global whole_read_b2b_aln
 			global whole_read_b2b_sbst
 
 			#whole read
+			num_seqs_pf+=1
 			whole_read_num_key="Base substitutions (over V)"
 			whole_read_dnm_key="Number base-to-base aligned (over V)"
 			if(whole_read_num_key in annMap and whole_read_dnm_key in annMap):
@@ -988,6 +991,7 @@ def generateSampleLevelStatsJSON():
 	
 	#WHOLE json
 	whole_json="{\n"
+	whole_json+="NUM_SEQS : "+jsonOptWrapVal(num_seqs_pf)+",\n"
 	whole_json+="WHOLE_BSB : "+jsonOptWrapVal(whole_read_b2b_sbst)+",\n"
 	whole_json+="WHOLE_B2B : "+jsonOptWrapVal(whole_read_b2b_aln)+",\n"
 	whole_json+="WHOLE_BSB_F : "+jsonOptWrapVal(computeSmartRatio(whole_read_b2b_sbst,whole_read_b2b_aln))+",\n"
@@ -1008,6 +1012,7 @@ def add_rep_char_args_to_parser(parser):
 	parser.add_argument('-json_out',type=str,nargs=1,default="/dev/stdout",help="output file for the JSON segment count IMGT hierarchy")
 	parser.add_argument('-combo_out',type=str,nargs=1,default="/dev/stdout",help="output file for JSON segment recombination count data")
 	parser.add_argument('-cdr3_hist_out',type=str,nargs=1,default="/dev/stdout",help="output file for the CDR3 histogram of lengths (both kabat and imgt systems)")
+	parser.add_argument('-sample_json_out',type=str,nargs=1,default="/dev/stdout",help="output file for sample-level JSON repertoire data (e.g. R:S over IMGT CDRs)")
 	parser.add_argument('-skip_char',action='store_true', default=False,help="If this is set, then characterization besides germline segment assignment and CDR3 length is skipped")
 	parser.add_argument('char_out',type=str,nargs=1,help="the path to the output TSV file of read-level repertoire characterization data")
 	parser.add_argument('vdj_db_root',type=str,nargs=1,help="path to the VDJ directory root REQUIRED")
@@ -1026,6 +1031,7 @@ if (__name__=="__main__"):
 	if(args):
 		organism=extractAsItemOrFirstFromList(args.db_organism)
 		mf=makeVDJMLDefaultMetaAndFactoryFromArgs(args)
+		sample_json_path=extractAsItemOrFirstFromList(args.sample_json_out)
 		meta=mf[0]
 		fact=mf[1]
 		imgtdb_obj=imgt_db(extractAsItemOrFirstFromList(args.vdj_db_root))
@@ -1153,9 +1159,10 @@ if (__name__=="__main__"):
 		recomb_out_file=extractAsItemOrFirstFromList(args.combo_out)
 		print "Writing JSONS segment combination frequency data to ",recomb_out_file
 		combo_counter.writeJSONToFile(recomb_out_file)
-		
+		print "Writing sample-level JSON data to ",
 		samp_json=generateSampleLevelStatsJSON()
-		print samp_json
+		writeStringToFilePathAssumingDirectoryExists(samp_json,sample_json_path)
+
 
 
 
