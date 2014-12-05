@@ -15,6 +15,18 @@ import glob
 import sys
 
 
+def jsonOptWrapVal(v):
+	if(type(v)==float):
+		return str(v)
+	elif(type(v)==int):
+		return str(v)
+	elif(type(v)==str):
+		return "'"+str(v)+"'"
+	else:
+		return "'"+str(v)+"'"
+	
+
+
 def digit_pad(num,pad_size=8):
 	#math.ceil(3-math.log10(199))
 	num_zeros=int(math.ceil(pad_size-math.log10(num)))
