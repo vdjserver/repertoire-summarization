@@ -4,6 +4,11 @@ import fileinput
 from codon_analysis import codonCounter
 
 class ags_manager:
+	"""
+	A class that is 'fed' numbered mutations (e.g. A31BC)
+	keeps track of counts, then, when requested computes
+	AGS and NMO scores
+	"""
 	ags6_count=0
 	ags5_count=0
 	rm_count=0
@@ -17,6 +22,7 @@ class ags_manager:
 		self.ags5_nums=["31B","40","56","57","81"]
 	
 	def receive_numbered_mut(self,numbered_mut):
+		"""add a mutation to count"""
 		mut_pieces=self.appearsToBeNumberedMut(numbered_mut)
 		if(mut_pieces!=None):
 			numbered_pos=mut_pieces[1]
@@ -27,6 +33,11 @@ class ags_manager:
 			self.rm_count+=1
 	
 	def appearsToBeNumberedMut(self,nm):
+		"""
+		return False if it's not a numbered mutation, 
+		but a 3-element array of the FROM, POSITION, and TO 
+		information of the mutation if it is		
+		"""
 		#return self.codonCounterObj.appearsToBeNumberedMut(nm)
 		import re
 		nmRe=re.compile(r'^([A-Z\*])([0-9][0-9][ABC]?)([A-Z\*])$')
@@ -42,6 +53,10 @@ class ags_manager:
 	
 	
 	def compute_ags(self,mode="AGS6",returnThreeZeroesIfDivByZero=False):
+		"""
+		Given the mutations whose countings have been
+		accrued/aggregated, compute AGS scores based on them
+		"""
 		#print "mgr named ",self.name,"giving ags from counter obj named ",self.codonCounterObj.name
 		if(mode=="AGS6"):
 			sampTot=self.rm_count
