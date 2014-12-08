@@ -1,14 +1,17 @@
 #!/usr/bin/env python
 
 import random
-from utils import makeEmptyArrayOfDigitsOfLen,biopythonTranslate,getNumberBpInAlnStr,biopythonTranslate
+from utils import makeEmptyArrayOfDigitsOfLen,biopythonTranslate,getNumberBpInAlnStr,biopythonTranslate,buildAlignmentWholeSeqs
 import re
 import threading
 
 
-#in a string find the number of dashes that may prefix the string
-#return 0, 1, etc.
+
 def getNumStartingDashes(s):
+	"""
+	in a string find the number of dashes that may prefix the string
+	return 0, 1, etc.	
+	"""
 	dre=re.compile(r'^(\-+)')
 	sr=re.search(dre,s)
 	if(sr):
@@ -66,10 +69,8 @@ class CodonAnalysis:
 
 	#test for ambiguity
 	def is_unambiguous_base(self,b):
-		if(b in self.bases):
-			return True
-		else:
-			return False
+		return (b in self.bases)
+
 
 
 
@@ -356,25 +357,32 @@ class alignment:
 		s_pos=self.s_start
 		q_pos=self.q_start
 		if(s_pos==0 or q_pos==0):
+			#for alignments starting at undefined (either of the two values should be >=1)
 			return self
 		if(len(self.s_aln)<=0 or len(self.q_aln)<=0):
+			#no negatives allowed so just echo error back
 			return self
 		allGaps=re.compile(r'^\-+$')
 		if(allGaps.match(self.s_aln) or allGaps.match(self.q_aln)):
+			#if the whole thing is gaps just echo it bac,
 			return self
 		if(self.s_aln[0]!="-" and self.q_aln[0]!="-"):
+			#if the alignment already starts non-gapped just return itself
 			return self
 		sdashRe=re.compile(r'^(\-+)[^\-]')
 		sreres=re.match(sdashRe,self.s_aln)
 		qreres=re.match(sdashRe,self.q_aln)
 		if(sreres):
+			#in this case, the subject starts with a gap
 			dashes=sreres.group(1)
 			num_dashes=len(dashes)
 			nq_start=self.q_start+num_dashes
+			#start at the query BP aligning to the first non-gap in the subject
 			return self.getAlnAtAndCond(nq_start,"query","geq")
 		else:
 			dashes=qreres.group(1)
 			num_dashes=len(dashes)
+			sq_start=self.s_start+num_dashes
 			return self.getAlnAtAndCond(sq_start,"subject","geq")
 		
 
