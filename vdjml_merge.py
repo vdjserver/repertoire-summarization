@@ -113,7 +113,7 @@ if (__name__=="__main__"):
 			#nothing to do!
 			pass
 	else:
-		parser.print_args()
+		parser.print_help()
 
 
 
