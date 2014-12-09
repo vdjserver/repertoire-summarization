@@ -13,6 +13,12 @@ from subprocess import call
 import pickle
 import glob
 import sys
+import argparse
+import sys
+import glob
+import os
+
+
 
 
 def jsonOptWrapVal(v):
@@ -28,7 +34,7 @@ def jsonOptWrapVal(v):
 
 
 def digit_pad(num,pad_size=8):
-	#math.ceil(3-math.log10(199))
+	import math
 	num_zeros=int(math.ceil(pad_size-math.log10(num)))
 	zero_str=""
 	for z in range(num_zeros):
@@ -640,6 +646,7 @@ def execute_bash_script(scriptPath,outPath="/dev/stdout",errPath="/dev/stderr"):
 #wrapper to write a bash script
 def write_temp_bash_script(cmd_string,scriptFilePath=None):
 	if(scriptFilePath==None):
+		import binascii
 		scriptFilePath="/tmp/vdj_server_rand_"+binascii.hexlify(os.urandom(16))+".sh"
 	try:
 		script_writer=open(scriptFilePath,'w')
@@ -917,27 +924,6 @@ def getVersionInfo(ver_type="desc"):
 		return output.strip()
 	
 
-
-
-def test():
-	tb=">dsfsdf|1111|dslfkjsdf|dklsfjdsf"
-	imgt=extractIMGTNameFromKey(tb)
-	print "the extraction is ",imgt
-	print "Running test...."
-	timestamp=returnTimeStamp()
-	print "A timestamp is ",timestamp
-	a_str="art"
-	b_str="dart"
-	if(a_subseq_of_b(a_str,b_str)):
-		print a_str,"is a substring of",b_str
-	else:
-		print a_str,"is NOT a substring of",b_str
-	if(a_subseq_of_b(b_str,a_str)):
-		print b_str,"is a substring of",a_str
-	else:
-		print b_str,"is NOT a substring of",a_str
-	zpath="/tmp/imgt_down/www.imgt.org/download/LIGM-DB/imgt.dat.Z.copy.Z"
-	uncompressZFile(zpath,True)
 
 
 
