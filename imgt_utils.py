@@ -460,11 +460,9 @@ class imgt_db:
 			search_and_avoid=["\.py","down","\.pkl","\.sh","\.zip"]
 			for tl in total_list:
 				tls=str(tl.strip())
-				if(tls.startswith("www.") or tls.startswith("ftp.")):
-					pass
 				matched_no_regex=True
 				for s in search_and_avoid:
-					if(re.search(s,tsl,re.IGNORECASE)):
+					if(re.search(s,tls,re.IGNORECASE)):
 						matched_no_regex=False
 				if(matched_no_regex):
 					org_list.append(tl.strip())
@@ -559,7 +557,7 @@ class imgt_db:
 
 
 
-	#build the Ref. Dir Set files locus-based files to IgBLAST against 
+	#build the Ref. Dir Set files (locus-based files to IgBLAST against )
 	#from the downloaded GENEDB files
 	def buildRefDirSetsFromGENEDB(self):
 		base_fna=self.getBaseDir()+"/"+self.imgt_genedb_rel_path
@@ -605,40 +603,6 @@ class imgt_db:
 						writer.write(">"+descriptor.strip()+"\n"+org_loci_map[descriptor].strip()+"\n")
 					writer.close()
 					
-			
-			
-
-
-	#download gene tables and reference directory sets from imgt
-	def download_imgt_RefDirSeqs_AndGeneTables_HumanAndMouse(self,unconditionalForceReplace=False):
-		self.download_GeneTables(unconditionalForceReplace)
-		base=self.db_base
-		organisms=self.getOrganismList(True)
-		print "To download for ",organisms
-		for organism in organisms:
-			#do all organisms
-			loci=get_loci_list()
-			print "To download for ",loci
-			for locus in loci:
-				#do all 17 groups
-				print "Downloading",locus,"for",organism,"at",formatNiceDateTimeStamp(),"..."
-				#download the reference directory
-				refDirBase=geneTablesBase=base+"/"+organism+"/ReferenceDirectorySet"
-				if(not(os.path.isdir(refDirBase))):
-					os.makedirs(refDirBase)
-				refDirFile=refDirBase+"/"+locus+".html"
-				refDirOrgName=organism
-				if(refDirOrgName=="human"):
-					#the ref dir URL won't take 'human', it needs 'Homo+sapiens' instead! :(
-					refDirOrgName="Homo+sapiens"
-				refDirURL=formRefDirURL(refDirOrgName,locus)
-				if(not(os.path.exists(refDirFile)) or unconditionalForceReplace==True):
-					print "Downloading reference directory set ",locus,"for organism",organism,"and saving to",orphonTablePath			
-					downloadURLToLocalFileAssumingDirectoryExists(refDirURL,refDirFile)
-					refDirFastaFile=refDirFile+".fna"
-					localRefURL="file://"+refDirFile
-					fastaString=downloadRefDirFasta(locus,refDirOrgName,localRefURL)
-					writeStringToFilePathAssumingDirectoryExists(fastaString,refDirFastaFile)
 			
 
 	#download from IMGT
@@ -934,7 +898,7 @@ class imgt_db:
 			else:
 				raise Exception("Error, descriptor with allele name = '"+str(allele_name)+"' not found under "+str(self.db_base)+" for organism = "+str(org))
 		else:
-			raise Exception("Error, invalid organism="+str(org)+", its directory doesn't exist under"+str(db_base)+"!")
+			raise Exception("Error, invalid organism="+str(org)+", its directory doesn't exist under"+str(self.db_base)+"!")
 
 
 
