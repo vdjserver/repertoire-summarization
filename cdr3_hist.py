@@ -341,8 +341,9 @@ def VJRearrangementInFrameTest(vInfo,jInfo,imgtdb_obj,organism):
 
 
 
-#given info maps for V and J and the returnd a 
+#given info maps for V and J and the return a 
 #dictionary with kabat and imgt lengths
+#return other related information as well
 def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
 	#currentQueryName=str(currentQueryName.strip())
 	currentV=vMap['subject ids']
