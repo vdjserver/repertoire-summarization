@@ -330,11 +330,13 @@ class codonCounter:
 			#print "The valid lengths are : ",valid_lengths
 			#print "\n\n\n\n\n"
 			if(not(valid_flag)):
+				validityNote=validityNote+":INVALID_ON_"+str(regions_to_analyze[ri])
 				valid_on_all=False
 			else:
 				pass				
 				#sys.exit(0)
-		validityNote="OK"		
+		if(validityNote==""):
+			validityNote="OK"		
 		return [validityNote,valid_on_all]
 		
 
