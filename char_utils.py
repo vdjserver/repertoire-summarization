@@ -14,17 +14,6 @@ def getNumberIndelsFromBTOP(btop):
 
 
 
-#given a position in inverted space and the sequence length in base pairs
-#return the position in regular (un-inverted) space
-def getRegPosFromInvertedPos(inv_pos, seq_len_in_bp):
-    '''
-    from a position in the inverted space, get the position in regular space
-    '''
-    fake_interval = [inv_pos, inv_pos]
-    reg_fake_interval = getRevCompInterval(fake_interval, seq_len_in_bp)
-    return reg_fake_interval[0]
-
-
 
 
 
@@ -41,6 +30,7 @@ def getNumberBaseSubsFromBTOP(btop):
 		#btops for these are pairs of S/Q data
 		if(not(len(btop)%2==0)):
 			#ummm....they should be in pairs!
+			import sys
 			print "btop should be even for mutations and indels!"
 			sys.exit(0)
 		number_muts_and_indels=len(btop)/2
