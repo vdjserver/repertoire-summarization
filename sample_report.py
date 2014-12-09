@@ -543,6 +543,7 @@ if (__name__=="__main__"):
 	args=parser.parse_args()
 	if(not(args)):
 		parser.print_help()
+		import sys
 		sys.exit(0)
 	#input_file_path=extractAsItemOrFirstFromList(args.tsv_in)
 	#log_file_path=extractAsItemOrFirstFromList(args.log_in)

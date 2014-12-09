@@ -15,7 +15,6 @@ from segment_utils import recombFreqManager
 from char_utils import getNumberBaseSubsFromBTOP,getNumberIndelsFromBTOP,getIndelMapFromBTOP
 from alignment import alignment,CodonAnalysis,codonAnalyzer
 from CharacterizationThread import CharacterizationThread
-from char_utils import getRegPosFromInvertedPos
 from codon_analysis import *
 import re
 import Queue
@@ -360,7 +359,7 @@ def returnWholeSeqCharMap(vInfo,jInfo,imgtdb_obj,organism,annMap):
 	preCDR3Aln=cdr3_surround_aln[0]
 	postCDR3AlnObj=cdr3_surround_aln[1]
 	emptyMap=getEmptyRegCharMap()
-	if(preCDR3Aln==None and pfreqostCDR3AlnObj==None):
+	if(preCDR3Aln==None and postCDR3AlnObj==None):
 		return emptyMap
 	elif(preCDR3Aln!=None and postCDR3AlnObj==None):
 		return preCDR3Aln.characterize()
@@ -771,7 +770,7 @@ def prodRearrangmentVJ(vInfo,jInfo,imgtdb_obj,organism):
 			pass	
 	else:
 		v_end_aln=vInfo['s. end']
-		v_end_frm=getTheFrameForThisReferenceAtThisPosition(vInfor['subject ids'],organism,imgtdb_obj,v_end_aln)
+		v_end_frm=getTheFrameForThisReferenceAtThisPosition(vInfo['subject ids'],organism,imgtdb_obj,v_end_aln)
 		sys.exit(0)
 		
 	
