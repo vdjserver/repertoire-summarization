@@ -923,7 +923,8 @@ class imgt_db:
 		#>M13911|IGHV1-NL1*01|Homo sapiens|P|V-REGION|125..420|296 nt|1| | | | |296+24=320| |rev-compl|
 		#>D87017|IGLJ5*02|Homo sapiens|ORF|J-REGION|11386..11423|38 nt|2| | | | |38+0=38| |rev-compl|
 		interval_piece=desc_pieces[5]
-		interval_re=re.compile('(\d+)\.+(\d+)')
+		ss_re='(\d+)\.+(\d+)'
+		interval_re=re.compile(ss_re)
 		search_res=re.search(interval_re,interval_piece)
 		if(search_res):
 			first=int(search_res.group(1))
@@ -933,7 +934,7 @@ class imgt_db:
 			t=[start,end]
 			return t
 		else:
-			raise Exception("Error, from pieces "+str(desc_pieces)+" unable to retrieve start/stop!")
+			raise Exception("Error, from pieces "+str(desc_pieces)+" (piece='"+interval_piece+"' with regex="+ss_re+") unable to retrieve start/stop!")
 
 
 
