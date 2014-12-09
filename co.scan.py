@@ -49,6 +49,7 @@ def obtainBatchSampleBSMapFromLookupFile(lookup_file_path):
 		if(not(len(pieces)==3)):
 			err_msg="Error, got "+str(len(pieces))+" tab-separated values in file "+lookup_file_path+" but expected 3 : BATCH[TAB]SAMPLE[TAB]SUBJECT_BARCODE !"
 			raise Exception(err_msg)
+			import sys
 			sys.exit(0)
 		batch=pieces[0]
 		sample=pieces[1]
