@@ -282,7 +282,7 @@ def computeNumAsnCombos(group_asn_arr,isList=True):
 def getPctStr(num,tot_poss):
 	pct=float(num)/float(tot_poss)
 	pct*=100.0
-	pct_str=str(rount(pct,2))
+	pct_str=str(round(pct,2))
 	pct_str=pct_str[0:5]
 	return pct_str
 
@@ -460,6 +460,8 @@ def kidera_dist_print(f1,f2,fs_are_files=True):
 	print "num k1 is ",len(k1),"with f=",f1
 	print "num k2 is ",len(k2),"with f=",f2
 	#merge them for subsequent use with a matrix
+	lab1="g1"
+	lab2="g2"
 	merged_and_labels=joinKideraListsAndMakeLabels(k1,k2,lab1,lab2)
 	merged=merged_and_labels[0]
 	labels=merged_and_labels[1]
