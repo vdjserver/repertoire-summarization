@@ -613,6 +613,12 @@ def getADJCDR3EndFromJAllele(jallele,imgtdb_obj,org="human",mode="imgt"):
 		#print "got a raw cdr3 end=",cdr3_end_raw
 		desc_pieces=jdescriptor.split("|")
 		if(desc_pieces[14]=="rev-compl"):
+			ellipsis_interval=desc_pieces[5]
+			ellipsis_interval=ellipsis_interval.strip()
+			if(ellipsis_interval==""):
+				accession_num=desc_pieces[0]
+				ss_arr=imgtdb_obj.getJRegionStartStopFromIMGTDatGivenAlleleAndAccession(jallele,accession_num)
+				desc_pieces[5]=str(ss_arr[0])+".."+str(ss_arr[1])
 			desc_pieces[5]=swapIMGTDescInterval(desc_pieces[5])
 			sep="|"
 			jdescriptor=sep.join(desc_pieces)
@@ -664,29 +670,34 @@ def getCDR3EndFromJData(allele,imgtdb_obj,org="human"):
 	#print "The extracted descriptor from inputs ",allele," and ",org," is (extracted) : "+str(extracted_descriptor)
 	extracted_descriptor_pieces=imgtdb_obj.extractIMGTDescriptorPieces(extracted_descriptor)
 	extracted_descriptor_interval=imgtdb_obj.getStartStopFromIMGTDescPieces(extracted_descriptor_pieces)
-	reg_start=extracted_descriptor_interval[0]
-	reg_end=extracted_descriptor_interval[1]
-
-	if(not(reg_start==None)):
-		for record in records:
-			feature_list=record.features
-			for feature in feature_list:
-				#print "got a feature : ",feature
-				ftype=feature.type
-				#print "the type is ",ftype	
-				qualifiers=feature.qualifiers
-				#print "qualifiers : ",qualifiers
-				if(ftype=="J-TRP" or ftype=="J-PHE"):
-					c_start=int(re.sub(r'[^0-9]','',str(feature.location.start)))
-					c_end=int(re.sub(r'[^0-9]','',str(feature.location.end)))
-					#print "found a jtrp"
-					if(reg_start<=c_end and c_end<=reg_end):
-						#this is it!
-						#subtract 3 becuase we want to ignore the TRP or PHE residue and look at the residue immediately preceding
-						return c_end-3
-	else:
-		print "failed to get a start!"
-		pass
+	if(extracted_descriptor_interval==None):
+		#print "COULDN'T GET INTERVAL FOR ALLELE=",allele," organism=",org
+		#sys.exit(0)
+		print "getCDR3EndFromJData returning 'None' for allele="+str(allele)+" and org="+str(org)
+		return None		
+	if(extracted_descriptor_interval!=None and type(extracted_descriptor_interval)==list):
+		reg_start=extracted_descriptor_interval[0]
+		reg_end=extracted_descriptor_interval[1]
+		if(not(reg_start==None)):
+			for record in records:
+				feature_list=record.features
+				for feature in feature_list:
+					#print "got a feature : ",feature
+					ftype=feature.type
+					#print "the type is ",ftype	
+					qualifiers=feature.qualifiers
+					#print "qualifiers : ",qualifiers
+					if(ftype=="J-TRP" or ftype=="J-PHE"):
+						c_start=int(re.sub(r'[^0-9]','',str(feature.location.start)))
+						c_end=int(re.sub(r'[^0-9]','',str(feature.location.end)))
+						#print "found a jtrp"
+						if(reg_start<=c_end and c_end<=reg_end):
+							#this is it!
+							#subtract 3 becuase we want to ignore the TRP or PHE residue and look at the residue immediately preceding
+							return c_end-3
+		else:
+			print "failed to get a start!"
+			pass
 	#os.remove(tmp_file_path)
 	print "getCDR3EndFromJData returning 'None' for allele="+str(allele)+" and org="+str(org)
 	return None
