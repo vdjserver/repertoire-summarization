@@ -633,6 +633,25 @@ class imgt_db:
 	
 
 
+
+	#given an accession number return the IMGT dat record
+	def extractIMGTDatRecordUsingAccession(self,accession,biopythonRec=False):
+		if(self.db_base==None):
+			raise Exception("Error, db_base is not, must initialize first!")		
+		ss=self.getStartStopFromIndexGivenAccession(accession)
+		if(len(ss)==2):
+			#regular accession
+			start=ss[0]
+			stop=ss[1]
+			#return self.fetchBioPythonRecFromDat(start,stop,biopythonRec)
+			return self.fetchRecFromDat(start,stop,biopythonRec)
+		else:
+			#irregular accession, use descriptor and index to find the correct accession
+			raise Exception("Error :  irregular descriptor : "+descriptor+" failed to obain imgt.dat start/stop of accession  "+accession)				
+
+
+
+
 	#given a full fasta descriptor, get the record from IMGT.dat
 	#note that the descriptor should not have the ">" at the beginning
 	def extractIMGTDatRecordUsingRefDirSetDescriptor(self,descriptor,biopythonRec=False):
@@ -918,6 +937,51 @@ class imgt_db:
 		pieces=desc.split("|")
 		return self.getStartStopFromIMGTDescPieces(pieces)
 
+
+
+	def getJRegionStartStopFromIMGTDatGivenAlleleAndAccession(self,allele_name,accession_num):
+		#extract the biopython record using the accession
+		accesion_biopython_rec=self.extractIMGTDatRecordUsingAccession(accession_num,True)
+		feature_list=accesion_biopython_rec.features
+		#print "GOT PASSED IN ALLELE_NAME=",allele_name
+		#print "GOT PASSED IN ACCESSION=",accession_num
+		for feature in feature_list:
+			#print "got a feature : ",feature
+			ftype=feature.type
+			#print "the type is ",ftype	
+			ftype_str=str(ftype)
+			if(ftype_str=="J-REGION"):
+				#print "GOT MATCH ON REGION!"
+				qualifiers=feature.qualifiers
+				for qualifier in qualifiers:
+					#print "Looking at a qualifier : ",qualifier
+					#print "The type of qualifier is ",type(qualifier)
+					qualifier_str=str(qualifier)
+					if(qualifier_str=="IMGT_allele"):
+						#print "Not looking at imgt_allele qualifier!!!!!!!!!!!!"
+						qualifier_val=qualifiers[qualifier_str]
+						#print "THE VALUE OF IT IS ",qualifier_val
+						#print "The type of qualifier_val is ",type(qualifier_val)
+						if(type(qualifier_val)==list):
+							if(len(qualifier_val)==1):
+								the_actual_val=str(qualifier_val[0])
+								if(the_actual_val==allele_name):
+									#print "Got the match!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+									location=feature.location
+									#print "location : ",location
+									l_start=int(location.start)+1	#add 1 cause it's 0-based
+									l_end=int(location.end)+1	#add 1 cause it's 0-based
+									l_min=min(l_start,l_end)
+									l_max=max(l_start,l_end)
+									ss_list=[l_min,l_max]
+									#print "I want to return : ",ss_list
+									return ss_list
+		#never found any match?!
+		return None
+		
+
+
+
 	#from IMGT descriptor pieces return an array of start/stop where start<=stop
 	def getStartStopFromIMGTDescPieces(self,desc_pieces):
 		#>M13911|IGHV1-NL1*01|Homo sapiens|P|V-REGION|125..420|296 nt|1| | | | |296+24=320| |rev-compl|
@@ -933,6 +997,14 @@ class imgt_db:
 			end=max(first,second)
 			t=[start,end]
 			return t
+		white_re='^\s*$'
+		white_res=re.search(white_re,interval_piece)
+		if(white_res):
+			#okay, it's whitespace, so try to use the accession to find the start/stop
+			accession=desc_pieces[0]
+			allele_name=desc_pieces[1]
+			j_r_ss=self.getJRegionStartStopFromIMGTDatGivenAlleleAndAccession(allele_name,accession)
+			return j_r_ss
 		else:
 			raise Exception("Error, from pieces "+str(desc_pieces)+" (piece='"+interval_piece+"' with regex="+ss_re+") unable to retrieve start/stop!")
 
