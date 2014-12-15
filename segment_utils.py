@@ -150,6 +150,7 @@ def dicts(t): return {k: dicts(t[k]) for k in t}
 #Finally, return all the hierarchy and clone data!
 def analyze_download_dir_forVDJserver(base_dir,pickle_file_full_path=None,countsMap=None,specifiedOrganism=None,specifiedLocus=None):
 	myDB=imgt_db(base_dir)
+	analyze_IGBlastLookupsVSIMGTDatLookups(myDB)
 	organisms=myDB.getOrganismList()
 	org_hierarchy=tree()
 	clone_names_by_org=dict()
@@ -287,7 +288,26 @@ def analyze_download_dir_forVDJserver(base_dir,pickle_file_full_path=None,counts
 	return tbr
 
 
-
+def analyze_IGBlastLookupsVSIMGTDatLookups(imgtdb_obj):
+	print "Now comparing IgBLAST region lookup information with imgt.dat lookup information...."
+	organisms=organisms=imgtdb_obj.getOrganismList()
+	for organism in organisms:
+		print "Now anlyzing for organism ",organism
+		seq_types=types=["IG","TR"]
+		for seq_type in seq_types:
+			print "\tNow analyzing for seq type ",seq_type
+			v_gene_alleles=imgtdb_obj.getAlleles("V",organism,seq_type)
+			for allele in v_gene_alleles:
+				print "\t\tNow analyzing for allele = ",allele
+				region_list=["FR1","CDR1","FR2","CDR2","FR3"]
+				for region in region_list:
+					print "\t\t\tNow analyzing for region ",region
+					#getRegionStartStopFromIMGTDat(self,allele_name,org,region):
+					imgt_data_ss=imgtdb_obj.getRegionStartStopFromIMGTDat(allele,organism,region)
+					print "imgt ss is ",imgt_data_ss
+	sys.exit(0)
+			
+	
 
 
 
