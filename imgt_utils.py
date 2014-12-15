@@ -740,8 +740,15 @@ class imgt_db:
 			imgt_dat_rec=self.getIMGTDatGivenAllele(allele_name,True,org)
 			start_stop=self.getStartStopFromIMGTDesc(desired_descriptor)
 			print "The desired descriptor is ",desired_descriptor
+			if(start_stop is None):
+				return [-1,-1]
 			reg_int=self.getRegionStartStopFromIMGTDatRecAndRange(imgt_dat_rec,True,start_stop[0],start_stop[1],region)
 			return reg_int
+
+
+
+
+
 
 	#given an interval range and an imgtdata record, fetch
 	#the start/stop of the specified region
@@ -939,7 +946,13 @@ class imgt_db:
 
 
 
-	def getJRegionStartStopFromIMGTDatGivenAlleleAndAccession(self,allele_name,accession_num):
+
+
+
+
+
+
+	def getSegmentRegionStartStopFromIMGTDatGivenAlleleAndAccession(self,allele_name,accession_num,segment_type="J"):
 		#extract the biopython record using the accession
 		accesion_biopython_rec=self.extractIMGTDatRecordUsingAccession(accession_num,True)
 		feature_list=accesion_biopython_rec.features
@@ -950,7 +963,7 @@ class imgt_db:
 			ftype=feature.type
 			#print "the type is ",ftype	
 			ftype_str=str(ftype)
-			if(ftype_str=="J-REGION"):
+			if(ftype_str==segment_type+"-REGION"):
 				#print "GOT MATCH ON REGION!"
 				qualifiers=feature.qualifiers
 				for qualifier in qualifiers:
@@ -977,6 +990,7 @@ class imgt_db:
 									#print "I want to return : ",ss_list
 									return ss_list
 		#never found any match?!
+		print "NEVER FOUND A MATCH WITH allele_name=",allele_name,", accession_num=",accession_num," and segment_type=",segment_type
 		return None
 		
 
@@ -987,6 +1001,7 @@ class imgt_db:
 		#>M13911|IGHV1-NL1*01|Homo sapiens|P|V-REGION|125..420|296 nt|1| | | | |296+24=320| |rev-compl|
 		#>D87017|IGLJ5*02|Homo sapiens|ORF|J-REGION|11386..11423|38 nt|2| | | | |38+0=38| |rev-compl|
 		interval_piece=desc_pieces[5]
+		region_segment_type_piece=desc_pieces[4]
 		ss_re='(\d+)\.+(\d+)'
 		interval_re=re.compile(ss_re)
 		search_res=re.search(interval_re,interval_piece)
@@ -1003,7 +1018,15 @@ class imgt_db:
 			#okay, it's whitespace, so try to use the accession to find the start/stop
 			accession=desc_pieces[0]
 			allele_name=desc_pieces[1]
-			j_r_ss=self.getJRegionStartStopFromIMGTDatGivenAlleleAndAccession(allele_name,accession)
+			if(region_segment_type_piece=="V-REGION"):
+				st="V"
+			elif(region_segment_type_piece=="D-REGION"):
+				st="D"
+			elif(region_segment_type_piece=="J-REGION"):
+				st="V"
+			else:
+				raise Exception("ERROR, failture to extract V-REGION, D-REGION, J-REGION from | field (indexed by 0-based 5) from "+str(desc_pieces))
+			j_r_ss=self.getSegmentRegionStartStopFromIMGTDatGivenAlleleAndAccession(allele_name,accession,st)
 			return j_r_ss
 		else:
 			raise Exception("Error, from pieces "+str(desc_pieces)+" (piece='"+interval_piece+"' with regex="+ss_re+") unable to retrieve start/stop!")
