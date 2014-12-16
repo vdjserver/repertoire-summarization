@@ -637,7 +637,7 @@ class imgt_db:
 	#given an accession number return the IMGT dat record
 	def extractIMGTDatRecordUsingAccession(self,accession,biopythonRec=False):
 		if(self.db_base==None):
-			raise Exception("Error, db_base is not, must initialize first!")		
+			raise Exception("Error, db_base is 'None', must initialize first!!!!")		
 		ss=self.getStartStopFromIndexGivenAccession(accession)
 		if(len(ss)==2):
 			#regular accession
@@ -647,7 +647,8 @@ class imgt_db:
 			return self.fetchRecFromDat(start,stop,biopythonRec)
 		else:
 			#irregular accession, use descriptor and index to find the correct accession
-			raise Exception("Error :  irregular descriptor : "+descriptor+" failed to obain imgt.dat start/stop of accession  "+accession)				
+			#raise Exception("Error :  irregular descriptor : "+descriptor+" failed to obain imgt.dat start/stop of accession  "+accession)	
+			return None
 
 
 
@@ -672,7 +673,8 @@ class imgt_db:
 			return self.fetchRecFromDat(start,stop,biopythonRec)
 		else:
 			#irregular accession, use descriptor and index to find the correct accession
-			raise Exception("Error :  irregular descriptor : "+descriptor+" failed to obain imgt.dat start/stop of accession  "+accession)
+			return None
+			#raise Exception("Error :  irregular descriptor : "+descriptor+" failed to obain imgt.dat start/stop of accession  "+accession)
 
 
 
@@ -739,7 +741,7 @@ class imgt_db:
 		if(not(desired_descriptor is None)):
 			imgt_dat_rec=self.getIMGTDatGivenAllele(allele_name,True,org)
 			start_stop=self.getStartStopFromIMGTDesc(desired_descriptor)
-			print "The desired descriptor is ",desired_descriptor
+			#print "The desired descriptor is ",desired_descriptor
 			if(start_stop is None):
 				return [-1,-1]
 			reg_int=self.getRegionStartStopFromIMGTDatRecAndRange(imgt_dat_rec,True,start_stop[0],start_stop[1],region)
@@ -753,6 +755,8 @@ class imgt_db:
 	#given an interval range and an imgtdata record, fetch
 	#the start/stop of the specified region
 	def getRegionStartStopFromIMGTDatRecAndRange(self,imgt_dat,isBiopython,range_start,range_end,region_name):
+		if(imgt_dat is None):
+			return [-1,-1]
 		if(not(isBiopython)):
 			lines=imgt_dat.split("\n")
 			reg_regex=re.compile("^FT\s+"+region_name+"[^\s]*\s+<?(\d+)\.+(\d+)>?\s*$")
@@ -782,15 +786,20 @@ class imgt_db:
 				r_end=max(l_start,l_end)
 				r_len=abs(r_start-r_end)
 				if(ftype.startswith(region_name)):
+					print "r_start is ",r_start," and r_rend is ",r_end," for region ",region_name
 					if(range_start-1<=r_start and r_end<=range_end+1):
+						print "first block in range ....."
 						ret_start=r_start-range_start+1
 						ret_end=ret_start+r_len-1
+						print "r_start=",r_start," r_end=",r_end
+						print "range_start=",range_start," range_end=",range_end
+						print "ret_start=",ret_start," and ret_end=",ret_end
 						if(strand==1):
 							return [ret_start,ret_end]
 						else:
 							print "NEED RETURN REVERSE!"
 							range_len=abs(range_start-range_end)
-							new_start=range_len-ret_end+2
+							new_start=range_len-ret_end+1
 							new_end=new_start+r_len-1
 							return [new_start,new_end]
 							#sys.exit(0)
@@ -990,7 +999,7 @@ class imgt_db:
 									#print "I want to return : ",ss_list
 									return ss_list
 		#never found any match?!
-		print "NEVER FOUND A MATCH WITH allele_name=",allele_name,", accession_num=",accession_num," and segment_type=",segment_type
+		#print "NEVER FOUND A MATCH WITH allele_name=",allele_name,", accession_num=",accession_num," and segment_type=",segment_type
 		return None
 		
 

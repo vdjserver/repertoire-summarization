@@ -298,18 +298,46 @@ def analyze_IGBlastLookupsVSIMGTDatLookups(imgtdb_obj):
 			print "\tNow analyzing for seq type ",seq_type
 			v_gene_alleles=imgtdb_obj.getAlleles("V",organism,seq_type)
 			for allele in v_gene_alleles:
-				print "\t\tNow analyzing for allele = ",allele
+				#print "\t\tNow analyzing for allele = ",allele
 				region_list=["FR1","CDR1","FR2","CDR2","FR3"]
 				for region in region_list:
-					print "\t\t\tNow analyzing for region ",region
-					#getRegionStartStopFromIMGTDat(self,allele_name,org,region):
+					#print "\t\t\tNow analyzing for region ",region
 					imgt_data_ss=imgtdb_obj.getRegionStartStopFromIMGTDat(allele,organism,region)
-					print "imgt ss is ",imgt_data_ss
+					#print "\t\t\t\timgt ss is ",imgt_data_ss
+					igblast_data_ss=getVRegionStartAndStopGivenRefData(allele,organism,imgtdb_obj,region,"imgt")
+					#print "\t\t\t\tigb ss is ",igblast_data_ss
+					if(twoListsMatch(imgt_data_ss,igblast_data_ss)):
+						#print "MATCHING!"
+						pass
+					else:
+						print "NOT MATCHING!!!"
+						print "FOR allele=",allele," for organism =",organism," for region=",region
+						print "IMGT data is ",imgt_data_ss
+						print "IGBLAST is ",igblast_data_ss
+						print "\n\n\n"
 	sys.exit(0)
 			
 	
 
-
+def twoListsMatch(ia1,ia2):
+	if(type(ia1)!=type(ia2)):
+		#can't be matching if the types aren't matching
+		return False
+	if((ia1 is None) and (ia2 is None)):
+		#they're not lists, but they're both None?
+		return True
+	if(type(ia1)!=list or type(ia2)!=list):
+		#they're not lists!
+		return False
+	if(len(ia1)!=len(ia2)):
+		#lengths not equal
+		return False
+	for n in range(len(ia1)):
+		if(ia1[n]!=ia2[n]):
+			return False
+	#never failed anywhere!!!!
+	return True
+	
 
 
 #given a gene table hierarchy and a patch file path
