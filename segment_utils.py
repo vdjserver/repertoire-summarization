@@ -298,14 +298,16 @@ def analyze_IGBlastLookupsVSIMGTDatLookups(imgtdb_obj):
 			print "\tNow analyzing for seq type ",seq_type
 			v_gene_alleles=imgtdb_obj.getAlleles("V",organism,seq_type)
 			for allele in v_gene_alleles:
-				#print "\t\tNow analyzing for allele = ",allele
+				print "\t\tNow analyzing for allele = ",allele
 				region_list=["FR1","CDR1","FR2","CDR2","FR3"]
 				for region in region_list:
-					#print "\t\t\tNow analyzing for region ",region
+					print "\t\t\tNow analyzing for region ",region
 					imgt_data_ss=imgtdb_obj.getRegionStartStopFromIMGTDat(allele,organism,region)
-					#print "\t\t\t\timgt ss is ",imgt_data_ss
+					print "\t\t\t\timgt ss is ",imgt_data_ss
 					igblast_data_ss=getVRegionStartAndStopGivenRefData(allele,organism,imgtdb_obj,region,"imgt")
-					#print "\t\t\t\tigb ss is ",igblast_data_ss
+					print "\t\t\t\tigb ss is ",igblast_data_ss
+					v_quest_ss=imgtdb_obj.getVQuestRegionInformation(organism,allele,region)
+					print "\t\t\t\tVQ is ",v_quest_ss
 					if(twoListsMatch(imgt_data_ss,igblast_data_ss)):
 						#print "MATCHING!"
 						pass
