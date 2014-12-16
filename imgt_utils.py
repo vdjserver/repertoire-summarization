@@ -348,11 +348,11 @@ def extractRegionStartStopFromVQFile(vqf,region_name):
 		re_res=re.search(annRE,temp_line)
 		if(re_res):
 			passedAnnotation=True
-		if(passedAnnotation)
-			regRE_res=re.search(regRE,temp_line):
-			if(regRE_res)
+		if(passedAnnotation):
+			regRE_res=re.search(regRE,temp_line)
+			if(regRE_res):
 				ann_reg=regRE_res.group(1)
-				if(ann_reg==region_name)
+				if(ann_reg==region_name):
 					print "match for region=",region_name," from line ",temp_line
 	reader.close()
 
@@ -1029,7 +1029,7 @@ class imgt_db:
 		organism_dir=self.db_base()+"/"+organism
 		globs=[organism_dir,organism_dir+"/*",organism_dir+"/*/*",organism_dir+"/*/*/*",organism_dir+"/*/*/*/*",organism_dir+"/*/*/*/*/*"]
 		for glob in globs:
-			for walked in glob_walk(glob)
+			for walked in glob_walk(glob):
 				if(isThisFileAVQUESTOutputFileForASingleRead(walked)):
 					if(isThisVQuestFileTheCorrectFile(walked,allele_name)):
 						return extractRegionStartStopFromVQFile(walked,region_name)
