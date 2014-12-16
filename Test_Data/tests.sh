@@ -46,7 +46,11 @@ do
 		echo -e "\n\n\n\n\n******************************************"
 		QRY=$ORGANISM.$SEQ_TYPE.fna
 		echo "USING query file = $QRY "
-		for DCMODE in imgt kabat ; 
+		DC_MODE_SET="imgt kabat"
+		if [ "$SEQ_TYPE" == "TR" ] ; then
+			DC_MODE_SET="imgt" ;
+		fi ;
+		for DCMODE in ${DC_MODE_SET} ; 
 		do
 			if [ "$SEQ_TYPE" == "TR" ]; then
 				echo "SEQ_TYPE has the value 'TR'"

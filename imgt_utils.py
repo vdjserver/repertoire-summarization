@@ -1044,26 +1044,28 @@ class imgt_db:
 		feature_list=accesion_biopython_rec.features
 		#print "GOT PASSED IN ALLELE_NAME=",allele_name
 		#print "GOT PASSED IN ACCESSION=",accession_num
+		
 		for feature in feature_list:
-			#print "got a feature : ",feature
+			#print "\tgot a feature : ",feature
 			ftype=feature.type
-			#print "the type is ",ftype	
+			#print "\tthe type is ",ftype	
 			ftype_str=str(ftype)
 			if(ftype_str==segment_type+"-REGION"):
-				#print "GOT MATCH ON REGION!"
+				#print "\t\tGOT MATCH ON REGION!"
 				qualifiers=feature.qualifiers
 				for qualifier in qualifiers:
-					#print "Looking at a qualifier : ",qualifier
-					#print "The type of qualifier is ",type(qualifier)
+					#print "\t\t\tLooking at a qualifier : ",qualifier
+					#print "\t\t\tThe type of qualifier is ",type(qualifier)
 					qualifier_str=str(qualifier)
 					if(qualifier_str=="IMGT_allele"):
-						#print "Not looking at imgt_allele qualifier!!!!!!!!!!!!"
+						#print "\t\t\t\tNow looking at imgt_allele qualifier!!!!!!!!!!!!"
 						qualifier_val=qualifiers[qualifier_str]
-						#print "THE VALUE OF IT IS ",qualifier_val
-						#print "The type of qualifier_val is ",type(qualifier_val)
+						#print "\t\t\t\tTHE VALUE OF IT IS ",qualifier_val
+						#print "\t\t\t\tThe type of qualifier_val is ",type(qualifier_val)
 						if(type(qualifier_val)==list):
 							if(len(qualifier_val)==1):
 								the_actual_val=str(qualifier_val[0])
+								#print "Got an actual val ",the_actual_val," need to compare it with ",allele_name
 								if(the_actual_val==allele_name):
 									#print "Got the match!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 									location=feature.location
@@ -1075,8 +1077,15 @@ class imgt_db:
 									ss_list=[l_min,l_max]
 									#print "I want to return : ",ss_list
 									return ss_list
+								else:
+									#print "The actual val '("+the_actual_val+")' is NOT the allele_name "+allele_name
+									pass
+			else:
+				#print "segment_type-REGION is ",str(segment_type)+"-REGION BUT ftype_str is ",ftype_str
+				pass
 		#never found any match?!
 		#print "NEVER FOUND A MATCH WITH allele_name=",allele_name,", accession_num=",accession_num," and segment_type=",segment_type
+		#sys.exit(0)
 		return None
 		
 
@@ -1100,8 +1109,10 @@ class imgt_db:
 			return t
 		white_re='^\s*$'
 		white_res=re.search(white_re,interval_piece)
+		#print "Failed first, interval_piece is ",interval_piece
 		if(white_res):
 			#okay, it's whitespace, so try to use the accession to find the start/stop
+			#print "pass white"
 			accession=desc_pieces[0]
 			allele_name=desc_pieces[1]
 			if(region_segment_type_piece=="V-REGION"):
@@ -1109,9 +1120,12 @@ class imgt_db:
 			elif(region_segment_type_piece=="D-REGION"):
 				st="D"
 			elif(region_segment_type_piece=="J-REGION"):
-				st="V"
+				st="J"
 			else:
 				raise Exception("ERROR, failture to extract V-REGION, D-REGION, J-REGION from | field (indexed by 0-based 5) from "+str(desc_pieces))
+			#print "allele_name is ",allele_name
+			#print "accession is ",accession
+			#print "st is ",st
 			j_r_ss=self.getSegmentRegionStartStopFromIMGTDatGivenAlleleAndAccession(allele_name,accession,st)
 			return j_r_ss
 		else:

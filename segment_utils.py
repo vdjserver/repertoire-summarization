@@ -673,7 +673,7 @@ def getADJCDR3EndFromJAllele(jallele,imgtdb_obj,org="human",mode="imgt"):
 			ellipsis_interval=ellipsis_interval.strip()
 			if(ellipsis_interval==""):
 				accession_num=desc_pieces[0]
-				ss_arr=imgtdb_obj.getJRegionStartStopFromIMGTDatGivenAlleleAndAccession(jallele,accession_num)
+				ss_arr=imgtdb_obj.getSegmentRegionStartStopFromIMGTDatGivenAlleleAndAccession(jallele,accession_num,"J")
 				desc_pieces[5]=str(ss_arr[0])+".."+str(ss_arr[1])
 			desc_pieces[5]=swapIMGTDescInterval(desc_pieces[5])
 			sep="|"
@@ -725,7 +725,9 @@ def getCDR3EndFromJData(allele,imgtdb_obj,org="human"):
 	extracted_descriptor=imgtdb_obj.extractDescriptorLine(allele,org)
 	#print "The extracted descriptor from inputs ",allele," and ",org," is (extracted) : "+str(extracted_descriptor)
 	extracted_descriptor_pieces=imgtdb_obj.extractIMGTDescriptorPieces(extracted_descriptor)
+	#print "The pieces is ",extracted_descriptor_pieces
 	extracted_descriptor_interval=imgtdb_obj.getStartStopFromIMGTDescPieces(extracted_descriptor_pieces)
+	#print "extracted interval : ",extracted_descriptor_interval
 	if(extracted_descriptor_interval==None):
 		#print "COULDN'T GET INTERVAL FOR ALLELE=",allele," organism=",org
 		#sys.exit(0)
