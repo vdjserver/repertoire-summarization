@@ -46,6 +46,9 @@ do
 		echo -e "\n\n\n\n\n******************************************"
 		QRY=$ORGANISM.$SEQ_TYPE.fna
 		echo "USING query file = $QRY "
+		#default to BOTH imgt and kabat
+		#BUT if data is TR, then do imgt only
+		#cause kabat isn't defined for TR!
 		DC_MODE_SET="imgt kabat"
 		if [ "$SEQ_TYPE" == "TR" ] ; then
 			DC_MODE_SET="imgt" ;
