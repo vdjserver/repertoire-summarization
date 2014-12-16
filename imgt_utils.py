@@ -313,6 +313,75 @@ def hier_look(pmap,name,max_iter):
 
 
 
+def isThisVQuestFileTheCorrectFile(vqf,allele_name):
+	try:
+		reader=open(fp,'r')
+		ln=0
+		test_str="Sequence number 1 : "+str(allele_name)
+		for line in reader:
+			temp_line=""+line+""
+			temp_line=temp_line.strip()
+			if(temp_line.startswith(test_str)):
+				reader.close()
+				return True
+			ln+=1
+		reader.close()
+	except:
+		return False
+	return False	
+
+
+
+
+
+
+
+
+def extractRegionStartStopFromVQFile(vqf,region_name):
+	reader=open(vqf,'r')
+	passedAnnotation=False
+	annRE=re.compile(r'^\d\d\.\s+Annotation')
+	regRE=re.complie(r'^([\-]+)\-IMGT\s+(\d+)\.+(\d+)')
+	for line in reader:
+		temp_line=line
+		temp_line=temp_line.strip()
+		re_res=re.search(annRE,temp_line)
+		if(re_res):
+			passedAnnotation=True
+		if(passedAnnotation)
+			regRE_res=re.search(regRE,temp_line):
+			if(regRE_res)
+				ann_reg=regRE_res.group(1)
+				if(ann_reg==region_name)
+					print "match for region=",region_name," from line ",temp_line
+	reader.close()
+
+
+
+
+
+def isThisFileAVQUESTOutputFileForASingleRead(fp):
+	try:
+		reader=open(fp,'r')
+		ln=0
+		for line in reader:
+			temp_line=""+line+""
+			temp_line=temp_line.strip()
+			if(ln<=1):
+				if(temp_line.startswith("IMGT/HighV-QUEST")):
+					reader.close()
+					return True
+				if(temp_line.startswith("IMGT/V-QUEST")):
+					reader.close()
+					return True
+			ln+=1
+		reader.close()
+	except:
+		return False
+	return False
+
+	
+
 
 
 
@@ -955,8 +1024,16 @@ class imgt_db:
 
 
 
-
-
+	#form GLOBS for searching for the proper VQ file and extract the region info
+	def getVQuestRegionInformation(self,organism,allele_name,region_name):
+		organism_dir=self.db_base()+"/"+organism
+		globs=[organism_dir,organism_dir+"/*",organism_dir+"/*/*",organism_dir+"/*/*/*",organism_dir+"/*/*/*/*",organism_dir+"/*/*/*/*/*"]
+		for glob in globs:
+			for walked in glob_walk(glob)
+				if(isThisFileAVQUESTOutputFileForASingleRead(walked)):
+					if(isThisVQuestFileTheCorrectFile(walked,allele_name)):
+						return extractRegionStartStopFromVQFile(walked,region_name)
+					
 
 
 
