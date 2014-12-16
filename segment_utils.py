@@ -317,7 +317,9 @@ def analyze_IGBlastLookupsVSIMGTDatLookups(imgtdb_obj):
 						print "\n\n\n"
 	sys.exit(0)
 			
-	
+
+
+
 
 def twoListsMatch(ia1,ia2):
 	if(type(ia1)!=type(ia2)):
@@ -338,6 +340,10 @@ def twoListsMatch(ia1,ia2):
 	#never failed anywhere!!!!
 	return True
 	
+
+
+
+			
 
 
 #given a gene table hierarchy and a patch file path
