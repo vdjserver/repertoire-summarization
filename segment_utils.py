@@ -288,6 +288,18 @@ def analyze_download_dir_forVDJserver(base_dir,pickle_file_full_path=None,counts
 	return tbr
 
 
+
+def twoListsMatchByLessEucDistThan(l1,l2,m):
+	d1=(l1[0]-l2[0])**2
+	d2=(l1[1]-l2[1])**2
+	dist=(d1+d2)**(0.5)
+	if(dist<=m):
+		return True
+	else:
+		return False
+
+
+
 def analyze_IGBlastLookupsVSIMGTDatLookups(imgtdb_obj):
 	print "Now comparing IgBLAST region lookup information with imgt.dat lookup information...."
 	vq_ig=0
@@ -296,6 +308,8 @@ def analyze_IGBlastLookupsVSIMGTDatLookups(imgtdb_obj):
 	vq_dd_mm=0
 	ig_dd=0
 	ig_dd_mm=0
+	sdm=0
+	sdm_mm=0
 	organisms=organisms=imgtdb_obj.getOrganismList()
 	lom=dict()
 	for organism in organisms:
@@ -326,6 +340,10 @@ def analyze_IGBlastLookupsVSIMGTDatLookups(imgtdb_obj):
 					if(twoListsMatch(v_quest_ss,igblast_data_ss)):
 						vq_ig+=1
 					else:
+						if(twoListsMatchByLessEucDistThan(v_quest_ss,igblast_data_ss,2**(0.5))):
+							sdm+=1
+						else:
+							sdm_mm+=1
 						vq_ig_mm+=1
 						if(allele+"_"+organism in lom):
 							lom[allele+"_"+organism].append(region)
@@ -335,6 +353,7 @@ def analyze_IGBlastLookupsVSIMGTDatLookups(imgtdb_obj):
 	print "NUMBER IGB IMGT.DAT MATCH : ",ig_dd," MISMATCH : ",ig_dd_mm
 	print "NUMBER VQ IMGT.DAT MATCH : ",vq_dd," MISMATCH : ",vq_dd_mm
 	print "NUMBER VQ IGB MATCH : ",vq_ig," MISMATCH : ",vq_ig_mm
+	print "NUMBER VQ IGB MISMATCH WITH EUC. DIST<=SQRT(2) ", sdm, ", NOT : ",sdm_mm
 	print "\n\n\n"
 	print lom
 	sys.exit(0)
