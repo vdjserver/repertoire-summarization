@@ -290,7 +290,14 @@ def analyze_download_dir_forVDJserver(base_dir,pickle_file_full_path=None,counts
 
 def analyze_IGBlastLookupsVSIMGTDatLookups(imgtdb_obj):
 	print "Now comparing IgBLAST region lookup information with imgt.dat lookup information...."
+	vq_ig=0
+	vq_ig_mm=0
+	vq_dd=0
+	vq_dd_mm=0
+	ig_dd=0
+	ig_dd_mm=0
 	organisms=organisms=imgtdb_obj.getOrganismList()
+	lom=dict()
 	for organism in organisms:
 		print "Now anlyzing for organism ",organism
 		seq_types=types=["IG","TR"]
@@ -301,7 +308,7 @@ def analyze_IGBlastLookupsVSIMGTDatLookups(imgtdb_obj):
 				print "\t\tNow analyzing for allele = ",allele
 				region_list=["FR1","CDR1","FR2","CDR2","FR3"]
 				for region in region_list:
-					print "\t\t\tNow analyzing for region ",region
+					print "\t\t\tNow analyzing for region ",region," for allele=",allele," for organism =",organism
 					imgt_data_ss=imgtdb_obj.getRegionStartStopFromIMGTDat(allele,organism,region)
 					print "\t\t\t\timgt ss is ",imgt_data_ss
 					igblast_data_ss=getVRegionStartAndStopGivenRefData(allele,organism,imgtdb_obj,region,"imgt")
@@ -309,14 +316,27 @@ def analyze_IGBlastLookupsVSIMGTDatLookups(imgtdb_obj):
 					v_quest_ss=imgtdb_obj.getVQuestRegionInformation(organism,allele,region)
 					print "\t\t\t\tVQ is ",v_quest_ss
 					if(twoListsMatch(imgt_data_ss,igblast_data_ss)):
-						#print "MATCHING!"
-						pass
+						ig_dd+=1
 					else:
-						print "NOT MATCHING!!!"
-						print "FOR allele=",allele," for organism =",organism," for region=",region
-						print "IMGT data is ",imgt_data_ss
-						print "IGBLAST is ",igblast_data_ss
-						print "\n\n\n"
+						ig_dd_mm+=1
+					if(twoListsMatch(v_quest_ss,imgt_data_ss)):
+						vq_dd+=1
+					else:
+						vq_dd_mm+=1
+					if(twoListsMatch(v_quest_ss,igblast_data_ss)):
+						vq_ig+=1
+					else:
+						vq_ig_mm+=1
+						if(allele+"_"+organism in lom):
+							lom[allele+"_"+organism].append(region)
+						else:
+							lom[allele+"_"+organism]=list()
+							lom[allele+"_"+organism].append(region)
+	print "NUMBER IGB IMGT.DAT MATCH : ",ig_dd," MISMATCH : ",ig_dd_mm
+	print "NUMBER VQ IMGT.DAT MATCH : ",vq_dd," MISMATCH : ",vq_dd_mm
+	print "NUMBER VQ IGB MATCH : ",vq_ig," MISMATCH : ",vq_ig_mm
+	print "\n\n\n"
+	print lom
 	sys.exit(0)
 			
 
