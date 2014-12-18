@@ -315,7 +315,7 @@ def hier_look(pmap,name,max_iter):
 
 def isThisVQuestFileTheCorrectFile(vqf,allele_name):
 	try:
-		reader=open(fp,'r')
+		reader=open(vqf,'r')
 		ln=0
 		test_str="Sequence number 1 : "+str(allele_name)
 		for line in reader:
@@ -341,45 +341,64 @@ def extractRegionStartStopFromVQFile(vqf,region_name):
 	reader=open(vqf,'r')
 	passedAnnotation=False
 	annRE=re.compile(r'^\d\d\.\s+Annotation')
-	regRE=re.complie(r'^([\-]+)\-IMGT\s+(\d+)\.+(\d+)')
+	regRE=re.compile(r'^([^\-]+)\-IMGT\s+<?(\d+)\.+(\d+)>?')
 	for line in reader:
+		#print "read a line ",line
 		temp_line=line
 		temp_line=temp_line.strip()
 		re_res=re.search(annRE,temp_line)
 		if(re_res):
 			passedAnnotation=True
 		if(passedAnnotation):
-			regRE_res=re.search(regRE,temp_line)
-			if(regRE_res):
-				ann_reg=regRE_res.group(1)
-				if(ann_reg==region_name):
-					print "match for region=",region_name," from line ",temp_line
+			if(temp_line.startswith(region_name)):
+				regRE_res=re.search(regRE,temp_line)
+				if(regRE_res):
+					ann_reg=regRE_res.group(1)
+					#print "FOUND A GOOD REGION LINE (REGION=",ann_reg,") ",temp_line
+					if(ann_reg==region_name):
+						#print "match for region=",region_name," from line ",temp_line
+						region_start=ann_reg=int(regRE_res.group(2))
+						region_ends=ann_reg=int(regRE_res.group(3))
+						vq_reg_ss=[region_start,region_ends]
+						return vq_reg_ss
+					else:
+						#print "NO match for region=",region_name," from line ",temp_line
+						pass
+				else:
+					#print "line '"+temp_line+"' fails"
+					pass
+			else:
+				#doesn't start with region name
+				pass
 	reader.close()
+	return [-1,-1]
 
 
 
 
 
 def isThisFileAVQUESTOutputFileForASingleRead(fp):
-	try:
-		reader=open(fp,'r')
-		ln=0
-		for line in reader:
-			temp_line=""+line+""
-			temp_line=temp_line.strip()
-			if(ln<=1):
-				if(temp_line.startswith("IMGT/HighV-QUEST")):
-					reader.close()
-					return True
-				if(temp_line.startswith("IMGT/V-QUEST")):
-					reader.close()
-					return True
-			ln+=1
-		reader.close()
-	except:
+	if('_individual_files_folder' in fp):
+		try:
+			reader=open(fp,'r')
+			ln=0
+			for line in reader:
+				temp_line=""+line+""
+				temp_line=temp_line.strip()
+				if(ln<=1):
+					if(temp_line.startswith("IMGT/HighV-QUEST")):
+						reader.close()
+						return True
+					if(temp_line.startswith("IMGT/V-QUEST")):
+						reader.close()
+						return True
+				ln+=1
+			reader.close()
+		except:
+			return False
 		return False
-	return False
-
+	else:
+		return False
 	
 
 
@@ -855,14 +874,14 @@ class imgt_db:
 				r_end=max(l_start,l_end)
 				r_len=abs(r_start-r_end)
 				if(ftype.startswith(region_name)):
-					print "r_start is ",r_start," and r_rend is ",r_end," for region ",region_name
+					#print "r_start is ",r_start," and r_rend is ",r_end," for region ",region_name
 					if(range_start-1<=r_start and r_end<=range_end+1):
-						print "first block in range ....."
+						#print "first block in range ....."
 						ret_start=r_start-range_start+1
 						ret_end=ret_start+r_len-1
-						print "r_start=",r_start," r_end=",r_end
-						print "range_start=",range_start," range_end=",range_end
-						print "ret_start=",ret_start," and ret_end=",ret_end
+						#print "r_start=",r_start," r_end=",r_end
+						#print "range_start=",range_start," range_end=",range_end
+						#print "ret_start=",ret_start," and ret_end=",ret_end
 						if(strand==1):
 							return [ret_start,ret_end]
 						else:
@@ -1026,13 +1045,21 @@ class imgt_db:
 
 	#form GLOBS for searching for the proper VQ file and extract the region info
 	def getVQuestRegionInformation(self,organism,allele_name,region_name):
-		organism_dir=self.db_base()+"/"+organism
+		organism_dir=self.db_base+"/"+organism
 		globs=[organism_dir,organism_dir+"/*",organism_dir+"/*/*",organism_dir+"/*/*/*",organism_dir+"/*/*/*/*",organism_dir+"/*/*/*/*/*"]
 		for glob in globs:
+			#print "DOING GLOB ",glob
 			for walked in glob_walk(glob):
+				#print "Got walked ",walked
 				if(isThisFileAVQUESTOutputFileForASingleRead(walked)):
+					#print "its a VQ file"
+					#print "Wonder if its valid for o=",organism," allele=",allele_name
 					if(isThisVQuestFileTheCorrectFile(walked,allele_name)):
+						#print "TARGET FOUND!"
+						#sys.exit(0)
 						return extractRegionStartStopFromVQFile(walked,region_name)
+					else:
+						pass
 					
 
 
