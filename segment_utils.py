@@ -356,6 +356,25 @@ def analyze_IGBlastLookupsVSIMGTDatLookups(imgtdb_obj):
 	print "NUMBER VQ IGB MISMATCH WITH EUC. DIST<=SQRT(2) ", sdm, ", NOT : ",sdm_mm
 	print "\n\n\n"
 	print lom
+	for allele_o in lom:
+		pieces=allele_o.split("_")
+		allele=pieces[0]
+		organism=pieces[1]
+		if(len(pieces)>2):
+			for i in range(2,len(pieces)):
+				organism=organism+"_"+pieces[i]		
+		print "\n\n\n"
+		print "Examining allele : ",allele," and organism ",organism
+		regions_to_examine=lom[allele_o]
+		print "Now looking at regions ",regions_to_examine," for it\n"
+		for region in regions_to_examine:
+			print "Looking at region :",region
+			imgt_data_ss=imgtdb_obj.getRegionStartStopFromIMGTDat(allele,organism,region)
+			print "IMGT DAT reports : ",imgt_data_ss
+			igblast_data_ss=getVRegionStartAndStopGivenRefData(allele,organism,imgtdb_obj,region,"imgt")
+			print "IGB reports : ",igblast_data_ss
+			v_quest_ss=imgtdb_obj.getVQuestRegionInformation(organism,allele,region)
+			print "V QUEST reports : ",v_quest_ss
 	sys.exit(0)
 			
 
