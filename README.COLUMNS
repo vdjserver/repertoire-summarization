@@ -1,0 +1,64 @@
+README FOR COLUMNS
+
+
+
+Read identifier
+V gene
+J gene
+D gene
+Sequence similarity
+Out-of-frame junction
+Missing CYS
+Missing TRP/PHE
+Stop Codon?
+Indels Found
+Only Frame-Preserving Indels Found
+CDR3 AA (imgt)
+CDR3 NA (imgt)
+FR1 aligned bases (imgt)
+FR1 base subst. (imgt)
+FR1 AA subst. (imgt)
+FR1 codons with silent mut. (imgt)
+CDR1 aligned bases (imgt)
+CDR1 base subst. (imgt)
+CDR1 AA subst. (imgt)
+CDR1 codons with silent mut. (imgt)
+FR2 aligned bases (imgt)
+FR2 base subst. (imgt)
+FR2 AA subst. (imgt)
+FR2 codons with silent mut. (imgt)
+CDR2 aligned bases (imgt)
+CDR2 base subst. (imgt)
+CDR2 AA subst. (imgt)
+CDR2 codons with silent mut. (imgt)
+FR3 aligned bases (imgt)
+FR3 base subst. (imgt)
+FR3 AA subst. (imgt)
+FR3 codons with silent mut. (imgt)
+CDR3 AA (kabat)
+CDR3 NA (kabat)
+FR1 aligned bases (kabat)
+FR1 base subst. (kabat)
+FR1 AA subst. (kabat)
+FR1 codons with silent mut. (kabat)
+CDR1 aligned bases (kabat)
+CDR1 base subst. (kabat)
+CDR1 AA subst. (kabat)
+CDR1 codons with silent mut. (kabat)
+FR2 aligned bases (kabat)
+FR2 base subst. (kabat)
+FR2 AA subst. (kabat)
+FR2 codons with silent mut. (kabat)
+CDR2 aligned bases (kabat)
+CDR2 base subst. (kabat)
+CDR2 AA subst. (kabat)
+CDR2 codons with silent mut. (kabat)
+FR3 aligned bases (kabat)
+FR3 base subst. (kabat)
+FR3 AA subst. (kabat)
+FR3 codons with silent mut. (kabat)
+Alternate V gene
+Alternate J gene
+Alternate D gene
+Release Version Tag
+Release Version Hash
