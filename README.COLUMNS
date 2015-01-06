@@ -1,20 +1,62 @@
 README FOR COLUMNS
 
-
+Values are "None" if no determination can be made (for example if there is no alignment)
 
 Read identifier
+The name of the read
+
+
 V gene
+The first V allele "hit" if any
+
+
 J gene
+The first J allele "hit" if any
+
+
 D gene
+The first D allele "hit" if any
+
 V Sequence similarity
+The total number of base-to-base alignments with V minus the number are mismatched (with V), divided by the total number of base-to-base aligned (with V).  Thus, only the V alignment is considered here and indels are not considered.
+
+
 Out-of-frame junction
+
+
+
 Missing CYS
+True if and only if the three BP at the CYS-104 position : 1) align to V with length 3 , 2) have no indels, and 3) translate to C
+False or None otherwise.  The first V hit is used.
+
+
 Missing TRP/PHE
+True if and only if the three BP at the TRP/PHE position : 1) align to J with length 3 , 2) have no indels, and 3) translate to W (or F)
+False or None otherwise.  The first J hit is used.
+
+
 Stop Codon?
+
+The first base pair of the read at frame 0 (not frame 1, and not frame 2) is taken and then translated up to the last BP of J.  If a "*" (stop codon) is found, then this column gets True.  Otherwise, False or None.
+
 Indels Found
+
+Each of the V, D, J alignments is examined if it exists.  If at least one indel is found among them, then this column is True.  Otherwise, False.
+
 Only Frame-Preserving Indels Found
+
+Each of the V, D, J alignments is examined if it exists.  If NO indels at all are found, then this columns is True.  If at least one instance of an indel is found AND the instance is NOT of a length of a multiple of three, then this column is False. 
+
+
+
 CDR3 AA (imgt)
+The translation of the CDR3 nucleic acid string.
+
+
 CDR3 NA (imgt)
+
+First the CDR3 start/stop (in V and J) IMGT anchors are acquired.  If either is not, then this field is empty.  Then, it is required that both anchors align to the read.  I not, then the field is empty.  Then, the subsequence of nucleic acids of the the read between the two positions is taken and put in this field.
+
 FR1 aligned bases (imgt)
 FR1 base subst. (imgt)
 FR1 AA subst. (imgt)
@@ -35,6 +77,13 @@ FR3 aligned bases (imgt)
 FR3 base subst. (imgt)
 FR3 AA subst. (imgt)
 FR3 codons with silent mut. (imgt)
+
+
+
+
+
+
+
 CDR3 AA (kabat)
 CDR3 NA (kabat)
 FR1 aligned bases (kabat)
