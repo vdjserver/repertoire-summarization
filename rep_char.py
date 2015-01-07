@@ -168,7 +168,7 @@ def readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,read_ann
 def getIndelsFlags(vInfo,dInfo,jInfo):
 	strs_to_analyze=list()
 	basicIndelsFlags=False
-	framePreservingIndelsFlag=True
+	framePreservingIndelsFlag=False
 	#printMap(vInfo)
 	if(vInfo!=None):
 		v_q_seq=vInfo['query seq']
@@ -186,19 +186,25 @@ def getIndelsFlags(vInfo,dInfo,jInfo):
 		strs_to_analyze.append(j_q_seq)
 		strs_to_analyze.append(j_s_seq)
 	gap_re=re.compile(r'([\-]{1,})')	
+	#first look for >=1 indels
 	for s in strs_to_analyze:
 		if(s.find("-")!=(-1)):
 			#found a gap!
 			basicIndelsFlags=True
-		gap_groups=re.findall(gap_re,s)
-		for gap_group in gap_groups:
-			gap_len=len(gap_group)
-			if(gap_len%3==0):
-				#it's frame preserving!
-				pass
-			else:
-				#found at least one non-frame preserving gap!
-				framePreservingIndelsFlag=False
+	#if at least one was found then look at the frame-preserving status
+	if(basicIndelsFlags):
+		#set the p flag to TRUE unless at least on frame-destroying indel is found
+		framePreservingIndelsFlag=True
+		for s in strs_to_analyze:
+			gap_groups=re.findall(gap_re,s)
+			for gap_group in gap_groups:
+				gap_len=len(gap_group)
+				if(gap_len%3!=0):
+					#it's not frame preserving!
+					framePreservingIndelsFlag=False
+				else:
+					#found a frame preserving gap!
+					pass
 	gap_ret_package=[basicIndelsFlags,framePreservingIndelsFlag]
 	return gap_ret_package
 
