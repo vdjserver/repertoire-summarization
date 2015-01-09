@@ -1018,7 +1018,7 @@ def add_rep_char_args_to_parser(parser):
 	parser.add_argument('-combo_out',type=str,nargs=1,default="/dev/stdout",help="output file for JSON segment recombination count data")
 	parser.add_argument('-cdr3_hist_out',type=str,nargs=1,default="/dev/stdout",help="output file for the CDR3 histogram of lengths (both kabat and imgt systems)")
 	parser.add_argument('-sample_json_out',type=str,nargs=1,default="/dev/stdout",help="output file for sample-level JSON repertoire data (e.g. R:S over IMGT CDRs)")
-	parser.add_argument('-skip_char',action='store_true', default=False,help="If this is set, then characterization besides germline segment assignment and CDR3 length is skipped")
+	parser.add_argument('-skip_char',action='store_true', default=False,help="If this is set, then characterization besides germline segment assignment and CDR3 analysis is skipped")
 	parser.add_argument('char_out',type=str,nargs=1,help="the path to the output TSV file of read-level repertoire characterization data")
 	parser.add_argument('vdj_db_root',type=str,nargs=1,help="path to the VDJ directory root REQUIRED")
 	parser.add_argument('qry_fasta',type=str,nargs=1,help="path to the input fasta file of query (Rep-Seq) data input to IgBLAST")
