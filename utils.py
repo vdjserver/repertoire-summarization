@@ -817,9 +817,12 @@ def readAURL(url):
 #assuming a directory exists write a string to a file whose path is in
 #that directory
 def writeStringToFilePathAssumingDirectoryExists(string,file_path):
-	outfile=open(file_path,'w')
-	outfile.write(string)
-	outfile.close()
+	if(file_path=="/dev/stdout"):
+		print string
+	else:
+		outfile=open(file_path,'w')
+		outfile.write(string)
+		outfile.close()
 
 
 
