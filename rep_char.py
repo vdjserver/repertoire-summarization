@@ -807,6 +807,7 @@ def appendAnnToFileWithMap(fHandl,m,rid,read_name,desiredKeys=None,defaultValue=
 	"Stop Codon?",
 	"Indels Found",
 	"Only Frame-Preserving Indels Found"
+	]	
 	
 	#PART 3 IMGT/KABAT
 	#append IMGT/KABAT region data
