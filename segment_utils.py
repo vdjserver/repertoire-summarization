@@ -8,14 +8,10 @@ import re
 import pprint
 from imgt_utils import get_loci_list,imgt_db
 import glob
-from igblast_utils import printNiceAlignment
-#from utils import printMap,makeAllMapValuesVal,getAlnAtAndCond,removeTerminatingSemicolonIfItExists,getNumberBpInAlnStr,printList,readFileIntoString,read_fasta_string,read_fasta_into_map,getIMGTNameListFromFastaMap,allelifyList,merge_maps,write_map_to_file,get_list_of_alleles_appearing_in_tree
 #from utils import biopythonTranslate
 from utils import *
 from alignment import alignment
 import os
-
-
 
 
 
@@ -76,7 +72,7 @@ def hierarchyTreeFromGenetableURL(url,locus,listOfAllowableNames=None,existingHi
 					class_val_first=str(class_val[0])
 					#print "class_val_first is ",class_val_first
 					class_val_first_str=str(class_val_first)
-					if(class_val_first_str=="subgroup_middle_note"):
+					if(class_val_first_str=="subgroup_middle_note" or class_val_first_str=="subgroup_note"):
 						text = td.find(text=True)# + ';'
 						if text is None:
 							text="UNDEFINED_SUBGROUP;"
@@ -85,6 +81,7 @@ def hierarchyTreeFromGenetableURL(url,locus,listOfAllowableNames=None,existingHi
 						#print "GOT A SUBGROUP=",text
 						subgroup=str(text)
 						subgroup=removeTerminatingSemicolonIfItExists(subgroup)
+						subgroup=subgroup.strip()
 					elif(class_val_first_str=="gene_note"):
 						text = td.find(text=True)# + ';'
 						if text is None:
@@ -94,13 +91,12 @@ def hierarchyTreeFromGenetableURL(url,locus,listOfAllowableNames=None,existingHi
 						#print "GOT A GENE=",text
 						gene_name=str(text)
 						gene_name=removeTerminatingSemicolonIfItExists(gene_name)
+						gene_name=gene_name.strip()
 					elif(class_val_first_str=="col_note"):
 						if(col_note_num==12):
 							text=td.find(text=True)
-							#print "col_note_num =",col_note_num,"and text=",text
 							if(text is not None):
 								clone_names_map[allele_name]=re.sub(r'\s+','',text)
-								#print "clone_names_map[",allele_name,"] =",clone_names_map[allele_name]
 						col_note_num+=1
 					elif(class_val_first_str=="allele_note"):
 						text = td.find(text=True)# + ';'
@@ -111,21 +107,19 @@ def hierarchyTreeFromGenetableURL(url,locus,listOfAllowableNames=None,existingHi
 							if(not(alleleEndRegex.search(allele_name))):
 								#if there is no allele, make it allele *01
 								allele_name+="*01"
-							#SOMETIMES SUBGROUP ISN'T A COLUMN IN THE TABLE SO INHERIT IT FROM THE GENE NAME!
-							#if(subgroup==""):
-							#	print "Setting a blank subgroup to equal gene_name=",gene_name
-							#	subgroup=gene_name
-							#elif(not(gene_name.startswith(subgroup))):
-							#	print "Setting an old subgroup to equal gene_name=",gene_name
-							#	subgroup=gene_name
+							allele_name=allele_name.strip()
 							if(listOfAllowableNames==None or ((listOfAllowableNames!=None) and (allele_name in listOfAllowableNames))):
 								#print "proceeding with setting : gene_name="+gene_name+", allele_name="+allele_name+", and subgroup="+subgroup
 								if(subgroup==""):
-									my_hier[gene_name][allele_name]
+									#if there is no subgroup or 
+									#store this way
+									my_hier [gene_name][allele_name]
 								else:
+									#otherwise, store this way, using the complete path/resolution
 									my_hier[subgroup][gene_name][allele_name]
+							
 							else:
-								print "NOTE : skipping the addition of ",allele_name," into the hierarchy cause it's not in the list of allowable alleles!"
+								print "NOTE : skipping the addition of ",allele_name," into the hierarchy  (url=",url," and locus=",locus,")  cause it's not in the list of alleles from the Reference Fasta!"
 	return [my_hier,clone_names_map]
 	
 
@@ -149,8 +143,14 @@ def dicts(t): return {k: dicts(t[k]) for k in t}
 #and any specified organism and/or locus
 #scan the reference directory set FASTAs
 #and see what entries of them are in the gene tables (or not)
-def analyze_download_dir_forVDJserver(base_dir,countsMap=None,specifiedOrganism=None,specifiedLocus=None):
+#present a "side-by-side" diff showing any differences thus 
+#allowing user to best know how to "patch" the gene 
+#tables so that all fasta entries have a place!
+#Also, obtain clone name data
+#Finally, return all the hierarchy and clone data!
+def analyze_download_dir_forVDJserver(base_dir,pickle_file_full_path=None,countsMap=None,specifiedOrganism=None,specifiedLocus=None):
 	myDB=imgt_db(base_dir)
+	analyze_IGBlastLookupsVSIMGTDatLookups(myDB)
 	organisms=myDB.getOrganismList()
 	org_hierarchy=tree()
 	clone_names_by_org=dict()
@@ -167,14 +167,20 @@ def analyze_download_dir_forVDJserver(base_dir,countsMap=None,specifiedOrganism=
 				if((not(locus==specifiedLocus)) or (not(organism==specifiedOrganism))):
 					continue
 			print "Analyzing for o=",organism," and l=",locus
+			###########################################
+			###########################################
+			# HERE , FIND THE CORRESPONDING HTML FILES FOR THE GENE TABLES
 			htmlGeneTablesGlob=base_dir+"/"+organism+"/GeneTables/*"+locus+"*.html"
 			geneTableHTMLFiles=glob.glob(htmlGeneTablesGlob)
-			print "Got html files"
-			printList(geneTableHTMLFiles)
+			geneTableHTMLFiles.sort() #sort here so that the HTML file is first and the orphon file is second
+			###########################################
+			###########################################
+			# HERE , FIND THE CORRESPONDING FNA FILES in the Reference Directory Set Data
 			fastaFilesGlob=base_dir+"/"+organism+"/ReferenceDirectorySet/*"+locus+"*.fna"
 			fastaFiles=glob.glob(fastaFilesGlob)
-			print "got fasta files :"
-			printList(fastaFiles)
+			##################################################
+			##################################################
+			#HERE extract the IMGT-style names (e.g. IGHV4-1*02)				
 			fastaMainMap=dict()
 			for fastaFile in fastaFiles:
 				fastaString=readFileIntoString(fastaFile)
@@ -183,65 +189,96 @@ def analyze_download_dir_forVDJserver(base_dir,countsMap=None,specifiedOrganism=
 				for fastaKey in fastaMap:
 					fastaMainMap[fastaKey]=fastaMap[fastaKey]
 			#print "done loading into main map..."
+			#printMap(fastaMainMap)
 			fastaListOfNames=getIMGTNameListFromFastaMap(fastaMainMap)
-			#print "FASTA LIST OF NAMES:"
 			fastaListOfNames.sort()
-			#printList(fastaListOfNames)
-			#print "got name list.... its length is",len(fastaListOfNames)
+			##################################################
+			##################################################
+			#HERE "allelify" the names (add "*01") if no allele information is on the name
+			#this is because the desired graphics/hierarchy requires an allele at the leaves of the hierarchy
+			#and because I've seen a few cases of names without alleles!!!! 
      			fastaAlleleList=allelifyList(fastaListOfNames)
-			#print "got allele list....it is"
-			#print "ALLELIFIED LIST:"
-			#printList(fastaAlleleList)
+			#################################################
+			#################################################
+			#HERE, actually load into a "tree" dict the hierachy structures
+			#also obtain the clone names from the HTML
+			#This is done for regular genes and for orphons
 			html_data=hierarchyTreeFromGenetableURL("file://"+geneTableHTMLFiles[0],locus,fastaAlleleList)
 			locusHierarchyData=html_data[0]
-			#print "GOT HIERARCHY FROM HD0:"
-			#prettyPrintTree(locusHierarchyData)
-			#print "DONE SHOWING PRETTY PRINT GOT HIERARCHY FROM HD0"
 			clone_names_plain=html_data[1]
 			html_data=hierarchyTreeFromGenetableURL("file://"+geneTableHTMLFiles[1],locus,fastaAlleleList,locusHierarchyData)
 			locusHierarchyData=html_data[0]
-			print "GOT HIERARCHY FROM HD0 ORPH:"
-			prettyPrintTree(locusHierarchyData)
-			print "DONE SHOWING PRETTY PRINT GOT HIERARCHY FROM HD0 ORPH"
+			#print "GOT HIERARCHY FROM HD0 ORPH:"
+			#prettyPrintTree(locusHierarchyData)
+			#print "DONE SHOWING PRETTY PRINT GOT HIERARCHY FROM HD0 ORPH"
 			clone_names_orph=html_data[1]	
 			clone_names=merge_maps(clone_names_plain,clone_names_orph)
 			write_map_to_file(clone_names,geneTableHTMLFiles[0]+".clone_names.map")
-			print "GOT FASTA MAP KEY ALLELES :"
-			printList(fastaAlleleList)
-			print "GOT HIERARCHY:"
-			prettyPrintTree(locusHierarchyData)
-			print "DONE SHOWING PRETTY PRINT GOT HIERARCHY"
+			#print "GOT FASTA MAP KEY ALLELES :"
+			#printList(fastaAlleleList)
+			#print "GOT HIERARCHY:"
+			#prettyPrintTree(locusHierarchyData)
+			#print "DONE SHOWING PRETTY PRINT GOT HIERARCHY"
 			#print "SHOWING CLONE NAME MAP:"
 			#printMap(clone_names)
 			print "\n\n\n\n"
 			#from
 			#http://stackoverflow.com/questions/82831/how-do-i-check-if-a-file-exists-using-python
 			patchPath=geneTableHTMLFiles[0]+".patch"
+			foundPatchFile=False
 			if(os.path.isfile(patchPath)):
+				foundPatchFile=True
 				print "Found a patch file (",patchPath,") found, so now patching is being performed....."
+				print "\n\n############################################"
+				print "PATCH FILE CONTENTS : "
+				print readFileIntoString(patchPath)
+				print "\n"
+				print "\n\n############################################"
+				print "BEFORE PATCHING, THE HIERARCHY IS  :"
+				prettyPrintTree(locusHierarchyData)
 				locusHierarchyData=patchlocusHierarchyData(locusHierarchyData,patchPath)
-				print "AFTER PATCHING, THE HIERARCHY IS NOW :"
-				#prettyPrintTree(locusHierarchyData)
+				print "\n\n############################################"
+				print "AFTER PATCHING, THE HIERARCHY IS  :"
+				prettyPrintTree(locusHierarchyData)
 				#print "THIS IS THE PRETTY PRINT FOR PATCHED ORG HIERARCHY DATA"
 				org_hierarchy[organism][locus]=locusHierarchyData
-				#prettyPrintTree(org_hierarchy)
-				print "END SHOW PATCH"
 			else:
 				print "No patch file (",patchPath,") found, so no patching being performed....."
+			#################################################
+			#################################################
+			#extract the leaves/alleles from the tree/hierarchy structure and perform a "side-by-side" diff			
 			treeAlleles=get_list_of_alleles_appearing_in_tree(locusHierarchyData)
 			setSameStats=(set(fastaAlleleList) == set(treeAlleles))
 			print "For organism=",organism,"locus=",locus
+			#################################################
+			#################################################
+			#based on the side-by-side diff result and based
+			#on the patching result, 
 			if setSameStats:
-				print "After patching, the fasta/RefDirNames ARE the same as the hierarchy allele names!!! :)"
+				print "The fasta/RefDirNames ARE the same as the hierarchy allele names!!! :)"
+				if(foundPatchFile):
+					#no need to re-print the hierarchy cause it was printed before and after patching
+					pass
+				else:
+					#since no patch file was found, go ahead and print the hierarchy
+					print "\n\n############################################"
+					print "The hierarchy is : "
+					prettyPrintTree(locusHierarchyData)						
 			else:
-				print "SAD even after patching the fasta/RefDirNames ARE different from the hierarchy allele names!!! :("
+				print "The fasta/RefDirNames ARE different from the hierarchy allele names!!! :("
+				if(not(foundPatchFile)):
+					#since no patch file was found, AND the stats are bad, print the hierarchy to 
+					#help the user understand how to patch					
+					print "\n\n############################################"
+					print "The hierarchy is : "
+					prettyPrintTree(locusHierarchyData)				
 			briefSetDiff(fastaAlleleList,treeAlleles,"fasta alleles "+organism+"_"+locus,"tree alleles "+organism+"_"+locus)			
 			extendedSortedSetDiff(fastaAlleleList,treeAlleles,"fasta alleles "+organism+"_"+locus,"tree alleles "+organism+"_"+locus)
-			print "THIS IS THE PRETTY PRINT FOR LOCUS HIERARCHY DATA, o=",organism,"l=",locus
-			prettyPrintTree(locusHierarchyData)
-			print "THIS IS THE PRETTY PRINT FOR ORG HIERARCHY DATA"
+			#print "THIS IS THE PRETTY PRINT FOR LOCUS HIERARCHY DATA, o=",organism,"l=",locus
+			#prettyPrintTree(locusHierarchyData)
+			#print "THIS IS THE PRETTY PRINT FOR ORG HIERARCHY DATA"
 			org_hierarchy[organism][locus]=locusHierarchyData
-			prettyPrintTree(org_hierarchy)
+			#prettyPrintTree(org_hierarchy)
 			clone_names_by_org[organism]=merge_maps(clone_names_by_org[organism],clone_names)
 			print "\n\n\n"
 	#prettyPrintTree(org_hierarchy)
@@ -252,8 +289,121 @@ def analyze_download_dir_forVDJserver(base_dir,countsMap=None,specifiedOrganism=
 
 
 
+def twoListsMatchByLessEucDistThan(l1,l2,m):
+	d1=(l1[0]-l2[0])**2
+	d2=(l1[1]-l2[1])**2
+	dist=(d1+d2)**(0.5)
+	if(dist<=m):
+		return True
+	else:
+		return False
 
 
+
+def analyze_IGBlastLookupsVSIMGTDatLookups(imgtdb_obj):
+	print "Now comparing IgBLAST region lookup information with imgt.dat lookup information...."
+	vq_ig=0
+	vq_ig_mm=0
+	vq_dd=0
+	vq_dd_mm=0
+	ig_dd=0
+	ig_dd_mm=0
+	sdm=0
+	sdm_mm=0
+	organisms=organisms=imgtdb_obj.getOrganismList()
+	lom=dict()
+	for organism in organisms:
+		print "Now anlyzing for organism ",organism
+		seq_types=types=["IG","TR"]
+		for seq_type in seq_types:
+			print "\tNow analyzing for seq type ",seq_type
+			v_gene_alleles=imgtdb_obj.getAlleles("V",organism,seq_type)
+			for allele in v_gene_alleles:
+				print "\t\tNow analyzing for allele = ",allele
+				region_list=["FR1","CDR1","FR2","CDR2","FR3"]
+				for region in region_list:
+					print "\t\t\tNow analyzing for region ",region," for allele=",allele," for organism =",organism
+					imgt_data_ss=imgtdb_obj.getRegionStartStopFromIMGTDat(allele,organism,region)
+					print "\t\t\t\timgt ss is ",imgt_data_ss
+					igblast_data_ss=getVRegionStartAndStopGivenRefData(allele,organism,imgtdb_obj,region,"imgt")
+					print "\t\t\t\tigb ss is ",igblast_data_ss
+					v_quest_ss=imgtdb_obj.getVQuestRegionInformation(organism,allele,region)
+					print "\t\t\t\tVQ is ",v_quest_ss
+					if(twoListsMatch(imgt_data_ss,igblast_data_ss)):
+						ig_dd+=1
+					else:
+						ig_dd_mm+=1
+					if(twoListsMatch(v_quest_ss,imgt_data_ss)):
+						vq_dd+=1
+					else:
+						vq_dd_mm+=1
+					if(twoListsMatch(v_quest_ss,igblast_data_ss)):
+						vq_ig+=1
+					else:
+						if(twoListsMatchByLessEucDistThan(v_quest_ss,igblast_data_ss,2**(0.5))):
+							sdm+=1
+						else:
+							sdm_mm+=1
+						vq_ig_mm+=1
+						if(allele+"_"+organism in lom):
+							lom[allele+"_"+organism].append(region)
+						else:
+							lom[allele+"_"+organism]=list()
+							lom[allele+"_"+organism].append(region)
+	print "NUMBER IGB IMGT.DAT MATCH : ",ig_dd," MISMATCH : ",ig_dd_mm
+	print "NUMBER VQ IMGT.DAT MATCH : ",vq_dd," MISMATCH : ",vq_dd_mm
+	print "NUMBER VQ IGB MATCH : ",vq_ig," MISMATCH : ",vq_ig_mm
+	print "NUMBER VQ IGB MISMATCH WITH EUC. DIST<=SQRT(2) ", sdm, ", NOT : ",sdm_mm
+	print "\n\n\n"
+	print lom
+	for allele_o in lom:
+		pieces=allele_o.split("_")
+		allele=pieces[0]
+		organism=pieces[1]
+		if(len(pieces)>2):
+			for i in range(2,len(pieces)):
+				organism=organism+"_"+pieces[i]		
+		print "\n\n\n"
+		print "Examining allele : ",allele," and organism ",organism
+		regions_to_examine=lom[allele_o]
+		print "Now looking at regions ",regions_to_examine," for it\n"
+		for region in regions_to_examine:
+			print "Looking at region :",region
+			imgt_data_ss=imgtdb_obj.getRegionStartStopFromIMGTDat(allele,organism,region)
+			print "IMGT DAT reports : ",imgt_data_ss
+			igblast_data_ss=getVRegionStartAndStopGivenRefData(allele,organism,imgtdb_obj,region,"imgt")
+			print "IGB reports : ",igblast_data_ss
+			v_quest_ss=imgtdb_obj.getVQuestRegionInformation(organism,allele,region)
+			print "V QUEST reports : ",v_quest_ss
+	sys.exit(0)
+			
+
+
+
+
+def twoListsMatch(ia1,ia2):
+	if(type(ia1)!=type(ia2)):
+		#can't be matching if the types aren't matching
+		return False
+	if((ia1 is None) and (ia2 is None)):
+		#they're not lists, but they're both None?
+		return True
+	if(type(ia1)!=list or type(ia2)!=list):
+		#they're not lists!
+		return False
+	if(len(ia1)!=len(ia2)):
+		#lengths not equal
+		return False
+	for n in range(len(ia1)):
+		if(ia1[n]!=ia2[n]):
+			return False
+	#never failed anywhere!!!!
+	return True
+	
+
+
+
+			
 
 
 #given a gene table hierarchy and a patch file path
@@ -376,6 +526,36 @@ def zeroPadDigitsTo(s,num=8):
 
 
 
+def determineAllelicOrdering(a1,a2):
+	if(a1==a2):
+		return 0
+	else:
+		aa=[a1,a2]
+		o_aa=orderAlleicArrayWithZeroPadding(aa)
+		if(a1==o_aa[0]):
+			return (-1)
+		else:
+			return 1	
+
+
+
+def orderAlleicArrayWithZeroPadding(a_arr):
+	#the reason for all this "padded" stuff is so that digits are zero-padded
+	#so that ordering (based on ASCII) will put IGHV4 before IGHV40 (and not IGHV40 before IGHV4)
+	original_to_padded=dict()
+	padded_to_original=dict()	
+	for a in a_arr:
+		padded_key=zeroPadDigitsTo(hier_map_key)
+		original_to_padded[a]=padded_key
+		padded_to_original[padded_key]=hier_map_key
+		padded_key_list.append(padded_key)
+	padded_key_list.sort()
+	ready_list=list()
+	for p in range(len(padded_key_list)):
+		ready_list.append(padded_to_original[padded_key_list[p]])
+	return ready_list
+
+
 
 #JSONIFY from a hierarchy with a counts map
 #the "count_string" is used to make the label for the count in the JSON
@@ -386,6 +566,8 @@ def jsonify_hierarchy(hier_map,name,counts_map,count_string,labelString="label")
 	original_to_padded=dict()
 	padded_to_original=dict()
 	padded_key_list=list()
+	#the reason for all this "padded" stuff is so that digits are zero-padded
+	#so that ordering (based on ASCII) will put IGHV4 before IGHV40 (and not IGHV40 before IGHV4)
 	for hier_map_key in hier_map_keys:
 		padded_key=zeroPadDigitsTo(hier_map_key)
 		original_to_padded[hier_map_key]=padded_key
@@ -510,15 +692,47 @@ def get_segment_count_map_from_blast_output(blast_out,fasta_file_list):
 #given the JALLELE name and IMGTDB object (and organism and mode)
 #find the position (1-based) of the CDR3 end in the indicated sequece
 #use the LOOKUP tables in the database 
-#IMGT data use the imgt.dat
+#IMGT data use the imgt.dat .  Once data are looked up, store then in a
+#dict structure for subsequent faster lookups
+cdr3_end_lookup=dict()
 def getADJCDR3EndFromJAllele(jallele,imgtdb_obj,org="human",mode="imgt"):
+	#print "in getADJCDR3EndFromJAllele. jallele=",jallele," org=",org,"mode=",mode
+	global cdr3_end_lookup
+	if(org in cdr3_end_lookup):
+		if(jallele in cdr3_end_lookup[org]):
+			if(mode in cdr3_end_lookup[org][jallele]):
+				#the lookup is there!  use it!
+				return cdr3_end_lookup[org][jallele][mode]
+			else:
+				#the lookup ain't there, look it up , then cache it!
+				pass
+		else:
+			#add the allele if it ain't there
+			cdr3_end_lookup[org][jallele]=dict()		
+	else:
+		#add the organism if it ain't there
+		#add the jallele cause it won't be there either
+		cdr3_end_lookup[org]=dict()
+		cdr3_end_lookup[org][jallele]=dict()
+	val_to_return=(-1)
 	if(mode=="imgt"):
+		#print "mode=imgt"
 		jdescriptor=imgtdb_obj.extractDescriptorLine(jallele,org)
 		cdr3_end_raw=getCDR3EndFromJData(jallele,imgtdb_obj,org)
+		if(cdr3_end_raw==None):
+			cdr3_end_lookup[org][jallele][mode]=(-1)
+			return cdr3_end_lookup[org][jallele][mode]
+		cdr3_end_raw=int(cdr3_end_raw)
 		#print "Got a descriptor ",jdescriptor
 		#print "got a raw cdr3 end=",cdr3_end_raw
 		desc_pieces=jdescriptor.split("|")
 		if(desc_pieces[14]=="rev-compl"):
+			ellipsis_interval=desc_pieces[5]
+			ellipsis_interval=ellipsis_interval.strip()
+			if(ellipsis_interval==""):
+				accession_num=desc_pieces[0]
+				ss_arr=imgtdb_obj.getSegmentRegionStartStopFromIMGTDatGivenAlleleAndAccession(jallele,accession_num,"J")
+				desc_pieces[5]=str(ss_arr[0])+".."+str(ss_arr[1])
 			desc_pieces[5]=swapIMGTDescInterval(desc_pieces[5])
 			sep="|"
 			jdescriptor=sep.join(desc_pieces)
@@ -529,14 +743,19 @@ def getADJCDR3EndFromJAllele(jallele,imgtdb_obj,org="human",mode="imgt"):
 		if(mr):
 			start=int(mr.group(1))
 			stop=int(mr.group(2))
-			if(start<=cdr3_end_raw and cdr3_end_raw<=stop):
-				return cdr3_end_raw-start+1
+			#print "got start=",start
+			#print "got stop=",stop
+			if(min(start,stop)<=cdr3_end_raw and cdr3_end_raw<=max(start,stop)):
+				adjusted=cdr3_end_raw-min(start,stop)+1
+				#print "RETURNING VALID CDR3 END = "+str(adjusted)
+				cdr3_end_lookup[org][jallele][mode]=adjusted
 			else:
-				#out of range
-				return (-1)
+				#print "OUT OF RANGE????"
+				cdr3_end_lookup[org][jallele][mode]=(-1)
 		else:
-			print "FAILED TO MATCH ON INTERVAL REGEX!!!!\n"
-			return None
+			#print "FAILED TO MATCH ON INTERVAL REGEX!!!!\n"
+			cdr3_end_lookup[org][jallele][mode]=(-1)
+		return cdr3_end_lookup[org][jallele][mode]
 	elif(mode=="kabat"):
 		kabat_file=imgtdb_obj.getBaseDir()+"/"+org+"/ReferenceDirectorySet/KABAT/Jlookup.tsv"
 		reader=open(kabat_file,'r')
@@ -547,69 +766,56 @@ def getADJCDR3EndFromJAllele(jallele,imgtdb_obj,org="human",mode="imgt"):
 				pieces=line.split("\t")
 				cdr3_end_adj_kabat=int(pieces[1])
 		reader.close()
-		return cdr3_end_adj_kabat
-		
+		val_to_return=cdr3_end_adj_kabat
+	cdr3_end_lookup[org][jallele][mode]=val_to_return
+	return 	cdr3_end_lookup[org][jallele][mode]
 		
 
 
 
 #use the IMGT dat FILE to find the CDR3 end for a JALLELE
 def getCDR3EndFromJData(allele,imgtdb_obj,org="human"):
-	#tmp_file_path="/dev/shm/"+re.sub(r'[^0-9\.a-zA-Z]','',allele)
-	#print "tpath is ",tmp_file_path
-	#writer=open(tmp_file_path,'w')
-	#writer.write(jdata)
-	#writer.close()
-	#from Bio import SeqIO
-	#records=SeqIO.parse(tmp_file_path,"imgt")
+	#print "*********************************\nEntering getCDR3EndFromJData\n*******************************"
 	biopyrec=imgtdb_obj.getIMGTDatGivenAllele(allele,True,org)
 	records=[biopyrec]
 	reg_start=None
 	reg_end=None
-	for record in records:
-		feature_list=record.features
-		for feature in feature_list:
-			#print "got a feature : ",feature
-			ftype=feature.type
-			#print "the type is ",ftype	
-			qualifiers=feature.qualifiers
-			#print "qualifiers : ",qualifiers
-			if(ftype=="J-REGION"):
-				if("IMGT_allele" in qualifiers):
-					#print "found allele in qualifiers!"
-					#print "the value of the allele is ",qualifiers["IMGT_allele"]
-					allele_qualifier_list=qualifiers["IMGT_allele"]
-					actual_value=allele_qualifier_list[0]
-					#print "the actual is ",actual_value
-					if(actual_value==allele):
-						#print "THIS IS THE RIIIIIIIIIIIIIIIIIIIIIGHT ONE!"
-						#print "the start is ",feature.location.start
-						reg_start=int(re.sub(r'[^0-9]','',str(feature.location.start)))
-						#print "fetched is ",reg_start
-						reg_end=int(re.sub(r'[^0-9]','',str(feature.location.end)))
-	#records=SeqIO.parse(tmp_file_path,"imgt")
-	if(not(reg_start==None)):
-		for record in records:
-			feature_list=record.features
-			for feature in feature_list:
-				#print "got a feature : ",feature
-				ftype=feature.type
-				#print "the type is ",ftype	
-				qualifiers=feature.qualifiers
-				#print "qualifiers : ",qualifiers
-				if(ftype=="J-TRP" or ftype=="J-PHE"):
-					c_start=int(re.sub(r'[^0-9]','',str(feature.location.start)))
-					c_end=int(re.sub(r'[^0-9]','',str(feature.location.end)))
-					#print "found a jtrp"
-					if(reg_start<=c_end and c_end<=reg_end):
-						#this is it!
-						#os.remove(tmp_file_path)
-						#subtract 3 becuase we want to ignore the TRP or PHE residue and look at the residue immediately preceding
-						return c_end-3
-	else:
-		#print "failed to get a start!"
-		pass
+	extracted_descriptor=imgtdb_obj.extractDescriptorLine(allele,org)
+	#print "The extracted descriptor from inputs ",allele," and ",org," is (extracted) : "+str(extracted_descriptor)
+	extracted_descriptor_pieces=imgtdb_obj.extractIMGTDescriptorPieces(extracted_descriptor)
+	#print "The pieces is ",extracted_descriptor_pieces
+	extracted_descriptor_interval=imgtdb_obj.getStartStopFromIMGTDescPieces(extracted_descriptor_pieces)
+	#print "extracted interval : ",extracted_descriptor_interval
+	if(extracted_descriptor_interval==None):
+		#print "COULDN'T GET INTERVAL FOR ALLELE=",allele," organism=",org
+		#sys.exit(0)
+		print "getCDR3EndFromJData returning 'None' for allele="+str(allele)+" and org="+str(org)
+		return None		
+	if(extracted_descriptor_interval!=None and type(extracted_descriptor_interval)==list):
+		reg_start=extracted_descriptor_interval[0]
+		reg_end=extracted_descriptor_interval[1]
+		if(not(reg_start==None)):
+			for record in records:
+				feature_list=record.features
+				for feature in feature_list:
+					#print "got a feature : ",feature
+					ftype=feature.type
+					#print "the type is ",ftype	
+					qualifiers=feature.qualifiers
+					#print "qualifiers : ",qualifiers
+					if(ftype=="J-TRP" or ftype=="J-PHE"):
+						c_start=int(re.sub(r'[^0-9]','',str(feature.location.start)))
+						c_end=int(re.sub(r'[^0-9]','',str(feature.location.end)))
+						#print "found a jtrp"
+						if(reg_start<=c_end and c_end<=reg_end):
+							#this is it!
+							#subtract 3 becuase we want to ignore the TRP or PHE residue and look at the residue immediately preceding
+							return c_end-3
+		else:
+			print "failed to get a start!"
+			pass
 	#os.remove(tmp_file_path)
+	print "getCDR3EndFromJData returning 'None' for allele="+str(allele)+" and org="+str(org)
 	return None
 
 
@@ -626,19 +832,6 @@ def swapIMGTDescInterval(i):
 		raise Exception("Error, bad interval in IMGT descriptor "+i)
 
 
-#return true if VAL is between two numbers
-def isValBetweenTwoNumsInc(n1,n2,val):
-	#print "in testing func"
-	if(int(n1)<=int(n2)):
-		#print "in first isv"
-		if(n1<=val and val<=n2):
-			return True
-	if(int(n2)<=int(n1)):
-		#print "in second isv"
-		if(n2<=val and val<=n1):
-			return True
-	#print "n1=",n1,"n2=",n2,"val=",val
-	return False
 
 
 
@@ -660,85 +853,24 @@ def getAdjustedCDR3StartFromRefDirSetAllele(allele,imgtdb_obj,organism="human",m
 	if(mode=="kabat" and alleleIsTR(allele)):
 		#no kabat for CDR3 for TR!
 		return (-1)
-	if(1==1):
-		if(mode=="imgt"):
-			#read the HIGH-VQUEST ANNOTATION
-			#print "need to handle IMGT mode for get CDR3 start"
-			if(organism in cdr3_adj_map):
-				if(allele in cdr3_adj_map[organism]["imgt"]):
-					return cdr3_adj_map[organism]["imgt"][allele]
+	if(organism in cdr3_adj_map):
+		if(mode in cdr3_adj_map[organism]):
+			#mode in the dict
+			if(allele in cdr3_adj_map[organism][mode]):
+				return cdr3_adj_map[organism][mode][allele]
 			else:
-				cdr3_adj_map[organism]=dict()
-			baseDir=getIMGTRegionBaseFolderForNONCDR3(allele,organism,imgtdb_obj)
-			fglobstr=baseDir+"/*"
-			imgt_files=glob.glob(fglobstr)
-			fileToUse=None
-			annotationStartLine=None
-			for imgt_file in imgt_files:
-				if(fileToUse==None):
-					reader=open(imgt_file,'r')
-					lineNum=0
-					for line in reader:
-						sline=line.strip()
-						if(sline==">"+allele.strip()):
-							fileToUse=imgt_file
-						if(sline.startswith("13. Annotation by IMGT/Automat") and not(fileToUse==None)):
-							annotationStartLine=lineNum
-						lineNum+=1
-			if(fileToUse==None):
-				#print "Found no file to use"
-				print "ERROR, could not find IMGT file to use for CDR3 annotation for ",allele," of organism ",organism,"!"
-				cdr3_adj_map[organism]["imgt"][allele]=(-1)
-				return  cdr3_adj_map[organism]["imgt"][allele]
-			else:
-				#print "Found file ",fileToUse,"to use to start at line=",annotationStartLine
+				#do the actual looking up below!
 				pass
-			cdr3_reader=open(fileToUse,'r')
-			lineNum=0
-			cdr3_re=re.compile(r'^CDR3(\-IMGT)?\s+(\d+)[^0-9]+(\d+)',re.IGNORECASE)
-			cdr3_start=None
-			for line in cdr3_reader:
-				if(lineNum>annotationStartLine):
-					sline=line.strip()
-					search_result=re.search(cdr3_re,sline)
-					if(cdr3_start!=None):
-						#print "Looking at ",sline
-						pass
-					if(search_result):
-						#print "FOUND A CDR3 line: ",
-						leftInt=int(search_result.group(2))
-						rightInt=int(search_result.group(3))
-						cdr3_start=leftInt
-				lineNum+=1
-			if(cdr3_start==None):
-				cdr3_start=(-1)
-			cdr3_adj_map[organism]["imgt"][allele]=cdr3_start
-			return cdr3_adj_map[organism]["imgt"][allele]
-		elif(mode=="kabat"):
-			#print "need to handle KABAT mode for CDR3 start!"
-			if(organism in cdr3_adj_map):
-				if(allele in cdr3_adj_map[organism]["kabat"]):
-					return cdr3_adj_map[organism]["kabat"][allele]			
-			kabat_file=imgtdb_obj.getBaseDir()+"/"+organism+"/ReferenceDirectorySet/KABAT/Vlookup.tsv"
-			reader=open(kabat_file,'r')
-			for line in reader:
-				line=line.strip()
-				if(line.startswith(allele)):
-					pieces=line.split("\t")
-					cdr3_start=pieces[11]
-					cdr3_adj_map[organism]["kabat"][allele]=int(cdr3_start)
-			reader.close()
-			toReturn=None
-			if(allele in cdr3_adj_map[organism]["kabat"]):
-				toReturn=cdr3_adj_map[organism]["kabat"][allele]
-			else:
-				cdr3_adj_map[organism]["kabat"][allele]=(-1)
-				toReturn=cdr3_adj_map[organism]["kabat"][allele]				
-			#print "for kabat (",allele,"), to return ",toReturn
-			return toReturn
 		else:
-			print "NON EXISTENT MODE : ",mode
-			sys.exit(0)
+			#mode not in the dict
+			cdr3_ajd_map[organism][mode]=dict()
+	else:
+		cdr3_adj_map[organism]=dict()
+		cdr3_adj_map[organism][mode]=dict()
+	cdr3_int=getVRegionStartAndStopGivenRefData(allele,organism,imgtdb_obj,"CDR3",mode)
+	cdr3_adj_map[organism][mode][allele]=cdr3_int[0]
+	return cdr3_int[0]
+
 
 
 
@@ -763,322 +895,29 @@ def getRegionAlignmentFromLargerVAlignment(sub_info_map,org,mode,region_name,img
 	if(ref_region_interval[0]==(-1) or ref_region_interval[1]==(-1)):
 		#print "Can't get region info, start or stop of ref region is neg 1...."
 		return None
+	elif(
+		(ref_region_interval[0]!=(-1) and  ref_region_interval[0]>int(sub_info_map['s. end'])) or 
+		(ref_region_interval[1]!=(-1) and ref_region_interval[1]<int(sub_info_map['s. start']))
+		):
+		#this is for the case where the region isn't covered at all!
+		return None
 	else:
-		region_frame_start=(ref_region_interval[0]-ref_region_transcript_start)%3
-		#print "ref_region_interval : ",ref_region_interval
-		#print "ref_region_transcript_start : ",ref_region_transcript_start
-		#print "region_frame_start : ",region_frame_start
-		aln_obj=alignment(sub_info_map['query seq'],sub_info_map['subject seq'],sub_info_map['q. start'],sub_info_map['q. end'],sub_info_map['s. start'],sub_info_map['s. end'])
+		#create an alignment from the whole V
+		aln_obj=alignment(
+			sub_info_map['query seq'],
+			sub_info_map['subject seq'],
+			sub_info_map['q. start'],
+			sub_info_map['q. end'],
+			sub_info_map['s. start'],
+			sub_info_map['s. end']
+			)
+		#extract a sub-alignment
 		region_aln=aln_obj.getSubAlnInc(ref_region_interval[0],ref_region_interval[1],"subject")
+		#aquire frame information
+		region_frame_start=(ref_region_interval[0]-ref_region_transcript_start)%3
+		#use/set the frame information in the alignment object
 		region_aln.setSFM(region_frame_start)
 		return region_aln
-		#region_alignment=list()
-		#region_alignment.append(region_aln.q_aln)
-		#region_alignment.append(region_aln.s_aln)
-		#return [region_alignment,region_aln.s_frame_mask,region_aln.q_start,region_aln.q_end,region_aln.s_start,region_aln.s_end]
-		#aln_obj.setSFM(region_frame_start)		
-		#reg_start=int(ref_region_interval[0])
-		#if(reg_start==(-1)):
-		#	reg_start=int(sub_info_map['s. start'])
-		#reg_end=int(ref_region_interval[1])
-		#if(reg_end==(-1)):
-		#	reg_end=int(sub_info_map['s. end'])
-		#s_start=int(sub_info_map['s. start'])
-		#s_end=int(sub_info_map['s. end'])
-		#q_start=int(sub_info_map['q. start'])
-		#q_end=int(sub_info_map['q. end'])
-		#print "s_start=",s_start," and s_end=",s_end
-		#s_aln=sub_info_map['subject seq']
-		#q_aln=sub_info_map['query seq']
-		#region_alignment=["",""]
-		#temp_index=0
-		#temp_index_sbjct=s_start
-		#temp_index_qury=q_start
-		#frame_mask=list()
-		#r_q_start=(-1)
-		#r_q_end=(-1)
-		#refName=sub_info_map['subject ids']
-		#while(temp_index<len(s_aln)):
-		#	if(reg_start<=temp_index_sbjct and temp_index_sbjct<=reg_end):
-		#		#in region
-		#		#subject at 0, query at 1
-		#		if(r_q_start==(-1) and q_aln[temp_index]!="-"):
-		#			r_q_start=temp_index_qury
-		#		if(q_aln[temp_index]!=(-1)):
-		#			r_q_end=temp_index_qury
-		#		region_alignment[0]+=q_aln[temp_index]
-		#		region_alignment[1]+=s_aln[temp_index]
-		#		if(s_aln[temp_index]!="-"):
-		#			#if the frame is knowable, use it
-		#			frame_mask.append(getTheFrameForThisReferenceAtThisPosition(refName,org,imgtdb_obj,temp_index_sbjct))
-		#		else:
-		#			#if the frame is not knowable, put 1 everywhere for the frame to trigger plain sub cts
-		#			frame_mask.append(1)					
-		#	else:
-		#		#not in region
-		#		pass
-		#	if(s_aln[temp_index]!="-"):
-		#		temp_index_sbjct+=1
-		#	if(q_aln[temp_index]!="-"):
-		#		temp_index_qury+=1
-		#	temp_index+=1
-		#return [region_alignment,frame_mask,r_q_start,r_q_end]
-
-
-#given a V segment alignment extract from it the sub-portion for a given
-#region.  Return a 4-length array with subject and query alignment data  [region_alignment,frame_mask,r_q_start,r_q_end] (region_alignment has query first, then sub)
-#return None if alignment too short or doesn't cover region
-def getRegionAlignmentObjFromLargerVAlignment(sub_info_map,org,mode,region_name,imgtdb_obj,wholeOnly=False):
-	#print "THE SIM is ",sub_info_map
-	if(wholeOnly==True):
-		raise Exception("Error, wholeOnly not yet implemented!!!!!!!!!")
-	#print "\n\n\n\nusing region=",region_name
-	valid_regions=getVRegionsList()
-	if(not(region_name in valid_regions)):
-		print region_name," is an invalid region!!!!"
-		return None
-	sub_name=sub_info_map['subject ids']
-	ref_region_interval=getVRegionStartAndStopGivenRefData(sub_name,org,imgtdb_obj,region_name,mode)
-	ref_region_transcript_start=getVRegionStartAndStopGivenRefData(sub_name,org,imgtdb_obj,region_name,"imgt")[0]
-	#print "For reference=",sub_name," for org=",org," region=",region_name," got (mode=",mode,")region=",ref_region_interval
-	if(ref_region_interval[0]==(-1) and ref_region_interval[1]==(-1)):
-		print "Can't get region info, start and stop of ref region is neg 1...."
-		return None
-	else:	
-		reg_start=int(ref_region_interval[0])
-		if(reg_start==(-1)):
-			reg_start=int(sub_info_map['s. start'])
-		reg_end=int(ref_region_interval[1])
-		if(reg_end==(-1)):
-			reg_end=int(sub_info_map['s. end'])
-		s_start=int(sub_info_map['s. start'])
-		s_end=int(sub_info_map['s. end'])
-		q_start=int(sub_info_map['q. start'])
-		q_end=int(sub_info_map['q. end'])
-		#print "s_start=",s_start," and s_end=",s_end
-		s_aln=sub_info_map['subject seq']
-		q_aln=sub_info_map['query seq']
-		region_alignment=["",""]
-		temp_index=0
-		temp_index_sbjct=s_start
-		temp_index_qury=q_start
-		frame_mask=list()
-		r_q_start=(-1)
-		r_q_end=(-1)
-		refName=sub_info_map['subject ids']
-		while(temp_index<len(s_aln)):
-			if(reg_start<=temp_index_sbjct and temp_index_sbjct<=reg_end):
-				#in region
-				#subject at 0, query at 1
-				if(r_q_start==(-1) and q_aln[temp_index]!="-"):
-					r_q_start=temp_index_qury
-				if(q_aln[temp_index]!=(-1)):
-					r_q_end=temp_index_qury
-				region_alignment[0]+=q_aln[temp_index]
-				region_alignment[1]+=s_aln[temp_index]
-				if(s_aln[temp_index]!="-"):
-					#if the frame is knowable, use it
-					frame_mask.append(getTheFrameForThisReferenceAtThisPosition(refName,org,imgtdb_obj,temp_index_sbjct))
-				else:
-					#if the frame is not knowable, put 1 everywhere for the frame to trigger plain sub cts
-					frame_mask.append(1)					
-			else:
-				#not in region
-				pass
-			if(s_aln[temp_index]!="-"):
-				temp_index_sbjct+=1
-			if(q_aln[temp_index]!="-"):
-				temp_index_qury+=1
-			temp_index+=1
-		return [region_alignment,frame_mask,r_q_start,r_q_end]		
-
-
-
-#from a codon list, get an amino list
-def getAminosFromCodonSpace(codon_space):
-	amino_list=list()
-	for codon in codon_space:
-		amino_list.append(str(biopythonTranslate(codon)))
-	return amino_list
-
-
-#given a codon, if there are gaps in it
-#return all possible codons that are the 
-#same but have all 4 nucleotides at the gaps
-def getCodonSpace(codon):
-	if(codon.find("-")==(-1)):
-		return [codon]
-	codon_space=list()
-	bs=['A','C','G','T']
-	for first in bs:
-		for second in bs:
-			for third in bs:
-				temp_codon=first+second+third
-				if(isInCodonSpace(codon,temp_codon)):
-					codon_space.append(temp_codon)
-	return codon_space
-	
-
-#it's in the space if it only differs at gap positions
-def isInCodonSpace(codon,proposal):
-	non_gap_differ=0
-	gap_differ=0
-	for pos in range(len(codon)):
-		if(codon[pos]=="-"):
-			gap_differ+=1
-		elif(codon[pos]!=proposal[pos]):
-			non_gap_differ+=1
-	if(non_gap_differ==0):
-		return True
-	else:
-		return False
-
-
-
-#change a list of codons to a set
-def getCodonSpaceAsSet(codon_space):
-	css=set()
-	for codon in codon_space:
-		css.add(str(codon))
-	return css
-
-
-
-#combine two maps (assuming same keysets!)
-#by adding the values
-#c[x]=a[x]+b[x]
-def combineCharMaps(map_1,map_2):
-	combo_map=dict()
-	for k in map_1:
-		combo_map[k]=map_1[k]+map_2[k]
-	return combo_map
-
-#return a map with 'q. end ' and 's. end' as keys
-def givenAlnAndStartsFindLasts(q_aln,s_aln,q_from,s_from):
-	temp=0
-	q_pos=q_from
-	s_pos=s_from
-	while(temp<len(q_aln)):
-		if(temp==len(q_aln)-1):
-			res=dict()
-			res['s. end']=s_pos
-			res['q. end']=q_pos
-			return res
-		if(q_aln[temp]!="-"):
-			q_pos+=1
-		if(s_aln[temp]!="-"):
-			s_pos+=1
-		temp+=1
-	res=dict()
-	res['s. end']=s_pos
-	res['q. end']=q_pos
-	return res
-	
-
-
-
-#find CDR3 by subalignment styles and find the characterization
-def  getCDR3RegionSpecificCharacterizationSubAln(vData,dData,jData,organism,imgtdb_obj,dMode,query_rec):
-	#it is assume that CDR3 length evaluates to a non-negative number here!
-	#assume VDATA, DDATA, JDATA are all non-None!
-	#aln=["",""]
-	if(vData==None or jData==None):
-		return getEmptyRegCharMap()
-	#get ALIGNMENT starting at CDR3 in V QUERY
-	VrefName=vData['subject ids']
-	v_ref_cdr3_start=getAdjustedCDR3StartFromRefDirSetAllele(VrefName,imgtdb_obj,organism,dMode)
-	vRefTo=int(vData['s. end'])
-	vRefFrom=int(vData['s. start'])
-	vQryFrom=int(vData['q. start'])
-	vQryTo=int(vData['q. end'])
-	v_q_aln=vData['query seq']
-	v_s_aln=vData['subject seq']
-	print "target=",v_ref_cdr3_start," ref=",VrefName," mode=",dMode
-	print "V s from/to : ",vRefFrom," and ",vRefTo
-	print "V q from/to : ",vQryFrom," and ",vQryTo
-	#qry_cdr3_start=getQueryIndexGivenSubjectIndexAndAlignment(v_q_aln,v_s_aln,vQryFrom,vQryTo,vRefFrom,vRefTo,v_ref_cdr3_start)
-	v_cdr3_aln=getAlnAtAndCond(v_q_aln,v_s_aln,vQryFrom,vQryTo,vRefFrom,vRefTo,v_ref_cdr3_start,"subject","geq")
-	print "CDR3=",v_cdr3_aln
-	#find the position number of the last BP in the V CDR3 query
-	#use this position number to extract the portion of the D alignment that is not already covered 
-	#in the V alignment.  This in the case the junction sequence is "double aligned" by both V and D
-	# this is notated with "GA(TTA)CA" in the IGBLAST output
-	q_last_cdr3=vQryTo
-	#increment the value by one to get the next bp to avoid overcounting and because the routine to call will use >= not >
-	q_d_cdr3_lim=q_last_cdr3+1
-	#using this 'q_d_cdr3_lim' if D alignment exists, find the sub alignment in D of CDR3
-	numDInAlnRemoved=0 #represents number BP chopped from beginning of D alignment
-	d_adj_cdr3_start=(-1)
-	#get D subalignment
-	d_q_aln=dData['query seq']
-	d_s_aln=dData['subject seq']
-	dQryFrom=int(dData['q. start'])
-	dQryTo=int(dData['q. end'])
-	dRefFrom=int(dData['s. start'])
-	dRefTo=int(dData['s. end'])
-	#printMap(dData)
-	#print "D s from/to : ",dRefFrom," and ",dRefTo
-	#print "D q from/to : ",dQryFrom," and ",dQryTo
-	d_cdr3_aln=getAlnAtAndCond(d_q_aln,d_s_aln,dQryFrom,dQryTo,dRefFrom,dRefTo,q_d_cdr3_lim,"query","geq")
-	if(len(d_cdr3_aln[0])==0):
-		d_q_last_cdr3=q_d_cdr3_lim
-		numDInAlnRemoved=len(d_q_aln)
-		d_adj_cdr3_start=(-1)
-	else:
-		d_q_last_cdr3=dQryTo
-		numDInAlnRemoved=len(d_q_aln)-len(d_cdr3_aln)
-		#get the adjust D cdr3 "resume" (not start)
-		#so that proper frame can be achieved
-		temp=0
-		q_pos=dQryTo
-		temp=len(d_q_aln)-1
-		while(temp>=0):
-			if(temp==numDInAlnRemoved):
-				d_adj_cdr3_start=q_pos
-				temp=0
-			if(d_q_aln[temp]!="-"):
-				q_pos-=1
-			temp-=1
-	#NOW d_adj_cdr3_start represents the position of the first base of the D alignment
-	#that is not also in the V alignment for 
-	print "D CDR3 ALN WITH OVERLAP REMOVED : "
-	print d_cdr3_aln
-
-	#J part
-	if(d_adj_cdr3_start==(-1)):
-		#if all D alignment was removed, use same limit that D used
-		j_cdr3_lim=q_d_cdr3_lim
-	else:
-		#if not all D was removed
-		j_cdr3_lim=d_q_last_cdr3+1
-
-	#get sub J alignment
-	j_q_aln=jData['query seq']
-	j_s_aln=jData['subject seq']
-	jQryFrom=int(jData['q. start'])
-	jQryTo=int(jData['q. end'])
-	jRefFrom=int(jData['s. start'])
-	jRefTo=int(jData['s. end'])
-	j_cdr3_aln=getAlnAtAndCond(j_q_aln,j_s_aln,jQryFrom,jQryTo,jRefFrom,jRefTo,j_cdr3_lim,"query","geq")
-	
-
-	#accumulate on base subs, insertions, deletions
-	noSynMap=getEmptyRegCharMap()	
-	segs=['V','D','J']
-	for s in range(len(segs)):
-		to_analyze=None
-		if(s==0):
-			to_analyze=v_cdr3_aln
-		elif(s==1):
-			to_analyze=d_cdr3_aln
-		else:
-			to_analyze=j_cdr3_aln
-		temp_frame_array=list()
-		for i in range(len(to_analyze[0])):
-			temp_frame_array.append(0)
-		temp_char_map=getRegionSpecifcCharacterization(s_aln,q_aln,reg_name,temp_frame_array,mode)
-		for k in temp_char_map:
-			noSynMap[k]+=temp_char_map[k]
 
 
 
@@ -1087,323 +926,6 @@ def  getCDR3RegionSpecificCharacterizationSubAln(vData,dData,jData,organism,imgt
 
 
 
-
-
-
-#characterize CDR3
-def getCDR3RegionSpecificCharacterization(vData,dData,jData,organism,imgtdb_obj,dMode):
-	print "###############################ENTER CDR3#################################"
-	char_map=dict()
-	num_ins=0
-	num_del=0
-	num_syn=0
-	num_nsy=0
-	num_bsb=0
-	VrefName=vData['subject ids']
-	############################################
-	#get CDR3 from V characterization
-	v_ref_cdr3_start=getAdjustedCDR3StartFromRefDirSetAllele(VrefName,imgtdb_obj,organism,dMode)
-	cdr3_v_char_map=getEmptyRegCharMap()
-	qry_cdr3_start=(-1)
-	qry_cdr3_start_last_frame=(-1)
-	lastVPos=(-1)
-	v_tot=0
-	v_same=0
-	cdr3_q_start_for_return=(-1)
-	if(vData!=None and v_ref_cdr3_start!=(-1)):
-		v_s_aln=vData['subject seq']
-		v_q_aln=vData['query seq']
-		vRefTo=int(vData['s. end'])
-		vRefFrom=int(vData['s. start'])
-		print "V call is ",VrefName
-		qry_cdr3_start=getQueryIndexGivenSubjectIndexAndAlignment(v_q_aln,v_s_aln,int(vData['q. start']),int(vData['q. end']),vRefFrom,vRefTo,v_ref_cdr3_start)
-		print "The CDR3 start (mode=",dMode,") is ",v_ref_cdr3_start
-		temp_v=0
-		temp_v_pos=int(vData['s. start'])
-		temp_v_q_pos=int(vData['q. start'])
-		print "sub start and end are ",temp_v_pos," and ",vRefTo
-		cdr3_s_aln=""
-		cdr3_q_aln=""
-		frame_mask=list()
-		while(temp_v<len(v_s_aln)):
-			if(temp_v_pos>=v_ref_cdr3_start):
-				
-				cdr3_s_aln+=v_s_aln[temp_v]
-				cdr3_q_aln+=v_q_aln[temp_v]
-				qry_cdr3_start_last_frame=getTheFrameForThisReferenceAtThisPosition(VrefName,organism,imgtdb_obj,temp_v_pos)
-				if(v_s_aln[temp_v]!="-" and v_q_aln[temp_v]!="-"):
-					v_tot+=1
-					if(v_s_aln[temp_v]==v_q_aln[temp_v]):
-						v_same+=1
-				frame_mask.append(qry_cdr3_start_last_frame)
-			if(v_q_aln[temp_v]!="-" and cdr3_q_start_for_return!=(-1)):
-				cdr3_q_start_for_return=temp_v_q_pos
-			if(v_q_aln[temp_v]!="-"):
-				temp_v_q_pos+=1
-			if(v_s_aln[temp_v]!="-"):
-				lastVPos=temp_v_pos
-				temp_v_pos+=1
-			temp_v+=1
-		cdr3_v_char_map=getRegionSpecifcCharacterization(cdr3_s_aln,cdr3_q_aln,"CDR3",frame_mask,dMode)
-	if(cdr3_q_start_for_return==(-1)):
-		cdr3_q_start_for_return=int(vData['q. end'])+1
-	print "THE V CDR3 CHAR MAP is "
-	printMap(cdr3_v_char_map)
-	##########################################	
-	#D CDR3
-	cdr3_d_char_map=getEmptyRegCharMap()
-	d_tot=0
-	d_same=0
-	if(dData!=None):
-		d_s_aln=dData['subject seq']
-		print "D CALL is ",dData['subject ids']
-		d_q_aln=dData['query seq']
-		#non_frame=[1]*len(d_s_aln)
-		d_frame=[]
-		q_d_start=int(dData['q. start'])
-		temp_q_d_pos=q_d_start
-		temp_d=0
-		while(temp_d<len(d_s_aln)):
-			if(d_s_aln[temp_d]!="-" and d_q_aln[temp_d]!="-"):
-				d_tot+=1
-				if(d_s_aln[temp_d]==d_q_aln[temp_d]):
-					d_same+=1
-			if lastVPos!=(-1):
-				d_frame.append((temp_q_d_pos-qry_cdr3_start_last_frame)%3)
-			else:
-				d_frame.append(1)
-			if(d_q_aln[temp_d]!="-"):
-				temp_q_d_pos+=1
-			temp_d+=1
-		print "Some d info:"
-		cdr3_d_char_map=getRegionSpecifcCharacterization(d_s_aln,d_q_aln,"CDR3",d_frame,dMode)
-		print "the d alignment"
-		print printNiceAlignment(d_q_aln,d_s_aln)
-		print d_frame
-		print "d map "
-		printMap(cdr3_d_char_map)
-	###############################################
-	#J CDR3
-	cdr3_j_char_map=getEmptyRegCharMap()
-	firstJFrame=(-1)
-	j_tot=0
-	j_same=0
-	j_cdr3_reg_end=(-1)
-	if(jData!=None):
-		jDataRefName=jData['subject ids']
-		print "J CALL is ",jDataRefName
-		ref_cdr3_end=getADJCDR3EndFromJAllele(jDataRefName,imgtdb_obj,organism,dMode)
-		if(ref_cdr3_end!=(-1)):
-			j_s_aln=jData['subject seq']
-			j_q_aln=jData['query seq']
-			j_from=int(jData['s. start'])
-			j_to=int(jData['s. end'])
-			i_pos=0
-			sub_pos=j_from
-			qry_pos=int(jData['q. start'])
-			cdr3_s_aln=""
-			cdr3_q_aln=""
-			j_frame=[]
-			while(i_pos<len(j_s_aln)):
-				if(j_q_aln[i_pos]!="-" and firstJFrame==(-1)):
-					firstJFrame=(ref_cdr3_end+1-sub_pos)%3
-				if(sub_pos<=ref_cdr3_end):
-					j_frame.append((ref_cdr3_end+1-sub_pos)%3)
-					cdr3_s_aln+=j_s_aln[i_pos]
-					cdr3_q_aln+=j_q_aln[i_pos]
-					if(j_q_aln[i_pos]!="-" and j_s_aln[i_pos]!="-"):
-						j_tot+=1
-						if(j_q_aln[i_pos]==j_s_aln[i_pos]):
-							j_same+=1
-					if(j_q_aln[i_pos]!="-"):
-						j_cdr3_reg_end=qry_pos
-				if(j_s_aln[i_pos]!="-"):
-					sub_pos+=1
-				if(j_q_aln[i_pos]!="-"):
-					qry_pos+=1
-				i_pos+=1
-			print "jcdr3 end is ",ref_cdr3_end," but s_from and to are ",j_from," and ",j_to
-			cdr3_j_char_map=getRegionSpecifcCharacterization(cdr3_s_aln,cdr3_q_aln,"CDR3",j_frame,dMode)
-			print "THE J CDR3 CHAR MAP and frame info:"
-			printMap(cdr3_j_char_map)
-			print j_frame
-		if(j_cdr3_reg_end==(-1)):
-			j_cdr3_reg_end=int(jData['q. start'])-1
-	if(j_cdr3_reg_end==(-1)):
-		j_cdr3_reg_end=cdr3_q_start_for_return
-	############################################
-	#cumulation
-	combo_map=combineCharMaps(cdr3_v_char_map,cdr3_d_char_map)
-	combo_map=combineCharMaps(combo_map,cdr3_j_char_map)
-	cum_tot=v_tot+d_tot+j_tot
-	print "v,d,j tots",v_tot,d_tot,j_tot
-	print "v,d,j smes",v_same,d_same,j_same
-	cum_sme=v_same+d_same+j_same
-	print "cumulative same and cumulative tot : ",cum_sme," ",cum_tot
-	cum_pct_id=float(cum_sme)/float(cum_tot)
-	combo_map['pct_id']=cum_pct_id*100.0
-	print "THE COMBO MAP is "
-	printMap(combo_map)
-	#temp_j=0
-	#temp_j_pos=int(jData['s. start'])
-	#j_s_aln=vData['subject seq']
-	#j_q_aln=vData['query seq']
-	#cdr3_s_aln=""
-	#cdr3_q_aln=""	
-	#while(temp_j<len(j_s_aln)):
-	#	if(temp_j_pos<j_ref_cdr3_end):
-	#		cdr3_s_aln+=j_s_aln[temp_j]
-	#		cdr3_q_aln+=j_q_aln[temp_j]
-	#	if(j_s_aln[temp_j]!="-"):
-	#		temp_j_pos+=1
-	#Jrefname=jData['subject ids']
-	#jRefTo=int(jData['s. end'])
-	#jRefFrom=int(jData['s. start'])
-	#j_ref_cdr3_end=getADJCDR3EndFromJAllele(Jrefname,imgtdb_obj,organism,dMode)
-	return [combo_map,cdr3_q_start_for_return,j_cdr3_reg_end]
-	
-	
-
-
-
-#given a sub alignment with a region, compute :
-#A) synonymous mutations, B) non-synonymous mutations
-#C) insertions, D) deletions, E) number stop codons
-#F) mutation(sum A-D)
-#NOTE "A" and "B" are 'base substitutions'
-def getRegionSpecifcCharacterization(s_aln,q_aln,reg_name,frame_mask,mode,q_start=None,limit=(-1)):
-	char_map=dict()
-	num_ins=0
-	num_del=0
-	num_syn=0
-	num_nsy=0
-	num_bsb=0
-	#print "\n\nNice alignment (region=",reg_name," ,mode=",mode,") query top, subject bottom : \n",printNiceAlignment(q_aln,s_aln),"\n"
-	if(len(s_aln)!=len(q_aln)):
-		raise Exception("ERROR, Q_ALN LENGTH NOT EQUAL TO S_ALN LENGTH!?!?!")
-	#do indel counts independent of codons/translations
-	for i in range(len(s_aln)):
-		if(s_aln[i]=="-"):
-			num_ins+=1
-		elif(q_aln[i]=="-"):
-			num_del+=1
-	#do counts with codon information
-	temp_index=0
-	#using such flags take stats with the limitation of limit
-	if(q_start!=None):
-		q_pos=q_start
-	else:
-		q_pos=float("inf")
-	last_q_pos=q_pos
-	while(temp_index<len(s_aln)):
-		#print "temp_index=",temp_index," and frame mask is ",frame_mask[temp_index]
-		if(
-			temp_index<len(s_aln)-2 and 
-			frame_mask[temp_index]==0 and 
-			frame_mask[temp_index+1]==1 and 
-			frame_mask[temp_index+2]==2 
-			):
-			#print "encountered a codon...."
-			s_codon=s_aln[temp_index:(temp_index+3)]
-			s_codon_w_gaps=s_codon
-			#s_codon=re.sub(r'\-','N',s_codon)
-			#print "s codon is ",s_codon
-			q_codon=q_aln[temp_index:(temp_index+3)]
-			q_codon_w_gaps=q_codon
-			#q_codon=re.sub(r'\-','N',q_codon)
-			#print "q codon is ",q_codon
-			if(s_codon.find("-")==(-1) and q_codon.find("-")==(-1)):
-				#ANALYSIS FOR CODONS WITH NO GAPS
-				#no gaps, perform analysis
-				s_amino=str(biopythonTranslate(s_codon))
-				#print "subject amino :",s_amino
-				q_amino=str(biopythonTranslate(q_codon))
-				#print "query amino ",q_amino
-				#if(q_amino!=s_amino):
-				#	print "AMINOS NOT EQUAL - NS MUT!"
-				for cp in range(3):
-					if(s_codon[cp]!=q_codon[cp] and s_amino==q_amino and q_pos+cp>limit):
-						num_syn+=1
-						num_bsb+=1
-						if(q_codon_w_gaps[cp]!="-"):
-							q_pos+=1
-							last_q_pos=q_pos
-					elif(s_codon[cp]!=q_codon[cp] and s_amino!=q_amino and q_pos+cp>limit):
-						num_nsy+=1
-						num_bsb+=1
-						if(q_codon_w_gaps[cp]!="-"):
-							q_pos+=1
-							last_q_pos=q_pos
-			else:
-				#ANALYSIS FOR CODONS WITHOUT GAPS
-				#print "analyzing with gap..."
-				for cp in range(3):
-					if(s_codon[cp]!="-" and q_codon[cp]!="-" and s_codon[cp]!=q_codon[cp] and q_pos>limit):
-						num_bsb+=1
-					if(q_codon_w_gaps[cp]!="-"):
-						q_pos+=1
-						last_q_pos=q_pos
-			#q_codon_space=getCodonSpace(q_codon)
-			#s_codon_space=getCodonSpace(s_codon)
-			#q_codon_set=getCodonSpaceAsSet(q_codon_space)
-			#s_codon_set=getCodonSpaceAsSet(s_codon_space)
-			#print "The codon space from query codon ",q_codon," is ",q_codon_space," and the set is ",q_codon_set
-			#print "The subject cd space from subject ",s_codon," is ",s_codon_space," and the set is ",s_codon_set
-			# "The query amino space is ",getAminosFromCodonSpace(s_codon_space)
-			temp_index+=3
-		else:
-			#print "encountered a single...."
-			if(s_aln[temp_index]!=q_aln[temp_index] and s_aln[temp_index]!="-" and q_aln[temp_index]!="-"):
-				if(q_pos>limit):
-					num_bsb+=1
-				if(q_aln[temp_index]!="-"):
-					q_pos+=1
-					
-			temp_index+=1
-	#have this loop below for pct id
-	num_same=0
-	num_tot=0
-	temp_index=0
-	#using such flags take stats with the limitation of limit
-	if(q_start!=None):
-		q_pos=q_start
-	else:
-		q_pos=float("inf")
-	while(temp_index<len(s_aln)):
-		num_tot+=0
-		if(s_aln[temp_index]==q_aln[temp_index] and s_aln[temp_index]!="-" and q_aln[temp_index]!="-" and q_pos>limit):
-			num_same+=1
-		if(s_aln[temp_index]!="-" and q_aln[temp_index]!="-" and q_pos>limit):
-			num_tot+=1
-		if(q_aln[temp_index]!="-"):
-			q_pos+=1
-		temp_index+=1
-	pct_id=0
-	if(num_tot==0):
-		pct_id=float(0)
-	else:
-		pct_id=float(num_same)/float(num_tot)
-	#print "done with codon-based counting...."
-	char_map['insertions']=num_ins
-	char_map['deletions']=num_del
-	char_map['base_sub']=num_bsb
-	char_map['synonymous_bsb']=num_syn
-	char_map['nonsynonymous_bsb']=num_nsy
-	if(num_syn!=0):
-		char_map['ns_rto']=num_syn/num_syn
-	else:
-		#leave it at zero
-		char_map['ns_rto']=0
-	char_map['mutations']=num_bsb+num_del+num_ins
-	char_map['pct_id']=pct_id*100.0
-	if(len(q_aln)==0):
-		char_map['bsb_freq']=0
-	else:
-		if(not(getNumberBpInAlnStr(q_aln)==0)):
-			char_map['bsb_freq']=num_bsb/(getNumberBpInAlnStr(q_aln))
-		else:
-			char_map['bsb_freq']=0
-	return char_map
 
 
 
@@ -1490,7 +1012,32 @@ def ofLeftmostJNucleotideNotAligningToJGetItsFrameAssumingJunctionSegmentOverlap
 
 
 
-#at the indicated position find the frame by using the first imgt delineation start as a "base" or "frame of reference"
+def getTheFrameForThisJReferenceAtThisPosition(refJName,organism,imgtdb_obj,refPos):
+	ref_cdr3_end=getADJCDR3EndFromJAllele(refJName,imgtdb_obj,organism,"imgt")
+	if(ref_cdr3_end==(-1)):
+		return None
+	else:
+		#ref_cdr3_end in in FRAME #2 because it represents the last BP of the codon immediately before W or F of CDR3 end.
+		if(refPos==ref_cdr3_end):
+			return 2
+		else:
+			if(refPos<ref_cdr3_end):
+				diff=ref_cdr3_end-refPos
+				neg_diff=(-1)*(diff)
+				frame=((neg_diff)-1)%3
+				return frame
+			else:
+				diff=refPos-ref_cdr3_end
+				frame=(diff-1)%3
+				return frame
+				
+		
+
+
+
+
+#at the indicated position find the frame by using the
+#imgt delineation/region starts as a "base" or "frame of reference"
 def getTheFrameForThisReferenceAtThisPosition(refName,organism,imgtdb_obj,refPos):
 	regions=getVRegionsList(True)
 	for r in range(len(regions)-1):
@@ -1508,20 +1055,19 @@ def getTheFrameForThisReferenceAtThisPosition(refName,organism,imgtdb_obj,refPos
 			interval_r_next_start=int(interval_r_next[0])
 			interval_r_next_stop=int(interval_r_next[1])
 			if(
-				interval_r_start!=(-1) and 
+				#interval_r_start!=(-1) and 
 				interval_r_stop!=(-1) and 
-				interval_r_next_start!=(-1) and 
-				interval_r_next_stop!=(-1)
+				interval_r_next_start!=(-1)#  and
+				#interval_r_next_stop!=(-1)
 				):
 				return (refPos-interval_r_next_start)%3
 			else:
 				pass
-				#print "interval_r=",interval_r
-				#print "interval_r_next=",interval_r_next
-	eMsg="ERROR, COULD NOT FIND ANY FRAME POSITION AT ALL FOR "+refName+" with organism="+organism
+	eMsg="ERROR, COULD NOT FIND ANY FRAME POSITION AT ALL FOR "+refName+" with organism="+organism+"!"
+	eMsg+="\nIs frame data avaialble in the database?!?!? Consider Re-run but skipping annotation ('-skip_char')"
 	print eMsg
-	raise Exception(eMsg+"\nIs frame data avaialble in the database?!?!? Consider Re-run but skipping annotation ('-skip_char')")
-	#raise Exception()
+	raise Exception(eMsg)
+
 
 
 
@@ -1539,29 +1085,6 @@ def alleleIsTR(an):
 	else: 
 		return False
 
-def alleleIsIG(an):
-	if(alleleIsTR(an)):
-		return False
-	else:
-		return True
-
-#given the imgtobj, refname, and reforganism
-#obtain the base folder for IMGT lookups
-def getIMGTRegionBaseFolderForNONCDR3(refName,refOrg,imgtdb_obj):
-	lookupFile=None
-	if(alleleIsIG(refName)):
-		if(refOrg=="human"):
-			lookupFile=imgtdb_obj.getBaseDir()+"/human/ReferenceDirectorySet/HUMAN_REF/IMGT_HighV-QUEST_individual_files_folder"
-		elif(refOrg=="Mus_musculus"):
-			lookupFile=imgtdb_obj.getBaseDir()+"/Mus_musculus/ReferenceDirectorySet/MOUSE/IMGT_HighV-QUEST_individual_files_folder"	
-	else:
-		if(refOrg=="human"):
-			lookupFile=imgtdb_obj.getBaseDir()+"/human/ReferenceDirectorySet/HUMAN_TR_V/IMGT_HighV-QUEST_individual_files_folder"
-		elif(refOrg=="Mus_musculus"):
-			lookupFile=imgtdb_obj.getBaseDir()+"/Mus_musculus/ReferenceDirectorySet/MOUSE_TR_V/IMGT_HighV-QUEST_individual_files_folder"
-	return lookupFile
-		
-
 
 
 #have a cache map for region information for reference data
@@ -1574,7 +1097,7 @@ reg_adj_map["Mus_musculus"]["kabat"]=dict()
 reg_adj_map["Mus_musculus"]["imgt"]=dict()
 def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 	global reg_adj_map
-	regions=getVRegionsList()
+	regions=getVRegionsList(True)
 	if(refOrg in reg_adj_map):
 		if(mode in reg_adj_map[refOrg]):
 			if(refName in reg_adj_map[refOrg][mode]):
@@ -1598,92 +1121,96 @@ def getVRegionStartAndStopGivenRefData(refName,refOrg,imgtdb_obj,region,mode):
 		#organism not in there!
 		raise Exception("Unknown organism "+refOrg)
 	#first, form a path to a lookup.
-	#this depends on organis and mode
-	#for KABAT its a file
-	#for IMGT it st(<?arts as a directory but later becomes a file!
-	lookupFile=None
-	if(mode=="kabat"):
-		if(refOrg=="human"):
-			lookupFile=imgtdb_obj.getBaseDir()+"/human/ReferenceDirectorySet/KABAT/Vlookup.tsv"
-		elif(refOrg=="Mus_musculus"):
-			lookupFile=imgtdb_obj.getBaseDir()+"/Mus_musculus/ReferenceDirectorySet/KABAT/Vlookup.tsv"
-		else:
-			print "ERROR, UNKNOWN ORGANISM ",refOrg
-			sys.exit(0)
-	elif(mode=="imgt" or mode=="IMGT"):
-		if(refOrg=="human" or refOrg=="Mus_musculus"):
-			lookupFile=getIMGTRegionBaseFolderForNONCDR3(refName,refOrg,imgtdb_obj)
-		else:
-			print "ERROR, UNKNOWN ORGANISM ",refOrg
-			sys.exit(0)
-	else:
-		print "ERROR, undefined mode : ",mode
-	########################################
-	#now that a lookup is selected do an actual lookup!
-	#print "TO USE LOOKUP : ",lookupFile
-	if(mode=="kabat"):
-		idx_num=None
-		for i in range(len(regions)):
-			if(regions[i]==region):
-				idx_num=i
-		if((idx_num is None) or not(region in regions)):
-			print "ERROR, UNKNOWN REGION : ",region
-			sys.exit(0)
-		kabat_reader=open(lookupFile,'r')
-		for line in kabat_reader:
-			line=line.strip()
-			line_pieces=line.split('\t')
-			line_segment=line_pieces[0]
-			#print "looking at ",line
-			if(line_segment==refName):
-				col_num=1+idx_num*2
-				region_interval=[int(line_pieces[col_num]),int(line_pieces[col_num+1])]
-				reg_adj_map[refOrg]["kabat"][refName][region]=region_interval
-				kabat_reader.close()
-				return reg_adj_map[refOrg]["kabat"][refName][region]
-		kabat_reader.close()
-		print "ERROR, FAILED TO FIND KABAT REGION FOR REFERENCE NAMED "+refName+" in "+lookupFile
-		#return [(-1),(-1)]
+	#this depends on organism and mode
+	seq_type=refName[0:2]
+	lookupPath=imgtdb_obj.getBaseDir()+"/"+refOrg+"/ReferenceDirectorySet/"+mode.upper()+"/Vlookup."+seq_type+".tsv"
+	if(not(os.path.exists(lookupPath)) or not(os.path.isfile(lookupPath))):
+		raise Exception("Error, failed to find lookup file "+lookupPath+" for "+refName+" for organism = "+refOrg)
+	idx_num=None
+	for i in range(len(regions)):
+		if(regions[i]==region):
+			idx_num=i
+	if((idx_num is None) or not(region in regions)):
+		print "ERROR, UNKNOWN REGION : ",region
 		sys.exit(0)
-	elif(mode=="IMGT" or mode=="imgt"):
-		lookupBase=lookupFile
-		filesToScan=lookupBase+"/*"
-		filesToScan=glob.glob(filesToScan)
-		for current_file in filesToScan:
-			#print "Now to scan in "+current_file
-			current_file_refname=None
-			target_file_flag=False
-			passed_annotation_flag=False
-			imgt_reader=open(current_file,'r')
-			for line in imgt_reader:
-				line=line.strip()
-				if(line.startswith(">"+refName.strip())):
-					target_file_flag=True
-				if(line.startswith("13. Annotation")):
-					passed_annotation_flag=True
-				if(passed_annotation_flag and target_file_flag and (line.startswith(region+"-IMGT"))):
-					#print "Found target line "+line+" in file "+current_file
-					regRE=re.compile(r'(\-?IMGT)?\s+(<?)(\d+)[^0-9]+(\d+)(>?)\s*',re.IGNORECASE)
-					#note that this regex PROHIBITS the <,> signs
-					matchRes=re.search(regRE,line)
-					if(matchRes):
-						lt=matchRes.group(2)
-						gt=matchRes.group(5)
-						reg_start=matchRes.group(3)
-						if(lt=="<"):
-							reg_start=(-1)
-						reg_end=matchRes.group(4)
-						if(gt==">"):
-							reg_end=(-1)
-						if(reg_start==(-1) and reg_end!=(-1)):
-							reg_start=1
-						region_interval=[int(reg_start),int(reg_end)]
-						reg_adj_map[refOrg]["imgt"][refName][region]=region_interval
-						imgt_reader.close()
-						return reg_adj_map[refOrg]["imgt"][refName][region]
-			imgt_reader.close()
-		reg_adj_map[refOrg]["imgt"][refName][region]=[(-1),(-1)]
-		return reg_adj_map[refOrg]["imgt"][refName][region]
+	region_reader=open(lookupPath,'r')
+	for line in region_reader:
+		line=line.strip()
+		line_pieces=line.split('\t')
+		line_segment=line_pieces[0]
+		#print "looking at ",line
+		if(line_segment==refName):
+			col_num=1+idx_num*2
+			region_interval=[int(line_pieces[col_num]),int(line_pieces[col_num+1])]
+			reg_adj_map[refOrg][mode][refName][region]=region_interval
+			region_reader.close()
+			return reg_adj_map[refOrg][mode][refName][region]
+	region_reader.close()
+	print "ERROR, FAILED TO FIND "+mode.upper()+" REGION FOR REFERENCE NAMED "+refName+" in "+lookupFile
+	#return [(-1),(-1)]
+	sys.exit(0)	
+
+
+
+class recombFreqManager():
+
+	#have a frequency map
+	freq_map=None
+
+	def itemToStr(self,item):
+		if(item is None):
+			return "None"
+		else:
+			return str(item)
+
+	#constructor
+	def __init__(self):
+		self.freq_map=dict()
+	
+	#increment the count for a particular combination	
+	def addVDJRecombination(self,vName,dName,jName,maskAllele=True):
+		if(maskAllele):
+			#print "v=",vName,"d=",dName,"j=",jName
+			vName=deAllelifyName(self.itemToStr(vName))
+			dName=deAllelifyName(self.itemToStr(dName))
+			jName=deAllelifyName(self.itemToStr(jName))
+		comb=[self.itemToStr(vName),self.itemToStr(dName),self.itemToStr(jName)]
+		comb_str=",".join(comb)
+		if(comb_str in self.freq_map):
+			self.freq_map[comb_str]=self.freq_map[comb_str]+1
+		else:
+			self.freq_map[comb_str]=1
+
+	#write JSON to a file
+	def writeJSONToFile(self,outPath):
+		writer=open(outPath,'w')
+		JSON=self.makeJSON()
+		writer.write(JSON)
+		writer.close()
+
+	#create JSON from combos
+	def makeJSON(self):
+		json="{\ncombinations : [\n"
+		combo_array=list()
+		for combination in self.freq_map:
+			combo_json="{"
+			combo_pieces=combination.split(",")
+			combo_json+=" v : '"+combo_pieces[0]+"',"
+			combo_json+=" d : '"+combo_pieces[1]+"',"
+			combo_json+=" j : '"+combo_pieces[2]+"',"
+			combo_json+=" count : "+str(self.freq_map[combination])
+			combo_json+="}"
+			combo_array.append(combo_json)
+		all_combos=",\n".join(combo_array)
+		json+=all_combos+"\n]}"
+		return json
+
+
+
+	
+		
+
+
 
 
 
@@ -1757,16 +1284,16 @@ class IncrementMapWrapper():
 				self.increment(k)
 
 	#write JSON to file
-	def JSONIFYToFile(self,db_base,organism,filePath,filterbyFastaAlleles=False):
-		JSON=self.JSONIFYIntoHierarchy(db_base,organism,filterbyFastaAlleles)
+	def JSONIFYToFile(self,db_base,organism,filePath,filterbyFastaAlleles=False,pickle_file_full_path=None):
+		JSON=self.JSONIFYIntoHierarchy(db_base,organism,filterbyFastaAlleles,pickle_file_full_path)
 		writer=open(filePath,'w')
 		writer.write(JSON)
 		writer.close()
 
 
 	#JSONIFY into hierarchy
-	def JSONIFYIntoHierarchy(self,db_base,organism,filterbyFastaAlleles=False):
-		hierarchy=getHierarchyByOrganism(db_base+"/"+organism+"/GeneTables/",organism,filterbyFastaAlleles)
+	def JSONIFYIntoHierarchy(self,db_base,organism,filterbyFastaAlleles=False,pickle_file_full_path=None):
+		hierarchy=getHierarchyBy(db_base+"/"+organism+"/GeneTables/",organism,filterbyFastaAlleles,pickle_file_full_path)
 		JSON=jsonify_hierarchy(hierarchy,organism,self.count_map,"value")
 		return JSON
 
@@ -1855,7 +1382,21 @@ def getQueryIndexGivenSubjectIndexAndAlignment(query_aln,subject_aln,q_start,q_s
 
 
 #rooted at an organism get the hierarchy from the gene tables
-def getHierarchyByOrganism(geneTablesDirectoryOfHTMLFiles,org_name,filterbyFastaAlleles=False):
+def getHierarchyBy(geneTablesDirectoryOfHTMLFiles,org_name,filterbyFastaAlleles=False,fullPklPath=None):
+	print "Trying to use " ,fullPklPath
+	if(not(fullPklPath==None)):
+		#print "not none"
+		if(os.path.exists(fullPklPath)):
+			#print "it exists"
+			unpickled_data=pickleRead(fullPklPath)
+			#print unpickled_data
+			#print "len of data is ",len(unpickled_data)
+			subset_for_extraction=unpickled_data[0]
+			for item in subset_for_extraction:
+				if(item==org_name):
+					return subset_for_extraction[item]
+				#print item
+			#return unpickled_data[org_name]
 	loci=get_loci_list()
 	hierarchy=tree()
 	for locus in loci:
@@ -1890,23 +1431,38 @@ def getHierarchyByOrganism(geneTablesDirectoryOfHTMLFiles,org_name,filterbyFasta
 
 
 
+def testAcquireRegionInfo():
+	imgtdb_obj=imgt_db("/home/data/DATABASE/10_29_2014/")
+	orgs=imgtdb_obj.getOrganismList()
+	for organism in orgs:
+		#vsegs
+		types=["IG","TR"]
+		for seq_type in types:
+			v_segs=getAlleles("V",organism,seq_type)
+			regions="FR1","FR2","FR3","CDR1","CDR2"
+			
+
+
+
+
 if (__name__=="__main__"):
+	pass
 	#getQueryIndexGivenSubjectIndexAndAlignment
 	#getQueryIndexGivenSubjectIndexAndAlignment(query_aln,subject_aln,q_start,q_stop,s_start,s_stop,subject_pos):
-	query_aln="AC-XN-GT"
-	sbjct_aln="-GAT-ACA"
-	query_from=2
-	query_to=7
-	sbjct_f=3
-	sbjct_t=8
-	for i in range(3,8+1):
-		print "\n\n\n"
-		print "Now analyzing (s at top, q at bottom):"
-		print sbjct_f,sbjct_aln,sbjct_t
-		print query_from,query_aln,query_to
-		print "q_from=",query_from," query_to=",query_to,",s_from=",sbjct_f,", s_to=",sbjct_t," At subject position=",i
-		#print "The corresponding query position is "+str(getQueryIndexGivenSubjectIndexAndAlignment(query_aln,sbjct_aln,query_from,query_to,sbjct_f,sbjct_t,i))
-		#print "The corresponding (lean_left) query position is "+str(getQueryIndexGivenSubjectIndexAndAlignment(query_aln,sbjct_aln,query_from,query_to,sbjct_f,sbjct_t,i,"left"))
+	#query_aln="AC-XN-GT"
+	#sbjct_aln="-GAT-ACA"
+	#query_from=2
+	#query_to=7
+	#sbjct_f=3
+	#sbjct_t=8
+	#for i in range(3,8+1):
+	#	print "\n\n\n"
+	#	print "Now analyzing (s at top, q at bottom):"
+	#	print sbjct_f,sbjct_aln,sbjct_t
+	#	print query_from,query_aln,query_to
+	#	print "q_from=",query_from," query_to=",query_to,",s_from=",sbjct_f,", s_to=",sbjct_t," At subject position=",i
+	#	#print "The corresponding query position is "+str(getQueryIndexGivenSubjectIndexAndAlignment(query_aln,sbjct_aln,query_from,query_to,sbjct_f,sbjct_t,i))
+	#	#print "The corresponding (lean_left) query position is "+str(getQueryIndexGivenSubjectIndexAndAlignment(query_aln,sbjct_aln,query_from,query_to,sbjct_f,sbjct_t,i,"left"))
 
 
 

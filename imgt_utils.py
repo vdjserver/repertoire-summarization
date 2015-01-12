@@ -4,21 +4,17 @@ from sets import Set
 import subprocess
 import urllib2
 from bs4 import BeautifulSoup
-import yaml
 from collections import defaultdict
 import pprint
 import re
 from utils import *
 import glob
 import json
-from igblast_utils import *
 from subprocess import call
 from Bio.Blast import NCBIXML
-import sys, traceback
+import sys
+import traceback
 import pickle
-import ntpath
-#from utils import looksLikeAlleleStr
-from utils import *
 from Bio import SeqIO
 import glob
 
@@ -34,29 +30,14 @@ def countNumTerminalEntriesInHierarchy(h):
 	return num_kids
 
 
-#find out if two allels are the same except for the allele * part
-#ie A*01 and A*02 ARE equivalent
-#ie A*01 and B*01 ARE NOT equivalent!
-def areTwoAllellesAlleleEquivalent(a1,a2):
-	#print "in comp, a1=",a1,"a2="
-	a1=re.sub(r'\*\d+$',"",a1)
-	a2=re.sub(r'\*\d+$',"",a2)
-	if(a1==a2):
-		return True
-	else:
-		return False
-	
 
 
-#used in mapping IGBLAST data with
-#IMGT data
-#remove???
-def get_key_from_blast_title(title):
-	space_index=title.find(' ')
-	space_index+=1
-	#print "from title=",title," the space index is ",space_index
-	key=title[space_index:]
-	return str(key)
+
+
+
+
+
+
 
 
 #from an IMGT descriptor, extract the IMGT name (eg IGHV4-1*01)
@@ -68,536 +49,33 @@ def extractIMGTNameFromKey(k):
 
 
 
-#from a string (presumably of DNA characters)
-#remove Ns at the beginning and end
-def removeHeadTailN(s):
-	s=re.sub(r'^N+','',s)
-	s=re.sub(r'N+$','',s)
-	return s
-
-
-#given an organism name,
-#make it "directoryable"
-#by removing chars such as /\-)( and
-#replace them with '_'
-def directoryFyOrgName(n):
-	d=re.sub(r'[\ \/\-\(\);:]','_',n)
-	return d
-
-
-
-#used in mapping IGBLAST data with
-#IMGT data
-#remove???
-def partitionIMGTFastaInDirByFile(f):
-	fasta_map=read_fasta_file_into_map(f)
-	for desc in fasta_map:
-		pieces=desc.split("|")
-		org=pieces[2]
-		org_dir=directoryFyOrgName(org)
-		dirPath=f+"_partition/"+org_dir+"/"
-		#print "the dir path is ",dirPath
-		if not os.path.exists(dirPath):
-			os.makedirs(dirPath)
-		org_fasta=dirPath+org_dir+".fna"
-		part_writer=open(org_fasta,'a')
-		part_writer.write(">"+desc+"\n")
-		part_writer.write(fasta_map[desc]+"\n")
-		part_writer.close()
-
-		
-	
-#used in mapping IGBLAST data with
-#IMGT data
-#remove???
-def filterIMGTMapByBasicCaseInsensitiveStartsWith(unfiltered_map,filter_str):
-	filtered_map=dict()
-	for key in unfiltered_map:
-		unfkey_pieces=key.split("|")
-		unfkey_imgt=unfkey_pieces[2]
-		unfkey_imgt=unfkey_imgt.upper()
-		filter_str=filter_str.upper()
-		if(unfkey_imgt.startswith(filter_str)):
-			filtered_map[key]=unfiltered_map[key]
-		else:
-			pass
-	return filtered_map
-			
-
-
-
-#iterative, 'filter-based' process comparing two datasets
-#igblast and imgt
-def igblast_blast_map_multistep(nonExistentMapDir,query,refDirSetFNAList,allPPath,clone_map,alleleList,organism_filter):
-	#query is path to query data
-	#ref dir set fna list is a list of fasta of ref dir FNA files
-	#allppath dir is a path to the allP file
-	#clone_map is a dict (or list) of clone names (already subsetted by organism!)
-	#allelelist is a dict (or list) of alleles (already subsetted by organism!)
-	print "Now performing IGBLAST/IMGT multipstep mapping in directory :",nonExistentMapDir
-
-	if(os.path.isdir(nonExistentMapDir)):
-		#dir already exists! Abort!
-		print "MAPPING directory",nonExistentMapDir,"already exists! Abort!"
-		return
-	else:
-		os.mkdir(nonExistentMapDir)
-
-	#step 1, copy query to process dir
-	q_seq_map=read_fasta_file_into_map(query)
-	query_path=nonExistentMapDir+"/query.fna"
-	query_writer=open(query_path,'w')
-	for d in q_seq_map:
-		query_writer.write(">"+d+"\n")
-		query_writer.write(q_seq_map[d]+"\n")
-	query_writer.close()
-
-	#step #2 copy seqs in ref dir fna list to a single db file
-	totNumSeqsWrit=0
-	ref_dir_db_fna_path=nonExistentMapDir+"/ref_dir_set_data.fna"
-	ref_dir_db_fna_writer=open(ref_dir_db_fna_path,'w')
-	for refDirFNA in refDirSetFNAList:
-		#this list is already filtere by organism so no need to filter it by organism here
-		s_seq_map=read_fasta_file_into_map(refDirFNA)
-		#print "The number items read from ref dir ",refDirFNA," is ",len(s_seq_map)
-		#if(len(s_seq_map)>0):
-		#	sys.exit(1)
-		for s in s_seq_map:
-			#print "Writing key =",s
-			#print "Writing value = ",s_seq_map[s][0:3],"..."
-			ref_dir_db_fna_writer.write(">"+s+"\n")
-			ref_dir_db_fna_writer.write(re.sub(r'\.','',s_seq_map[s])+"\n")
-			totNumSeqsWrit+=1
-	ref_dir_db_fna_writer.close()
-
-
-	#step #3 take query data and blast it against ref dir set data
-	#and return if all data are mapped!
-	#"plan a"
-	total_to_map=len(q_seq_map.keys())
-	num_mapped=0
-	ref_dir_map_path=nonExistentMapDir+"/ref_dir.map"
-	ref_dir_unmap_path=nonExistentMapDir+"/ref_dir.unmapped"
-	igblast_map_FA(query_path,ref_dir_db_fna_path,ref_dir_map_path,ref_dir_unmap_path,clone_map,alleleList)
-	ref_dir_unmapped_list=read_list_from_file(ref_dir_unmap_path)
-	numBlastMappedToRefDir=getNumberLinesInFile(ref_dir_map_path)
-	numRemainingToMap=len(ref_dir_unmapped_list)
-	print "Number items that blast mapped to the ref dir set : ",str(numBlastMappedToRefDir)
-	print "Number left to map is ",str(numRemainingToMap)
-	if(numRemainingToMap==0):
-		print "No more mapping since all are mapped and none left to map!"
-		return
-
-
-	#Step #4, use NW to map data unmapped by BLAST 
-	#and return if all data are mapped
-	#plan "b"
-	query_path_ref_dir_unmapped=query_path+".ref_dir_unmapped.fna"
-	#fastaSubset(inputFastaPath,subset,outputFastaPath)
-	fastaSubset(query_path,ref_dir_unmapped_list,query_path_ref_dir_unmapped)
-	nw_log=query_path_ref_dir_unmapped+".nw.log"
-	nw_map_ref_dir=nonExistentMapDir+"/ref_dir.nw.map"
-	nw_map_ref_dir_unmapped=nw_map_ref_dir+".unmapped"
-	nw_map_from_fastas(query_path_ref_dir_unmapped,ref_dir_db_fna_path,nw_log,clone_map,alleleList,nw_map_ref_dir,nw_map_ref_dir_unmapped)
-	numNWMappedToRefDir=getNumberLinesInFile(nw_map_ref_dir)
-	numNWUnMappedToRefDir=getNumberLinesInFile(nw_map_ref_dir_unmapped)
-	print "Number items that NW mapped to the ref dir set : ",str(numNWMappedToRefDir)
-	print "Number left to map is ",str(numNWUnMappedToRefDir)
-	if(numNWUnMappedToRefDir==0):
-		print "No more mapping since all are mapped and none left to map!"
-		return
-	
-
-	#now take what nw couldn't map and blast it against allp
-	#"plan c"
-	all_p_map=read_fasta_file_into_map(allPPath)
-	all_p_map=filterIMGTMapByBasicCaseInsensitiveStartsWith(all_p_map,organism_filter)
-	allPLocalPath=nonExistentMapDir+"/allP.fna"
-	fastaSubset(allPPath,all_p_map,allPLocalPath)#use this to basically just write the file
-	allPBlastQuery=nw_map_ref_dir_unmapped+".blast.allpquery.fna"
-	allPMapped=nonExistentMapDir+"/allP.map"
-	allPUnmapped=allPMapped+".unmapped"
-	print "FASTA SUBSET TO BE CALLED, FASTA=",query_path,"map=",nw_map_ref_dir_unmapped," and output=",allPBlastQuery
-	fastaSubset(query_path,read_list_from_file(nw_map_ref_dir_unmapped),allPBlastQuery)
-	print "To run blast with query=",allPBlastQuery,"db=",allPLocalPath,"mapped_out=",allPMapped,"unmapped_out=",allPUnmapped
-	igblast_map_FA(
-			allPBlastQuery,
-			allPLocalPath,
-			allPMapped,
-			allPUnmapped,
-			clone_map,
-			alleleList
-			)
-	numMappedByBlastToAllP=getNumberLinesInFile(allPMapped)
-	numUnMappedByBlastToAllP=getNumberLinesInFile(allPUnmapped)
-	print "Number items that BLAST mapped to the allP file : ",str(numMappedByBlastToAllP)
-	print "Number left to map is ",str(numUnMappedByBlastToAllP)
-	if(numUnMappedByBlastToAllP==0):
-		print "No more mapping since all are mapped and none left to map!"
-		return		
-
-
-
-	
-	#now take what blast could map with allp and use nw as "plan d"
-	allpnwinputsubsetfasta=nonExistentMapDir+"/nw.allp.query.fna"
-	allPUnmappedList=read_list_from_file(allPUnmapped)
-	fastaSubset(query_path,allPUnmappedList,allpnwinputsubsetfasta)
-	allpnwmapped=nonExistentMapDir+"/nw.allp.map"
-	allpnwunmapped=allpnwmapped+".unmapped"
-	nwallpLog=allpnwmapped+".log"
-	nw_map_from_fastas(allpnwinputsubsetfasta,allPLocalPath,nwallpLog,clone_map,alleleList,allpnwmapped,allpnwunmapped)
-	nw_allp_map_count=getNumberLinesInFile(allpnwmapped)
-	nw_allp_unmap_count=getNumberLinesInFile(allpnwunmapped)
-	print "Number items that NW mapped to allP : ",nw_allp_map_count
-	print "Number items left to map : ",nw_allp_unmap_count
-	if(nw_allp_unmap_count==0):
-		print "No more mapping since all are mapped and none left to map!"
-	else:
-		print "Unfortunately, the number of unmapped items is ",nw_allp_unmap_count," so there are still item left to map!"
-
-
-
-
-#give  SINGLE fastas (query and subject) perform mapping/comparison
-def igblast_map_FA(queryFastaPath,subjectFastaPath,mappedPath,unMappedPath,clone_map,alleleList):
-	q_seq_map=read_fasta_file_into_map(queryFastaPath)
-	s_seq_map=read_fasta_file_into_map(subjectFastaPath)
-	#query fasta needs no editing, but subject fasta needs to
-	#have a BLAST database build
-	format_cmd=format_blast_db(subjectFastaPath)
-	#now BLAST the query against the subject DB and save to a log file the commands run
-	blast_output_path=subjectFastaPath+".blast.xml"
-	xml_blast_cmd=blast_db(queryFastaPath,subjectFastaPath,blast_output_path)
-	plain_blast_output_path=blast_output_path+".plain"
-	pln_blast_cmd=blast_db(queryFastaPath,subjectFastaPath,plain_blast_output_path,False)
-	blast_cmd_logger_path=subjectFastaPath+".blast.cmdlog"
-	blast_cmd_logger=open(blast_cmd_logger_path,'w')
-	blast_cmd_logger.write(xml_blast_cmd+"\n")
-	blast_cmd_logger.write(pln_blast_cmd+"\n")
-	blast_cmd_logger.close()
-	human_blast=blast_output_path+".human_readable.txt"
-	blast_map_path=mappedPath
-	blast_unmapped_path=unMappedPath
-	blast_mapped=dict()
-	blast_unmapped=set()	
-	status_lines=list()
-	try:
-		print "ENTER INTO TRY-PARSE BLOCK:"
-		if(os.path.exists(blast_output_path)):
-			if(os.path.getsize(blast_output_path)==0):
-				#empty file!
-				unmapped_cause_empty_file_list=list(q_seq_map.keys())
-				mapped_cause_empty_file=dict()
-				write_map_to_file(mapped_cause_empty_file,blast_map_path)
-				write_list_to_file(list(unmapped_cause_empty_file_list),blast_unmapped_path)
-				return
-			else:
-				#go ahead and attemp to parse!
-				pass
-		else:
-			#non-existent file
-			unmapped_cause_nonexisting_file_list=list(q_seq_map.keys())
-			mapped_cause_nonexistent_file=dict()
-			write_map_to_file(mapped_cause_nonexistent_file,blast_map_path)
-			write_list_to_file(list(unmapped_cause_nonexisting_file_list),blast_unmapped_path)
-		result_handle=open(blast_output_path)
-		blast_records = NCBIXML.parse(result_handle)
-		readable=open(human_blast,'w')
-		for blast_record in blast_records:
-			query_name=blast_record.query
-			#map_analyzed.add(query_name)
-			if(len(blast_record.alignments)<1):
-				print "TOO FEW ALIGNMENTS",query_name
-				status_line=blast_record.query+"\tNO_HIT"
-				readable.write(status_line+"\n\n")
-				status_lines.append(status_line)
-				blast_unmapped.add(blast_record.query)
-				continue
-			alignment=blast_record.alignments[0]
-			#print "An alignment length is ",alignment.length
-			if(len(alignment.hsps)<1):
-				print "TOO FEW HSPs",query_name
-				status_line=blast_record.query+"\tNO_HIT"
-				readable.write(status_line+"\n\n")
-				status_lines.append(status_line)
-				blast_unmapped.add(blast_record.query)
-				continue
-			hsp=alignment.hsps[0]
-			#print "alignment title:",alignment.title
-			s_map_key=get_key_from_blast_title(alignment.title)
-			imgt_name=extractIMGTNameFromKey(s_map_key)
-			#print "imgt  name :",imgt_name
-			#print "query name :",blast_record.query
-			status=""
-			q_seq=removeHeadTailN(q_seq_map[blast_record.query])
-			s_seq=s_seq_map[s_map_key]
-			if(q_seq==s_seq):
-				status="=="
-			elif(a_subseq_of_b(q_seq,s_seq)):
-				status="<"
-			elif(a_subseq_of_b(s_seq,q_seq)):
-				status=">"
-			else:
-				status="X"
-			#sttus_line=blast_record.query+"\t"+imgt_name
-			status_line=blast_record.query+"\t"+imgt_name
-			readable.write(status_line+"\n")
-			status_line=s_map_key
-			readable.write(status_line+"\n")			
-			if(imgt_name in clone_map):
-				readable.write("clone_names : "+clone_map[imgt_name]+"\n")
-			else:
-				readable.write("no clone names!\n")
-			alignment_frac=float(float(len(hsp.match))/float(min(len(s_seq),alignment.length)))
-			#alignment_frac is the length of the alignment as a fraction of the shorter of the two sequences
-			substr_ind=(a_subseq_of_b(hsp.query,hsp.sbjct) and a_subseq_of_b(hsp.sbjct,hsp.query))
-			#substr_ind==TRUE means the alignment is perfect (no mutations)
-			#
-			readable.write("alignment_len="+str(len(hsp.match))+" query_len="+str(alignment.length)+" subject_len="+str(len(s_seq))+" alignment_frac=alignment_len/(min(query_len,subject_len))="+str(alignment_frac)+" subst_ind="+str(substr_ind)+"\n")
-			readable.write(hsp.query+"\n")
-			readable.write(hsp.match+"\n")
-			readable.write(hsp.sbjct+"\n")
-			if(imgt_name in alleleList):
-				imgt_name_in_alleleList=True
-			else:
-				imgt_name_in_alleleList=False
-			readable.write("Is IMGT purported name in the hierarchy : "+str(imgt_name_in_alleleList)+"\n")
-			readable.write("\n"+"\n")
-			status_lines.append(status_line)
-			if( (imgt_name in alleleList) and substr_ind and ( (alignment_frac>=0.9 and alignment_frac<=1.0) or blast_record.query.strip()==imgt_name.strip())):
-				blast_mapped[blast_record.query]=imgt_name
-			else:
-				blast_unmapped.add(blast_record.query)
-			#print "\n\n\n"
-		readable.close()
-		status_lines.sort()
-		#printList(status_lines)
-		#blast_map_writer.close()
-		write_map_to_file(blast_mapped,blast_map_path)
-		write_list_to_file(list(blast_unmapped),blast_unmapped_path)
-	except:
-		print "Exception in BLAST user code:"
-		print '-'*60
-		traceback.print_exc(file=sys.stdout)
-		print '-'*60
-		#the file contents signal any errors
-		write_map_to_file(blast_mapped,blast_map_path)
-		write_list_to_file(list(blast_unmapped),blast_unmapped_path)
-	print "DONE WITH TRY PARSE BLOCK...."	
-
-
-
-
-#based on GLOBs perform a comparison IGBLAST/IMGT
-def igblast_map(igblastFNAGlob,refDirFNAGlob,nonExistentMapDir,clone_map,alleleList):
-	#get IGBLAST FNA files using the glob
-	igblast_fna=glob.glob(igblastFNAGlob)
-	if(os.path.isdir(nonExistentMapDir)):
-		#dir already exists! Abort!
-		print "MAPPING directory",nonExistentMapDir,"already exists! Abort!"
-		return
-	os.makedirs(nonExistentMapDir)
-	query_file=nonExistentMapDir+"/query.fna"
-	#write subject/reference fnas to a  single fasta after fetching them with GLOB
-	db_file=nonExistentMapDir+"/db.fna"
-	query_writer=open(query_file,'w')
-	subject_fnas=glob.glob(refDirFNAGlob)
-	db_writer=open(db_file,'w')
-	s_seq_map=dict()
-	imgt_names_map=dict()
-	imgt_names_seq_map=dict()
-	for s_fna in subject_fnas:
-		print "Writing from file (for database) =",s_fna
-		fasta_map=read_fasta_file_into_map(s_fna,alwaysSeqToUpper=True)
-		for fasta_desc in fasta_map:
-			descriptor=fasta_desc
-			s_seq_map[descriptor]=fasta_map[fasta_desc]
-			imgt_names_map[extractIMGTNameFromKey(fasta_desc)]=1
-			imgt_names_seq_map[extractIMGTNameFromKey(fasta_desc)]=fasta_map[fasta_desc]
-			seq=re.sub(r'\.','',fasta_map[fasta_desc])
-			db_writer.write(">"+fasta_desc+"\n"+seq+"\n")
-	db_writer.close()
-	#write igblast files/fasta to a single FNA
-	q_seq_map=dict()
-	num_query_written=0
-	for q_fna in igblast_fna:
-		print "Writing from file (for query) =",q_fna
-		fasta_map=read_fasta_file_into_map(q_fna,alwaysSeqToUpper=True)
-		for fasta_desc in fasta_map:
-			#if(fasta_desc=="VH7-40P"):
-			#if(not(fasta_desc in imgt_names_map)):
-			num_query_written+=1
-			q_seq_map[fasta_desc]=fasta_map[fasta_desc]
-			query_writer.write(">"+fasta_desc+"\n"+removeHeadTailN(fasta_map[fasta_desc])+"\n")
-	query_writer.close()
-	if(num_query_written==0):
-		return
-	#format the database and BLAST against them
-	format_cmd=format_blast_db(db_file)
-	a_db_file=db_file+".nhr"
-	#blast against it
-	blast_output_path=nonExistentMapDir+"/blast.xml"
-	xml_blast_cmd=blast_db(query_file,db_file,blast_output_path)
-	pln_blast_cmd=blast_db(query_file,db_file,blast_output_path+".plain",False)
-	cmd_log=nonExistentMapDir+"/cmd.log"
-	logger=open(cmd_log,'w')
-	logger.write(format_cmd+"\n"+xml_blast_cmd+"\n"+pln_blast_cmd+"\n")
-	logger.close()
-	q_id=0
-	status_lines=list()
-	human_blast=blast_output_path+".human_readable.txt"
-	blast_map_path=nonExistentMapDir+"/blast.map"
-	blast_unmapped_path=nonExistentMapDir+"/blast.unmap"
-	#touch(blast_map_path)
-	blast_mapped=dict()
-	blast_unmapped=set()
-	#for fasta_desc in q_seq_map:
-	#	unmapped.add(fasta_desc)
-	try:
-		print "ENTER INTO TRY-PARSE BLOCK:"
-		result_handle=open(blast_output_path)
-		blast_records = NCBIXML.parse(result_handle)
-		readable=open(human_blast,'w')
-		#blast_map_writer=open(blast_map_path,'w')
-		blast_map=dict()
-		for blast_record in blast_records:
-			query_name=blast_record.query
-			#map_analyzed.add(query_name)
-			if(len(blast_record.alignments)<1):
-				print "TOO FEW ALIGNMENTS",query_name
-				status_line=blast_record.query+"\tNO_HIT"
-				readable.write(status_line+"\n\n")
-				status_lines.append(status_line)
-				blast_unmapped.add(blast_record.query)
-				continue
-			alignment=blast_record.alignments[0]
-			#print "An alignment length is ",alignment.length
-			if(len(alignment.hsps)<1):
-				print "TOO FEW HSPs",query_name
-				status_line=blast_record.query+"\tNO_HIT"
-				readable.write(status_line+"\n\n")
-				status_lines.append(status_line)
-				blast_unmapped.add(blast_record.query)
-				continue
-			hsp=alignment.hsps[0]
-			#print "alignment title:",alignment.title
-			s_map_key=get_key_from_blast_title(alignment.title)
-			imgt_name=extractIMGTNameFromKey(s_map_key)
-			#print "imgt  name :",imgt_name
-			#print "query name :",blast_record.query
-			status=""
-			q_seq=removeHeadTailN(q_seq_map[blast_record.query])
-			s_seq=s_seq_map[s_map_key]
-			if(q_seq==s_seq):
-				status="=="
-			elif(a_subseq_of_b(q_seq,s_seq)):
-				status="<"
-			elif(a_subseq_of_b(s_seq,q_seq)):
-				status=">"
-			else:
-				status="X"
-			#sttus_line=blast_record.query+"\t"+imgt_name
-			status_line=blast_record.query+"\t"+imgt_name
-			readable.write(status_line+"\n")
-			status_line=s_map_key
-			readable.write(status_line+"\n")			
-			if(imgt_name in clone_map):
-				readable.write("clone_names : "+clone_map[imgt_name]+"\n")
-			else:
-				readable.write("no clone names!\n")
-			alignment_frac=float(float(len(hsp.match))/float(min(len(s_seq),alignment.length)))
-			#alignment_frac is the length of the alignment as a fraction of the shorter of the two sequences
-			substr_ind=(a_subseq_of_b(hsp.query,hsp.sbjct) and a_subseq_of_b(hsp.sbjct,hsp.query))
-			#substr_ind==TRUE means the alignment is perfect (no mutations)
-			#
-			readable.write("alignment_len="+str(len(hsp.match))+" query_len="+str(alignment.length)+" subject_len="+str(len(s_seq))+" alignment_frac=alignment_len/(min(query_len,subject_len))="+str(alignment_frac)+" subst_ind="+str(substr_ind)+"\n")
-			readable.write(hsp.query+"\n")
-			readable.write(hsp.match+"\n")
-			readable.write(hsp.sbjct+"\n")
-			if(imgt_name in alleleList):
-				imgt_name_in_alleleList=True
-			else:
-				imgt_name_in_alleleList=False
-			readable.write("Is IMGT purported name in the hierarchy : "+str(imgt_name_in_alleleList)+"\n")
-			readable.write("\n"+"\n")
-			status_lines.append(status_line)
-			if( (imgt_name in alleleList) and substr_ind and ( (alignment_frac>=0.9 and alignment_frac<=1.0) or blast_record.query.strip()==imgt_name.strip())):
-				blast_mapped[blast_record.query]=imgt_name
-			else:
-				blast_unmapped.add(blast_record.query)
-			#print "\n\n\n"
-		readable.close()
-		status_lines.sort()
-		printList(status_lines)
-		#blast_map_writer.close()
-		write_map_to_file(blast_mapped,blast_map_path)
-		write_list_to_file(list(blast_unmapped),blast_unmapped_path)
-	except:
-		print "Exception in BLAST user code:"
-		print '-'*60
-		traceback.print_exc(file=sys.stdout)
-		print '-'*60
-	print "DONE WITH TRY PARSE BLOCK...."
-	try:
-		logPath=nonExistentMapDir+"/nw_log.txt"
-		nw_input_map=dict()
-		for item in blast_unmapped:
-			nw_input_map[item]=q_seq_map[item]
-		good_map=find_best_nw_from_maps_KeepPerfects(nw_input_map,s_seq_map,logPath,clone_map,alleleList)
-		write_map_to_file(good_map,nonExistentMapDir+"/nw.map")
-		nw_unmapped=set()
-		for item in blast_unmapped:
-			if(item not in good_map):
-				nw_unmapped.add(item)
-		nw_umapped_path=nonExistentMapDir+"/nw.unmapped"
-		write_list_to_file(list(nw_unmapped),nw_umapped_path)
-	except:
-		print "ERROR IN NW alignment calls!\n"
-		print "Exception in user code:"
-		print '-'*60
-		traceback.print_exc(file=sys.stdout)
-		print '-'*60
-
-
-
-
-
-#given a MYSQLLITE DB, make a JSON from the counts
-def get_count_JSON_ofVDJ(dbfilepath,db_base_dir,organism_name):
-	print "Now getting counts from ",dbfilepath,"..."
-	counts_map=get_rearrangement_segment_counts_from_db(dbfilepath)
-	print "Now retrieving hierachy from ",db_base_dir," for organism=",organism_name,"..."
-	down_dir=analyze_download_dir_forVDJserver(db_base_dir,counts_map,organism_name)
-	filled_hierarchy=down_dir[0]
-	unallocated_segments_counts=dict()
-	treeAlleles=get_list_of_alleles_appearing_in_tree(filled_hierarchy)
-	for segment in counts_map:
-		if segment in treeAlleles:
-			pass
-		elif(segment=="N/A"):
-			pass
-		else:
-			unallocated_segments_counts[segment]=counts_map[segment]
-	for segment in unallocated_segments_counts:
-		filled_hierarchy[organism_name]['unallocated'][segment]
-	JSON=jsonify_hierarchy(filled_hierarchy[organism_name],organism_name,counts_map)
-	return JSON
 
 #get the IMGT URL base
 #used in the downloading process
 def getIMGTURLBase():
 	return "http://www.imgt.org/"
 
+
+
+
+
 #get the list of LOCI
 def get_loci_list():
 	loci=["IGHV","IGHD","IGHJ","IGKV","IGKJ","IGLV","IGLJ","TRAV","TRAJ","TRBV","TRBD","TRBJ","TRDV","TRDD","TRDJ","TRGV","TRGJ"]
 	return loci
 
+
+
+
+
 #of the 17 loci, return the ones defined as "heavy"
 def get_heavy_loci():
 	defined_as_heavy=["IGHD","IGHJ","IGHV","TRBD","TRBJ","TRBV","TRDD","TRDJ","TRDV"]
 	return defined_as_heavy
+
+
+
+
 
 #get loci that are light (not heavy)
 def get_light_loci():
@@ -797,99 +275,6 @@ def formGeneTableURLs(species,locus):
 
 
 
-
-
-
-#example tree usage
-def basic_tree_test():
-	mytree=tree()
-	mytree['TCRA']
-	mytree['TCRA']['TCRA1']
-	mytree['TCRA']['TCRA2']
-	counts_map=dict()
-	counts_map['TCRA1']=3
-	counts_map['TCRA2']=7
-	get_total_tree(mytree['TCRA'],'TCRA',counts_map)
-	
-
-
-
-
-
-
-
-
-
-#from http://stackoverflow.com/questions/8384737/python-extract-file-name-from-path-no-matter-what-the-os-path-format
-def path_leaf(path):
-	head, tail = ntpath.split(path)
-	return tail or ntpath.basename(head)
-
-
-
-
-
-
-
-
-#find .dat hierarchies in in_dir
-#create corresponding .json file in out_dir (which is not the same as in dir) with counts
-def hierarchy_jsonify_batch(in_hier_dir,out_hier_dir,count_map):
-	if not os.path.exists(out_hier_dir):
-		os.makedirs(out_hier_dir)
-	else:
-		print "ERROR, output directory ",out_hier_dir," exists! Abort !"
-		sys.exit(1)
-	in_glob_str=in_hier_dir+"/*.dat"
-	in_dat_files=glob.glob(in_glob_str)
-	for x in range(len(in_dat_files)):
-		#print "got .dat file (#"+(str(int(x)+1))+") : ",in_dat_files[x]
-		basename=path_leaf(in_dat_files[x])
-		#print "The base name is ",basename
-	   	target=out_hier_dir+"/"+basename+".json"
-		#print "The target is ",target
-		hier_root=getRootFromFile(in_dat_files[x])
-		#print "The hier_root is ",hier_root
-		hier_tree=getHierarchyTreeFromFile(in_dat_files[x])
-		json_string=jsonify_hierarchy(hier_tree[hier_root],hier_root,count_map)
-		json_file=open(target,'w')
-		json_file.write(json_string)
-		json_file.close()
-		
-		
-
-
-
-#given a hierarchy file (of tab-separated values of parent/child)
-#return a tree with the indicated hierarchy
-def getHierarchyTreeFromFile(hier_file):
-	#get the hierarchy
-	#hier_file="/home/data/vdj_server/pipeline/vdj_ann/hierarchy.txt";
-	#hier_file="/home/data/vdj_server/pipeline/vdj_ann/17_way/IGHJ.dat"
-	#get the child->parent map
-	mapping=get_pmap(hier_file)
-	array_eval_join_str=str("']['")
-	taxonomy = tree()
-	#taxonomy['Animalia']['Chordata']['Mammalia']['Carnivora']['Felidae']['Felis']['cat']
-	for child in mapping:
-		lineage=hier_look(mapping,child,20)
-		#print "i have a child=",child,"with lineage="+lineage
-		lineage_array=lineage.split('->')
-		#print "\tAs an array : ",lineage_arrayIndentationError: expected an indented block
-		lineage_array.reverse()
-		#print "\tAs a reversed array : ",lineage_array
-		str_to_eval=array_eval_join_str.join(lineage_array)
-		str_to_eval="taxonomy['"+str_to_eval+"']"
-		#print "\tThe str to eval is "+str_to_eval
-		eval(str_to_eval)
-	return taxonomy
-
-
-
-
-
-
-
 #given a list, return it back
 #but with each element having been
 #applied with "strip"
@@ -899,58 +284,6 @@ def trimList(l):
 		l[idx]=l[idx].strip()
 	return l
 
-
-
-
-
-
-
-#from a hierarchy file (tab-separated)
-#find the root by searching for a parent
-#who is its own child
-def getRootFromFile(hfile):
-	f = open(hfile, 'r')
-	root=""
-	for line in f:
-		line=line.strip()
-		pieces=line.split('\t')
-		if(pieces[0]==pieces[1]):
-			root=pieces[0]
-	f.close()
-	return root
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#from a tab-separated values file
-#get a mapping 
-#first colum is child
-#second column is parent
-#children allowed 0 or 1 parents, no more
-#multiple parents triggers shutdown
-def get_pmap(hier_file):
-	mapping=dict()
-	f = open(hier_file, 'r')
-	#print f
-	for line in f:
-		line=line.strip()
-		pieces=line.split('\t')
-		if(pieces[0] in mapping):
-			print "Error, DOUBLE MAPPING",line
-			exit(1)
-		mapping[pieces[0]]=pieces[1]
-	f.close()
-	return mapping
 
 
 
@@ -983,31 +316,93 @@ def hier_look(pmap,name,max_iter):
 
 
 
+def isThisVQuestFileTheCorrectFile(vqf,allele_name):
+	try:
+		reader=open(vqf,'r')
+		ln=0
+		test_str="Sequence number 1 : "+str(allele_name)
+		for line in reader:
+			temp_line=""+line+""
+			temp_line=temp_line.strip()
+			if(temp_line.startswith(test_str)):
+				reader.close()
+				return True
+			ln+=1
+		reader.close()
+	except:
+		return False
+	return False	
 
-#given a hierarchy (parent/child) file
-# initialize a map of counts whose keys
-#are the children and whose counts are initialized to zero
-def init_hierarchy_count_map(hierarchy_file):
-	INPUT=open(hierarchy_file,'r')
-	count_map=dict()
-	for line in INPUT:
-		#child on the left, parent on the right
-		line=line.strip()
-		pieces=line.split('\t')
-		count_map[pieces[0]]=0
-	return count_map
 
 
 
 
 
-#determine if all strings in a list are allelic
-#if at least one FAILS return false
-def areAllItemsInListIMGTAlleles(l):
-	for i in l:
-		if(not(looksLikeAlleleStr(i))):
+
+
+def extractRegionStartStopFromVQFile(vqf,region_name):
+	reader=open(vqf,'r')
+	passedAnnotation=False
+	annRE=re.compile(r'^\d\d\.\s+Annotation')
+	regRE=re.compile(r'^([^\-]+)\-IMGT\s+<?(\d+)\.+(\d+)>?')
+	for line in reader:
+		#print "read a line ",line
+		temp_line=line
+		temp_line=temp_line.strip()
+		re_res=re.search(annRE,temp_line)
+		if(re_res):
+			passedAnnotation=True
+		if(passedAnnotation):
+			if(temp_line.startswith(region_name)):
+				regRE_res=re.search(regRE,temp_line)
+				if(regRE_res):
+					ann_reg=regRE_res.group(1)
+					#print "FOUND A GOOD REGION LINE (REGION=",ann_reg,") ",temp_line
+					if(ann_reg==region_name):
+						#print "match for region=",region_name," from line ",temp_line
+						region_start=ann_reg=int(regRE_res.group(2))
+						region_ends=ann_reg=int(regRE_res.group(3))
+						vq_reg_ss=[region_start,region_ends]
+						return vq_reg_ss
+					else:
+						#print "NO match for region=",region_name," from line ",temp_line
+						pass
+				else:
+					#print "line '"+temp_line+"' fails"
+					pass
+			else:
+				#doesn't start with region name
+				pass
+	reader.close()
+	return [-1,-1]
+
+
+
+
+
+def isThisFileAVQUESTOutputFileForASingleRead(fp):
+	if('_individual_files_folder' in fp):
+		try:
+			reader=open(fp,'r')
+			ln=0
+			for line in reader:
+				temp_line=""+line+""
+				temp_line=temp_line.strip()
+				if(ln<=1):
+					if(temp_line.startswith("IMGT/HighV-QUEST")):
+						reader.close()
+						return True
+					if(temp_line.startswith("IMGT/V-QUEST")):
+						reader.close()
+						return True
+				ln+=1
+			reader.close()
+		except:
 			return False
-	return True
+		return False
+	else:
+		return False
+	
 
 
 
@@ -1032,245 +427,6 @@ def getPMapFromTree(t,emap,currentParent):
 
 
 
-#using a directory, with organism directories under it
-#iterate through .map files
-#and pick up clone names
-#the map files must match the glob *clone_names.map
-def get_clone_names_by_org_map_from_base_dir(bd):
-	print "now in ",bd
-	clone_names_by_org=dict()
-	organisms=getOrganismList()
-	for organism in organisms:
-		print "now in org=",organism
-		clone_names_by_org[organism]=dict()
-		#./human/GeneTables/TRGV.html.orphons.html.clone_names.map
-		names_glob=bd+"/"+organism+"/GeneTables/*clone_names.map"
-		map_files=glob.glob(names_glob)
-		for map_file in map_files:
-			print "To read from ",map_file
-			reader=open(map_file,'r')
-			for line in reader:
-				line=line.strip()
-				pieces=line.split('\t')
-				if(len(pieces)==2):
-					clone_names_by_org[organism][pieces[0]]=pieces[1]
-			reader.close()
-	return clone_names_by_org
-
-
-
-
-
-#used in IGBLAST/IMGT mapping
-def getPartitionGlobFromIMGTFastaPathAndOrganism(f,org):
-	if(org=="Mus_musculus"):
-		return f+"_partition/Mus*/*.fna"
-	elif((org=="Homo sapiens") or (org=="human") or (org.starswith("human"))):
-		return f+"_partition/Homo_sapiens/*.fna"
-	else:
-		print "ABORT TRYING TO ACCESS UN PARTITIONED DATA...."
-		print "f=",f
-		print "org=",org
-		sys.exit(0)
-
-
-#used in IGBLAST/IMGT mapping
-def igblast_imgt_mapping(base_dir,org_to_glob_db_map,imgtfastaPath,hierachyByOrg):
-	clone_names_by_org=get_clone_names_by_org_map_from_base_dir(base_dir)
-	organism_list=getOrganismList()
-	for organism in organism_list:
-		segments=['V','D','J']
-		#segments=['D']
-		alleleNames=get_list_of_alleles_appearing_in_tree(hierachyByOrg[organism])
-		print "\n\nTHE FOLLOWING TREE WAS USED FOR EXTRACTING ALLELE NAMES :"
-		prettyPrintTree(hierachyByOrg[organism])
-		print "\n\nTHE ALLELE NAMES EXTRACTED ARE : "
-		printList(alleleNames)
-		print "\n\n\n"
-		ref_glob=getPartitionGlobFromIMGTFastaPathAndOrganism(imgtfastaPath,organism)
-		for segment in segments:
-			ig_glob=org_to_glob_db_map[organism]+segment+".fna"
-			#if(organism=="Mus_musculus"):
-			#	#ig_glob="/usr/local/igblast_from_lonestar/database/mouse_gl_"+segment+".fna"
-			#	ig_glob=org_to_glob_db_map[org
-			#else:IndentationError: expected an indented block
-			#	#continue
-			#	ig_glob="/usr/local/igblast_from_lonestar/database/"+organism+"_gl_"+segment+".fna"
-			#ref_glob="/tmp/imgt_down/"+organism+"/ReferenceDirectorySet/IG*"+segment+".html.fna"
-			#ref_glob="/home/esalina2/Downloads/imgt.2/www.imgt.org/download/GENE-DB/IMGTGENEDB-ReferenceSequences.fasta-nt-WithoutGaps-F+ORF+allP"
-			#ref_glob=imgtfastaPath
-
-			blast_dir=base_dir+"/"+organism+"/BLAST_MAP_"+segment
-			print "Calling blast_map with ig_glob=",ig_glob,"ref_glob=",ref_glob," and blast_dir=",blast_dir
-			try:
-				igblast_map(ig_glob,ref_glob,blast_dir,clone_names_by_org[organism],alleleNames)
-			except Exception, e:
-				print "igblast_map error!"
-				print "Exception in user code:"
-				print '-'*60
-				traceback.print_exc(file=sys.stdout)
-				print '-'*60	
-
-
-
-
-
-
-def makeIGBLASTVRegionDatabase(outputdir,listOfVDatabases,auxBase):
-	if not os.path.exists(outputdir):
-			os.makedirs(outputdir)	
-	#write a script that contains commands for extracting FNAs from BLAST DBs
-	script_path=outputdir+"/blast_script.sh"
-	igblast_executable_path=getIGBlastExecutablePath()
-	domain_list=getDomainClasses()
-	resultFiles=list()
-	sw=open(script_path,'w')
-	sw.write("#!/bin/bash\n")
-	
-	for db in listOfVDatabases:
-		#write a query_file for each db
-		base_name=ntpath.basename(db)
-		db_query_file=outputdir+"/"+base_name+".fna"
-		blastdbcmdpath="/usr/local/bin/blastdbcmd"
-		cmd=blastdbcmdpath+" -db "+db+" -dbtype nucl -entry all > "+db_query_file
-		sw.write(cmd+"\n")
-		ddb=re.sub(r'_V','_D',db)
-		jdb=re.sub(r'_V','_J',db)
-		for domain in domain_list:
-			orgRE=re.search(r'/([^_/]+)_gl_V',db)
-			if(orgRE):
-				org=orgRE.group(1)
-				aux_full=auxBase+"/"+org+"_gl.aux"
-				result_file=db_query_file+"."+domain+".out"
-				igblast_cmd=igblast_executable_path+" -domain_system "+domain+" -germline_db_V "+db+" -germline_db_D "+ddb+"  -germline_db_J "+jdb+" -query "+db_query_file+" -outfmt 7 -out "+result_file+" -auxiliary_data "+aux_full
-				sw.write(igblast_cmd+"\n")		
-				resultFiles.append(result_file)
-	sw.close()
-	#run the script with logs referenced
-	script_err=script_path+".err"
-	script_out=script_path+".out"
-	execute_bash_script(script_path,script_out,script_err)
-	#now parse the outputs and write dbs!
-	regions=['FWR1','CDR1','FWR2','CDR2','FWR3','CDR3']
-	current_query=None
-	for result_file in resultFiles:
-		region_map=tree()
-		query_list=list()
-		db_lookup_file=result_file+".db"
-		dw=open(db_lookup_file,'w')
-		rr=open(result_file,'r')
-		for line in rr:
-			temp=line.strip()
-			search_res=re.search(r'^#\ Query:\ (.*)$',temp)
-			if(search_res):
-				current_query=search_res.group(1)
-				current_query=re.sub(r'lcl\|','',current_query)
-				print "picked up cq ",current_query				
-				query_list.append(current_query)
-			for region in regions:
-				if(temp.startswith(region) and not(current_query==None)):
-					region_map[query_list[len(query_list)-1]][region]=temp
-		rr.close()
-		print "now to writing...."
-		for q in range(len(query_list)):
-			query=query_list[q]
-			query=re.sub(r'lcl\|','',query)
-			print "writing for query=",query," file=",db_lookup_file
-			dw.write(query+"\t")
-			for r in range(len(regions)):
-				print "now looking at ",regions[r]
-				if(regions[r] in region_map[query]):
-					data=str(region_map[query][regions[r]])
-					#print "from query=",query," data=",data
-					data_pieces=data.split('\t')
-					if(data_pieces[0].strip().startswith("CDR3")):
-						dw.write(data_pieces[1]+"N/A\n")
-					else:
-						dw.write(data_pieces[1]+"\t"+data_pieces[2]+"\t")
-				else:
-					if(regions[r]=="CDR3"):
-						dw.write("N/A\tN/A\n")
-					else:
-						dw.write("N/A\tN/A\t")
-		dw.close()
-
-
-#map IGBLAST and IMGT data
-def batchMultistepSegmentsAndOrganisms(base_dir):
-	allPPath="/tmp/imgt_down/www.imgt.org/download/GENE-DB/IMGTGENEDB-ReferenceSequences.fasta-nt-WithoutGaps-F+ORF+allP"
-	hier_data=loadPickleDataAndMakeIfNotAvailable(base_dir)
-	organism_hierarchy=hier_data[0]
-	clone_names_by_org=hier_data[1]
-	#	alleleNames=get_list_of_alleles_appearing_in_tree(organism_hierarchy['human'])
-	organism_list=getOrganismList()
-	for organism in organism_list:
-		segment_list=['V','D','J']
-		for segment in segment_list:
-			blast_dir=base_dir+"/"+organism+"/BLAST_MAP_"+segment
-			filter_str=""
-			if(organism=="human"):
-				filter_str="Homo "
-			elif(organism=="Mus_musculus"):
-				filter_str="Mus "
-			segment_ref_dir_org_glob=base_dir+"/"+organism+"/ReferenceDirectorySet/IG*"+segment+".html.fna"
-			segment_ref_dir_org_list=glob.glob(segment_ref_dir_org_glob)
-			blast_base_org=organism
-			if(organism=="Mus_musculus"):
-				blast_base_org="mouse"
-			query="/usr/local/igblast_from_lonestar/database/"+blast_base_org+"_gl_"+segment+".fna"
-			alleleNames=get_list_of_alleles_appearing_in_tree(organism_hierarchy[organism])
-			igblast_blast_map_multistep(
-				blast_dir,
-				query,
-				segment_ref_dir_org_list,
-				allPPath,
-				clone_names_by_org[organism],
-				alleleNames,
-				filter_str
-				)
-			
-
-
-
-
-
-
-def loadPickleDataAndMakeIfNotAvailable(base_dir):
-	pickleFilePath=base_dir+"/hierarchy_data.pkl"
-	if(os.path.exists(pickleFilePath)):
-		hier_data=pickleRead(pickleFilePath)
-	else:
-		hier_data=analyze_download_dir_forVDJserver("/tmp/imgt_down",None,None,None)
-		pickleWrite(pickleFilePath,hier_data)
-	#organism_hierarchy=hier_data[0]
-	#clone_names_by_org=hier_data[1]	
-	return hier_data
-	
-
-
-
-
-
-	
-		
-
-#verify if a dat file is usable with its index
-def testIdx(dat,idx):
-	idx_read=open(idx,'r')
-	m=5
-	for line_num in range(m):
-		print "\n\n\n"
-		line=idx_read.readline()
-		print "read line :"+str(line)
-		pieces=line.split('\t')
-		acc=pieces[0]
-		start=int(pieces[1])
-		end=int(pieces[2])
-		data=fetchRecFromDat(dat,start,end)
-		print "For accession='"+str(acc)+"', got data='"+str(data)+"' ! :)\n\n"
-
-
-
 
 
 
@@ -1283,15 +439,18 @@ class imgt_db:
 	####################
 	#data members
 	org_allele_name_desc_map=None
+	org_allele_desc_gapless_map=None
 	db_base=None
 	db_idx_extension=".acc_idx"
 	accession_start_stop_map=None
 	accession_dat_file_map=None
 	imgt_dat_rel_path="www.imgt.org/download/LIGM-DB/imgt.dat"
+	imgt_genedb_rel_path="www.imgt.org/download/GENE-DB/IMGTGENEDB-ReferenceSequences.fasta-nt-WithGaps-F+ORF+inframeP"
 	imgt_dat_path=None
 	indexPath=None
 	ref_dir_set_desc_seqs_map=None
 	ol=["human","Mus_musculus"]
+	pickle_file_name="hierarchy_data.pkl"
 
 	####################
 	#constructor(s)
@@ -1302,6 +461,10 @@ class imgt_db:
 	####################
 	#function members
 
+	def getPickleFullPath(self):
+		return self.getBaseDir()+"/"+self.pickle_file_name
+
+
 
 	#for each locus, for each organism, dump it into a FASTA to be blast formatted
 	def prepareFASTAForBLASTFormatting(self):
@@ -1310,7 +473,12 @@ class imgt_db:
 			loci=get_loci_list()
 			for locus in loci:
 				rds_base=self.db_base+"/"+organism+"/ReferenceDirectorySet/"
-				source_html_fna=rds_base+locus+".html.fna"
+				source_html_glob_str=rds_base+locus+"*fna"
+				glob_res=glob.glob(source_html_glob_str)
+				if(len(glob_res)!=1):
+					no_file_msg="ERROR, failed to find files ",source_html_glob_str," for BLAST formatting preparation!"
+					raise Exception(no_file_msg)
+				source_html_fna=glob_res[0]
 				target_fna=rds_base+"/"+organism+"_"+locus[0:2]+"_"+locus[3]+".fna"
 				fna_map=read_fasta_file_into_map(source_html_fna)
 				blast_fna_map=dict()
@@ -1330,14 +498,43 @@ class imgt_db:
 					else:
 						blast_writer.write("\n")
 				blast_writer.close()
+		#downloading of some databases have shown that some sequences can be duplicated
+		#which leads to BLAST formatting errors....so the code below reads a fasta into a
+		#map and writes it back....this way effectively removing duplicates
+		#esalina2@eddiecomp:/home/data/DATABASE/04_22_2014/Mus_musculus/ReferenceDirectorySet$ grep -P 'TRAV15\-1/DV6\-1\*02' *.fna
+		#Mus_musculus_TR_V.fna:>TRAV15-1/DV6-1*02
+		#Mus_musculus_TR_V.fna:>TRAV15-1/DV6-1*02
+		#TRAV.html.fna:>X63939|TRAV15-1/DV6-1*02|Mus musculus|(F)|V-REGION|16..303|292 nt|1| | | | |292+42=334| | |
+		#TRDV.html.fna:>X63939|TRAV15-1/DV6-1*02|Mus musculus|(F)|V-REGION|16..303|292 nt|1| | | | |292+42=334| | |
+		for organism in organisms:
+			loci=get_loci_list()
+			for locus in loci:
+				segments=['V','D','J']
+				for segment in segments:
+					seq_types=["IG","TR"]
+					for seq_type in seq_types:
+						fasta=self.db_base+"/"+organism+"/ReferenceDirectorySet/"+organism+"_"+seq_type+"_"+segment+".fna"
+						fasta_map=read_fasta_file_into_map(fasta)
+						fasta_writer=open(fasta,'w')
+						for desc in fasta_map:
+							fasta_writer.write(">"+desc+"\n"+fasta_map[desc]+"\n")
+						fasta_writer.close()
+
 					
 				
-
+	#format the BLAST database!
 	def blastFormatFNAInRefDirSetDirs(self,makeblastdbbin):
 		organisms=self.getOrganismList()
 		for organism in organisms:
 			rds_base=self.db_base+"/"+organism+"/ReferenceDirectorySet/"
-			blastFormatFNAInDir(rds_base,makeblastdbbin)
+			segments=['V','D','J']
+			for segment in segments:
+				seq_types=["IG","TR"]
+				for seq_type in seq_types:
+					fasta=self.db_base+"/"+organism+"/ReferenceDirectorySet/"+organism+"_"+seq_type+"_"+segment+".fna"
+					blastFormatFLEX(fasta,makeblastdbbin,True)
+
+
 
 	#return the organism list
 	def getOrganismList(self,fromHardCode=True):
@@ -1348,16 +545,15 @@ class imgt_db:
 			#get downloaded organism!
 			thedir=self.db_base
 			org_list=list()
+			# http://stackoverflow.com/questions/141291/how-to-list-only-top-level-directories-in-python
 			total_list=[ name for name in os.listdir(thedir) if os.path.isdir(os.path.join(thedir, name)) ]
-			print "total_list is ",total_list
+			#print "total_list is ",total_list
 			search_and_avoid=["\.py","down","\.pkl","\.sh","\.zip"]
 			for tl in total_list:
 				tls=str(tl.strip())
-				if(tls.startswith("www.") or tls.startswith("ftp.")):
-					pass
 				matched_no_regex=True
 				for s in search_and_avoid:
-					if(re.search(s,tsl,re.IGNORECASE)):
+					if(re.search(s,tls,re.IGNORECASE)):
 						matched_no_regex=False
 				if(matched_no_regex):
 					org_list.append(tl.strip())
@@ -1373,8 +569,43 @@ class imgt_db:
 	def getDirBase(self):
 		return self.getBaseDir()
 
-	#download gene tables and reference directory sets from imgt
-	def download_imgt_RefDirSeqs_AndGeneTables_HumanAndMouse(self,unconditionalForceReplace=False):
+
+
+
+	#get the alleles in the database (by segment, organism, and seq_type)
+	def getAlleles(self,segment="V",org="human",seq_type="IG"):
+		fastaPath=self.getDirBase()+"/"+org+"/ReferenceDirectorySet/"+org+"_"+seq_type+"_"+segment+".fna"
+		if(not(os.path.isfile(fastaPath))):
+			raise Exception("Error, fasta file "+fastaPath+" does not exists!  Is an invalid organism, seq type or segment used???")
+		fastaDict=read_fasta_file_into_map(fastaPath)
+		fastaKeys=fastaDict.keys()
+		fastaKeysList=list(fastaKeys)
+		return fastaKeysList
+
+	
+	#get a list of genes, withouth the alleles designation
+	def getGenes(self,alleles=None,segment="V",org="human",seq_type="IG"):
+		if(alleles==None):
+			alleles=self.getAlleles(segment,org,seq_type)
+		gene_set=set()
+		for allele in alleles:
+			if(looksLikeAlleleStr(allele)):
+				#good!
+				gene_name=deAllelifyName(allele)
+				if(not(gene_name in gene_set)):
+					gene_set.add(gene_name)
+			else:
+				#huh?
+				raise Exception("Error, the allele "+allele+" doesn't look allelic by name !")
+		gene_list=list(gene_set)
+		gene_list.sort()
+		return gene_list
+
+		
+
+
+	#download GENE tables only
+	def download_GeneTables(self,unconditionalForceReplace=False):
 		print "in download_imgt_RefDirSeqs_AndGeneTables_HumanAndMouse"
 		base=self.db_base
 		organisms=self.getOrganismList(True)
@@ -1400,28 +631,69 @@ class imgt_db:
 					print "Gene table",locus,"for organism",organism,"not found or force replace set to true...so downloading it...."
 					print "Downloading gene table",locus,"for organism",organism,"from URL=",regularURL," saving to",regularTablePath
 					downloadURLToLocalFileAssumingDirectoryExists(regularURL,regularTablePath)
+				else:
+					print "Gene table",locus,"for organism",organism," found and force replace set to False...so not downloading it...."
 				orphonTablePath=regularTablePath+".orphons.html"
 				if(not(os.path.exists(orphonTablePath)) or unconditionalForceReplace==True):
 					print "Orphon gene table",locus,"for organism",organism,"not found, so downloading it..."
 					print "Downloading orphon gene table",locus,"for organism",organism,"from URL=",orphonURL,"and saving to",orphonTablePath
 					downloadURLToLocalFileAssumingDirectoryExists(orphonURL,orphonTablePath)
-				#download the reference directory
-				refDirBase=geneTablesBase=base+"/"+organism+"/ReferenceDirectorySet"
-				if(not(os.path.isdir(refDirBase))):
-					os.makedirs(refDirBase)
-				refDirFile=refDirBase+"/"+locus+".html"
-				refDirOrgName=organism
-				if(refDirOrgName=="human"):
-					#the ref dir URL won't take 'human', it needs 'Homo+sapiens' instead! :(
-					refDirOrgName="Homo+sapiens"
-				refDirURL=formRefDirURL(refDirOrgName,locus)
-				if(not(os.path.exists(refDirFile)) or unconditionalForceReplace==True):
-					print "Downloading reference directory set ",locus,"for organism",organism,"and saving to",orphonTablePath			
-					downloadURLToLocalFileAssumingDirectoryExists(refDirURL,refDirFile)
-					refDirFastaFile=refDirFile+".fna"
-					localRefURL="file://"+refDirFile
-					fastaString=downloadRefDirFasta(locus,refDirOrgName,localRefURL)
-					writeStringToFilePathAssumingDirectoryExists(fastaString,refDirFastaFile)
+				else:
+					print "Orphon Gene table",orphonTablePath,"for organism",organism," found and force replace set to False...so not downloading it...."
+
+		
+	#download the GeneDB and LIGM-DB
+	def download_IMGT(self,unconditionalForceReplace=False):
+		self.buildAndExecuteWGETDownloadScript()
+
+
+
+	#build the Ref. Dir Set files (locus-based files to IgBLAST against )
+	#from the downloaded GENEDB files
+	def buildRefDirSetsFromGENEDB(self):
+		base_fna=self.getBaseDir()+"/"+self.imgt_genedb_rel_path
+		if(not(os.path.isfile(base_fna)) or not (os.path.exists(base_fna))):
+			gmm="ERROR, GENEDB file not found!  Has it been downloaded?!?!?"
+			print gmm
+			raise Exception(gmm)
+		else:
+			organisms=self.getOrganismList(True)
+			org_imgt_regex_map=dict()
+			org_imgt_regex_map['human']='^homo\s*sapien'
+			org_imgt_regex_map['Mus_musculus']='^mus\smusculus'
+			genedb_map=read_fasta_file_into_map(base_fna)
+			#FOR EACH ORGANISM
+			for organism in organisms:
+				loci=get_loci_list()
+				org_re=re.compile(org_imgt_regex_map[organism],re.IGNORECASE)
+				#FOR EACH LOCUS
+				for locus in loci:
+					segments=get_segment_list()
+					#FOR EACH SEGMENT
+					#from the base_fna (GENEDB), gather all the key/value pairs for this organism and locus
+					org_loci_map=dict()
+					for descriptor in genedb_map:
+						pieces=descriptor.split("|")
+						allele_name=pieces[1]
+						org_name=pieces[2]
+						reg_name=pieces[4]
+						#MATCH BY ORGANISM AND THE REG-NAME (WHICH IS BASED ON SEGMENT/REGION)
+						if(allele_name.startswith(locus) and reg_name==locus[3]+"-REGION"    ):
+							#okay it matches on the locus and region name, now let's check on the organism
+							re_res=re.match(org_re, org_name)
+							if(re_res):
+								#matched on the organism, so add it to the map!
+								org_loci_map[descriptor]=genedb_map[descriptor]
+					#write the gathered descriptor/sequence pairs to FASTA files
+					dest_dir=self.getBaseDir()+"/"+organism+"/ReferenceDirectorySet/"
+					dest_file=dest_dir+"/"+locus+".fna"
+					if(not(os.path.isdir(dest_dir))):
+						 os.makedirs(dest_dir)
+					writer=open(dest_file,'w')
+					for descriptor in org_loci_map:
+						writer.write(">"+descriptor.strip()+"\n"+org_loci_map[descriptor].strip()+"\n")
+					writer.close()
+					
 			
 
 	#download from IMGT
@@ -1443,11 +715,33 @@ class imgt_db:
 		uncomp_cmd="echo \"Now searching for .Z compressed files to uncompress ...\" ; for COMPRESSED in `find "+str(self.db_base)+"|grep -P '\.Z$'` ; do UNCOMPRESSED=`echo $COMPRESSED|sed -r \"s/\.Z//gi\"` ;    echo \"Found compressed file $COMPRESSED ... to uncompress it to $UNCOMPRESSED ...\" ; echo \"USING command uncompress -c $COMPRESSED > $UNCOMPRESSED\" ; uncompress -c $COMPRESSED > $UNCOMPRESSED ; done ;\n"
 		wgetCMD+=uncomp_cmd
 		wgetScriptPath=self.db_base+"/wgetscript.sh"
-		wgetScriptOutLog=wgetScriptPath+".log.out"
-		wgetScriptErrLog=wgetScriptPath+".log.err"
+		wgetScriptLogBase=wgetScriptPath+".log"
+		wgetScriptOutLog=wgetScriptLogBase+".out"
+		wgetScriptErrLog=wgetScriptLogBase+".err"
 		write_temp_bash_script(wgetCMD,wgetScriptPath)
+		print "Proceeding to download "+refDBURL+"GENE-DB/ and "+refDBURL+"/LIGM-DB/ ...  (see logs at "+wgetScriptLogBase+".*)"
 		execute_bash_script(wgetScriptPath,outPath=wgetScriptOutLog,errPath=wgetScriptErrLog)
 	
+
+
+
+	#given an accession number return the IMGT dat record
+	def extractIMGTDatRecordUsingAccession(self,accession,biopythonRec=False):
+		if(self.db_base==None):
+			raise Exception("Error, db_base is 'None', must initialize first!!!!")		
+		ss=self.getStartStopFromIndexGivenAccession(accession)
+		if(len(ss)==2):
+			#regular accession
+			start=ss[0]
+			stop=ss[1]
+			#return self.fetchBioPythonRecFromDat(start,stop,biopythonRec)
+			return self.fetchRecFromDat(start,stop,biopythonRec)
+		else:
+			#irregular accession, use descriptor and index to find the correct accession
+			#raise Exception("Error :  irregular descriptor : "+descriptor+" failed to obain imgt.dat start/stop of accession  "+accession)	
+			return None
+
+
 
 
 	#given a full fasta descriptor, get the record from IMGT.dat
@@ -1470,29 +764,9 @@ class imgt_db:
 			return self.fetchRecFromDat(start,stop,biopythonRec)
 		else:
 			#irregular accession, use descriptor and index to find the correct accession
-			raise Exception("Address irregular descriptor....")
-			accession_rel_re=re.compile(r'^(\d+)\.+(\d+)')
-			accession_rel=pieces[5]
-			re_res=re.search(accession_rel_re,accession_rel)
-			if(re_res):
-				d1=re_res.group(1)
-				d2=re_res.group(2)
-				avg=(d1+d2)/2
-				indirect_accession=accession
-				accession_rel=pieces[5]
-				index_reader=open(indexPath,'r')
-				possible_accessions=list()
-				for line in index_reader:
-					line_pieces=line.split('\t')
-					if(line_pieces[0]==indirect_accession):
-						possible_accessions.append(line_pieces[1])
-					else:
-						pass
-				#now, go through possible accessions and see which one is in range!
-				return ""
-			else:
-				pass
-				return ""
+			return None
+			#raise Exception("Error :  irregular descriptor : "+descriptor+" failed to obain imgt.dat start/stop of accession  "+accession)
+
 
 
 
@@ -1539,6 +813,108 @@ class imgt_db:
 		return imgtDAT
 
 
+	#given the allele name and organism, get the descriptor
+	def getIMGTDescriptor(self,allele_name,org):
+		locus=allele_name[0:4]
+		fasta_path=self.getDirBase()+"/"+org+"/ReferenceDirectorySet/"+locus+".fna"
+		fasta_dict=read_fasta_file_into_map(fasta_path)
+		desired_descriptor=None
+		for desc in fasta_dict:
+			desc_pieces=desc.split("|")
+			desc_allele=desc_pieces[1]
+			if(desc_allele==allele_name):
+				desired_descriptor=desc
+		return desired_descriptor
+
+	#get the IMGT region start and stop from IMGT given the allele_name, organism, and region
+	def getRegionStartStopFromIMGTDat(self,allele_name,org,region):
+		desired_descriptor=self.getIMGTDescriptor(allele_name,org)
+		if(not(desired_descriptor is None)):
+			imgt_dat_rec=self.getIMGTDatGivenAllele(allele_name,True,org)
+			start_stop=self.getStartStopFromIMGTDesc(desired_descriptor)
+			#print "The desired descriptor is ",desired_descriptor
+			if(start_stop is None):
+				return [-1,-1]
+			reg_int=self.getRegionStartStopFromIMGTDatRecAndRange(imgt_dat_rec,True,start_stop[0],start_stop[1],region)
+			return reg_int
+
+
+
+
+
+
+	#given an interval range and an imgtdata record, fetch
+	#the start/stop of the specified region
+	def getRegionStartStopFromIMGTDatRecAndRange(self,imgt_dat,isBiopython,range_start,range_end,region_name):
+		if(imgt_dat is None):
+			return [-1,-1]
+		if(not(isBiopython)):
+			lines=imgt_dat.split("\n")
+			reg_regex=re.compile("^FT\s+"+region_name+"[^\s]*\s+<?(\d+)\.+(\d+)>?\s*$")
+			for line in lines:
+				search_res=re.search(reg_regex,line)					
+				if(search_res):
+					start=min(int(search_res.group(1)),int(search_res.group(2)))
+					end=max(int(search_res.group(1)),int(search_res.group(2)))
+					if(range_start<=start and end<=range_end):
+						return [start,end]
+		else:
+			feature_list=imgt_dat.features
+			for feature in feature_list:
+				#print "got a feature : ",feature
+				ftype=feature.type
+				#print "the type is ",ftype	
+				qualifiers=feature.qualifiers
+				#print "qualifiers : ",qualifiers
+				location=feature.location
+				#print "location : ",location
+				l_start=int(location.start)+1	#add 1 cause it's 0-based
+				l_end=int(location.end)+1	#add 1 cause it's 0-based
+				strand=location.strand
+				#print "The strand is ",strand
+				#print "The l_start and l_end are : ",l_start," and ",l_end
+				r_start=min(l_start,l_end)
+				r_end=max(l_start,l_end)
+				r_len=abs(r_start-r_end)
+				if(ftype.startswith(region_name)):
+					#print "r_start is ",r_start," and r_rend is ",r_end," for region ",region_name
+					if(range_start-1<=r_start and r_end<=range_end+1):
+						#print "first block in range ....."
+						ret_start=r_start-range_start+1
+						ret_end=ret_start+r_len-1
+						#print "r_start=",r_start," r_end=",r_end
+						#print "range_start=",range_start," range_end=",range_end
+						#print "ret_start=",ret_start," and ret_end=",ret_end
+						if(strand==1):
+							return [ret_start,ret_end]
+						else:
+							print "NEED RETURN REVERSE!"
+							range_len=abs(range_start-range_end)
+							new_start=range_len-ret_end+1
+							new_end=new_start+r_len-1
+							return [new_start,new_end]
+							#sys.exit(0)
+					else:
+						pass
+						#print "Though it's the right region it falls out of range .  The range is (",range_start,",",range_end,")"
+						#print "location : ",r_start,",",r_end
+						#print "Start test : ",range_start,"<=",r_start, "???"
+						#if(range_start<=r_start):
+						#	print "start test success"
+						#else:
+						#	print "start test fail"
+						#print "End test : ",r_end,"<=",range_end,"????"
+						#if(r_end<=range_end):
+						#	print "end test success"
+						#else:
+						#	print "end test fail"
+						
+				else:
+					#print "type ",ftype," isn't the desired region...."
+					pass
+		return [(-1),(-1)]			
+
+
 
 	#get start/stop from index given accession
 	def getStartStopFromIndexGivenAccession(self,a):
@@ -1552,19 +928,21 @@ class imgt_db:
 
 	#given a complete descriptor and organism, fetch the corresponding reference directory set sequence
 	def getRefDirSetFNAGivenCompleteDescriptor(self,descriptor,organism):
-		#print "in getRefDirSetFNAGivenCompleteDescriptor with desc='"+descriptor+"' org=",organism
+		#do a dict lookup to return the data if the routine has been used before
+		#NOTE that using the descriptor as the dict key addresses the ORGANISM not being used cause the descriptor contains the organism!
 		if(self.ref_dir_set_desc_seqs_map==None):
 			self.ref_dir_set_desc_seqs_map=dict()
 		if(descriptor in self.ref_dir_set_desc_seqs_map):
-			#print "using lookup in getRefDirSetFNAGivenCompleteDescriptor"
-			#sys.exit(0)
 			return self.ref_dir_set_desc_seqs_map[descriptor]
+
+
+		#if the routine hasn't been used before, load all the data!
 		myloci=get_loci_list()
 		for locus in myloci:
-			html_fna_path=self.db_base+"/"+organism+"/ReferenceDirectorySet/"+locus+".html.fna"
+			html_fna_path=self.db_base+"/"+organism+"/ReferenceDirectorySet/"+locus+".fna"
 			fasta_recs=read_fasta_file_into_map(html_fna_path)
 			for fasta_desc in fasta_recs:
-				self.ref_dir_set_desc_seqs_map[fasta_desc]=fasta_recs[fasta_desc]
+				self.ref_dir_set_desc_seqs_map[fasta_desc]=fasta_recs[fasta_desc].upper()
 		if(descriptor in self.ref_dir_set_desc_seqs_map):
 			return self.ref_dir_set_desc_seqs_map[descriptor]
 		else:
@@ -1577,8 +955,22 @@ class imgt_db:
 		#use the descriptor to get the sequence
 		subject_sequence=self.getRefDirSetFNAGivenCompleteDescriptor(subject_descriptor,organism)
 		if(removeGaps):
+			if(self.org_allele_desc_gapless_map!=None):
+				if(allele_name in self.org_allele_desc_gapless_map):
+					if(organism in self.org_allele_desc_gapless_map[allele_name]):
+						return self.org_allele_desc_gapless_map[allele_name][organism]
+					else:
+						#do the lookup below then add it!
+						pass
+				else:
+					#allele_name not here yet....
+					self.org_allele_desc_gapless_map[allele_name]=dict()
+			else:
+				self.org_allele_desc_gapless_map=dict()
+				self.org_allele_desc_gapless_map[allele_name]=dict()
 			repPattern=re.compile(r'[^A-Za-z]')
 			subject_sequence=re.sub(repPattern,"",subject_sequence)
+			self.org_allele_desc_gapless_map[allele_name][organism]=subject_sequence
 		return subject_sequence
 
 
@@ -1612,7 +1004,7 @@ class imgt_db:
 		org_dir=self.db_base+"/"+org
 		to_be_returned=None
 		if(os.path.isdir(org_dir)):
-			fna_glob_str=org_dir+"/ReferenceDirectorySet/*.html.fna"
+			fna_glob_str=org_dir+"/ReferenceDirectorySet/*.fna"
 			fna_files=glob.glob(fna_glob_str)
 			for fna_file in fna_files:
 				fna_reader=open(fna_file,'r')
@@ -1622,17 +1014,152 @@ class imgt_db:
 						if(not(org in self.org_allele_name_desc_map)):
 							self.org_allele_name_desc_map[org]=dict()
 						pieces=descriptor.split("|")
-						descriptor_allele=pieces[1]
-						if(descriptor_allele.strip()==allele_name.strip()):
-							to_be_returned=descriptor.strip()
-						self.org_allele_name_desc_map[org][descriptor_allele.strip()]=descriptor.strip()
+						if(len(pieces)>1):
+							descriptor_allele=pieces[1]
+							if(descriptor_allele.strip()==allele_name.strip()):
+								to_be_returned=descriptor.strip()
+							self.org_allele_name_desc_map[org][descriptor_allele.strip()]=descriptor.strip()
 			if(not(to_be_returned==None)):
 				return to_be_returned
 			else:
 				raise Exception("Error, descriptor with allele name = '"+str(allele_name)+"' not found under "+str(self.db_base)+" for organism = "+str(org))
 		else:
-			raise Exception("Error, invalid organism="+str(org)+", its directory doesn't exist under"+str(db_base)+"!")
+			raise Exception("Error, invalid organism="+str(org)+", its directory doesn't exist under"+str(self.db_base)+"!")
 
+
+
+	#from an IMGT descriptor (">sfsdf|sdklfdjsf|dklsfjlsf|....") extract the pices
+	def extractIMGTDescriptorPieces(self,dp):
+		if(dp[0]==">"):
+			new_desc=dp[1:]
+		else:
+			new_desc=dp
+		pieces=new_desc.split("|")
+		return pieces
+
+
+
+	#from IMGT descriptor return an array of start/stop where start<=stop
+	def getStartStopFromIMGTDesc(self,desc):
+		pieces=desc.split("|")
+		return self.getStartStopFromIMGTDescPieces(pieces)
+
+
+
+	#form GLOBS for searching for the proper VQ file and extract the region info
+	def getVQuestRegionInformation(self,organism,allele_name,region_name):
+		organism_dir=self.db_base+"/"+organism
+		globs=[organism_dir,organism_dir+"/*",organism_dir+"/*/*",organism_dir+"/*/*/*",organism_dir+"/*/*/*/*",organism_dir+"/*/*/*/*/*"]
+		for glob in globs:
+			#print "DOING GLOB ",glob
+			for walked in glob_walk(glob):
+				#print "Got walked ",walked
+				if(isThisFileAVQUESTOutputFileForASingleRead(walked)):
+					#print "its a VQ file"
+					#print "Wonder if its valid for o=",organism," allele=",allele_name
+					if(isThisVQuestFileTheCorrectFile(walked,allele_name)):
+						#print "TARGET FOUND!"
+						#sys.exit(0)
+						return extractRegionStartStopFromVQFile(walked,region_name)
+					else:
+						pass
+					
+
+
+
+
+	def getSegmentRegionStartStopFromIMGTDatGivenAlleleAndAccession(self,allele_name,accession_num,segment_type="J"):
+		#extract the biopython record using the accession
+		accesion_biopython_rec=self.extractIMGTDatRecordUsingAccession(accession_num,True)
+		feature_list=accesion_biopython_rec.features
+		#print "GOT PASSED IN ALLELE_NAME=",allele_name
+		#print "GOT PASSED IN ACCESSION=",accession_num
+		
+		for feature in feature_list:
+			#print "\tgot a feature : ",feature
+			ftype=feature.type
+			#print "\tthe type is ",ftype	
+			ftype_str=str(ftype)
+			if(ftype_str==segment_type+"-REGION"):
+				#print "\t\tGOT MATCH ON REGION!"
+				qualifiers=feature.qualifiers
+				for qualifier in qualifiers:
+					#print "\t\t\tLooking at a qualifier : ",qualifier
+					#print "\t\t\tThe type of qualifier is ",type(qualifier)
+					qualifier_str=str(qualifier)
+					if(qualifier_str=="IMGT_allele"):
+						#print "\t\t\t\tNow looking at imgt_allele qualifier!!!!!!!!!!!!"
+						qualifier_val=qualifiers[qualifier_str]
+						#print "\t\t\t\tTHE VALUE OF IT IS ",qualifier_val
+						#print "\t\t\t\tThe type of qualifier_val is ",type(qualifier_val)
+						if(type(qualifier_val)==list):
+							if(len(qualifier_val)==1):
+								the_actual_val=str(qualifier_val[0])
+								#print "Got an actual val ",the_actual_val," need to compare it with ",allele_name
+								if(the_actual_val==allele_name):
+									#print "Got the match!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+									location=feature.location
+									#print "location : ",location
+									l_start=int(location.start)+1	#add 1 cause it's 0-based
+									l_end=int(location.end)+1	#add 1 cause it's 0-based
+									l_min=min(l_start,l_end)
+									l_max=max(l_start,l_end)
+									ss_list=[l_min,l_max]
+									#print "I want to return : ",ss_list
+									return ss_list
+								else:
+									#print "The actual val '("+the_actual_val+")' is NOT the allele_name "+allele_name
+									pass
+			else:
+				#print "segment_type-REGION is ",str(segment_type)+"-REGION BUT ftype_str is ",ftype_str
+				pass
+		#never found any match?!
+		#print "NEVER FOUND A MATCH WITH allele_name=",allele_name,", accession_num=",accession_num," and segment_type=",segment_type
+		#sys.exit(0)
+		return None
+		
+
+
+
+	#from IMGT descriptor pieces return an array of start/stop where start<=stop
+	def getStartStopFromIMGTDescPieces(self,desc_pieces):
+		#>M13911|IGHV1-NL1*01|Homo sapiens|P|V-REGION|125..420|296 nt|1| | | | |296+24=320| |rev-compl|
+		#>D87017|IGLJ5*02|Homo sapiens|ORF|J-REGION|11386..11423|38 nt|2| | | | |38+0=38| |rev-compl|
+		interval_piece=desc_pieces[5]
+		region_segment_type_piece=desc_pieces[4]
+		ss_re='(\d+)\.+(\d+)'
+		interval_re=re.compile(ss_re)
+		search_res=re.search(interval_re,interval_piece)
+		if(search_res):
+			first=int(search_res.group(1))
+			second=int(search_res.group(2))
+			start=min(first,second)
+			end=max(first,second)
+			t=[start,end]
+			return t
+		white_re='^\s*$'
+		white_res=re.search(white_re,interval_piece)
+		#print "Failed first, interval_piece is ",interval_piece
+		if(white_res):
+			#okay, it's whitespace, so try to use the accession to find the start/stop
+			#print "pass white"
+			accession=desc_pieces[0]
+			allele_name=desc_pieces[1]
+			if(region_segment_type_piece=="V-REGION"):
+				st="V"
+			elif(region_segment_type_piece=="D-REGION"):
+				st="D"
+			elif(region_segment_type_piece=="J-REGION"):
+				st="J"
+			else:
+				raise Exception("ERROR, failture to extract V-REGION, D-REGION, J-REGION from | field (indexed by 0-based 5) from "+str(desc_pieces))
+			#print "allele_name is ",allele_name
+			#print "accession is ",accession
+			#print "st is ",st
+			j_r_ss=self.getSegmentRegionStartStopFromIMGTDatGivenAlleleAndAccession(allele_name,accession,st)
+			return j_r_ss
+		else:
+			raise Exception("Error, from pieces "+str(desc_pieces)+" (piece='"+interval_piece+"' with regex="+ss_re+") unable to retrieve start/stop!")
 
 
 
@@ -1669,6 +1196,8 @@ class imgt_db:
 				return [start,end]
 		return None
 
+
+
 	#index the imgt.dat file
 	def indexIMGTDatFile(self,filepath=None,indexfile=None):
 		if(filepath==None):
@@ -1687,9 +1216,9 @@ class imgt_db:
 		rec_num=0
 		flag=True
 		while(flag):
-			#line=line.strip()
 			line=reader.readline()
 			if(line):
+				#print "Got ",line.strip()
 				rs=re.search(acc_re,line)
 				es=re.search(embl_tpa_re,line)
 				if(rs):
@@ -1707,158 +1236,11 @@ class imgt_db:
 						#index_file.write(current_embl_tpa+"\t"+str(rec_start)+"\t"+str(rec_end)+"\n")
 						index_file.write(current_embl_tpa+"\t"+current_accession+"\n");
 					current_embl_tpa=None
+				#print "current accession = ",current_accession
 			else:
 				flag=False
 		index_file.close()	
 	
 
-
-
-
-
-def test():
-	pass
-	mydb=imgt_db("/home/data/DATABASE/01_22_2014/")
-	print "the db is ",mydb.db_base
-	#datPath="/home/data/DATABASE/01_22_2014/www.imgt.org/download/LIGM-DB/imgt.dat"
-	#datIndexPath=datPath+".acc_idx"
-	#print "Reading file",datPath
-	#indexIMGTDatFile(datPath,datIndexPath)
-	#print "Wrote index file",datIndexPath
-	#testIdx(datPath,datIndexPath)
-	#vtd=fetchRecFromDat(datPath,761609274,761613382)
-	#print "''''''"+vtd+"''''''''"
-	#jtd=fetchRecFromDat(datPath,741876366,741888356)
-	#print "''''''"+jtd+"''''''''"
-	
-	##download_imgt_RefDirSeqs_AndGeneTables_HumanAndMouse("/tmp/imgt_down","/tmp/del_me")
-	#analyze_download_dir_forVDJserver("/tmp/imgt_down",None,None,None)
-	#hier_data=loadPickleDataAndMakeIfNotAvailable("/tmp/imgt_down")
-	#organism_hierarchy=hier_data[0]
-	#clone_names_by_org=hier_data[1]
-	#alleleNames=get_list_of_alleles_appearing_in_tree(organism_hierarchy['human'])
-	#print "THESE ARE CLONE NAMES : "
-	#print yaml.dump(clone_names_by_org, default_flow_style=False)
-	#batchMultistepSegmentsAndOrganisms("/tmp/imgt_down")
-	#igblast_blast_map_multistep(nonExistentMapDir,query,refDirSetFNAList,allPPath,workDir,clone_map,alleleList):
-	#blast_dir="/tmp/imgt_down/human/BLAST_MAP_V"
-	#query="/usr/local/igblast_from_lonestar/database/human_gl_V.fna"
-	#refdirlist=[
-	#	"/tmp/imgt_down/human/ReferenceDirectorySet/IGHV.html.fna",
-	#	"/tmp/imgt_down/human/ReferenceDirectorySet/IGKV.html.fna",
-	#	"/tmp/imgt_down/human/ReferenceDirectorySet/IGLV.html.fna"
-	#	]
-	#allPPath="/tmp/imgt_down/www.imgt.org/download/GENE-DB/IMGTGENEDB-ReferenceSequences.fasta-nt-WithoutGaps-F+ORF+allP"
-	#igblast_blast_map_multistep(blast_dir,query,refdirlist,allPPath,clone_names_by_org,alleleNames,"homo ")
-
-
-	#test_map="/tmp/imgt_down/human/BLAST_MAP_V/test.map"
-	#test_unmapped="/tmp/imgt_down/human/BLAST_MAP_V/test.unmapped"
-	#test_query="/tmp/imgt_down/human/BLAST_MAP_V/query.fna"
-	#test_db="/tmp/imgt_down/human/BLAST_MAP_V/db.test.fna"
-	#igblast_map_FA(test_query,test_db,test_map,test_unmapped,clone_names_by_org['human'],alleleNames)
-	#print "Running test...."
-	#download_imgt_RefDirSeqs_AndGeneTables_HumanAndMouse("/tmp/imgt_down","/tmp/del_me")
-	#hier_data=analyze_download_dir_forVDJserver("/tmp/imgt_down",None,None,None)
-	#pickleFilePath="/tmp/imgt_down"+"/hierarchy_data.pkl"
-	#if(os.path.exists(pickleFilePath)):
-	#	hier_data=pickleRead(pickleFilePath)
-	#else:
-	#	pickleWrite(pickleFilePath,hier_data)
-	#organism_hierarchy=hier_data[0]
-	#clone_names_by_org=hier_data[1]
-	#
-	#print "GOT HIERARCHY : ",
-	#prettyPrintTree(organism_hierarchy)
-	#
-	#JSON=get_count_JSON_ofVDJ("/home/esalina2/round1/all_data.processed.r0.small.fna.imgt.db","/tmp/imgt_down","human")
-	#print "THIS IS THE JSON:"
-	#print JSON
-	#clone_names_by_org=get_clone_names_by_org_map_from_base_dir("/tmp/imgt_down")
-	#organism_list=getOrganismList()
-	
-	#base_dir="/tmp/imgt_down/"
-	#buildAndExecuteWGETDownloadScript(base_dir)
-	#org_to_glob_db_map=dict()
-	#org_to_glob_db_map['human']="/usr/local/igblast_from_lonestar/database/human_gl_"
-	#org_to_glob_db_map['Mus_musculus']="/usr/local/igblast_from_lonestar/database/mouse_gl_"
-	#imgtfastaPath=base_dir+"/www.imgt.org/download/GENE-DB/IMGTGENEDB-ReferenceSequences.fasta-nt-WithoutGaps-F+ORF+allP"
-	#partitionIMGTFastaInDirByFile(imgtfastaPath)
-	#igblast_imgt_mapping(base_dir,org_to_glob_db_map,imgtfastaPath,organism_hierarchy)
-	
-
-
-#	igblast_glob="/usr/local/igblast_from_lonestar/database/human_gl_*.fna"
-#	ref_glob="/tmp/imgt_down/human/ReferenceDirectorySet/IG*.fna"
-#	igblast_map(igblast_glob,ref_glob,"/tmp/imgt_down/human/BLAST_MAP_IG")
-#	igblast_glob="/usr/local/igblast_from_lonestar/database/mouse_gl_*.fna"
-#	ref_base="/tmp/imgt_down/Mus_musculus/ReferenceDirectorySet/IG*.fna"
-#	igblast_map(igblast_glob,ref_glob,"/tmp/imgt_down/Mus_musculus/BLAST_MAP_IG")
-	#annodbDir="/tmp/imgt_down/region_annotation_igblast"
-	#blastVList=["/usr/local/igblast_from_lonestar/database/human_gl_V","/usr/local/igblast_from_lonestar/database/mouse_gl_V"]
-	#auxBase="/usr/local/igblast_lonestar_tacc/optional_file/"
-	#makeIGBLASTVRegionDatabase(annodbDir,blastVList,auxBase)
-	#total_tree=get_total_tree(organism_hierarchy['human'],'IGHD',counts_map)
-	#JSON=jsonify_hierarchy(organism_hierarchy['human'],'human',counts_map)
-	#print "THIS IS RAW\n"
-	#print JSON
-	#print "\n\nTHIS IS NICE\n"
-	#json.dumps(JSON,index=8)
-	#analyze_download_dir_forVDJserver(base_dir,countsMap=None,specifiedOrganism=None,specifiedLoucs=None):
-	#raise Exception('spam', 'eggs')
-#	ref_sname="Homo+sapiens"
-#	gt_sname="human"
-#	loci=get_loci_list()
-#	species_names_ref=["Homo+sapiens","Mus_musculus"]
-#	speces_names_tbl=["human","Mus_musculus"]
-#	
-#	for species_index in range(len(species_names_ref)):
-#		ref_sname=species_names_ref[species_index]
-#		gt_sname=speces_names_tbl[species_index]
-#		for locus in loci:
-#			print "\n\n\n\nANALYZING WITH LOCUS=",locus," AND ORGANISM="+(ref_sname)+"/"+gt_sname+"\n"
-#			fastaString=downloadRefDirFasta(locus,ref_sname)
-#			print "Got a fasta string ",fastaString
-#			#print "class=",type(fastaString)
-#			fastaList=read_fasta_string(fastaString)
-#			fastaMap=read_fasta_into_map(fastaList)
-#			geneTableURLS=formGeneTableURLs(gt_sname,locus)
-#			print "Got URLs : ",geneTableURLS
-#			regURL=geneTableURLS[0]
-#			orpURL=geneTableURLS[1]
-#			#regURL="file:///home/data/vdj_server/igblast_routines/index.php?section=LocusGenes&repertoire=genetable&species=human&group=IGHD"
-#			#orpURL="file:///home/data/vdj_server/igblast_routines/index.php?section=LocusGenes&repertoire=genetable&species=human&group=IGHD&orphon"
-#			reg_hier=hierarchyTreeFromGenetableURL(regURL,locus)
-#			print "REGULAR HIERARCHY : "
-#			prettyPrintTree(reg_hier)
-#			full_hier=hierarchyTreeFromGenetableURL(orpURL,locus,reg_hier)
-#			print "FULL HIERARCHY : "
-#			prettyPrintTree(full_hier)
-#			listOfTreeAlleles=get_list_of_alleles_appearing_in_tree(full_hier)
-#			print "A LIST OF ALLELES FROM THE HIERARCHY : ",
-#			print listOfTreeAlleles
-#			listOfTreeAlleles.sort()
-#			print "A SORTED OF ALLELES : ",
-#			print listOfTreeAlleles
-#			fastaListOfNames=getIMGTNameListFromFastaMap(fastaMap)
-#			fastaListOfNames.sort()
-#			print "Extracted a list of FASTA NAMES :",fastaListOfNames
-#			allAlleles=areAllItemsInListIMGTAlleles(fastaListOfNames)
-#			print "Allele status : ",allAlleles
-#			setSameStats=(set(fastaListOfNames) == set(listOfTreeAlleles))
-#			print "\n\nHIERARCHY ALLELES : "
-#			printList(listOfTreeAlleles)
-#			print "\n\nFASTA ALLELES : "
-#			printList(fastaListOfNames)
-#			if setSameStats:
-#				print "The fasta/RefDirNames ARE the same as the hierarchy allele names!!! :)"
-#			else:
-#				print "SAD the fasta/RefDirNames ARE different from the hierarchy allele names!!! :("
-#			briefSetDiff(fastaListOfNames,listOfTreeAlleles,"fasta alleles "+ref_sname,"tree alleles "+gt_sname)
-
-
-if (__name__=="__main__"):
-	import sys
-	test()
 
 

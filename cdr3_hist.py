@@ -4,102 +4,26 @@ import os
 import re
 import glob
 from os.path import basename
-from segment_utils import getFastaListOfDescs,getQueryIndexGivenSubjectIndexAndAlignment,getAdjustedCDR3StartFromRefDirSetAllele,getADJCDR3EndFromJAllele,getEmptyRegCharMap,alleleIsTR
+from segment_utils import getFastaListOfDescs,getQueryIndexGivenSubjectIndexAndAlignment,getAdjustedCDR3StartFromRefDirSetAllele,getADJCDR3EndFromJAllele,getEmptyRegCharMap,alleleIsTR,getTheFrameForThisReferenceAtThisPosition,getTheFrameForThisJReferenceAtThisPosition
 from imgt_utils import imgt_db
-from utils import read_fasta_file_into_map,biopythonTranslate,printMap,get_domain_modes,repStr,looksLikeAlleleStr
-from igblast_utils import printNiceAlignment,buildAlignmentWholeSeqs,buildAlignmentWholeSeqsDirect
+from utils import *
 import vdjml
 from vdjml_utils import getTopVDJItems,getHitInfo
-from vdjml_igblast_parse import rev_comp_dna
+from igblast_parse import rev_comp_dna
 import argparse
+from alignment import alignment,CodonAnalysis,codonAnalyzer
 
 
 
 
-#how many deletions???
-def getNumDashInStr(s):
-	orig_len=len(s)
-	s_no_dash=re.sub(r'\-','',s)
-	nodash_len=len(s_no_dash)
-	return orig_len-nodash_len
 
 
-#from an alignment mark where CDR3 is with X
-#s_aln, q_aln are the alignment string
-#s_c q_c are the cdr3 starts for subject and query
-# s_s q_s are the subject and query alignment starts
-def annotatedCDR3(s_aln,q_aln,s_c,q_c,s_s,q_s):
-	#get CDR3 starts relative to the alignment starts
-	aln_rel_s=s_c-s_s
-	aln_rel_q=q_c-q_s
-	print "subject from is ",s_s
-	print "subject cdr3 is ",s_c
-	print "aln rel sub is ",aln_rel_s
-	print "query from is ",q_s
-	print "query CDR3 is ",q_c
-	print "aln rel q is ",aln_rel_q
-	#sys.exit(0)
-
-
-	#find position including gaps in the alignment for the SUBJECT STAR
-	#all this code is 1-based indices
-	#except for actually doing string comparison and string-printing which is 0-based
-	s_temp=0
-	if(s_aln[0]=="-"):
-		s_pos=0
-	else:
-		s_pos=1
-	while(s_pos<=aln_rel_s):
-		if(s_aln[s_temp]!="-"):
-			s_pos+=1
-		s_temp+=1
-	s_actual=s_temp
-	#0-based indices!
-	q_temp=0
-	if(q_aln[0]=="-"):
-		q_pos=0
-	else:
-		q_pos=1
-	while(q_pos<=aln_rel_q):
-		if(q_aln[q_temp]!="-"):
-			q_pos+=1
-		q_temp+=1
-	q_actual=q_temp 
-	#0-based indices
-	#if(q_actual!=s_actual):
-	#	print "***WARNING***"
-	annLines=["","","",""]
-	annLines[0]=repStr(" ",s_actual)
-	annLines[0]+="X"
-	annLines[1]=s_aln
-	annLines[2]=q_aln
-	annLines[3]=repStr(" ",q_actual)
-	annLines[3]+="X"
-	annotated=""
-	for i in range(len(annLines)):
-		#print annLines[i]
-		annotated+=str(i)+" : "+annLines[i]
-		if(i<len(annLines)-1):
-			annotated+="\n"
-	return annotated
-	
-
-	
-
-
-def getOtherMode(m):
-	if(m=="imgt"):
-		return "kabat"
-	else:
-		return "imgt"
 
 
 #utility to reconstruct alignments from a BTOP and data map and add it to the 
 #data map and return the data map
 def addAlignmentsPreCDR3(dataMap,alleleName,imgtdb_obj,organism,query_record):
 	btop=dataMap['btop']
-	bopyname=str(query_record.id)
-	#print "the biopython name is ",bopyname
 	query_seq=str(query_record.seq)
 	if(dataMap['is_inverted']):
 		#print "inversion is necessary...."
@@ -122,8 +46,6 @@ def CDR3LengthAnalysisVDMLOBJ(read_result_obj,meta,organism,imgtdb_obj,query_rec
 	# 3) q. start and q. end and s. start and s. end
 	# 4) read inversion flags
 	#print "got into cdr3 hist wrapper"
-	read_name=read_result_obj.id()
-	#print "got read name ",read_name
 	segment_combinations=read_result_obj.segment_combinations()
 	#if(len(segment_combinations)
 	#print "the length is ",len(segment_combinations)
@@ -271,7 +193,6 @@ class histoMapClass:
 		mode_stream_list=list()
 		for mode in self.modes:
 			#print "Now JSONIFying for MODE=",mode
-			values_list=list()
 			min_val=self.gminVal()
 			max_val=self.gmaxVal()
 			#print "min and max are ",min_val,max_val
@@ -372,13 +293,66 @@ def getEmptyCDR3Map():
 
 
 
-#given info maps for V and J and the returnd a 
+
+
+
+
+def VJRearrangementInFrameTest(vInfo,jInfo,imgtdb_obj,organism):
+	if(vInfo==None or jInfo==None):
+		#need valid data to test. return false in this case
+		return False
+	#use V and J frame
+	if(jInfo==None):
+		#no J means no prod. rearrangment???
+		return False
+	s_end=vInfo['s. end']
+	q_end=vInfo['q. end']
+	refName=vInfo['subject ids']
+	s_end_frame=getTheFrameForThisReferenceAtThisPosition(refName,organism,imgtdb_obj,s_end)
+	q_end_frame=s_end_frame
+	#print "Looking at ",vInfo['query id']
+	#print "q_start_frame (spos=",s_end,") ",q_end_frame
+	q_end_j=jInfo['q. end']
+	q_bgn_j=jInfo['q. start']
+	#print "First test...."
+	if(q_end_j<=q_end):
+		#print "WAY TOO SHORT or BAD ALIGNMENT"
+		#print "IF Q END IN J IS LESS THAN OR EQUAL TO Q END IN V\n\n\n"
+		return False
+	else:
+		#print "Second test"
+		j_bgn_j=jInfo['s. start']
+		j_bgn_frame=getTheFrameForThisJReferenceAtThisPosition(jInfo['subject ids'],organism,imgtdb_obj,j_bgn_j)
+		#print "j_bgn_frame is ",j_bgn_frame
+		if(j_bgn_frame!=None):
+			#print "passed into final...."
+			expected_frame_based_on_V=(q_end_frame+(q_bgn_j-q_end))%3
+			#print "expected_frame_based_on_V=",expected_frame_based_on_V
+			expected_frame_based_on_J=j_bgn_frame
+			#print "expected_frame_based_on_J=",expected_frame_based_on_J,"\n\n\n\n\n"
+			if(expected_frame_based_on_J==expected_frame_based_on_V):
+				#if both V and J impose the same frame, then the read should NOT be filtered
+				return True
+			else:
+				return False
+		return None
+
+
+
+
+
+#given info maps for V and J and the return a 
 #dictionary with kabat and imgt lengths
+#return other related information as well
 def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
 	#currentQueryName=str(currentQueryName.strip())
 	currentV=vMap['subject ids']
 	currentJ=jMap['subject ids']
 	cdr3_hist=getEmptyCDR3Map()
+	cdr3_hist['Missing CYS']=True
+	cdr3_hist['Missing TRP/PHE']=True
+	cdr3_hist['Out-of-frame junction']=None
+	cdr3_hist['Out-of-frame CDR3']=None
 	if(vMap['query id'].find("reversed|")==0):
 		cdr3_hist['qry_rev']=True
 	else:
@@ -400,6 +374,7 @@ def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
 				rsmap[dm][currentV]=ref_cdr3_start
 			else:
 				ref_cdr3_start=rsmap[dm][currentV]
+			#print "After initial retrieval, the ref CDR3 start for ",currentV," is ",ref_cdr3_start
 			if(not currentJ in remap[dm]):
 				#print currentJ,"not in lookup for dm=",dm
 				ref_cdr3_end=getADJCDR3EndFromJAllele(currentJ,imgtdb_obj,organism,dm)
@@ -407,6 +382,8 @@ def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
 			else:
 				ref_cdr3_end=remap[dm][currentJ]
 			if(ref_cdr3_start!=(-1) and ref_cdr3_end!=(-1)):
+				if(dm=="imgt"):
+					cdr3_hist['Out-of-frame junction']=not(VJRearrangementInFrameTest(vMap,jMap,imgtdb_obj,organism))
 				vq_aln=vMap['query seq']
 				vs_aln=vMap['subject seq']
 				vq_f=int(vMap['q. start'])
@@ -423,34 +400,80 @@ def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
 				qry_cdr3_start=getQueryIndexGivenSubjectIndexAndAlignment(vq_aln,vs_aln,vq_f,vq_t,vs_f,vs_t,ref_cdr3_start)
 				if(qry_cdr3_start!=(-1)):
 					qry_cdr3_start+=1
+				if(qry_cdr3_start!=(-1) and dm=='imgt'):
+					#code for test for CYS-104 found
+					#print "For ",currentV," the ref CDR3 start is ",ref_cdr3_start
+					ref_cys_start=ref_cdr3_start-2
+					ref_cys_end=ref_cdr3_start
+					v_aln_obj=alignment(vq_aln,vs_aln,vq_f,vq_t,vs_f,vs_t)
+					cys_aln=v_aln_obj.getSubAlnInc(ref_cys_start,ref_cys_end,"subject")
+					#print "CYS ALN="
+					#print "\n",cys_aln.getNiceString()
+					query_cys_na=cys_aln.q_aln
+					ref_cys_na=cys_aln.s_aln
+					if(len(query_cys_na)==3  and len(ref_cys_na)==3):
+						if(codonAnalyzer.is_unambiguous_codon(query_cys_na)==True):
+							query_cys_trx=codonAnalyzer.fastTrans(query_cys_na)
+							#print "The fast trans (with query=",vMap['query id']," and ref=",currentV,")=",query_cys_trx
+							#print "\n\n\n\n\n\n\n===========================================================\n\n\n\n\n\n\n"
+							#cdr3_hist['CYS']=true
+							if(query_cys_trx=='C'):
+								cdr3_hist['Missing CYS']=False
+							else:
+								cdr3_hist['Missing CYS']=True
 				ref_cdr3_end+=1
 				qry_cdr3_end=getQueryIndexGivenSubjectIndexAndAlignment(jq_aln,js_aln,jq_f,jq_t,js_f,js_t,ref_cdr3_end,"left")
 				if(qry_cdr3_end!=(-1)):
+					if(dm=='imgt'):
+						#code for test for J-TRP/J-PHE found
+						ref_trp_start=ref_cdr3_end
+						ref_trp_end=ref_trp_start+2
+						j_aln=alignment(jq_aln,js_aln,jq_f,jq_t,js_f,js_t)
+						trp_aln=j_aln.getSubAlnInc(ref_trp_start,ref_trp_end,"subject")
+						trp_q_na=trp_aln.q_aln
+						trp_s_na=trp_aln.s_aln
+						if(len(trp_q_na)==3 and len(trp_s_na)==3):
+							#print "For ",vMap['query id']," got TRP-ALN : "
+							#print "\n",trp_aln.getNiceString()
+							qry_trp_trx=codonAnalyzer.fastTrans(trp_q_na)
+							#print "Fast trans=",qry_trp_trx
+							#print 
+							#print "\n"
+							if(qry_trp_trx=='W' or qry_trp_trx=='F'):
+								cdr3_hist['Missing TRP/PHE']=False
+							else:
+								cdr3_hist['Missing TRP/PHE']=True
 					qry_cdr3_end-=1
 				if(qry_cdr3_start!=(-1) and qry_cdr3_end!=(-1)):
+					if(dm=="imgt"):
+						if(((qry_cdr3_end-qry_cdr3_start+1)%3)==0):
+							cdr3_hist['Out-of-frame CDR3']=False
+						else:
+							cdr3_hist['Out-of-frame CDR3']=True
 					#query_coding_seq=query_seq_map[currentQueryName]
 					#coding_seq=query_coding_seq[(qry_cdr3_start-1):(qry_cdr3_end-1)]
 					if(qry_cdr3_start<=qry_cdr3_end):
 						#good
 						cdr3_len=qry_cdr3_end-qry_cdr3_start+1
-						#translation=biopythonTranslate(coding_seq)
-						#print "the coding seq ("+dm+") is : ",coding_seq
-						#print "The translation ("+dm+") is : ",translation
-						#print "CDR3_LEN ("+dm+") ="+str(cdr3_len)
+						#print "mode=",dm,"read=",vMap['query id']
+						#print "For ",currentV," the ref_cdr3_bgn is ",ref_cdr3_start,"!"
+						#print "For ",currentJ," the ref_cdr3_end is ",ref_cdr3_end,"!"
+						#print "read start and end are ",qry_cdr3_start," and ",qry_cdr3_end,"\n\n\n\n"
 						cdr3_hist[dm]=cdr3_len
 						cdr3_hist[dm+'_from']=qry_cdr3_start
 						cdr3_hist[dm+'_to']=qry_cdr3_end
 					else:
 						#messed up alignment presumably due to overlap! or in the RARE case where J aligns before V in the read!
+						#print "messed up alignment presumably due to overlap! or in the RARE case where J aligns before V in the read!"
 						pass
 				else:
 					#print "BADQRYMAP Failure to map to query for mode=",dm," V=",currentV," J=",currentJ," read=",vMap['query id'],"  REFSTART=",ref_cdr3_start,"QRYSTART=",qry_cdr3_start,"REFEND=",ref_cdr3_end,"QRYEND=",qry_cdr3_end
 					pass
 			else:
-				#print "BADREFMAP mode=",dm," refVCDR3=(-1) for ",currentV," = ",ref_cdr3_start," or refJCDR3 ",currentJ," = ",ref_cdr3_end
+				#print "BADREFMAP mode=",dm," VALLELE=",currentV," and JALLELE=",currentJ," refVCDR3=(-1) for ",currentV," = ",ref_cdr3_start," or refJCDR3 ",currentJ," = ",ref_cdr3_end
 				pass
 	else:
-		#print "Ref names ",currentV," and ",currentJ," don't appear alleleic!"
+		print "Ref names ",currentV," and ",currentJ," don't appear alleleic!"
 		pass
 	#print "***************************\n"
 	#print "RETURNING THIS CDR3_HIST for ",vMap['query id'],":"

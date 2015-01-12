@@ -5,10 +5,16 @@ import re
 
 #find the number '-' in a btop
 def getNumberIndelsFromBTOP(btop):
-	orig_btop_len=len(btop)
-	btop=re.sub(r'\-','',btop)
-	btop_len_no_gap=len(btop)
-	return orig_btop_len-btop_len_no_gap
+	num_indels=0
+	for btop_char in btop:
+		if(btop_char=="-"):
+			num_indels+=1
+	return num_indels
+
+
+
+
+
 
 
 #find the number of base substitutions (does NOT include indels) from a BTOP
@@ -24,6 +30,7 @@ def getNumberBaseSubsFromBTOP(btop):
 		#btops for these are pairs of S/Q data
 		if(not(len(btop)%2==0)):
 			#ummm....they should be in pairs!
+			import sys
 			print "btop should be even for mutations and indels!"
 			sys.exit(0)
 		number_muts_and_indels=len(btop)/2

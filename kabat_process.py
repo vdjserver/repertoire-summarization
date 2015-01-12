@@ -11,17 +11,19 @@ from Bio.Blast import NCBIXML
 
 
 
-
+#scan blastx output
+#use motifs from http://www.bioinf.org.uk/abs/#cdrid
+#to identify CDR3 end for KABAT
 def writeKabatJCDR3End(k,o):
 	reader=open(k,'r')
 	blast_records = NCBIXML.parse(reader)
-	numRec=0
+	#regex for CDR3 for heavy chains
 	heavy_re=re.compile(r'WG.G')
+	#regex for CDR3 for light chains
 	light_re=re.compile(r'FG.G')
 	cdr_map=dict()
 	writer=open(o,'w')
 	for record in blast_records:
-		numRec+=1
 		print "\n\n\n******************"
 		print "query : ",record.query
 		query_name=record.query
@@ -40,6 +42,7 @@ def writeKabatJCDR3End(k,o):
 		query_trans=hsp.query
 		query_start=hsp.query_start
 		print "HSP",str(hsp),"\n"
+		#use the regex for the chain type
 		if(query_name.startswith("IGH")):
 			myre=heavy_re
 		else:
@@ -64,10 +67,11 @@ def writeKabatJCDR3End(k,o):
 			
 		#print "\n\n\n"
 	writer.close()
-	#print "numRecs is ",numRec
 
 
-def writeKabatRegionsFromIGBLASTKabatResult(k,o):
+
+def writeRegionsFromIGBLASTResult(k,o):
+	infile=k
 	reg_map=dict()
 	regions=["FWR1","CDR1","FWR2","CDR2","FWR3","CDR3"]
 	currentQuery=None
@@ -126,23 +130,6 @@ def writeKabatRegionsFromIGBLASTKabatResult(k,o):
 		if(True):
 			writer.write("\n")
 	writer.close()
-
-if (__name__=="__main__"):
-	#organisms=["Mus_musculus","human"]
-	#organisms=["Mus_musculus"]
-	organisms=["human"]
-
-	for org in organisms:
-		igblast="/home/data/DATABASE/01_22_2014/"+org+"/ReferenceDirectorySet/KABAT_TR/igblastn.kabat.out"
-		out="/home/data/DATABASE/01_22_2014/"+org+"/ReferenceDirectorySet/KABAT_TR/Vlookup.tsv"
-		if(os.path.exists(igblast) and not os.path.exists(out)):
-			print "proceed on kabat V"
-			writeKabatRegionsFromIGBLASTKabatResult(igblast,out)
-		xml="/home/data/DATABASE/01_22_2014/"+org+"/ReferenceDirectorySet/KABAT_TR/blastx.out.xml"
-		out="/home/data/DATABASE/01_22_2014/"+org+"/ReferenceDirectorySet/KABAT_TR/Jlookup.tsv"
-		if(os.path.exists(xml) and not os.path.exists(out)):
-			print "proceed on kabat J"
-			writeKabatJCDR3End(xml,out)
 
 
 
