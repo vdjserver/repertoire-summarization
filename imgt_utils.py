@@ -35,6 +35,11 @@ def countNumTerminalEntriesInHierarchy(h):
 
 
 
+	
+
+
+
+
 
 
 
@@ -460,6 +465,65 @@ class imgt_db:
 
 	def getPickleFullPath(self):
 		return self.getBaseDir()+"/"+self.pickle_file_name
+
+
+
+	def formAlignmentOfAllelesURL(self,organism,gene):
+		locus=gene[0:4]
+		#IF HUMAN USE THIS STYLE
+		#http://www.imgt.org/IMGTrepertoire/Proteins/alleles/index.php?species=Homo%20sapiens&group=IGHV&gene=IGHV7-4-1
+		if(organism=="human"):
+			url=getIMGTURLBase()+"IMGTrepertoire/Proteins/alleles/index.php?species=Homo%20sapiens&group="+locus+"&gene="+gene
+		elif(organism=="Mus_musculus" or organism=="Mus musculus"):
+			#IF MOUSE USE THIS STYLE
+			#http://www.imgt.org/IMGTrepertoire/Proteins/alleles/mouse/TRB/TRBV/Mu_TRBV2.html
+			url=getIMGTURLBase()+"IMGTrepertoire/Proteins/alleles/mouse/"
+			locus_nor=gene[0:3]
+			url=url+locus_nor+"/"+locus+"/"
+			url=url+"Mu_"+gene
+			url=url+".html"	
+		else:
+			raise Exception("Unknown organism "+organism+" for URL formation for alignment of alleles.")
+		return url
+		
+
+
+	def downdloadAlignmentOfAllelesHTML(self,organism,allele):
+		import os
+		gene_name=deAllelifyName(allele)
+		alignmentOfAllelesURL=self.formAlignmentOfAllelesURL(organism,gene_name)
+		output_dir=self.getBaseDir()+"/"+organism+"/ReferenceDirectorySet/AlignmentOfAllelesHTML/"
+		output_path=output_dir+"/"+gene_name+".html"
+		need_download=False
+		print "output_dir is ",output_dir
+		if(os.path.isdir(output_dir)):
+			#directory exists!
+			if(os.path.isfile(output_path)):
+				#file exists
+				pass
+			else:
+				need_download=True
+		else:
+			os.mkdir(output_dir)
+			need_download=True
+		if(need_download):
+			if("/" not in gene_name):
+				print "Need to use URL", alignmentOfAllelesURL
+				url_data=readAURL(alignmentOfAllelesURL)
+				#print "The URL data read is \n",url_data,"\n"
+				writer=open(output_path,'w')
+				writer.write(url_data);
+				writer.close()
+				html_log_path=output_dir+"/dl.log"
+				writer=open(html_log_path,'a')
+				log_str="Downloaded with URL="+alignmentOfAllelesURL+" to path "+output_path+"\n"
+				writer.write(log_str)
+				writer.close()
+				print "#######################################################\n"
+			else:
+				print "Skipping download of ",gene_name," with URL=",alignmentOfAllelesURL," containing a '/' in the gene_name...."
+		return output_path
+
 
 
 
