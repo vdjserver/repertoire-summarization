@@ -1164,7 +1164,7 @@ if (__name__=="__main__"):
 		recomb_out_file=extractAsItemOrFirstFromList(args.combo_out)
 		print "Writing JSONS segment combination frequency data to ",recomb_out_file
 		combo_counter.writeJSONToFile(recomb_out_file)
-		print "Writing sample-level JSON data to ",
+		print "Writing sample-level JSON data to ",sample_json_path
 		samp_json=generateSampleLevelStatsJSON()
 		writeStringToFilePathAssumingDirectoryExists(samp_json,sample_json_path)
 
