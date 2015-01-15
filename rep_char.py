@@ -176,21 +176,26 @@ def getIndelsFlags(vInfo,dInfo,jInfo):
 		strs_to_analyze.append(v_q_seq)
 		strs_to_analyze.append(v_s_seq)
 	if(dInfo!=None):
-		d_q_seq=vInfo['query seq']
-		d_s_seq=vInfo['subject seq']
+		d_q_seq=dInfo['query seq']
+		d_s_seq=dInfo['subject seq']
 		strs_to_analyze.append(d_q_seq)
 		strs_to_analyze.append(d_s_seq)
 	if(jInfo!=None):
-		j_q_seq=vInfo['query seq']
-		j_s_seq=vInfo['subject seq']
+		j_q_seq=jInfo['query seq']
+		j_s_seq=jInfo['subject seq']
 		strs_to_analyze.append(j_q_seq)
 		strs_to_analyze.append(j_s_seq)
 	gap_re=re.compile(r'([\-]{1,})')	
 	#first look for >=1 indels
 	for s in strs_to_analyze:
+		#print "Looking for gap in ",s
 		if(s.find("-")!=(-1)):
 			#found a gap!
+			#print "FOUND A GAP"
 			basicIndelsFlags=True
+		else:
+			#print "didn't find a gap!"
+			pass
 	#if at least one was found then look at the frame-preserving status
 	if(basicIndelsFlags):
 		#set the p flag to TRUE unless at least on frame-destroying indel is found
