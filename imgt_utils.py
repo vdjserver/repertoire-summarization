@@ -1162,7 +1162,7 @@ class imgt_db:
 									location=feature.location
 									#print "location : ",location
 									l_start=int(location.start)+1	#add 1 cause it's 0-based
-									l_end=int(location.end)+1	#add 1 cause it's 0-based
+									l_end=int(location.end)	#don't add one so it'll match with IMGT data
 									l_min=min(l_start,l_end)
 									l_max=max(l_start,l_end)
 									ss_list=[l_min,l_max]
