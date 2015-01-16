@@ -1041,6 +1041,9 @@ def getTheFrameForThisJReferenceAtThisPosition(refJName,organism,imgtdb_obj,refP
 
 #at the indicated position find the frame by using the
 #imgt delineation/region starts as a "base" or "frame of reference"
+#The region used is the region whose start/stop are *entirely* within the bounds of
+#the subject!  Otherwise, an uncovered region is used or a region start "off the read"
+#is used which may give incorrect frame
 def getTheFrameForThisReferenceAtThisPosition(refName,organism,imgtdb_obj,refPos):
 	regions=getVRegionsList(True)
 	for r in range(len(regions)-1):
