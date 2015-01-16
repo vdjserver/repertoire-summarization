@@ -150,7 +150,7 @@ def dicts(t): return {k: dicts(t[k]) for k in t}
 #Finally, return all the hierarchy and clone data!
 def analyze_download_dir_forVDJserver(base_dir,pickle_file_full_path=None,countsMap=None,specifiedOrganism=None,specifiedLocus=None):
 	myDB=imgt_db(base_dir)
-	analyze_IGBlastLookupsVSIMGTDatLookups(myDB)
+	#analyze_IGBlastLookupsVSIMGTDatLookups(myDB)
 	organisms=myDB.getOrganismList()
 	org_hierarchy=tree()
 	clone_names_by_org=dict()
