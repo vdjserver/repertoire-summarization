@@ -225,8 +225,11 @@ def getValnWholeSeqStopFlag(vInfo,dInfo,jInfo,imgtdb_obj,organism,annMap,seq_rec
 		#if no V alignment how can there be a frame, a J alignment, or a stop codon?
 		return None
 	else:
-		#vAlnObj=alignment(vInfo['query seq'],vInfo['subject seq'],vInfo['q. start'],vInfo['q. end'],vInfo['s. start'],vInfo['s. end'])
-		#vAlnNoGapStart=vAlnObj.getGEQAlignmentFirstNonGap()
+		vAlnObj=alignment(vInfo['query seq'],vInfo['subject seq'],vInfo['q. start'],vInfo['q. end'],vInfo['s. start'],vInfo['s. end'])
+		#print "Looking at STOP log for ",str(seq_rec.id)
+		#print "The alignment plain is \n",vAlnObj.getNiceString()
+		vAlnNoGapStart=vAlnObj.getGEQAlignmentFirstNonGap()
+		#print "The alignment non-gap start is ",vAlnNoGapStart.getNiceString()
 		s_start=int(vInfo['s. start'])
 		q_start=int(vInfo['q. start'])
 		s_start_frame=getTheFrameForThisReferenceAtThisPosition(vInfo['subject ids'],organism,imgtdb_obj,s_start)
@@ -240,16 +243,19 @@ def getValnWholeSeqStopFlag(vInfo,dInfo,jInfo,imgtdb_obj,organism,annMap,seq_rec
 		else:
 			info_to_use=jInfo
 		#use max in case there is germline alignment overlap
+		#print "S start frame is ",s_start_frame
 		q_end=max(int(info_to_use['q. end']),int(vInfo['q. end']))
 		if(not(vInfo['is_inverted'])):
+			#print "Computing to_trans regular block...."
 			to_trans=str(seq_rec.seq)[(q_start-1):q_end].upper()
 		else:
 			proper=rev_comp_dna(str(seq_rec.seq))
 			to_trans=str(proper[q_start-1:q_end]).upper()
+			#print "computing to_trans inverted block"
 		#print "s_start_frame is ",s_start_frame
 		if(s_start_frame!=0):
 			to_trans=to_trans[(3-s_start_frame):]
-		#print "To be translated for read=",str(seq_rec.id)," is ",to_trans
+		#print "To be translated for (pre-trim) read=",str(seq_rec.id)," is ",to_trans
 		to_trans_len=len(to_trans)
 		if((to_trans_len%3)!=0):
 			necessary_trim=(to_trans_len%3)
@@ -260,9 +266,10 @@ def getValnWholeSeqStopFlag(vInfo,dInfo,jInfo,imgtdb_obj,organism,annMap,seq_rec
 		translation=codonAnalyzer.fastTransStr(trim_to_trans)
 		stopFlag=stringContainsAStar(translation)
 		#print "The translation : ",translation
+		#print "The stop flag : ",stopFlag
 		#print "\n\n\n\n"
 		return stopFlag
-		#return False
+
 		
 		
 
