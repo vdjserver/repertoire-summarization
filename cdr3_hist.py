@@ -305,15 +305,16 @@ def VJRearrangementInFrameTest(vInfo,jInfo,imgtdb_obj,organism):
 	if(jInfo==None):
 		#no J means no prod. rearrangment???
 		return False
-	s_end=vInfo['s. end']
-	q_end=vInfo['q. end']
+	s_end=int(vInfo['s. end'])
+	q_end=int(vInfo['q. end'])
 	refName=vInfo['subject ids']
 	s_end_frame=getTheFrameForThisReferenceAtThisPosition(refName,organism,imgtdb_obj,s_end)
 	q_end_frame=s_end_frame
-	#print "Looking at ",vInfo['query id']
+	#print "========================================================="
+	#print "\n\n\nLooking at ",vInfo['query id']," for FRAME test...."
 	#print "q_start_frame (spos=",s_end,") ",q_end_frame
-	q_end_j=jInfo['q. end']
-	q_bgn_j=jInfo['q. start']
+	q_end_j=int(jInfo['q. end'])
+	q_bgn_j=int(jInfo['q. start'])
 	#print "First test...."
 	if(q_end_j<=q_end):
 		#print "WAY TOO SHORT or BAD ALIGNMENT"
@@ -321,19 +322,24 @@ def VJRearrangementInFrameTest(vInfo,jInfo,imgtdb_obj,organism):
 		return False
 	else:
 		#print "Second test"
-		j_bgn_j=jInfo['s. start']
+		j_bgn_j=int(jInfo['s. start'])
 		j_bgn_frame=getTheFrameForThisJReferenceAtThisPosition(jInfo['subject ids'],organism,imgtdb_obj,j_bgn_j)
+		#print "v_end_frame is ",s_end_frame
 		#print "j_bgn_frame is ",j_bgn_frame
 		if(j_bgn_frame!=None):
 			#print "passed into final...."
+			#print "V sub and qry end are : ",s_end," and ",q_end
+			#print "J sub and query bgn are : ",j_bgn_j," and ",q_bgn_j
 			expected_frame_based_on_V=(q_end_frame+(q_bgn_j-q_end))%3
-			#print "expected_frame_based_on_V=",expected_frame_based_on_V
+			#print "expected_frame_based_on_V=",expected_frame_based_on_V,"at read position=",q_bgn_j
 			expected_frame_based_on_J=j_bgn_frame
-			#print "expected_frame_based_on_J=",expected_frame_based_on_J,"\n\n\n\n\n"
+			#print "expected_frame_based_on_J=",expected_frame_based_on_J,"at read position=",q_bgn_j
 			if(expected_frame_based_on_J==expected_frame_based_on_V):
 				#if both V and J impose the same frame, then the read should NOT be filtered
+				#print "V extrapolated frame (",expected_frame_based_on_V,") is the same as J frame so return TRUE for frame test."
 				return True
 			else:
+				#print "V extrapolated frame (",expected_frame_based_on_V,") is NOT the same as J frame so return TRUE for frame test."
 				return False
 		return None
 
@@ -382,6 +388,7 @@ def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
 			else:
 				ref_cdr3_end=remap[dm][currentJ]
 			if(ref_cdr3_start!=(-1) and ref_cdr3_end!=(-1)):
+				#print "ref_cdr3_end is ",ref_cdr3_end
 				if(dm=="imgt"):
 					cdr3_hist['Out-of-frame junction']=not(VJRearrangementInFrameTest(vMap,jMap,imgtdb_obj,organism))
 				vq_aln=vMap['query seq']
@@ -421,12 +428,13 @@ def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
 								cdr3_hist['Missing CYS']=False
 							else:
 								cdr3_hist['Missing CYS']=True
-				ref_cdr3_end+=1
-				qry_cdr3_end=getQueryIndexGivenSubjectIndexAndAlignment(jq_aln,js_aln,jq_f,jq_t,js_f,js_t,ref_cdr3_end,"left")
-				if(qry_cdr3_end!=(-1)):
+				ref_cdr3_trp_start=ref_cdr3_end+1 #cause CDR3 end is 1bp before the TRP start
+				#print "after mod, ref_cdr3_end is ",ref_cdr3_end	
+				qry_trp_start=getQueryIndexGivenSubjectIndexAndAlignment(jq_aln,js_aln,jq_f,jq_t,js_f,js_t,ref_cdr3_trp_start,"left")
+				if(qry_trp_start!=(-1)):
 					if(dm=='imgt'):
 						#code for test for J-TRP/J-PHE found
-						ref_trp_start=ref_cdr3_end
+						ref_trp_start=ref_cdr3_trp_start
 						ref_trp_end=ref_trp_start+2
 						j_aln=alignment(jq_aln,js_aln,jq_f,jq_t,js_f,js_t)
 						trp_aln=j_aln.getSubAlnInc(ref_trp_start,ref_trp_end,"subject")
@@ -443,7 +451,8 @@ def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
 								cdr3_hist['Missing TRP/PHE']=False
 							else:
 								cdr3_hist['Missing TRP/PHE']=True
-					qry_cdr3_end-=1
+
+				qry_cdr3_end=getQueryIndexGivenSubjectIndexAndAlignment(jq_aln,js_aln,jq_f,jq_t,js_f,js_t,ref_cdr3_end,"left")
 				if(qry_cdr3_start!=(-1) and qry_cdr3_end!=(-1)):
 					if(dm=="imgt"):
 						if(((qry_cdr3_end-qry_cdr3_start+1)%3)==0):

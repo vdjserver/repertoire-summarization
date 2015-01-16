@@ -694,6 +694,8 @@ def get_segment_count_map_from_blast_output(blast_out,fasta_file_list):
 #use the LOOKUP tables in the database 
 #IMGT data use the imgt.dat .  Once data are looked up, store then in a
 #dict structure for subsequent faster lookups
+#the lookup represents the position in the reference data IgBLASTED
+#against that is just before the J-TRP or J-PHE (one bp which is in the last codon position of the immediately preceding amino residue)
 cdr3_end_lookup=dict()
 def getADJCDR3EndFromJAllele(jallele,imgtdb_obj,org="human",mode="imgt"):
 	#print "in getADJCDR3EndFromJAllele. jallele=",jallele," org=",org,"mode=",mode
@@ -774,6 +776,7 @@ def getADJCDR3EndFromJAllele(jallele,imgtdb_obj,org="human",mode="imgt"):
 
 
 #use the IMGT dat FILE to find the CDR3 end for a JALLELE
+#return the index of the bp immediately before the first bp of the codon of JTRP or JPHE
 def getCDR3EndFromJData(allele,imgtdb_obj,org="human"):
 	#print "*********************************\nEntering getCDR3EndFromJData\n*******************************"
 	biopyrec=imgtdb_obj.getIMGTDatGivenAllele(allele,True,org)
@@ -789,7 +792,7 @@ def getCDR3EndFromJData(allele,imgtdb_obj,org="human"):
 	if(extracted_descriptor_interval==None):
 		#print "COULDN'T GET INTERVAL FOR ALLELE=",allele," organism=",org
 		#sys.exit(0)
-		print "getCDR3EndFromJData returning 'None' for allele="+str(allele)+" and org="+str(org)
+		#print "getCDR3EndFromJData returning 'None' for allele="+str(allele)+" and org="+str(org)
 		return None		
 	if(extracted_descriptor_interval!=None and type(extracted_descriptor_interval)==list):
 		reg_start=extracted_descriptor_interval[0]
@@ -806,16 +809,16 @@ def getCDR3EndFromJData(allele,imgtdb_obj,org="human"):
 					if(ftype=="J-TRP" or ftype=="J-PHE"):
 						c_start=int(re.sub(r'[^0-9]','',str(feature.location.start)))
 						c_end=int(re.sub(r'[^0-9]','',str(feature.location.end)))
-						#print "found a jtrp"
+						#print "found a jtrp with c_start and c_end being ",c_start," and ",c_end
+						#print "NOTE c_start already subtrats one...compared to imgt.dat....why???"
 						if(reg_start<=c_end and c_end<=reg_end):
-							#this is it!
-							#subtract 3 becuase we want to ignore the TRP or PHE residue and look at the residue immediately preceding
-							return c_end-3
+							#this is it! it's within the range
+							return c_start
 		else:
-			print "failed to get a start!"
+			#print "failed to get a start!"
 			pass
 	#os.remove(tmp_file_path)
-	print "getCDR3EndFromJData returning 'None' for allele="+str(allele)+" and org="+str(org)
+	#print "getCDR3EndFromJData returning 'None' for allele="+str(allele)+" and org="+str(org)
 	return None
 
 
@@ -1038,6 +1041,9 @@ def getTheFrameForThisJReferenceAtThisPosition(refJName,organism,imgtdb_obj,refP
 
 #at the indicated position find the frame by using the
 #imgt delineation/region starts as a "base" or "frame of reference"
+#The region used is the region whose start/stop are *entirely* within the bounds of
+#the subject!  Otherwise, an uncovered region is used or a region start "off the read"
+#is used which may give incorrect frame
 def getTheFrameForThisReferenceAtThisPosition(refName,organism,imgtdb_obj,refPos):
 	regions=getVRegionsList(True)
 	for r in range(len(regions)-1):
