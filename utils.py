@@ -857,7 +857,7 @@ def uncompressZFile(path,uncompressInPlace=False):
 
 def extractFromPosTo(mut):
 	nmRe=re.compile(r'^([A-Z\*])([0-9][0-9][ABC]?)([A-Z\*])$')
-	nmmo=re.search(nmRe,nm)
+	nmmo=re.search(nmRe,mut)
 	if(nmmo):
 		mut_from=nmmo.group(1)
 		mut_pos=nmmo.group(2)
