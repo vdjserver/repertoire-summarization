@@ -854,6 +854,17 @@ def uncompressZFile(path,uncompressInPlace=False):
 		uncomp_writer.close()
 		p1.wait()
 		
+
+def extractFromPosTo(mut):
+	nmRe=re.compile(r'^([A-Z\*])([0-9][0-9][ABC]?)([A-Z\*])$')
+	nmmo=re.search(nmRe,nm)
+	if(nmmo):
+		mut_from=nmmo.group(1)
+		mut_pos=nmmo.group(2)
+		mut_to=nmmo.group(3)
+		return [str(mut_from),str(mut_pos),str(mut_to)]
+	else:
+		return None	
 		
 
 def getVersionInfo(ver_type="desc"):
