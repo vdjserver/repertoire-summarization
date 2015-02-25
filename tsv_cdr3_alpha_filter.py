@@ -118,7 +118,7 @@ def obtain_alpha_filtered_CDR3_barcode_blacklist_mapping(alpha,sb_cdr3_pct_file)
 
 #perform TSV filtering using a alpha-modified CDR3->sample-barcode blacklist (input and output paths are used)
 #a batch->sample=sample_barcode lookup is also required
-def TSV_alpha_filter(input_dir,new_black_list_cdr3_bc,output_dir,filter_report_output_path,batch_sample_bc_loookup,min_count_num):
+def TSV_alpha_filter(input_dir,new_black_list_cdr3_bc,output_dir,filter_report_output_path,batch_sample_bc_loookup,min_count_num,use_cdr3_na=True):
 	#define the output base
 	output_filtered_base=output_dir
 	if(not(os.path.exists(output_filtered_base))):
@@ -166,7 +166,10 @@ def TSV_alpha_filter(input_dir,new_black_list_cdr3_bc,output_dir,filter_report_o
 				pass
 			else:
 				pieces=temp_line.split('\t')
-				cdr3=pieces[20]
+				if(use_cdr3_na):
+					cdr3=pieces[20]
+				else:
+					cdr3=pieces[18]
 				status=pieces[183]
 				rm_list_str=pieces[185]
 				rm_list=eval(rm_list_str)
@@ -179,7 +182,11 @@ def TSV_alpha_filter(input_dir,new_black_list_cdr3_bc,output_dir,filter_report_o
 						num_reads_OK_None_CDR3+=1
 						num_reads_OK_None_CDR3_weighted+=count_val
 					else:
-						if(not(re.match(r'^[ACGT]+$',cdr3))):
+						if(use_cdr3_na):
+							valid_cdr3_re=re.compile(r'^[ACGT]+$')
+						else:
+							valid_cdr3_re=re.compile(r'^[GPAVLIMCFYWHKRQNEDST]+$')					
+						if(not(re.match(valid_cdr3_re,cdr3))):
 							#invalid CDR3!
 							num_reads_OK_HaveBlankCDR3OrNONACGT+=1
 							num_reads_OK_HaveBlankCDR3OrNONACGT_weighted+=count_val
@@ -245,14 +252,15 @@ if (__name__=="__main__"):
 	parser.add_argument('output_base',type=str,nargs=1,help="path to a (non-existent!) directory that will contain the filterd output and the filter report")
 	parser.add_argument('-alpha_cutoff',type=float,nargs=1,default=float(0.95),help="the alpha cutoff for defining false positive of the blacklist (default 0.95)")
 	parser.add_argument('-min_count_num',type=int,default=1,nargs=1,help="required minimum count value that triggers row into aggregtation (default 1)")
+	parser.add_argument('-use_na',action='store_true',help="use nucleic acid in the cross over (using amino acid is the default unless this is used)")
 	args=parser.parse_args()
 	if(args):
-		print "success!"
 		BS_SBC_lookup_file=extractAsItemOrFirstFromList(args.b_s_b_file_path)
 		print "Using batch,sample,sample_barcode lookup file ",BS_SBC_lookup_file
 		batch_sample_bc_loookup=get_batch_sample_barcode_lookup(BS_SBC_lookup_file)
 		alpha=extractAsItemOrFirstFromList(args.alpha_cutoff)
 		print "Using alpha cutoff = ",alpha
+		na_flag=args.use_na
 		sb_cdr3_pct_file=extractAsItemOrFirstFromList(args.sb_cdr3_pct_file)
 		cdr3_bc_blacklist=obtain_alpha_filtered_CDR3_barcode_blacklist_mapping(alpha,sb_cdr3_pct_file)
 		input_dir=extractAsItemOrFirstFromList(args.input_base)
@@ -267,7 +275,7 @@ if (__name__=="__main__"):
 			parser.print_help()
 			import sys
 			sys.exit(0)
-		TSV_alpha_filter(input_dir,cdr3_bc_blacklist,output_dir,filter_report_output_path,batch_sample_bc_loookup,min_count_num)
+		TSV_alpha_filter(input_dir,cdr3_bc_blacklist,output_dir,filter_report_output_path,batch_sample_bc_loookup,min_count_num,na_flag)
 	else:
 		#print "failure!"
 		parser.print_help()
