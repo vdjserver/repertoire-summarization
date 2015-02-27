@@ -16,6 +16,7 @@ import re
 #acquire signature from a line
 def acquireSignatureFromTSVLine(l,use_na_cdr3=False):
 	pieces=l.split('\t')
+	#gene/allele portion
 	ighv_allele=pieces[2]
 	ighv_gene=deAllelifyName(ighv_allele)
 	rm_text=pieces[185]
@@ -23,9 +24,9 @@ def acquireSignatureFromTSVLine(l,use_na_cdr3=False):
 	include_sm=False
 	mut_arr=list()
 	rms=eval(rm_text)
+	#RM portion
 	for rm in rms:
 		fromPosTo=extractFromPosTo(rm)
-		rm_from=fromPosTo[0]
 		rm_pos=fromPosTo[1]
 		rm_to=fromPosTo[2]
 		mut_arr.append(rm_pos+rm_to)
@@ -33,6 +34,7 @@ def acquireSignatureFromTSVLine(l,use_na_cdr3=False):
 		sms=eval(sm_text)
 		for sm in sms:
 			mut_arr.add(sm)
+	#CDR3 portion
 	if(use_na_cdr3):
 		cdr3_index=20
 	else:
@@ -47,7 +49,11 @@ def acquireSignatureFromTSVLine(l,use_na_cdr3=False):
 	cdr3_sig_port=cdr3
 	#V call portion of signature
 	v_sig_port=ighv_gene
-	sig=v_sig_port+"."+mut_sig_port+"."+cdr3_sig_port
+	#sig=v_sig_port+"."+mut_sig_port+"."+cdr3_sig_port
+	sig=mut_sig_port+"."+cdr3_sig_port
+	#print "Acquiring a signature...."
+	#print "allele=",ighv_allele," gene=",ighv_gene," RM portion =",mut_sig_port," cdr3=",cdr3_sig_port
+	#print "To return signature ",sig
 	return sig
 		
 
@@ -59,29 +65,72 @@ def acquireSignatureFromTSVLine(l,use_na_cdr3=False):
 
 
 
-#return uniq lines from TSV based on signature
-def acquire_uniq_lines_from_path(p,include_header_in_output=True):
-	reader=open(p,'r')
+def acquire_sigs_to_max_dict(single_tsv_path):
+	reader=open(single_tsv_path,'r')
 	line_num=0
-	sig_to_data_map=dict()
-	output=list()
+	sig_to_max_dict=dict()
+	for line in reader:
+		if(line_num>0):
+			#data!
+			temp_line=line.strip()
+			sig=acquireSignatureFromTSVLine(temp_line)
+			pieces=temp_line.strip()
+			count=int(pieces[len(pieces)-1])
+			print "For a line the sig is ",sig," and the count is ",count
+			if(sig in sig_to_max_dict):
+				#do a comparison
+				existing_val=sig_to_max_dict[sig]
+				if(existing_val<count):
+					#count bigger than existing key?, then overwrite!
+					sig_to_max_dict[sig]=count
+				else:
+					#if existing>=count, then leave the dict alone,
+					#the first value is the one chosen if the two vals are the same
+					pass
+			else:
+				#nothing? then store it!
+				sig_to_max_dict[sig]=count
+		else:
+			#line_num==0?
+			pass
+		line_num+=1
+	reader.close()
+	return sig_to_max_dict
+
+
+
+
+
+
+def perfrom_dgx_uniq(tsv_input_path,tsv_output_path,sig_to_max_dict):
+	reader=open(tsv_input_path,'r')
+	writer=open(tsv_output_path,'w')
+	line_num=0
 	for line in reader:
 		temp_line=line.strip()
 		if(line_num==0):
-			header=temp_line
-			output.append(header)
+			#write the header!
+			writer.write(temp_line+"\n")
 		else:
-			#pieces=temp_line.split('\t')
-			#status=pieces[183]	
-			#status presumed to ALWAYS be OKAY here????
-			sig=acquireSignatureFromTSVLine(temp_line)
-			if(sig in sig_to_data_map):
+			pieces=temp_line.split('\t')
+			this_line_count=int(pieces[len(pieces)-1])
+			this_line_sig=acquireSignatureFromTSVLine(temp_line)
+			if(not(this_line_sig in sig_to_max_dict)):
 				pass
 			else:
-				output.append(temp_line)
-			sig_to_data_map[sig]=temp_line
+				this_sig_max=sig_to_max_dict[this_line_sig]
+				if(this_sig_max>=this_line_count):
+					#output and remove!
+					writer.write(temp_line+"\n")
+					del sig_to_max_dict[this_line_sig]
+				else:
+					#skip!
+					pass
 		line_num+=1
-	return output
+	writer.close()
+	reader.close()
+
+
 
 
 
@@ -90,20 +139,19 @@ def acquire_uniq_lines_from_path(p,include_header_in_output=True):
 def batch_sig_uniq(input_base,output_base):
 	tsv_glob=input_base+"/*/*out.tsv"
 	for tsv in glob_walk(tsv_glob):
+		#first acquire file level information
 		tsv_batch_sample=getBatchIDAndSampleIDFromPath(tsv)
 		tsv_batch=tsv_batch_sample[0]
 		tsv_sample=tsv_batch_sample[1]
 		filtered_file_dir=output_base+"/"+tsv_batch+"/"
 		filtered_file_path=filtered_file_dir+os.path.basename(tsv)
-		filtered_lines=acquire_uniq_lines_from_path(tsv)
-		print "Data read from ",tsv,"...now to write filtered data to",filtered_file_path,"..."
-		if(not(os.path.isdir(filtered_file_dir)) and not(os.path.exists(filtered_file_dir))):
+		#acquire signature->max data/dict
+		print "Now processing file ",tsv," to write to ",filtered_file_path,"..."
+		sig_to_max_dict=acquire_sigs_to_max_dict(tsv)
+		if(not(os.path.exists(filtered_file_dir))):
 			os.makedirs(filtered_file_dir)
-		writer=open(filtered_file_path,'w')
-		for i in range(len(filtered_lines)):
-			writer.write(filtered_lines[i]+"\n")
-		writer.close()
-	
+		#using the map perform the filtering/uniquing/outputting
+		perfrom_dgx_uniq(tsv,filtered_file_path,sig_to_max_dict)
 
 
 
