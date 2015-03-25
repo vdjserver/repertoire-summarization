@@ -21,6 +21,22 @@ import os
 
 
 
+def isAlleleConstRegion(allele_str):
+	if(not(looksLikeAlleleStr(allele_str))):
+		#if it doesn't look like an allele it's not constant!
+		return False
+	else:
+		if(len(allele_str)>=4):
+			#get VDJ part
+			vdj_part=allele_str[3:]
+			if(vdj_part.startswith("C") or vdj_part.startswith("c") or vdj_part.startswith("-C") or vdj_part.startswith("-c")):
+				return True
+			else:
+				return False
+		else:
+			return False
+
+
 def jsonOptWrapVal(v):
 	if(type(v)==float):
 		return str(v)
