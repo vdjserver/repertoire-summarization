@@ -22,6 +22,16 @@ The total number of base-to-base alignments with V minus the number are mismatch
 
 
 Out-of-frame junction
+This is a true/false test.
+For it to be marked true several criteria must be true.
+First, both V and J alignment must be present.
+Second, they must not only be present but good enough so that the J alignment comes after the V alignment.  Bad alignments sometimes show J aligning before V with no V-J junction.  If J aligns before the V, then the test is marked as False.
+Third, frame information must be successfully extracted from the the alignments.  
+The final test is a reading-frame test.  The frame from the end of the V alignment is taken.  The frame from the beginning of the J alignment is taken.
+The frame from the V alignment is extrapolated using modular arithmetic to the location where alignment with J begins.
+If the two frames agree with the modular arithmetic then the test is marked as True.  If the two frames disagree, the tst is marked as Fasle.
+Any other situation results in the test being marked None.
+
 
 
 
