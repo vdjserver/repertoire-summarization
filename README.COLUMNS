@@ -1,6 +1,6 @@
 README FOR COLUMNS
 
-Values are "None" if no determination can be made (for example if there is no alignment)
+Values are "None" or blank if no determination can be made (for example if there is no alignment)
 
 Read identifier
 The name of the read
