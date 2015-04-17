@@ -48,14 +48,30 @@ Only Frame-Preserving Indels Found
 Each of the V, D, J alignments is examined if it exists.  If NO indels at all are found, then this columns is True.  If at least one instance of an indel is found AND the instance is NOT of a length of a multiple of three, then this column is False. 
 
 
-
-CDR3 AA (imgt)
-The translation of the CDR3 nucleic acid string.
-
-
+The nucleic acids of the subsequence of the CDR3 region (in KABAT and IMGT definitions)
 CDR3 NA (imgt)
+CDR3 NA (kabat)
+
+
+The translation of the CDR3 nucleic acid string (in KABAT and IMGT definitions):
+CDR3 AA (kabat)
+CDR3 AA (imgt)
+
+
+
+
+
 
 First the CDR3 start/stop (in V and J) IMGT anchors are acquired.  If either is not, then this field is empty.  Then, it is required that both anchors align to the read.  I not, then the field is empty.  Then, the subsequence of nucleic acids of the the read between the two positions is taken and put in this field.
+
+Various FR and CDR regions and their alignments 
+are analyzed and briefly summarized for both IMGT and KABAT defined regions : FR1, FR2, FR3, and CDR1 and CDR2.
+the "aligned bases" refers to the length of the query subsequence of the region
+the "base subst." refers to number of base substitutions (only in cases of base-to-base alignment)
+the "AA subst." refers to the number of amino-acid substitutions (in-frame and where 3-bases align as codons)
+"codons with silent mut." refers to the number of codons with at least one silent mutation. (non-synonymous).
+
+The following regions in IMGT and KABAT whose information are provided is listed here: 
 
 FR1 aligned bases (imgt)
 FR1 base subst. (imgt)
@@ -77,15 +93,6 @@ FR3 aligned bases (imgt)
 FR3 base subst. (imgt)
 FR3 AA subst. (imgt)
 FR3 codons with silent mut. (imgt)
-
-
-
-
-
-
-
-CDR3 AA (kabat)
-CDR3 NA (kabat)
 FR1 aligned bases (kabat)
 FR1 base subst. (kabat)
 FR1 AA subst. (kabat)
@@ -106,8 +113,17 @@ FR3 aligned bases (kabat)
 FR3 base subst. (kabat)
 FR3 AA subst. (kabat)
 FR3 codons with silent mut. (kabat)
+
+
+
+
+Other genes that aligned.  Often different allels of the same
+gene if the alignment was good, or of different genes if the
+alignment is poor.
 Alternate V gene
 Alternate J gene
 Alternate D gene
+
+
 Release Version Tag
 Release Version Hash
