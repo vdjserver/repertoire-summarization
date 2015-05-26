@@ -1160,9 +1160,6 @@ if (__name__=="__main__"):
 			print "No AGS/NMO data for non-human analysis!"
 
 
-		#write the segment counts when non-dev-null
-		if(type(segments_json_out)==list):
-			segments_json_out=segments_json_out
 		print "Writing JSON segment counts output to ",segments_json_out,"..."
 		segment_counter.JSONIFYToFile(
 			extractAsItemOrFirstFromList(args.vdj_db_root),
@@ -1175,6 +1172,12 @@ if (__name__=="__main__"):
 		recomb_out_file=extractAsItemOrFirstFromList(args.combo_out)
 		print "Writing JSONS segment combination frequency data to ",recomb_out_file
 		combo_counter.writeJSONToFile(recomb_out_file)
+		combo_csv_string=combo_counter.writeDataToCSV(False)
+		if(recomb_out_file=="/dev/stdout"):
+			combo_csv_file="/dev/stdout"
+		else:
+			combo_csv_file=recomb_out_file+".csv"
+		writeStringToFilePathAssumingDirectoryExists(combo_csv_string,combo_csv_file)
 		print "Writing sample-level JSON data to ",sample_json_path
 		samp_json=generateSampleLevelStatsJSON()
 		writeStringToFilePathAssumingDirectoryExists(samp_json,sample_json_path)
