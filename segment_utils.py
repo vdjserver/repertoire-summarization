@@ -1194,6 +1194,30 @@ class recombFreqManager():
 		writer.write(JSON)
 		writer.close()
 
+
+	#write data to CSV
+	def writeDataToCSV(self,maskAllele=False):
+		csv_dict=dict()
+		if(maskAllele):
+			#merge over alleles into genes
+			for triple in self.freq_map:
+				vdj=triple.split(',')
+				v=deAllelifyName(vdj[0])
+				d=deAllelifyName(vdj[1])
+				j=deAllelifyName(vdj[2])
+				gene_comb=str(v)+","+str(d)+","+str(j)
+				if(not(gene_comb in csv_dict)):
+					csv_dict[gene_comb]=1
+				else:
+					csv_dict[gene_comb]+=1
+		else:
+			csv_dict=self.freq_map
+		ret_val="V gene,J gene,D gene\n"
+		for triple in sorted(csv_dict):
+			ret_val+=triple+","+str(csv_dict[triple])+"\n"
+		return ret_val
+
+
 	#create JSON from combos
 	def makeJSON(self):
 		json="{\ncombinations : [\n"
