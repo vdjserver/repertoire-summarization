@@ -1147,9 +1147,13 @@ if (__name__=="__main__"):
 		#write the CDR3 hist when non-dev-null
 		if(type(cdr3_hist_out_file)==list):
 			cdr3_hist_out_file=extractAsItemOrFirstFromList(cdr3_hist_out_file)
+		print "file=",cdr3_hist_out_file
 		if(not(cdr3_hist_out_file=="/dev/null")):
 			my_cdr3_map.writeToFile(cdr3_hist_out_file)
 			print "Wrote CDR3 lengths histogram to ",cdr3_hist_out_file
+		print "NOTE : Number IMGT  CDR3 lengtgs not found = "+str(my_cdr3_map.count_map['imgt'][-1])
+		print "NOTE : Number KABAT CDR3 lengths not found = "+str(my_cdr3_map.count_map['kabat'][-1])
+
 
 		#write AGS/NMO information
 		if(organism=="human"):
