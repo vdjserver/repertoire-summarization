@@ -1027,6 +1027,7 @@ def add_rep_char_args_to_parser(parser):
 	parser.description+=' Generate read-level repertoire-characterization data. VERSION '+version_info
 	parser.add_argument('-json_out',type=str,nargs=1,default="/dev/stdout",help="output file for the JSON segment count IMGT hierarchy")
 	parser.add_argument('-combo_out',type=str,nargs=1,default="/dev/stdout",help="output file for JSON segment recombination count data")
+	parser.add_argument('-combo_csv_out',type=str,nargs=1,default="/dev/stdout",help="output file for CSV of segment combination count data")
 	parser.add_argument('-cdr3_hist_out',type=str,nargs=1,default="/dev/stdout",help="output file for the CDR3 histogram of lengths (both kabat and imgt systems)")
 	parser.add_argument('-sample_json_out',type=str,nargs=1,default="/dev/stdout",help="output file for sample-level JSON repertoire data (e.g. R:S over IMGT CDRs)")
 	parser.add_argument('-skip_char',action='store_true', default=False,help="If this is set, then characterization besides germline segment assignment and CDR3 analysis is skipped")
@@ -1177,10 +1178,8 @@ if (__name__=="__main__"):
 		print "Writing JSONS segment combination frequency data to ",recomb_out_file
 		combo_counter.writeJSONToFile(recomb_out_file)
 		combo_csv_string=combo_counter.writeDataToCSV(False)
-		if(recomb_out_file=="/dev/stdout"):
-			combo_csv_file="/dev/stdout"
-		else:
-			combo_csv_file=recomb_out_file+".csv"
+		combo_csv_file=extractAsItemOrFirstFromList(args.combo_csv_out)
+		print "Writing CSV segment combination frequency data to ",combo_csv_file
 		writeStringToFilePathAssumingDirectoryExists(combo_csv_string,combo_csv_file)
 		print "Writing sample-level JSON data to ",sample_json_path
 		samp_json=generateSampleLevelStatsJSON()
