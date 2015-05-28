@@ -74,6 +74,7 @@ do
 			DB_J=${BLAST_DB_ROOT}_J.fna
 			RC_VDJML=$RC_IN.rc.vdjml
 			RC_COMBO=$RC_IN.combo.json
+			RC_CSV_COMBO=${RC_COMBO}.csv
 			RC_CDR3_HIST=$RC_IN.cdr3_hist.tsv
 			RC_CDR3_SEG_JSON=$RC_IN.segments.json
 			RC_SAMP_JSON=$RC_IN.sample.json
@@ -97,6 +98,7 @@ do
 			SIM_CDR3=$SIM_B_OUT.cdr3_hist.tsv
 			SIM_VDJML=$SIM_B_OUT.vdjml
 			SIM_COMBO=$SIM_B_OUT.combo.json
+			SIM_CSV_COMBO=${SIM_COMBO}.csv
 			SIM_SAMP_JSON=$SIM_B_OUT.sample.json
 			SIM_RC_OUT=$SIM_B_OUT.rc_out.tsv
 			SIM_RC_OUT_LOG=${SIM_RC_OUT}.log
@@ -109,7 +111,7 @@ do
 				echo "Running IgBLAST for sim data $SIM_DATA ..."
 				echo "First in human-readable form..."
 				$IGBLAST_EXEC  $IGBLAST_GLOBAL_PARAMS  -num_threads 6   -domain_system $DCMODE  -query ${SIM_DATA} -germline_db_V $DB_V -germline_db_D $DB_D -germline_db_J $DB_J  -ig_seqtype $IGB_SEQ_FLAG -auxiliary_data $AUX_PATH  -show_translation   > $SIM_B_OUT_HR &
-				$IGBLAST_EXEC $IGBLAST_GLOBAL_PARAMS   -num_threads 6   -domain_system $DCMODE  -query ${SIM_DATA} -germline_db_V $DB_V -germline_db_D $DB_D -germline_db_J $DB_J  -ig_seqtype $IGB_SEQ_FLAG -auxiliary_data $AUX_PATH -outfmt '7 qseqid qgi qacc qaccver qlen sseqid sallseqid sgi sallgi sacc saccver sallacc slen qstart qend sstart send qseq sseq evalue bitscore score length pident nident mismatch positive gapopen gaps ppos frames qframe sframe btop'  |tee $SIM_B_OUT| ../rep_char.py  ${REP_CHAR_OPTS}  -combo_out $SIM_COMBO    -sample_json_out  $SIM_SAMP_JSON     -json_out $SIM_JSON -cdr3_hist_out $SIM_CDR3 /dev/stdin $SIM_VDJML $SIM_RC_OUT $RC_DB ${SIM_DATA} $ORGANISM  1>$SIM_RC_OUT_LOG 2>$SIM_RC_OUT_ERR
+				$IGBLAST_EXEC $IGBLAST_GLOBAL_PARAMS   -num_threads 6   -domain_system $DCMODE  -query ${SIM_DATA} -germline_db_V $DB_V -germline_db_D $DB_D -germline_db_J $DB_J  -ig_seqtype $IGB_SEQ_FLAG -auxiliary_data $AUX_PATH -outfmt '7 qseqid qgi qacc qaccver qlen sseqid sallseqid sgi sallgi sacc saccver sallacc slen qstart qend sstart send qseq sseq evalue bitscore score length pident nident mismatch positive gapopen gaps ppos frames qframe sframe btop'  |tee $SIM_B_OUT| ../rep_char.py  ${REP_CHAR_OPTS}  -combo_out $SIM_COMBO  -combo_csv_out $SIM_CSV_COMBO      -sample_json_out  $SIM_SAMP_JSON     -json_out $SIM_JSON -cdr3_hist_out $SIM_CDR3 /dev/stdin $SIM_VDJML $SIM_RC_OUT $RC_DB ${SIM_DATA} $ORGANISM  1>$SIM_RC_OUT_LOG 2>$SIM_RC_OUT_ERR
 				wait
 			fi ;
 			if [ -f "$QRY" ]  ;
@@ -124,7 +126,7 @@ do
 				$IGBLAST_HR > $OUTPUT_HUMAN & 
 				
 				#FORM REP_CHAR for reading from stdin
-				REP_CHAR_CMD="../rep_char.py   ${REP_CHAR_OPTS}  -combo_out $RC_COMBO   -sample_json_out  $RC_SAMP_JSON     -json_out $RC_CDR3_SEG_JSON -cdr3_hist_out $RC_CDR3_HIST /dev/stdin $RC_VDJML $RC_OUT $RC_DB $QRY $ORGANISM"
+				REP_CHAR_CMD="../rep_char.py   ${REP_CHAR_OPTS}  -combo_out $RC_COMBO  -combo_csv_out $RC_CSV_COMBO     -sample_json_out  $RC_SAMP_JSON     -json_out $RC_CDR3_SEG_JSON -cdr3_hist_out $RC_CDR3_HIST /dev/stdin $RC_VDJML $RC_OUT $RC_DB $QRY $ORGANISM"
 
 				#run the IgBLAST/tee/rep_char pipeline
 				$IGBLAST_EXEC  $IGBLAST_GLOBAL_PARAMS   -num_threads 6   -domain_system $DCMODE  -query $QRY -germline_db_V $DB_V -germline_db_D $DB_D -germline_db_J $DB_J  -ig_seqtype $IGB_SEQ_FLAG -auxiliary_data $AUX_PATH -outfmt '7 qseqid qgi qacc qaccver qlen sseqid sallseqid sgi sallgi sacc saccver sallacc slen qstart qend sstart send qseq sseq evalue bitscore score length pident nident mismatch positive gapopen gaps ppos frames qframe sframe btop' |tee $OUTPUT|$REP_CHAR_CMD   1>$RC_LOG_OUT 2>$RC_LOG_ERR ;
