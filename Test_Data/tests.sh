@@ -74,7 +74,7 @@ do
 			DB_J=${BLAST_DB_ROOT}_J.fna
 			RC_VDJML=$RC_IN.rc.vdjml
 			RC_COMBO=$RC_IN.combo.json
-			RC_CSV_COMBO=${RC_COMBO}.csv
+			RC_CSV_COMBO=${RC_COMBO}.tests.csv
 			RC_CDR3_HIST=$RC_IN.cdr3_hist.tsv
 			RC_CDR3_SEG_JSON=$RC_IN.segments.json
 			RC_SAMP_JSON=$RC_IN.sample.json
@@ -98,7 +98,7 @@ do
 			SIM_CDR3=$SIM_B_OUT.cdr3_hist.tsv
 			SIM_VDJML=$SIM_B_OUT.vdjml
 			SIM_COMBO=$SIM_B_OUT.combo.json
-			SIM_CSV_COMBO=${SIM_COMBO}.csv
+			SIM_CSV_COMBO=${SIM_COMBO}.tests.csv
 			SIM_SAMP_JSON=$SIM_B_OUT.sample.json
 			SIM_RC_OUT=$SIM_B_OUT.rc_out.tsv
 			SIM_RC_OUT_LOG=${SIM_RC_OUT}.log

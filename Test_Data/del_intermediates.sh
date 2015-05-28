@@ -16,3 +16,4 @@ rm -v $DIR/*.json
 rm -v $DIR/*.tsv
 rm -v $DIR/*.log
 rm -v $DIR/*.sim.fna
+rm -v $DIR/*.csv
