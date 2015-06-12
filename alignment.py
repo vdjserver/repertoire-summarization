@@ -36,10 +36,10 @@ class CodonAnalysis:
 	def is_unambiguous_amino(self,aa_res):
 		if(aa_res in self.valid_aminos):
 			return True
-		if(not(type(aa_res)==str)):
-			return False
 		if(aa_res.upper() in self.valid_aminos):
 			return True
+		if(not(type(aa_res)==str)):
+			return False
 		else:
 			return False
 
