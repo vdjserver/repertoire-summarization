@@ -6,7 +6,7 @@ import glob
 import csv
 import os
 
-IgblastOutput_files = glob.glob("*igblast.out.tsv") 
+IgblastOutput_files = glob.glob("*.fasta.igblast.out.imgt.rc_out.tsv") 
 
 header_saved = False
 with open('merged.tsv','wb') as fout:
