@@ -2,28 +2,32 @@
 #VDJServer UTSW
 #Tool to concatenate several igblast output tsv files
 
-import glob
-import csv
+import sys
 import os
+import glob
+import argparse
+import os.path
 
-IgblastOutput_files = glob.glob("*.fasta.igblast.out.imgt.rc_out.tsv") 
+parser = argparse.ArgumentParser()
+parser.add_argument('infiles', nargs = '+', help='TSV files to combine')
+parser.add_argument('-o', '--outfile', required = False, dest = 'outfile', help='Output filename. If not given, output is sent to stdout.')
+args = parser.parse_args()
+
+if args.outfile:
+    fout = open(args.outfile,'wb')
+else:
+    fout = sys.stdout
 
 header_saved = False
-with open('merged.tsv','wb') as fout:
-    for filename in IgblastOutput_files:
-        with open(filename) as fin:
-            header = next(fin)
-            if not header_saved:
-                fout.write(header)
-                header_saved = True
-            for line in fin:
+for filename in args.infiles:
+    with open(filename, 'rb') as fin:
+        header = fin.readline()
+        if not header_saved:
+            fout.write(header)
+            header_saved = True
+        for line in fin:
+            if line:
                 fout.write(line)
-input = open('merged.tsv', 'rb')
-output = open('outfile.tsv', 'wb')
-writer = csv.writer(output)
-for row in csv.reader(input):
-    if row:
-        writer.writerow(row)
-input.close()
-output.close()	
-os.remove('merged.tsv')
+if fout is not sys.stdout:
+    fout.close()
+
