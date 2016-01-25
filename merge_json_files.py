@@ -6,41 +6,38 @@ import json
 import glob
 import sys
 
+input_dir = sys.argv[1]
+out_file = sys.argv[2]
 
-input_files = sys.argv[1]
-out_file = "json_out.json"
+read_files = glob.glob("./"+input_dir+"/*.json")
 
-read_files = glob.glob("*.json")
 final_json_dict = {}
-
-file_counter = 0
+final_json_dict["gene_segments"] = {}
 for f in read_files:
     with open(f, "rb") as infile:
-        if file_counter == 0:
-            final_json_dict = json.load((infile))
+        json_dict = json.load(infile)
+
+        first_label = json_dict["label"]
+        first_value = json_dict["value"]
+        if first_label in final_json_dict.keys():
+            final_json_dict[first_label] += first_value
         else:
-            json_dict = json.load((infile))
+            final_json_dict[first_label] = first_value
+        while "children" in json_dict["children"][0].keys():
+            first_label = json_dict["children"][0]["label"]
+            first_value = json_dict["children"][0]["value"]
+            if first_label in final_json_dict.keys():
+                final_json_dict["gene_segments"][first_label] += first_value
+            else:
+                final_json_dict["gene_segments"][first_label] = first_value
+            json_dict = json_dict["children"][0]
+        last_label = json_dict["children"][0]["label"]
+        last_value = json_dict["children"][0]["value"]
+        if last_label in final_json_dict.keys():
+            final_json_dict["gene_segments"][last_label] += last_value
+        else:
+            final_json_dict["gene_segments"][last_label] = last_value
 
-            # add the current file's value to final file's value
-            final_json_dict["value"] += json_dict["value"]
 
-            children = json_dict["children"]
-            final_children = final_json_dict["children"]
-            for child in children:
-                label = child["label"]
-
-                dup_label = False
-                for final_child in final_children:
-                    if label in final_child.values():
-                        # label is a duplicate
-                        final_child["value"] += child["value"]
-                        dup_label = True
-                        break
-
-                if not dup_label:
-                    final_children.append(child)
-    file_counter += 1
-
-#print(final_json_dict)
-with open(out_file, "wb") as outfile:
+with open("./output/"+out_file, "wb") as outfile:
     json.dump(final_json_dict, outfile)
