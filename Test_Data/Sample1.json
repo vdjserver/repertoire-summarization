@@ -1,0 +1,32 @@
+{
+"label":"human",
+"value":2928883
+,
+"children": [
+{
+"label":"IGHD",
+"value":0
+,
+"children": [
+{
+"label":"IGHD1",
+"value":4
+,
+"children": [
+{
+"label":"IGHD1-1",
+"value":3
+,
+"children": [
+{
+"label":"IGHD1-1*01",
+"value":2
+ }
+ ] 
+ }
+ ] 
+ }
+ ] 
+ }
+ ] 
+ }
