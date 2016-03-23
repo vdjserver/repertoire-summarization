@@ -899,8 +899,8 @@ def appendAnnToFileWithMap(fHandl,m,rid,read_name,desiredKeys=None,defaultValue=
 	keys_to_append.append("Amino Muts (kabat)")
 	keys_to_append.append("Silent Codon Muts (kabat)")
 	keys_to_append.append("Silent Amino Muts (kabat)")
-	keys_to_append.append("Release Version Tag")
-	keys_to_append.append("Release Version Hash")
+	#keys_to_append.append("Release Version Tag")
+	#keys_to_append.append("Release Version Hash")
 
 
 
@@ -921,8 +921,8 @@ def appendAnnToFileWithMap(fHandl,m,rid,read_name,desiredKeys=None,defaultValue=
 	m[keys[0]]=read_name
 	global release_info_tag
 	global release_info_hash	
-	m[keys[len(keys)-2]]=release_info_tag
-	m[keys[len(keys)-1]]=release_info_hash
+	#m[keys[len(keys)-2]]=release_info_tag
+	#m[keys[len(keys)-1]]=release_info_hash
 
 
 
