@@ -6,12 +6,17 @@
 import json
 import glob
 import sys
+import argparse
 
+parser = argparse.ArgumentParser()
+parser.add_argument('infiles', nargs = '+', help='JSON files to combine')
+parser.add_argument('-o', '--outfile', required = False, dest = 'outfile', help='Output filename. If not given, output is sent to stdout.')
+args = parser.parse_args()
 
-input_dir = sys.argv[1]
-out_file = sys.argv[2]
-
-read_files = glob.glob("./"+input_dir+"/*.json")
+if args.outfile:
+    fout = open(args.outfile,'wb')
+else:
+    fout = sys.stdout
 
 def get_json_terminals_and_counts(j_data,existing_map):
     key = j_data['label']
@@ -28,7 +33,7 @@ def get_json_terminals_and_counts(j_data,existing_map):
 
 existing_map = None
 first = True
-for f in read_files:
+for f in args.infiles:
     with open(f, "rb") as infile:
         json_dict = json.load(infile)
 
@@ -38,5 +43,4 @@ for f in read_files:
            continue
         get_json_terminals_and_counts(json_dict, existing_map)
      
-with open("./output/"+out_file, "wb") as outfile:
-    json.dump(existing_map, outfile)
+json.dump(existing_map, fout)

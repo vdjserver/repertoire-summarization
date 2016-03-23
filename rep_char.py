@@ -606,10 +606,10 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 	amino_silent_map=maps['aminos_silent']
 	codon_silent_map=maps['codons_silent']
 	annMap["AGS Q Note"]=qualifNote
-	annMap["AGS Codon Muts"]=codon_map
-	annMap["AGS Amino Muts"]=amino_map
-	annMap["AGS Silent Codon Muts"]=codon_silent_map
-	annMap["AGS Silent Amino Muts"]=amino_silent_map
+	annMap["Codon Muts (kabat)"]=codon_map
+	annMap["Amino Muts (kabat)"]=amino_map
+	annMap["Silent Codon Muts (kabat)"]=codon_silent_map
+	annMap["Silent Amino Muts (kabat)"]=amino_silent_map
 
 
 
@@ -858,8 +858,8 @@ def appendAnnToFileWithMap(fHandl,m,rid,read_name,desiredKeys=None,defaultValue=
 			#keys_to_append.append(region+" silent mutation freq% ("+mode+")")
 			#keys_to_append.append(region+" silent mutations (codons) ("+mode+")")
 			#keys_to_append.append(region+" indel frequency ("+mode+")")
-			#keys_to_append.append(region+" insertion count ("+mode+")")
-			#keys_to_append.append(region+" deletion count ("+mode+")")
+			keys_to_append.append(region+" insertion count ("+mode+")")
+			keys_to_append.append(region+" deletion count ("+mode+")")
 
 
 
@@ -873,9 +873,9 @@ def appendAnnToFileWithMap(fHandl,m,rid,read_name,desiredKeys=None,defaultValue=
 	#keys_to_append.append("Nonsynonymous base substitutions (over V and J)")
 	#keys_to_append.append("Nonsynonymous base substitutions (over V)")
 	#keys_to_append.append("AA (over V and J)")
-	#keys_to_append.append("AA (over V)")
+	keys_to_append.append("AA (over V)")
 	#keys_to_append.append("Nucleotide read (over V and J)")
-	#keys_to_append.append("Nucleotide read (over V)")
+	keys_to_append.append("Nucleotide read (over V)")
 	#keys_to_append.append("R:S ratio (over V and J)")
 	#keys_to_append.append("R:S ratio (over V)")
 	#keys_to_append.append("Replacement mutation freq% (over V and J)")
@@ -886,7 +886,7 @@ def appendAnnToFileWithMap(fHandl,m,rid,read_name,desiredKeys=None,defaultValue=
 	#keys_to_append.append("Silent mutation freq% (over V and J)")
 	#keys_to_append.append("Silent mutations (codons) (over V and J)")
 	#keys_to_append.append("Base substitution freq% (over V and J)")
-	#keys_to_append.append("Stop codons? (over V)")
+	keys_to_append.append("Stop codons? (over V)")
 	#keys_to_append.append("Synonymous base substitutions (over V and J)")
 	#keys_to_append.append("Synonymous base substitutions (over V)")
 	segments=get_segment_list()
@@ -895,12 +895,12 @@ def appendAnnToFileWithMap(fHandl,m,rid,read_name,desiredKeys=None,defaultValue=
 		keys_to_append.append(alt_key)
 
 	#keys_to_append.append("AGS Q Note")
-	#keys_to_append.append("AGS Codon Muts")
-	#keys_to_append.append("AGS Amino Muts")
-	#keys_to_append.append("AGS Silent Codon Muts")
-	#keys_to_append.append("AGS Silent Amino Muts")
-	keys_to_append.append("Release Version Tag")
-	keys_to_append.append("Release Version Hash")
+	keys_to_append.append("Codon Muts (kabat)")
+	keys_to_append.append("Amino Muts (kabat)")
+	keys_to_append.append("Silent Codon Muts (kabat)")
+	keys_to_append.append("Silent Amino Muts (kabat)")
+	#keys_to_append.append("Release Version Tag")
+	#keys_to_append.append("Release Version Hash")
 
 
 
@@ -921,8 +921,8 @@ def appendAnnToFileWithMap(fHandl,m,rid,read_name,desiredKeys=None,defaultValue=
 	m[keys[0]]=read_name
 	global release_info_tag
 	global release_info_hash	
-	m[keys[len(keys)-2]]=release_info_tag
-	m[keys[len(keys)-1]]=release_info_hash
+	#m[keys[len(keys)-2]]=release_info_tag
+	#m[keys[len(keys)-1]]=release_info_hash
 
 
 
@@ -1152,8 +1152,8 @@ if (__name__=="__main__"):
 		if(not(cdr3_hist_out_file=="/dev/null")):
 			my_cdr3_map.writeToFile(cdr3_hist_out_file)
 			print "Wrote CDR3 lengths histogram to ",cdr3_hist_out_file
-		print "NOTE : Number IMGT  CDR3 lengtgs not found = "+str(my_cdr3_map.count_map['imgt'][-1])
-		print "NOTE : Number KABAT CDR3 lengths not found = "+str(my_cdr3_map.count_map['kabat'][-1])
+                print "NOTE : Number IMGT  CDR3 lengtgs not found = "+str(my_cdr3_map.count_map['imgt'].get(-1))
+		print "NOTE : Number KABAT CDR3 lengths not found = "+str(my_cdr3_map.count_map['kabat'].get(-1))
 
 
 		#write AGS/NMO information
