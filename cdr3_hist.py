@@ -68,8 +68,8 @@ def CDR3LengthAnalysisVDMLOBJ(read_result_obj,meta,organism,imgtdb_obj,query_rec
         #printMap(vData)
         #printMap(jData)
         cdr3_analysis_map=CDR3LengthAnalysis(vData,jData,organism,imgtdb_obj)
-        return cdr3_analysis_map
         #printMap(cdr3_analysis_map)
+        return cdr3_analysis_map
     else:
         #print "insufficient data!"
         return empty_map
@@ -457,7 +457,10 @@ def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
                             else:
                                 cdr3_hist['Missing TRP/PHE']=True
 
+                ref_cdr3_end+=1
                 qry_cdr3_end=getQueryIndexGivenSubjectIndexAndAlignment(jq_aln,js_aln,jq_f,jq_t,js_f,js_t,ref_cdr3_end,"left")
+                if(qry_cdr3_end!=(-1)):
+                    qry_cdr3_end-=1
                 if(qry_cdr3_start!=(-1) and qry_cdr3_end!=(-1)):
                     if(dm=="imgt"):
                         if(((qry_cdr3_end-qry_cdr3_start+1)%3)==0):

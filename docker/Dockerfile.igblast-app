@@ -1,0 +1,89 @@
+# This builds a composite image with IgBlast, VDJML
+# and repertoire-summarization. Useful for testing.
+
+# Base Image
+FROM debian:jessie
+
+MAINTAINER VDJServer <vdjserver@utsouthwestern.edu>
+
+# uncomment these if building behind UTSW proxy
+#ENV http_proxy 'http://proxy.swmed.edu:3128/'
+#ENV https_proxy 'https://proxy.swmed.edu:3128/'
+#ENV HTTP_PROXY 'http://proxy.swmed.edu:3128/'
+#ENV HTTPS_PROXY 'https://proxy.swmed.edu:3128/'
+
+# Install OS Dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    doxygen \
+    git \
+    graphviz \
+    libbz2-dev \
+    libxml2-dev \
+    libxslt-dev \
+    python \
+    python-dev \
+    python-sphinx \
+    python-pip \
+    vim emacs \
+    wget \
+    zlib1g-dev \
+    cpio
+
+RUN pip install \
+    biopython \
+    lxml \
+    numpy \
+    argparse \
+    BeautifulSoup4 \
+    reportlab
+
+# Igblast
+RUN mkdir /igblast-root
+RUN wget ftp://ftp.ncbi.nih.gov/blast/executables/igblast/release/1.4.0/ncbi-igblast-1.4.0-src.tar.gz
+
+RUN cd /igblast-root && tar zxf ../ncbi-igblast-1.4.0-src.tar.gz
+RUN cd /igblast-root/ncbi-igblast-1.4.0-src/c++ && ./configure --prefix=/igblast-root/local && make
+RUN cd /igblast-root/ncbi-igblast-1.4.0-src/c++ && make install
+
+# Boost
+ENV BOOST_VERSION 1.57.0
+ENV BOOST_VERSION_LINK 1_57_0
+
+RUN git clone https://bitbucket.org/vdjserver/vdjml.git vdjml-root
+RUN cd /vdjml-root && git checkout develop
+RUN cp /vdjml-root/docker/boost/boost-build.jam /
+RUN cp /vdjml-root/docker/boost/user-config.jam /root/
+
+# Install/bootstrap boost
+RUN wget http://downloads.sourceforge.net/project/boost/boost/$BOOST_VERSION/boost_$BOOST_VERSION_LINK.tar.gz
+RUN tar -xvzf boost_$BOOST_VERSION_LINK.tar.gz
+RUN cd /boost_$BOOST_VERSION_LINK && ./bootstrap.sh --prefix=/usr/local
+RUN cd /boost_$BOOST_VERSION_LINK && ./b2 install
+RUN cd /boost_$BOOST_VERSION_LINK/tools/build && ./bootstrap.sh
+RUN cd /boost_$BOOST_VERSION_LINK/tools/build && ./b2 install --prefix=/usr/local
+
+# VDJML
+RUN cd /vdjml-root && b2
+RUN cd /vdjml-root && b2 distro-bindings-py
+RUN tar zxvf /vdjml-root/out/VDJMLpy-0.1.3.tar.gz
+
+# Copy source
+RUN mkdir /repsum-root
+COPY . /repsum-root
+
+# Create release
+RUN cd /repsum-root && ./release.pl
+
+# extract database
+RUN tar zxvf /repsum-root/db.tgz
+
+# setup run environment
+ENV DB_DIR "/db"
+ENV VDJ_DB_ROOT "/db/07_11_2014/"
+ENV IGDATA "/db"
+ENV VDJSERVER_ROOT "/repsum-root"
+ENV PATH "$PATH:/igblast-root/local/bin"
+ENV PYTHONPATH="/VDJMLpy-0.1.3:$PYTHONPATH"
+ENV PYTHONPATH="/VDJMLpy-0.1.3/vdjml:$PYTHONPATH"
+ENV LD_LIBRARY_PATH="/VDJMLpy-0.1.3/vdjml:$LD_LIBRARY_PATH"
