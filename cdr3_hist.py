@@ -67,7 +67,7 @@ def CDR3LengthAnalysisVDMLOBJ(read_result_obj,meta,organism,imgtdb_obj,query_rec
         jData=addAlignmentsPreCDR3(jData,jAllele,imgtdb_obj,organism,query_record)
         #printMap(vData)
         #printMap(jData)
-        cdr3_analysis_map=CDR3LengthAnalysis(vData,jData,organism,imgtdb_obj)
+        cdr3_analysis_map=CDR3LengthAnalysis(vData,jData,organism,imgtdb_obj,query_record)
         #printMap(cdr3_analysis_map)
         return cdr3_analysis_map
     else:
@@ -355,7 +355,7 @@ def VJRearrangementInFrameTest(vInfo,jInfo,imgtdb_obj,organism):
 #given info maps for V and J and the return a 
 #dictionary with kabat and imgt lengths
 #return other related information as well
-def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
+def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj,read_rec):
     #currentQueryName=str(currentQueryName.strip())
     currentV=vMap['subject ids']
     currentJ=jMap['subject ids']
@@ -408,31 +408,44 @@ def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
                 jq_t=int(jMap['q. end'])
                 js_f=int(jMap['s. start'])
                 js_t=int(jMap['s. end'])
+                
+                # Get the start of CDR3
                 ref_cdr3_start-=1
                 qry_cdr3_start=getQueryIndexGivenSubjectIndexAndAlignment(vq_aln,vs_aln,vq_f,vq_t,vs_f,vs_t,ref_cdr3_start)
-                if(qry_cdr3_start!=(-1)):
-                    qry_cdr3_start+=1
-                if(qry_cdr3_start!=(-1) and dm=='imgt'):
-                    #code for test for CYS-104 found
-                    #print "For ",currentV," the ref CDR3 start is ",ref_cdr3_start
-                    ref_cys_start=ref_cdr3_start-2
-                    ref_cys_end=ref_cdr3_start
-                    v_aln_obj=alignment(vq_aln,vs_aln,vq_f,vq_t,vs_f,vs_t)
-                    cys_aln=v_aln_obj.getSubAlnInc(ref_cys_start,ref_cys_end,"subject")
-                    #print "CYS ALN="
-                    #print "\n",cys_aln.getNiceString()
-                    query_cys_na=cys_aln.q_aln
-                    ref_cys_na=cys_aln.s_aln
-                    if(len(query_cys_na)==3  and len(ref_cys_na)==3):
-                        if(codonAnalyzer.is_unambiguous_codon(query_cys_na)==True):
-                            query_cys_trx=codonAnalyzer.fastTrans(query_cys_na)
+                #print "For ",currentV,dm," the ref CDR3 start is ",ref_cdr3_start
+                #print "For ",currentV,dm," the qry CDR3 start is ",qry_cdr3_start
+
+                # Check for Cys
+                if (qry_cdr3_start != (-1) and dm=='imgt'):
+                    # There are scenarios (issue #24) whereby the IgBlast alignment ends early
+                    # and does not contain the sequence with the Cys.
+                    # Thus we need to use the read sequence versus the alignment sequence.
+                    qw=str(read_rec.seq)
+                    if(cdr3_hist['qry_rev']):
+                        qw=rev_comp_dna(qw)
+                    #print "read_rec=",qw
+
+                    qry_cys_start = qry_cdr3_start-3
+                    qry_cys_end = qry_cdr3_start
+                    qry_test_cys=qw[qry_cys_start:qry_cys_end]
+                    #print "qry_cys_start",qry_cys_start
+                    #print "qry_cys_end",qry_cys_end
+                    #print "qry_test_cys=",qry_test_cys
+                    if (len(qry_test_cys) == 3):
+                        if (codonAnalyzer.is_unambiguous_codon(qry_test_cys) == True):
+                            query_cys_trx=codonAnalyzer.fastTrans(qry_test_cys)
                             #print "The fast trans (with query=",vMap['query id']," and ref=",currentV,")=",query_cys_trx
-                            #print "\n\n\n\n\n\n\n===========================================================\n\n\n\n\n\n\n"
-                            #cdr3_hist['CYS']=true
                             if(query_cys_trx=='C'):
                                 cdr3_hist['Missing CYS']=False
                             else:
                                 cdr3_hist['Missing CYS']=True
+                                qry_cdr3_start = -1
+
+                # CDR3 starts 1bp after alignment
+                if(qry_cdr3_start!=(-1)):
+                    qry_cdr3_start+=1
+
+                # Check for TRP
                 ref_cdr3_trp_start=ref_cdr3_end+1 #cause CDR3 end is 1bp before the TRP start
                 #print "after mod, ref_cdr3_end is ",ref_cdr3_end   
                 qry_trp_start=getQueryIndexGivenSubjectIndexAndAlignment(jq_aln,js_aln,jq_f,jq_t,js_f,js_t,ref_cdr3_trp_start,"left")
@@ -459,6 +472,8 @@ def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj):
 
                 ref_cdr3_end+=1
                 qry_cdr3_end=getQueryIndexGivenSubjectIndexAndAlignment(jq_aln,js_aln,jq_f,jq_t,js_f,js_t,ref_cdr3_end,"left")
+                #print "For ",currentV,dm," the ref CDR3 end is ",ref_cdr3_end
+                #print "For ",currentV,dm," the qry CDR3 end is ",qry_cdr3_end
                 if(qry_cdr3_end!=(-1)):
                     qry_cdr3_end-=1
                 if(qry_cdr3_start!=(-1) and qry_cdr3_end!=(-1)):
