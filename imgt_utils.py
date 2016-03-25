@@ -79,7 +79,12 @@ def get_heavy_loci():
 	return defined_as_heavy
 
 
-
+# CDR3 end codon
+# J-TRP in J region of IG heavy chain
+# J-PHE in J region of IG light chain and all TCR
+def get_cdr3_end(locus):
+        if (locus == "IGHV"): return 'W'
+        else: return 'F'
 
 
 #get loci that are light (not heavy)
