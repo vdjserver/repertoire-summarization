@@ -1334,82 +1334,60 @@ class IncrementMapWrapper():
 
 
 
-
+#
+# This function translates a position from germline coordinates into query coordinates
+# given an alignment between the two. It takes into account indels.
+#
+# It may be the case that the position is beyond the alignment, in which case it
+# assumes a straight translation and shifts by remaining bp.
+#
 #the lean right means that if the subject pos aligns to a gap, then choose the bp position to the right
 #otherwise if the subject aligns to a gap at the position, lean "left" and choose the previous bp positoin
 #RIGHT is the default!
 def getQueryIndexGivenSubjectIndexAndAlignment(query_aln,subject_aln,q_start,q_stop,s_start,s_stop,subject_pos,lean="right"):
 	#print "in getQueryIndexGivenSubjectIndexAndAlignment"
-	#import hashlib
 	#print "query_aln=",query_aln
-	#print "query_aln_digest=",hashlib.md5(query_aln).hexdigest()
 	#print "subct_aln=",subject_aln
-	#print "subct_aln_digest=",hashlib.md5(subject_aln).hexdigest()	
 	#print "q_start=",q_start
 	#print "q_stop=",q_stop
 	#print "s_start=",s_start
 	#print "s_stop=",s_stop
 	#print "desired=",subject_pos
-	firstCond=(s_start<=subject_pos)
-	secondCond=(subject_pos<=s_stop)
-	#print "firstCond (s_start<=subject_pos) is ",firstCond
-	#print "secondCond (subject_pos<=s_stup)   is ",secondCond
-	if(not(firstCond) or not(secondCond)):
-		#invalid range!
-		#print "INVALID RANGE!"
-		#print "s_start=",s_start,"dbus=",subject_pos,"s_stop=",s_stop
-		#print "getQueryIndexGivenSubjectIndexAndAlignment to return (neg) (-1)"
-		return (-1)
-	if(firstCond and secondCond):
-		#if within the boundaries!
-		s_counter=s_start
-		q_counter=q_start
-		delta=0
-		q_val=query_aln[delta]
-		s_val=subject_aln[delta]
-		#print "s counter=",s_counter
-		#print "s_val=",s_val
-		#print "q counter=",q_counter
-		#print "q_val=",q_val
-		#print "alignment s, then q:"
-		#print subject_aln
-		#print query_aln
-		while(delta<len(query_aln)):
-			q_val=query_aln[delta]
-			s_val=subject_aln[delta]
-			#print "in while"
-			#print "delta=",delta
-			#print "len(query_aln[0])=",len(query_aln)
-			#print "s_counter=",s_counter
-			#print "q_counter=",q_counter
-			#print "q_val=",q_val
-			#print "s_val=",s_val
-			#print "delta+s_counter="+str(delta+s_counter)
-			#print "desired=",subject_pos
-			if(subject_pos<=s_counter):#: and s_val!="-"):
-				#print "got it"
-				#return 1-based index
-				#return q_counter
-				if(s_val!="-"):
-					if(lean=="right"):
-						return q_counter
-					elif(lean!="right" and q_val=="-"):
-						return q_counter-1
-					else:
-						return q_counter
-					#print "getQueryIndexGivenSubjectIndexAndAlignment to return (qcounter) ",q_counter
-					#if(q_val!="-"):
-					#	return q_counter
-					#else:
-					#	return q_counter+1
-			if(not(q_val=="-")):
-				q_counter+=1
-			if(not(s_val=="-")):
-				s_counter+=1
-			delta+=1
-			#print "\n\n"
+        s_counter=s_start
+        q_counter=q_start
+        delta=0
+        q_val=query_aln[delta]
+        s_val=subject_aln[delta]
 
+        # if the position is before the alignment even starts
+        # then best we can do is shift by the bp diff
+        if (subject_pos < s_start):
+                return q_counter - (s_start - subject_pos)
 
+        # walk through the alignment
+        while(delta<len(query_aln)):
+                q_val=query_aln[delta]
+                s_val=subject_aln[delta]
+                # if we reach the desired position
+                if(subject_pos<=s_counter):
+                        if(s_val!="-"):
+                                if(lean=="right"):
+                                        return q_counter
+                                elif(lean!="right" and q_val=="-"):
+                                        return q_counter-1
+                                else:
+                                        return q_counter
+                # - indicates an indel
+                if(not(q_val=="-")):
+                        q_counter+=1
+                if(not(s_val=="-")):
+                        s_counter+=1
+                delta+=1
+		#print "q_counter=",q_counter,"s_counter=",s_counter,"delta=",delta
+
+        # if we drop out of loop, then likely the desired position is beyond the end
+        # of the alignment, so shift by the remaining bp
+        return (subject_pos - s_counter) + q_counter
 
 #rooted at an organism get the hierarchy from the gene tables
 def getHierarchyBy(geneTablesDirectoryOfHTMLFiles,org_name,filterbyFastaAlleles=False,fullPklPath=None):
