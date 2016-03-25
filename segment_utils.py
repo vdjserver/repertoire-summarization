@@ -1359,11 +1359,16 @@ def getQueryIndexGivenSubjectIndexAndAlignment(query_aln,subject_aln,q_start,q_s
         q_val=query_aln[delta]
         s_val=subject_aln[delta]
 
+        # if the position is before the alignment even starts
+        # then best we can do is shift by the bp diff
+        if (subject_pos < s_start):
+                return q_counter - (s_start - subject_pos)
+
         # walk through the alignment
         while(delta<len(query_aln)):
                 q_val=query_aln[delta]
                 s_val=subject_aln[delta]
-                # if the desired position is before the start
+                # if we reach the desired position
                 if(subject_pos<=s_counter):
                         if(s_val!="-"):
                                 if(lean=="right"):

@@ -5,7 +5,7 @@ import re
 import glob
 from os.path import basename
 from segment_utils import getFastaListOfDescs,getQueryIndexGivenSubjectIndexAndAlignment,getAdjustedCDR3StartFromRefDirSetAllele,getADJCDR3EndFromJAllele,getEmptyRegCharMap,alleleIsTR,getTheFrameForThisReferenceAtThisPosition,getTheFrameForThisJReferenceAtThisPosition
-from imgt_utils import imgt_db
+from imgt_utils import imgt_db,get_cdr3_end
 from utils import *
 import vdjml
 from vdjml_utils import getTopVDJItems,getHitInfo
@@ -368,8 +368,10 @@ def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj,read_rec):
         cdr3_hist['qry_rev']=True
     else:
         cdr3_hist['qry_rev']=False
+
     if(looksLikeAlleleStr(currentV) and looksLikeAlleleStr(currentJ)):
         #print "WE'RE IN BUSINESS!"
+
         domain_modes=get_domain_modes()
         for dm in domain_modes:
             cdr3_hist[dm]=(-1)
@@ -439,43 +441,51 @@ def CDR3LengthAnalysis(vMap,jMap,organism,imgtdb_obj,read_rec):
                                 cdr3_hist['Missing CYS']=False
                             else:
                                 cdr3_hist['Missing CYS']=True
-                                qry_cdr3_start = -1
 
                 # CDR3 starts 1bp after alignment
                 if(qry_cdr3_start!=(-1)):
                     qry_cdr3_start+=1
 
+                # determine CDR3 end codon
+                locus=currentV[0:4]
+                cdr3_end_codon=get_cdr3_end(locus)
+                #print "locus=",locus,"codon=",cdr3_end_codon
+
                 # Check for TRP
                 ref_cdr3_trp_start=ref_cdr3_end+1 #cause CDR3 end is 1bp before the TRP start
-                #print "after mod, ref_cdr3_end is ",ref_cdr3_end   
+                #print "ref_cdr3_trp_start=",ref_cdr3_trp_start
                 qry_trp_start=getQueryIndexGivenSubjectIndexAndAlignment(jq_aln,js_aln,jq_f,jq_t,js_f,js_t,ref_cdr3_trp_start,"left")
-                if(qry_trp_start!=(-1)):
-                    if(dm=='imgt'):
-                        #code for test for J-TRP/J-PHE found
-                        ref_trp_start=ref_cdr3_trp_start
-                        ref_trp_end=ref_trp_start+2
-                        j_aln=alignment(jq_aln,js_aln,jq_f,jq_t,js_f,js_t)
-                        trp_aln=j_aln.getSubAlnInc(ref_trp_start,ref_trp_end,"subject")
-                        trp_q_na=trp_aln.q_aln
-                        trp_s_na=trp_aln.s_aln
-                        if(len(trp_q_na)==3 and len(trp_s_na)==3):
-                            #print "For ",vMap['query id']," got TRP-ALN : "
-                            #print "\n",trp_aln.getNiceString()
-                            qry_trp_trx=codonAnalyzer.fastTrans(trp_q_na)
-                            #print "Fast trans=",qry_trp_trx
-                            #print 
-                            #print "\n"
-                            if(qry_trp_trx=='W' or qry_trp_trx=='F'):
+                #print "qry_trp_start=",qry_trp_start
+                if (qry_trp_start!=(-1) and dm=='imgt'):
+                    # use query sequence because alignment may not contain Trp/Phe
+                    qw=str(read_rec.seq)
+                    if(cdr3_hist['qry_rev']):
+                        qw=rev_comp_dna(qw)
+                    #print "read_rec=",qw
+
+                    qry_trp_end = qry_trp_start+2
+                    qry_test_trp=qw[qry_trp_start-1:qry_trp_end]
+                    #print "qry_trp_start",qry_trp_start
+                    #print "qry_trp_end",qry_trp_end
+                    #print "qry_test_trp=",qry_test_trp
+                    if (len(qry_test_trp) == 3):
+                        if (codonAnalyzer.is_unambiguous_codon(qry_test_trp) == True):
+                            qry_trp_trx=codonAnalyzer.fastTrans(qry_test_trp)
+                            #print "The fast trans (with query=",vMap['query id']," and ref=",currentV,")=",qry_trp_trx
+                            if(qry_trp_trx==cdr3_end_codon):
                                 cdr3_hist['Missing TRP/PHE']=False
                             else:
                                 cdr3_hist['Missing TRP/PHE']=True
 
+                # CDR3 end
                 ref_cdr3_end+=1
                 qry_cdr3_end=getQueryIndexGivenSubjectIndexAndAlignment(jq_aln,js_aln,jq_f,jq_t,js_f,js_t,ref_cdr3_end,"left")
                 #print "For ",currentV,dm," the ref CDR3 end is ",ref_cdr3_end
                 #print "For ",currentV,dm," the qry CDR3 end is ",qry_cdr3_end
                 if(qry_cdr3_end!=(-1)):
                     qry_cdr3_end-=1
+
+                # Verify CDR3 start and end before reporting
                 if(qry_cdr3_start!=(-1) and qry_cdr3_end!=(-1)):
                     if(dm=="imgt"):
                         if(((qry_cdr3_end-qry_cdr3_start+1)%3)==0):
