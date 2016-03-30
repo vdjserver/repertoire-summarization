@@ -38,5 +38,5 @@ with open(sys.argv[2], 'w') as out_file:
                     line=line.strip()
                     line+='\t' + str(unique_number)+'\n'
                     unique_number-=1
-                out_file.write(line)
+            out_file.write(line)
             counter+=1
