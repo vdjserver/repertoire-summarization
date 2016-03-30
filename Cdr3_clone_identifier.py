@@ -21,26 +21,22 @@ with open(sys.argv[1], 'r') as my_file:
                 dup_dictionary[columns[12]]=value
                 value+=1
 
-if len(duplicate_entries) > 0:
-    with open(sys.argv[2], 'w') as out_file:
-        with open(sys.argv[1], 'r') as my_file:
-            unique_number=-1
-            counter=0
-            for line in my_file:
-                if counter==0:
+with open(sys.argv[2], 'w') as out_file:
+    with open(sys.argv[1], 'r') as my_file:
+        unique_number=-1
+        counter=0
+        for line in my_file:
+            if counter==0:
+                line=line.strip()
+                line+='\t'+ 'Clone Identifiers'+'\n'
+            else:
+                columns = line.strip().split('\t')
+                if columns[12] in dup_dictionary.keys():
                     line=line.strip()
-                    line+='\t'+ 'Clone Identifiers'+'\n'
+                    line+='\t'+ str(dup_dictionary[columns[12]])+'\n'
                 else:
-                    columns = line.strip().split('\t')
-                    if columns[12] in dup_dictionary.keys():
-                        line=line.strip()
-                        line+='\t'+ str(dup_dictionary[columns[12]])+'\n'
-                    else:
-                        line=line.strip()
-                        line+='\t' + str(unique_number)+'\n'
-                        unique_number-=1
+                    line=line.strip()
+                    line+='\t' + str(unique_number)+'\n'
+                    unique_number-=1
                 out_file.write(line)
-                counter+=1
-else:
-    print "No repetitions"
-    
+            counter+=1
