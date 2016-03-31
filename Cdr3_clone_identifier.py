@@ -28,7 +28,7 @@ with open(sys.argv[2], 'w') as out_file:
         for line in my_file:
             if counter==0:
                 line=line.strip()
-                line+='\t'+ 'Clone Identifiers'+'\n'
+                line+='\t'+ 'Clone Identifiers CDR3 NA (imgt)'+'\n'
             else:
                 columns = line.strip().split('\t')
                 if columns[12] in dup_dictionary.keys():
