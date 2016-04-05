@@ -899,8 +899,8 @@ def appendAnnToFileWithMap(fHandl,m,rid,read_name,desiredKeys=None,defaultValue=
 	keys_to_append.append("Amino Muts (kabat)")
 	keys_to_append.append("Silent Codon Muts (kabat)")
 	keys_to_append.append("Silent Amino Muts (kabat)")
-	keys_to_append.append("Release Version Tag")
-	keys_to_append.append("Release Version Hash")
+	#keys_to_append.append("Release Version Tag")
+	#keys_to_append.append("Release Version Hash")
 
 
 
@@ -921,8 +921,8 @@ def appendAnnToFileWithMap(fHandl,m,rid,read_name,desiredKeys=None,defaultValue=
 	m[keys[0]]=read_name
 	global release_info_tag
 	global release_info_hash	
-	m[keys[len(keys)-2]]=release_info_tag
-	m[keys[len(keys)-1]]=release_info_hash
+	#m[keys[len(keys)-2]]=release_info_tag
+	#m[keys[len(keys)-1]]=release_info_hash
 
 
 
@@ -1098,7 +1098,6 @@ if (__name__=="__main__"):
 
 		for read_result_obj in scanOutputToVDJML(extractAsItemOrFirstFromList(args.igblast_in),fact,query_fasta):
 
-
 			#prepare for the iteration and give a possible status message...
 			if(read_num>1 and read_num%every_read==0):
 				print "Processing read",read_num,"..."
@@ -1148,7 +1147,7 @@ if (__name__=="__main__"):
 		#write the CDR3 hist when non-dev-null
 		if(type(cdr3_hist_out_file)==list):
 			cdr3_hist_out_file=extractAsItemOrFirstFromList(cdr3_hist_out_file)
-		print "file=",cdr3_hist_out_file
+		#print "file=",cdr3_hist_out_file
 		if(not(cdr3_hist_out_file=="/dev/null")):
 			my_cdr3_map.writeToFile(cdr3_hist_out_file)
 			print "Wrote CDR3 lengths histogram to ",cdr3_hist_out_file
