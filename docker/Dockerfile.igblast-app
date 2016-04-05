@@ -1,13 +1,26 @@
+<<<<<<< HEAD
+=======
+# This builds a composite image with IgBlast, VDJML
+# and repertoire-summarization. Useful for testing.
+
+>>>>>>> 1ce4ed7ce803da3d00cb53a43015e674d363060a
 # Base Image
 FROM debian:jessie
 
 MAINTAINER VDJServer <vdjserver@utsouthwestern.edu>
 
 # uncomment these if building behind UTSW proxy
+<<<<<<< HEAD
 ENV http_proxy 'http://proxy.swmed.edu:3128/'
 ENV https_proxy 'https://proxy.swmed.edu:3128/'
 ENV HTTP_PROXY 'http://proxy.swmed.edu:3128/'
 ENV HTTPS_PROXY 'https://proxy.swmed.edu:3128/'
+=======
+#ENV http_proxy 'http://proxy.swmed.edu:3128/'
+#ENV https_proxy 'https://proxy.swmed.edu:3128/'
+#ENV HTTP_PROXY 'http://proxy.swmed.edu:3128/'
+#ENV HTTPS_PROXY 'https://proxy.swmed.edu:3128/'
+>>>>>>> 1ce4ed7ce803da3d00cb53a43015e674d363060a
 
 # Install OS Dependencies
 RUN apt-get update && apt-get install -y \
@@ -22,7 +35,11 @@ RUN apt-get update && apt-get install -y \
     python-dev \
     python-sphinx \
     python-pip \
+<<<<<<< HEAD
     vim \
+=======
+    vim emacs \
+>>>>>>> 1ce4ed7ce803da3d00cb53a43015e674d363060a
     wget \
     zlib1g-dev \
     cpio
