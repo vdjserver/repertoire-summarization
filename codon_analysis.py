@@ -262,21 +262,28 @@ class codonCounter:
 			#print "subject_read",('subject_read' in q_char_map)
 			return False
 		q_aa=q_char_map['AA']
+                # chop out any incomplete codons
+                q_aa=q_aa.replace('(-)','')
 		q_codons=q_char_map['nucleotide read']
 		s_aa=q_char_map['AA_ref']
 		s_codons=q_char_map['subject_read']
+                #print "q_aa=",q_aa
+                #print "q_codons=",q_codons
+                #print "s_aa=",s_aa
+                #print "s_codons=",s_codons
 		join_str=""
-		q_bp=self.getBPFromCodonList(q_codons)
-		s_bp=self.getBPFromCodonList(s_codons)
-		actual_q_aa=self.getBPFromCodonList(q_aa)
-		actual_s_aa=self.getBPFromCodonList(s_aa)
-		if(len(q_bp)!=len(s_bp) and not(self.allowGaps)):
-			return False
-		if(len(actual_q_aa)!=len(actual_s_aa)):
-			return False
+		#q_bp=self.getBPFromCodonList(q_codons)
+		#s_bp=self.getBPFromCodonList(s_codons)
+		#actual_q_aa=self.getBPFromCodonList(q_aa)
+		#actual_s_aa=self.getBPFromCodonList(s_aa)
+		#if(len(q_bp)!=len(s_bp) and not(self.allowGaps)):
+		#	return False
+		#if(len(actual_q_aa)!=len(actual_s_aa)):
+		#	return False
 		if(len(q_aa)!=len(s_aa)):
 			return False
-		if(num_aa_min<=len(q_aa) and len(q_aa)<=num_amino_max and len(actual_q_aa)==len(q_aa)):
+		#if(num_aa_min<=len(q_aa) and len(q_aa)<=num_amino_max and len(actual_q_aa)==len(q_aa)):
+		if(num_aa_min<=len(q_aa) and len(q_aa)<=num_amino_max):
 			return True
 		else:
 			#too short or too long!
@@ -295,7 +302,7 @@ class codonCounter:
 			return [16]   #all IGHV4 sequences have length=16 for CDR2 (52A,52B,52C are NOT used in IGHV4 ; 50-65 (inclusive) are used)
 		elif(reg_name=="FWR3" or reg_name=="FR3"):
 			#30 AND 82A,82B,and 83C are always present
-			return [30]
+			return [29,30]
 		else:
 			#invalid region
 			print "INVALID REGION PASSED "+reg_name
@@ -396,6 +403,10 @@ class codonCounter:
 			reg_info_map=reg_infos[r].getCharMap()
 			numbering_list=self.acquireNumberingMap(reg_names[r],len(reg_info_map['AA']))
 			q_codons=reg_info_map['nucleotide read']
+                        newq_codons=list()
+                        for qi in q_codons:
+                                if (qi.find('(') < 0): newq_codons.append(qi)
+                        q_codons=newq_codons
 			s_codons=reg_info_map['subject_read']
 			q_aminos=reg_info_map['AA']
 			s_aminos=reg_info_map['AA_ref']
@@ -403,6 +414,7 @@ class codonCounter:
 			#print reg_infos[r].getName()
 			#print reg_infos[r].getNiceString()
 			#print "Q=",q_codons," TRX=",q_aminos
+			#print "Q=",newq_codons," TRX=",q_aminos
 			#print "q AA len=",len(q_aminos)," q codon len=",len(q_codons)
 			#print "S=",s_codons," TRX=",s_aminos
 			#print "s AA len=",len(s_aminos)," s codon len=",len(s_codons)
