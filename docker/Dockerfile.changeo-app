@@ -22,7 +22,9 @@ RUN apt-get update && apt-get install -y --force-yes \
     python3-pip \
     python3-scipy \
     r-base \
-    r-base-dev
+    r-base-dev \
+    libssh2-1-dev \
+    libcurl4-openssl-dev
 
 RUN pip3 install \
     pandas \
@@ -30,5 +32,8 @@ RUN pip3 install \
     presto \
     changeo
 
+RUN echo 'install.packages(c("devtools", "roxygen2", "testthat", "knitr", "rmarkdown", "alakazam", "shazam"), repos=c("https://cran.revolutionanalytics.com/"))' | R --no-save
+
 RUN cd /repsum-root && git checkout master && git fetch origin --tags && git pull origin master && git checkout develop && git pull origin develop
 RUN cd /repsum-root/docker && bash changeo_setup.sh
+

@@ -22,6 +22,12 @@ seqType="Ig"
 domainSystem="imgt"
 #domainSystem="kabat"
 
+# output format
+# use this for rep_char
+OUTFMT="7 qseqid qgi qacc qaccver qlen sseqid sallseqid sgi sallgi sacc saccver sallacc slen qstart qend sstart send qseq sseq evalue bitscore score length pident nident mismatch positive gapopen gaps ppos frames qframe sframe btop"
+# use this for changeo
+#OUTFMT="7 std qseq sseq btop"
+
 # build up the arguments, generally do not need change this
 ARGS="-query $INPUT"
 ARGS="$ARGS -ig_seqtype $seqType"
@@ -34,7 +40,6 @@ ARGS="$ARGS -germline_db_D $VDJ_DB_ROOT/$organism/ReferenceDirectorySet/${organi
 ARGS="$ARGS -germline_db_J $VDJ_DB_ROOT/$organism/ReferenceDirectorySet/${organism}_${seqType}_J.fna"
 ARGS="$ARGS -domain_system $domainSystem"
 ARGS="$ARGS -outfmt "
-OUTFMT="7 qseqid qgi qacc qaccver qlen sseqid sallseqid sgi sallgi sacc saccver sallacc slen qstart qend sstart send qseq sseq evalue bitscore score length pident nident mismatch positive gapopen gaps ppos frames qframe sframe btop"
 
 # run igblast
 igblastn $ARGS "$OUTFMT"
