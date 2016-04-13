@@ -14,4 +14,3 @@ rm -f IG_VDJ.fna TR_VDJ.fna
 cat IG*.fna >IG_VDJ.fna
 cat TR*.fna >TR_VDJ.fna
 
-echo 'install.packages(c("devtools", "roxygen2", "testthat", "knitr", "rmarkdown", "alakazam", "shazam"), repos=c("https://cran.revolutionanalytics.com/"))' | R --no-save
