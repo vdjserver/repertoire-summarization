@@ -11,13 +11,13 @@
 # Change these:
 
 # your input file
-INPUT=/data/s166813/Downloads/Test4.txt
+INPUT=/data/s166813/Downloads/Plate1-unique.fasta
 
-organism="human"
-#organism="Mus_musculus"
+#organism="human"
+organism="mouse"
 
-seqType="Ig"
-#seqType="TCR"
+#seqType="Ig"
+seqType="TCR"
 
 domainSystem="imgt"
 #domainSystem="kabat"
@@ -35,6 +35,7 @@ if [ "$seqType" == "TCR" ]; then seqType="TR"; fi
 if [ "$seqType" == "Ig" ]; then seqType="IG"; fi  
 ARGS="$ARGS -organism $organism"
 ARGS="$ARGS -auxiliary_data $IGDATA/optional_file/${organism}_gl.aux"
+if [ "$organism" == "mouse" ]; then organism="Mus_musculus"; fi  
 ARGS="$ARGS -germline_db_V $VDJ_DB_ROOT/$organism/ReferenceDirectorySet/${organism}_${seqType}_V.fna"
 ARGS="$ARGS -germline_db_D $VDJ_DB_ROOT/$organism/ReferenceDirectorySet/${organism}_${seqType}_D.fna"
 ARGS="$ARGS -germline_db_J $VDJ_DB_ROOT/$organism/ReferenceDirectorySet/${organism}_${seqType}_J.fna"
