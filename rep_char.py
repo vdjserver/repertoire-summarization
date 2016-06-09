@@ -598,7 +598,8 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 			get_res+=1
 
 	#get mutation map
-	mut_map_info=annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted_jobs,imgtdb_obj,myCodonCounter,organism,read_rec,cdr3_map,0.85)
+	#mut_map_info=annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted_jobs,imgtdb_obj,myCodonCounter,organism,read_rec,cdr3_map,0.85)
+	mut_map_info=annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted_jobs,imgtdb_obj,myCodonCounter,organism,read_rec,cdr3_map,0)
 	qualifNote=mut_map_info[0]
 	maps=mut_map_info[1]
 	amino_map=maps['aminos']
@@ -1098,7 +1099,6 @@ if (__name__=="__main__"):
 
 		for read_result_obj in scanOutputToVDJML(extractAsItemOrFirstFromList(args.igblast_in),fact,query_fasta):
 
-
 			#prepare for the iteration and give a possible status message...
 			if(read_num>1 and read_num%every_read==0):
 				print "Processing read",read_num,"..."
@@ -1148,7 +1148,7 @@ if (__name__=="__main__"):
 		#write the CDR3 hist when non-dev-null
 		if(type(cdr3_hist_out_file)==list):
 			cdr3_hist_out_file=extractAsItemOrFirstFromList(cdr3_hist_out_file)
-		print "file=",cdr3_hist_out_file
+		#print "file=",cdr3_hist_out_file
 		if(not(cdr3_hist_out_file=="/dev/null")):
 			my_cdr3_map.writeToFile(cdr3_hist_out_file)
 			print "Wrote CDR3 lengths histogram to ",cdr3_hist_out_file
