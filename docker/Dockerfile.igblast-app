@@ -7,10 +7,10 @@ FROM debian:jessie
 MAINTAINER VDJServer <vdjserver@utsouthwestern.edu>
 
 # uncomment these if building behind UTSW proxy
-#ENV http_proxy 'http://proxy.swmed.edu:3128/'
-#ENV https_proxy 'https://proxy.swmed.edu:3128/'
-#ENV HTTP_PROXY 'http://proxy.swmed.edu:3128/'
-#ENV HTTPS_PROXY 'https://proxy.swmed.edu:3128/'
+ENV http_proxy 'http://proxy.swmed.edu:3128/'
+ENV https_proxy 'https://proxy.swmed.edu:3128/'
+ENV HTTP_PROXY 'http://proxy.swmed.edu:3128/'
+ENV HTTPS_PROXY 'https://proxy.swmed.edu:3128/'
 
 # Install OS Dependencies
 RUN apt-get update && apt-get install -y \
@@ -68,15 +68,17 @@ RUN cd /vdjml-root && b2
 RUN cd /vdjml-root && b2 distro-bindings-py
 RUN tar zxvf /vdjml-root/out/VDJMLpy-0.1.3.tar.gz
 
+# extract database
+COPY db.tgz /
+RUN tar zxvf db.tgz
+
 # Copy source
-RUN mkdir /repsum-root
+#RUN git clone https://bitbucket.org/vdjserver/repertoire-summarization.git repsum-root
+#RUN cd /repsum-root && git checkout develop
 COPY . /repsum-root
 
 # Create release
 RUN cd /repsum-root && ./release.pl
-
-# extract database
-RUN tar zxvf /repsum-root/db.tgz
 
 # setup run environment
 ENV DB_DIR "/db"
