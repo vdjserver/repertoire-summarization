@@ -73,9 +73,9 @@ COPY db.tgz /
 RUN tar zxvf db.tgz
 
 # Copy source
-RUN git clone https://bitbucket.org/vdjserver/repertoire-summarization.git repsum-root
-RUN cd /repsum-root && git checkout develop
-#COPY . /repsum-root
+#RUN git clone https://bitbucket.org/vdjserver/repertoire-summarization.git repsum-root
+#RUN cd /repsum-root && git checkout develop
+COPY . /repsum-root
 
 # Create release
 RUN cd /repsum-root && ./release.pl
