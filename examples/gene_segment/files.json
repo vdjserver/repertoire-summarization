@@ -1,0 +1,15 @@
+{
+    "mc1": {
+	"raw_sequence": "mc1_raw.fastq",
+	"processed_sequence": "mc1.fastq",
+	"assignment_sequence": "mc1.fasta",
+	"vdjml": "mc1.vdjml",
+	"summary": "mc1.summary.rc_out.tsv",
+    },
+
+    "mc2": {
+    },
+
+    "mc3": {
+    }
+}
