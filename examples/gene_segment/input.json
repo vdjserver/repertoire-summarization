@@ -1,0 +1,9 @@
+{
+	"metadata": "metadata.json",
+	"files": "files.json",
+	"calculations": [
+		{
+			"type": "gene"
+		}
+	]
+}

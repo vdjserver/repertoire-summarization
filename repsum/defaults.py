@@ -7,9 +7,8 @@ Default parameters
 
 # Keys in specification file
 metadata_file_key = "metadata"
-vdjml_file_key = "vdjml"
-sequence_file_key = "sequence"
-summary_file_key = "summary"
+files_key = "files"
+summary_key = "summary"
 calculations_key = "calculations"
 calc_type_key = "type"
 

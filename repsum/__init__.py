@@ -11,5 +11,10 @@ from .version import __license__
 from .defaults import *
 import repsum
 
+# Generate a repertoire summarization
+def summary():
+    repsum.summary()
+
+# Perform repertoire calculations and comparison
 def main():
     repsum.main()
