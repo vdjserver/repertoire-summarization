@@ -28,15 +28,17 @@ RUN apt-get update && apt-get install -y \
     cpio \
     emacs
 
-# Compile boost and vdjml first so it can be cached
+RUN pip install \
+    biopython \
+    lxml \
+    numpy \
+    argparse \
+    BeautifulSoup4 \
+    reportlab
+
 # Boost
 ENV BOOST_VERSION 1.57.0
 ENV BOOST_VERSION_LINK 1_57_0
-
-RUN git clone https://bitbucket.org/vdjserver/vdjml.git vdjml-root
-RUN cd /vdjml-root && git checkout develop
-RUN cp /vdjml-root/docker/boost/boost-build.jam /
-RUN cp /vdjml-root/docker/boost/user-config.jam /root/
 
 # Install/bootstrap boost
 RUN wget http://downloads.sourceforge.net/project/boost/boost/$BOOST_VERSION/boost_$BOOST_VERSION_LINK.tar.gz
@@ -48,6 +50,10 @@ RUN cd /boost_$BOOST_VERSION_LINK/tools/build && ./b2 install --prefix=/usr/loca
 
 # VDJML
 ENV VDJML_VERSION 0.1.4
+RUN git clone https://bitbucket.org/vdjserver/vdjml.git vdjml-root
+RUN cd /vdjml-root && git checkout develop
+RUN cp /vdjml-root/docker/boost/boost-build.jam /
+RUN cp /vdjml-root/docker/boost/user-config.jam /root/
 
 RUN cd /vdjml-root && b2
 RUN cd /vdjml-root && b2 distro-bindings-py
@@ -56,14 +62,6 @@ RUN tar zxvf /vdjml-root/out/VDJMLpy-$VDJML_VERSION.tar.gz
 # extract database
 COPY db.tgz /
 RUN tar zxvf db.tgz
-
-RUN pip install \
-    biopython \
-    lxml \
-    numpy \
-    argparse \
-    BeautifulSoup4 \
-    reportlab
 
 # Copy source
 RUN mkdir /repsum-root

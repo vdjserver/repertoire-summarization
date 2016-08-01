@@ -343,7 +343,7 @@ def getPrePostCDR3AlnObjs(vInfo,jInfo,imgtdb_obj,organism,annMap):
 
 	
 #return the char map for the V alignment
-def returnVAlnAllCharMap(vInfo,imgtdb_obj,read_result_obj=None,meta=None):
+def returnVAlnAllCharMap(vInfo,imgtdb_obj,organism,read_result_obj=None,meta=None):
 	global global_key_base
 	emptyMap=getEmptyRegCharMap()
 	if(vInfo==None):
@@ -506,7 +506,7 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 	if(not(skip_char)):
 		#V seq characterization (OVER v) only
 		#V_map=returnVAlnAllCharMap(vInfo,imgtdb_obj,read_result_obj,meta)
-		V_map=returnVAlnAllCharMap(vInfo,imgtdb_obj)
+		V_map=returnVAlnAllCharMap(vInfo,imgtdb_obj,organism)
 		#print "A V_MAP\n"
 		#printMap(V_map)
 		if(V_map is not None):
@@ -806,7 +806,7 @@ def prodRearrangmentVJ(vInfo,jInfo,imgtdb_obj,organism):
 
 
 
-def appendAnnToFileWithMap(fHandl,m,rid,read_name,desiredKeys=None,defaultValue="None",logHandle=None):
+def appendAnnToFileWithMap(fHandle,m,rid,read_name,desiredKeys=None,defaultValue="None",logHandle=None):
 
 
 	#apapend intro data
