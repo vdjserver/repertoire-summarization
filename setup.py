@@ -66,8 +66,8 @@ setup(name='repsum',
       package_dir={'repsum': 'repsum'},
       entry_points={
 		'console_scripts': [
-        	'repsum=repsum:summary',
-        	'repcalc=repsum:main',
+        	'repsum=repsum.repsum:main',
+        	'repcalc=repsum.repcalc:main',
     	],
 	  },
       classifiers=['Development Status :: 4 - Beta',

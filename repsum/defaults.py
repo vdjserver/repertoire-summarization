@@ -8,13 +8,13 @@ Default parameters
 # Keys in specification file
 metadata_file_key = "metadata"
 files_key = "files"
+groups_key = "groups"
 summary_key = "summary"
 calculations_key = "calculations"
 calc_type_key = "type"
 
 # Calculation types
 calculation_types = [
-	"summary",
 	"gene segment usage",
 	"CDR3",
 	"diversity",

@@ -166,7 +166,7 @@ def getHitInfo(read_result_obj,meta,alleleName,query_record=None,imgtdb_obj=None
 					ret_map['query id']=read_result_obj.id()
 					if(ret_map['is_inverted']):
 						ret_map['query id']="reversed|"+read_result_obj.id()
-					if(query_record!=None):
+					if(query_record is not None):
 						#attempt to use BTOP
 						q_start_line=ret_map['q. start']
 						q_end_line=ret_map['q. end']

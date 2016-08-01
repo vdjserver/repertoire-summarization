@@ -7,10 +7,10 @@
 				"href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
 			},
 			"permissions": {
-				"href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/3986234394319056410-242ac1110-0001-012/pems"
+				"href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/113136169120624155-242ac118-0001-012/pems"
 			},
 			"self": {
-				"href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/3986234394319056410-242ac1110-0001-012"
+				"href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/113136169120624155-242ac118-0001-012"
 			}
 		},
 		"associationIds": [],
@@ -20,7 +20,7 @@
 		"name": "project",
 		"owner": "vdj",
 		"schemaId": null,
-		"uuid": "3986234394319056410-242ac1110-0001-012",
+		"uuid": "113136169120624155-242ac118-0001-012",
 		"value": {
 			"contact_email": "",
 			"contact_institution": "",
@@ -59,9 +59,9 @@
 				"bio_processing_uuid": "",
 				"data_association": "barcode",
 				"description": "",
-				"name": "",
-				"projectFile": "",
-				"project_uuid": "3986234394319056410-242ac1110-0001-012",
+				"name": "sample1",
+				"projectFile": "3370168138574729701-242ac118-0001-012",
+				"project_uuid": "113136169120624155-242ac118-0001-012",
 				"software_processing_uuid": "",
 				"subject_uuid": ""
 			}
@@ -85,9 +85,9 @@
 				"bio_processing_uuid": "",
 				"data_association": "barcode",
 				"description": "",
-				"name": "mc2",
-				"projectFile": "",
-				"project_uuid": "3986234394319056410-242ac1110-0001-012",
+				"name": "sample2",
+				"projectFile": "3587536433425289701-242ac1111-0001-012",
+				"project_uuid": "113136169120624155-242ac118-0001-012",
 				"software_processing_uuid": "",
 				"subject_uuid": ""
 			}
@@ -111,9 +111,9 @@
 				"bio_processing_uuid": "",
 				"data_association": "barcode",
 				"description": "",
-				"name": "",
-				"projectFile": "",
-				"project_uuid": "3986234394319056410-242ac1110-0001-012",
+				"name": "sample3",
+				"projectFile": "3731031290784649701-242ac1111-0001-012",
+				"project_uuid": "113136169120624155-242ac118-0001-012",
 				"software_processing_uuid": "",
 				"subject_uuid": ""
 			}
@@ -137,12 +137,556 @@
 				"bio_processing_uuid": "",
 				"data_association": "barcode",
 				"description": "",
-				"name": "mc1",
-				"projectFile": "",
-				"project_uuid": "3986234394319056410-242ac1110-0001-012",
+				"name": "sample4",
+				"projectFile": "3906867251882889701-242ac1111-0001-012",
+				"project_uuid": "113136169120624155-242ac118-0001-012",
 				"software_processing_uuid": "",
 				"subject_uuid": ""
 			}
 		}
+	],
+	
+	"files":
+	[
+		{
+			"_links": {
+				"file": {
+					"href": "https://vdj-agave-api.tacc.utexas.edu/files/v2/media/system/data.vdjserver.org//projects/113136169120624155-242ac118-0001-012/files/Sample00001.fna"
+				},
+				"self": {
+					"href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/3370168138574729701-242ac118-0001-012"
+				}
+			},
+			"associationIds": [
+				"1049855075290321381-242ac113-0001-002"
+			],
+			"created": "2016-03-18T09:32:03.441-05:00",
+			"internalUsername": null,
+			"lastUpdated": "2016-04-15T11:36:37.757-05:00",
+			"name": "projectFile",
+			"owner": "jostmey",
+			"schemaId": null,
+			"uuid": "3370168138574729701-242ac118-0001-012",
+			"value": {
+				"fileType": 2,
+				"isDeleted": false,
+				"length": 17910778,
+				"name": "Sample00001.fna",
+				"projectUuid": "113136169120624155-242ac118-0001-012",
+				"publicAttributes": {
+					"tags": []
+				},
+				"qualityScoreMetadataUuid": "3524744011557769701-242ac118-0001-012",
+				"readDirection": ""
+			}
+		},
+		{
+			"_links": {
+				"file": {
+					"href": "https://vdj-agave-api.tacc.utexas.edu/files/v2/media/system/data.vdjserver.org//projects/113136169120624155-242ac118-0001-012/files/Sample00001.qual"
+				},
+				"self": {
+					"href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/3524744011557769701-242ac118-0001-012"
+				}
+			},
+			"associationIds": [
+				"1180293232069841381-242ac112-0001-002"
+			],
+			"created": "2016-03-18T09:32:07.040-05:00",
+			"internalUsername": null,
+			"lastUpdated": "2016-04-15T11:36:36.506-05:00",
+			"name": "projectFile",
+			"owner": "jostmey",
+			"schemaId": null,
+			"uuid": "3524744011557769701-242ac118-0001-012",
+			"value": {
+				"fileType": 5,
+				"isDeleted": false,
+				"length": 46588334,
+				"name": "Sample00001.qual",
+				"projectUuid": "113136169120624155-242ac118-0001-012",
+				"publicAttributes": {
+					"tags": []
+				},
+				"readDirection": ""
+			}
+		},
+		{
+			"name": "jobFile",
+			"uuid": "3524744011557769701-242ac118-0001-013",
+			"value": {
+				"fileType": 2,
+				"isDeleted": false,
+				"name": "01.fastq",
+				"projectUuid": "113136169120624155-242ac118-0001-012",
+				"publicAttributes": {
+					"tags": []
+				},
+				"readDirection": ""
+			}
+		},
+		{
+			"name": "jobFile",
+			"uuid": "3524744011557769701-242ac118-0001-014",
+			"value": {
+				"fileType": 2,
+				"isDeleted": false,
+				"name": "01.fasta",
+				"projectUuid": "113136169120624155-242ac118-0001-012",
+				"publicAttributes": {
+					"tags": []
+				},
+				"readDirection": ""
+			}
+		},
+		{
+			"name": "jobFile",
+			"uuid": "3524744011557769701-242ac118-0001-015",
+			"value": {
+				"fileType": 8,
+				"isDeleted": false,
+				"name": "01.igblast.out.vdjml",
+				"projectUuid": "113136169120624155-242ac118-0001-012",
+				"publicAttributes": {
+					"tags": []
+				},
+				"readDirection": ""
+			}
+		},
+		{
+			"name": "jobFile",
+			"uuid": "3524744011557769701-242ac118-0001-016",
+			"value": {
+				"fileType": 6,
+				"isDeleted": false,
+				"name": "01.igblast.out.kabat.rc_out.tsv",
+				"projectUuid": "113136169120624155-242ac118-0001-012",
+				"publicAttributes": {
+					"tags": []
+				},
+				"readDirection": ""
+			}
+		},
+		{
+			"_links": {
+				"file": {
+					"href": "https://vdj-agave-api.tacc.utexas.edu/files/v2/media/system/data.vdjserver.org//projects/113136169120624155-242ac118-0001-012/files/Sample00002.fna"
+				},
+				"self": {
+					"href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/3587536433425289701-242ac1111-0001-012"
+				}
+			},
+			"associationIds": [
+				"1226292331810001381-242ac113-0001-002"
+			],
+			"created": "2016-03-18T09:32:08.502-05:00",
+			"internalUsername": null,
+			"lastUpdated": "2016-03-18T09:43:16.304-05:00",
+			"name": "projectFile",
+			"owner": "schristley",
+			"schemaId": null,
+			"uuid": "3587536433425289701-242ac1111-0001-012",
+			"value": {
+				"fileType": 2,
+				"isDeleted": false,
+				"length": 3551931,
+				"name": "Sample00002.fna",
+				"projectUuid": "113136169120624155-242ac118-0001-012",
+				"publicAttributes": {
+					"tags": []
+				},
+				"qualityScoreMetadataUuid": "3654580872915849701-242ac118-0001-012",
+				"readDirection": ""
+			}
+		},
+		{
+			"_links": {
+				"file": {
+					"href": "https://vdj-agave-api.tacc.utexas.edu/files/v2/media/system/data.vdjserver.org//projects/113136169120624155-242ac118-0001-012/files/Sample00002.qual"
+				},
+				"self": {
+					"href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/3654580872915849701-242ac118-0001-012"
+				}
+			},
+			"associationIds": [
+				"1337832632487121381-242ac112-0001-002"
+			],
+			"created": "2016-03-18T09:32:10.063-05:00",
+			"internalUsername": null,
+			"lastUpdated": "2016-03-18T09:37:44.527-05:00",
+			"name": "projectFile",
+			"owner": "schristley",
+			"schemaId": null,
+			"uuid": "3654580872915849701-242ac118-0001-012",
+			"value": {
+				"fileType": 5,
+				"isDeleted": false,
+				"length": 9211666,
+				"name": "Sample00002.qual",
+				"projectUuid": "113136169120624155-242ac118-0001-012",
+				"publicAttributes": {
+					"tags": []
+				},
+				"readDirection": ""
+			}
+		},
+		{
+			"name": "jobFile",
+			"uuid": "3587536433425289701-242ac1111-0001-013",
+			"value": {
+				"fileType": 2,
+				"isDeleted": false,
+				"name": "02.fastq",
+				"projectUuid": "113136169120624155-242ac118-0001-012",
+				"publicAttributes": {
+					"tags": []
+				},
+				"readDirection": ""
+			}
+		},
+		{
+			"name": "jobFile",
+			"uuid": "3587536433425289701-242ac1111-0001-014",
+			"value": {
+				"fileType": 2,
+				"isDeleted": false,
+				"name": "02.fasta",
+				"projectUuid": "113136169120624155-242ac118-0001-012",
+				"publicAttributes": {
+					"tags": []
+				},
+				"readDirection": ""
+			}
+		},
+		{
+			"name": "jobFile",
+			"uuid": "3587536433425289701-242ac1111-0001-015",
+			"value": {
+				"fileType": 8,
+				"isDeleted": false,
+				"name": "02.igblast.out.vdjml",
+				"projectUuid": "113136169120624155-242ac118-0001-012",
+				"publicAttributes": {
+					"tags": []
+				},
+				"readDirection": ""
+			}
+		},
+		{
+			"name": "jobFile",
+			"uuid": "3587536433425289701-242ac1111-0001-016",
+			"value": {
+				"fileType": 6,
+				"isDeleted": false,
+				"name": "02.igblast.out.kabat.rc_out.tsv",
+				"projectUuid": "113136169120624155-242ac118-0001-012",
+				"publicAttributes": {
+					"tags": []
+				},
+				"readDirection": ""
+			}
+		},
+		{
+			"_links": {
+				"file": {
+					"href": "https://vdj-agave-api.tacc.utexas.edu/files/v2/media/system/data.vdjserver.org//projects/113136169120624155-242ac118-0001-012/files/Sample00003.fna"
+				},
+				"self": {
+					"href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/3731031290784649701-242ac1111-0001-012"
+				}
+			},
+			"associationIds": [
+				"1395857640656081381-242ac112-0001-002"
+			],
+			"created": "2016-03-18T09:32:11.842-05:00",
+			"internalUsername": null,
+			"lastUpdated": "2016-03-18T09:43:19.442-05:00",
+			"name": "projectFile",
+			"owner": "schristley",
+			"schemaId": null,
+			"uuid": "3731031290784649701-242ac1111-0001-012",
+			"value": {
+				"fileType": 2,
+				"isDeleted": false,
+				"length": 13740973,
+				"name": "Sample00003.fna",
+				"projectUuid": "113136169120624155-242ac118-0001-012",
+				"publicAttributes": {
+					"tags": []
+				},
+				"qualityScoreMetadataUuid": "3814138907962249701-242ac118-0001-012",
+				"readDirection": ""
+			}
+		},
+		{
+			"_links": {
+				"file": {
+					"href": "https://vdj-agave-api.tacc.utexas.edu/files/v2/media/system/data.vdjserver.org//projects/113136169120624155-242ac118-0001-012/files/Sample00003.qual"
+				},
+				"self": {
+					"href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/3814138907962249701-242ac118-0001-012"
+				}
+			},
+			"associationIds": [
+				"1506796645911761381-242ac113-0001-002"
+			],
+			"created": "2016-03-18T09:32:13.778-05:00",
+			"internalUsername": null,
+			"lastUpdated": "2016-03-18T09:37:51.713-05:00",
+			"name": "projectFile",
+			"owner": "schristley",
+			"schemaId": null,
+			"uuid": "3814138907962249701-242ac118-0001-012",
+			"value": {
+				"fileType": 5,
+				"isDeleted": false,
+				"length": 35968481,
+				"name": "Sample00003.qual",
+				"projectUuid": "113136169120624155-242ac118-0001-012",
+				"publicAttributes": {
+					"tags": []
+				},
+				"readDirection": ""
+			}
+		},
+		{
+			"name": "jobFile",
+			"uuid": "3731031290784649701-242ac1111-0001-013",
+			"value": {
+				"fileType": 2,
+				"isDeleted": false,
+				"name": "03.fastq",
+				"projectUuid": "113136169120624155-242ac118-0001-012",
+				"publicAttributes": {
+					"tags": []
+				},
+				"readDirection": ""
+			}
+		},
+		{
+			"name": "jobFile",
+			"uuid": "3731031290784649701-242ac1111-0001-014",
+			"value": {
+				"fileType": 2,
+				"isDeleted": false,
+				"name": "03.fasta",
+				"projectUuid": "113136169120624155-242ac118-0001-012",
+				"publicAttributes": {
+					"tags": []
+				},
+				"readDirection": ""
+			}
+		},
+		{
+			"name": "jobFile",
+			"uuid": "3731031290784649701-242ac1111-0001-015",
+			"value": {
+				"fileType": 8,
+				"isDeleted": false,
+				"name": "03.igblast.out.vdjml",
+				"projectUuid": "113136169120624155-242ac118-0001-012",
+				"publicAttributes": {
+					"tags": []
+				},
+				"readDirection": ""
+			}
+		},
+		{
+			"name": "jobFile",
+			"uuid": "3731031290784649701-242ac1111-0001-016",
+			"value": {
+				"fileType": 6,
+				"isDeleted": false,
+				"name": "03.igblast.out.kabat.rc_out.tsv",
+				"projectUuid": "113136169120624155-242ac118-0001-012",
+				"publicAttributes": {
+					"tags": []
+				},
+				"readDirection": ""
+			}
+		},
+		{
+			"_links": {
+				"file": {
+					"href": "https://vdj-agave-api.tacc.utexas.edu/files/v2/media/system/data.vdjserver.org//projects/113136169120624155-242ac118-0001-012/files/Sample00005.fna"
+				},
+				"self": {
+					"href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/3906867251882889701-242ac1111-0001-012"
+				}
+			},
+			"associationIds": [
+				"1558551001828561381-242ac113-0001-002"
+			],
+			"created": "2016-03-18T09:32:15.937-05:00",
+			"internalUsername": null,
+			"lastUpdated": "2016-03-18T09:43:22.629-05:00",
+			"name": "projectFile",
+			"owner": "schristley",
+			"schemaId": null,
+			"uuid": "3906867251882889701-242ac1111-0001-012",
+			"value": {
+				"fileType": 2,
+				"isDeleted": false,
+				"length": 8732042,
+				"name": "Sample00005.fna",
+				"projectUuid": "113136169120624155-242ac118-0001-012",
+				"publicAttributes": {
+					"tags": []
+				},
+				"qualityScoreMetadataUuid": "3995773074910089701-242ac118-0001-012",
+				"readDirection": ""
+			}
+		},
+		{
+			"_links": {
+				"file": {
+					"href": "https://vdj-agave-api.tacc.utexas.edu/files/v2/media/system/data.vdjserver.org//projects/113136169120624155-242ac118-0001-012/files/Sample00005.qual"
+				},
+				"self": {
+					"href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/3995773074910089701-242ac118-0001-012"
+				}
+			},
+			"associationIds": [
+				"1705095285968081381-242ac113-0001-002"
+			],
+			"created": "2016-03-18T09:32:18.007-05:00",
+			"internalUsername": null,
+			"lastUpdated": "2016-03-18T09:37:59.287-05:00",
+			"name": "projectFile",
+			"owner": "schristley",
+			"schemaId": null,
+			"uuid": "3995773074910089701-242ac118-0001-012",
+			"value": {
+				"fileType": 5,
+				"isDeleted": false,
+				"length": 22718330,
+				"name": "Sample00005.qual",
+				"projectUuid": "113136169120624155-242ac118-0001-012",
+				"publicAttributes": {
+					"tags": []
+				},
+				"readDirection": ""
+			}
+		},
+		{
+			"name": "jobFile",
+			"uuid": "3906867251882889701-242ac1111-0001-013",
+			"value": {
+				"fileType": 2,
+				"isDeleted": false,
+				"name": "05.fastq",
+				"projectUuid": "113136169120624155-242ac118-0001-012",
+				"publicAttributes": {
+					"tags": []
+				},
+				"readDirection": ""
+			}
+		},
+		{
+			"name": "jobFile",
+			"uuid": "3906867251882889701-242ac1111-0001-014",
+			"value": {
+				"fileType": 2,
+				"isDeleted": false,
+				"name": "05.fasta",
+				"projectUuid": "113136169120624155-242ac118-0001-012",
+				"publicAttributes": {
+					"tags": []
+				},
+				"readDirection": ""
+			}
+		},
+		{
+			"name": "jobFile",
+			"uuid": "3906867251882889701-242ac1111-0001-015",
+			"value": {
+				"fileType": 8,
+				"isDeleted": false,
+				"name": "05.igblast.out.vdjml",
+				"projectUuid": "113136169120624155-242ac118-0001-012",
+				"publicAttributes": {
+					"tags": []
+				},
+				"readDirection": ""
+			}
+		},
+		{
+			"name": "jobFile",
+			"uuid": "3906867251882889701-242ac1111-0001-016",
+			"value": {
+				"fileType": 6,
+				"isDeleted": false,
+				"name": "05.igblast.out.kabat.rc_out.tsv",
+				"projectUuid": "113136169120624155-242ac118-0001-012",
+				"publicAttributes": {
+					"tags": []
+				},
+				"readDirection": ""
+			}
+		},
+		{
+			"_links": {
+				"file": {
+					"href": "https://vdj-agave-api.tacc.utexas.edu/files/v2/media/system/data.vdjserver.org//projects/113136169120624155-242ac118-0001-012/files/Sample00006.fna"
+				},
+				"self": {
+					"href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/4078236446993289701-242ac1111-0001-012"
+				}
+			},
+			"associationIds": [
+				"3855069946293129701-242ac113-0001-002"
+			],
+			"created": "2016-03-18T09:32:19.927-05:00",
+			"internalUsername": null,
+			"lastUpdated": "2016-03-18T09:43:26.095-05:00",
+			"name": "projectFile",
+			"owner": "schristley",
+			"schemaId": null,
+			"uuid": "4078236446993289701-242ac1111-0001-012",
+			"value": {
+				"fileType": 2,
+				"isDeleted": false,
+				"length": 1756805,
+				"name": "Sample00006.fna",
+				"projectUuid": "113136169120624155-242ac118-0001-012",
+				"publicAttributes": {
+					"tags": []
+				},
+				"qualityScoreMetadataUuid": "4167915364133769701-242ac118-0001-012",
+				"readDirection": ""
+			}
+		},
+		{
+			"_links": {
+				"file": {
+					"href": "https://vdj-agave-api.tacc.utexas.edu/files/v2/media/system/data.vdjserver.org//projects/113136169120624155-242ac118-0001-012/files/Sample00006.qual"
+				},
+				"self": {
+					"href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/4167915364133769701-242ac118-0001-012"
+				}
+			},
+			"associationIds": [
+				"3914125746613129701-242ac112-0001-002"
+			],
+			"created": "2016-03-18T09:32:22.015-05:00",
+			"internalUsername": null,
+			"lastUpdated": "2016-03-18T09:38:07.415-05:00",
+			"name": "projectFile",
+			"owner": "schristley",
+			"schemaId": null,
+			"uuid": "4167915364133769701-242ac118-0001-012",
+			"value": {
+				"fileType": 5,
+				"isDeleted": false,
+				"length": 4576886,
+				"name": "Sample00006.qual",
+				"projectUuid": "113136169120624155-242ac118-0001-012",
+				"publicAttributes": {
+					"tags": []
+				},
+				"readDirection": ""
+			}
+		}
 	]
+
 }
