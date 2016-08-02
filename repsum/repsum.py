@@ -13,7 +13,7 @@ from imgt_utils import imgt_db
 from Bio import SeqIO
 import summarize
 from cdr3_hist import histoMapClass
-from segment_utils import IncrementMapWrapper, recombFreqManager
+from segment_utils import recombFreqManager
 
 def makeSummaryParserArgs():
 	"""Command line arguments for repsum"""
@@ -47,7 +47,7 @@ def main():
 	fasta_reader=SeqIO.parse(open(query_fasta, "r"), "fasta")
 	modes=['kabat','imgt']
 	my_cdr3_map=histoMapClass(modes)
-	segment_counter=IncrementMapWrapper()
+	#segment_counter=IncrementMapWrapper()
 	combo_counter=recombFreqManager()
 	read_num=1
 	rep_char_out=utils.extractAsItemOrFirstFromList(args.char_out)
@@ -83,8 +83,9 @@ def main():
 					segments=read_analysis_results['VDJ']
 					for s in segments:
 							actual=segments[s]
-							if(actual is not None):
-									segment_counter.increment(actual)
+                                                        #print(actual)
+							#if(actual is not None):
+									#segment_counter.increment(actual)
 					vseg=segments['V']
 					dseg=segments['D']
 					jseg=segments['J']

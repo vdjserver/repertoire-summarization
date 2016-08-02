@@ -1331,9 +1331,6 @@ class IncrementMapWrapper():
 
 
 
-
-
-
 #
 # This function translates a position from germline coordinates into query coordinates
 # given an alignment between the two. It takes into account indels.

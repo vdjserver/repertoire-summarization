@@ -13,7 +13,7 @@ from cdr3_hist import CDR3LengthAnalysisVDMLOBJ,histoMapClass
 #from vdjml_utils import getTopVDJItems,getHitInfo,getVDJServerRegionAlignmentFromLargerVAlignmentPyObj,getAlignmentString,getTypeNameScoreMap,getVDJTieMap
 from vdjml_utils import *
 from Bio import SeqIO
-from segment_utils import IncrementMapWrapper,getVRegionsList,getEmptyRegCharMap,getAdjustedCDR3StartFromRefDirSetAllele,getTheFrameForThisReferenceAtThisPosition,getVRegionStartAndStopGivenRefData,getADJCDR3EndFromJAllele,alleleIsTR
+from segment_utils import getVRegionsList,getEmptyRegCharMap,getAdjustedCDR3StartFromRefDirSetAllele,getTheFrameForThisReferenceAtThisPosition,getVRegionStartAndStopGivenRefData,getADJCDR3EndFromJAllele,alleleIsTR
 from segment_utils import recombFreqManager
 from char_utils import getNumberBaseSubsFromBTOP,getNumberIndelsFromBTOP,getIndelMapFromBTOP
 from alignment import alignment,CodonAnalysis,codonAnalyzer
@@ -1021,3 +1021,10 @@ def generateSampleLevelStatsJSON():
 
 	return whole_json
 		
+def summary_file_header_mappings(header):
+        """Generate mapping from header names to columns given the header line for a summary file"""
+        headerDict = {}
+        headers = header.split('\t')
+        # TODO: this should use an established set of names
+        headerDict = {h: headers.index(h) for h in headers}
+        return headerDict

@@ -3,29 +3,71 @@ Repertoire calculations and comparison
 """
 
 import sys
-import vdjml
-import utils
-from .version import __version__
 import argparse
 import json
-import defaults
+import importlib
+
+import vdjml
 from Bio import SeqIO
+
+# repsum modules
+import utils
+from .version import __version__
+import defaults
 import summarize
 import metadata
 
+def calc_types(inputDict):
+        """Return set of calculations types in input specification"""
+        calcTypes = set()
+        calcs = inputDict[defaults.calculationsKey]
+        for calc in calcs: calcTypes.add(calc[defaults.calcTypeKey])
+        return calcTypes
+
+def initialize_calculations(inputDict, metadataDict, headerMapping):
+        """Initialize each calculation module"""
+        calcTypes = calc_types(inputDict)
+        for calc in calcTypes:
+                m = defaults.calculationModules.get(calc)
+                if m is None:
+                        print("ERROR: Unknown calculation module type: " + calc)
+                        sys.exit()
+                try:
+                        cmod = importlib.import_module("repsum." + defaults.calculationModules[calc]['filename'])
+                except:
+                        print("ERROR: Could not load calculation module type: " + calc + "(" + defaults.calculationModules[calc]['filename'] + ".py)")
+                        raise
+                defaults.calculationModules[calc]['module'] = cmod
+                cmod.initialize_calculation_module(inputDict, metadataDict, headerMapping)
+
+def finalize_calculations(inputDict, metadataDict):
+        """Finalize and save the calculations"""
+        for mods in defaults.calculationModules:
+                cmod = defaults.calculationModules[mods].get('module')
+                if cmod is not None: cmod.finalize_calculation_module(inputDict, metadataDict)
+
 def extract_summary_files(inputDict, metadataDict):
-	"""Extract unique set of summary files for given input and metadata"""
+	"""Extract set of summary files for given input and metadata"""
 	summaryFiles = set()
-	groups = inputDict[defaults.groups_key]
-	files = inputDict[defaults.files_key]
+	groups = inputDict[defaults.groupsKey]
+	files = inputDict[defaults.filesKey]
 	for group in groups:
 		for sample in groups[group]['samples']:
 			file = files[groups[group]['samples'][sample]]
-			mfile = metadata.file_with_uuid(metadataDict, file['summary'])
-			if (mfile): summaryFiles.add(metadata.filename(mfile))
-			print(file['summary'])
-
+                        summaryFiles.add(file[defaults.summaryKey])
+			print(file[defaults.summaryKey])
 	return summaryFiles
+
+def groups_for_file(inputDict, fileKey, uuid):
+        """Return set of applicable groups for a given summary file"""
+        groupSet = set()
+        files = inputDict[defaults.filesKey]
+        groups = inputDict[defaults.groupsKey]
+        for group in groups:
+		for sample in groups[group]['samples']:
+			file = files[groups[group]['samples'][sample]]
+                        if file[fileKey] == uuid: groupSet.add(group)
+        return groupSet
 
 def make_parser_args():
 	"""Command line arguments for repcalc"""
@@ -47,33 +89,65 @@ def main():
 	# Load input specification
 	input_file = utils.extractAsItemOrFirstFromList(args.input)
 	try:
-			infile = open(input_file)
-			inputDict = json.load(infile)
+                infile = open(input_file, 'rt')
+                inputDict = json.load(infile)
 	except:
-			print("Could not read input specification file: " + input_file)
-			raise
+                print("Could not read input specification file: " + input_file)
+                raise
 	else:
-			infile.close()
+                infile.close()
 	#print(json.dumps(inputDict))
 
 	# Metadata
 	#print(inputDict[defaults.metadata_file_key])
 	input_file = inputDict[defaults.metadata_file_key]
 	try:
-			infile = open(input_file)
-			metadataDict = json.load(infile)
+                infile = open(input_file, 'rt')
+                metadataDict = json.load(infile)
 	except:
-			print("Could not read metadata file: " + input_file)
-			raise
+                print("Could not read metadata file: " + input_file)
+                raise
 	else:
-			infile.close()
+                infile.close()
 	#print(json.dumps(metadataDict))
 
 	# Extract summary file list
 	summaryFiles = extract_summary_files(inputDict, metadataDict)
-	print(summaryFiles)
+        namesDict = metadata.filenames_from_uuids(metadataDict, summaryFiles)
+	#print(summaryFiles)
+        #print(namesDict)
 
-	# Calculations
+	# walk through each file and perform calculations
+        first = True
+        for sfile in summaryFiles:
+                input_file = namesDict[sfile]
+                groupSet = groups_for_file(inputDict, defaults.summaryKey, sfile)
+                print(groupSet)
+                try:
+                        infile = open(input_file, 'rt')
+                        header = infile.readline()
+                        headerMapping = summarize.summary_file_header_mappings(header)
+                        if first:
+                                initialize_calculations(inputDict, metadataDict, headerMapping)
+                                first = False
+                        calcs = inputDict[defaults.calculationsKey]
+                        #print(headerMapping)
+                        while True:
+                                line = infile.readline()
+                                if not line: break
+                                fields = line.split('\t')
+                                if len(fields) != len(headerMapping):
+                                        print("ERROR: Number of fields does not equal number of column headings.")
+                                        sys.exit()
 
-	# Summary
-        
+                                for calc in calcs:
+                                        cmod = defaults.calculationModules[calc['type']]['module']
+                                        cmod.process_record(inputDict, metadataDict, headerMapping, groupSet, calc, fields)
+                        
+                except:
+                        print("ERROR: Could not process summary file: " + input_file)
+                        raise
+                else:
+                        infile.close()
+
+        finalize_calculations(inputDict, metadataDict)

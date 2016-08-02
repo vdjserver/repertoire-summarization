@@ -1,5 +1,5 @@
 """
-Default parameters
+Default settings
 """
 
 # Info
@@ -7,17 +7,25 @@ Default parameters
 
 # Keys in specification file
 metadata_file_key = "metadata"
-files_key = "files"
-groups_key = "groups"
-summary_key = "summary"
-calculations_key = "calculations"
-calc_type_key = "type"
+filesKey = "files"
+groupsKey = "groups"
+summaryKey = "summary"
+calculationsKey = "calculations"
+calcTypeKey = "type"
 
-# Calculation types
-calculation_types = [
-	"gene segment usage",
-	"CDR3",
-	"diversity",
-	"mutations",
-	"clonality",
-	"lineage"]
+# Calculation modules
+calculationModules = {
+    "gene segment usage": {"filename":"gene_segment"},
+    "CDR3": {"filename":"cdr3"},
+    "diversity": {"filename":"diversity"},
+    "mutations": {"filename":"mutations"},
+    "clonality": {"filename":"clones"},
+    "lineage": {"filename":"lineage"}
+}
+
+# Header column names for summary file
+headerNames = {
+    "V_CALL": "V gene",
+    "D_CALL": "D gene",
+    "J_CALL": "J gene"
+}
