@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 from bs4 import BeautifulSoup
-from collections import defaultdict
 import pickle
 import urllib2
 import re
@@ -129,12 +128,6 @@ def hierarchyTreeFromGenetableURL(url,locus,listOfAllowableNames=None,existingHi
 
 
 
-
-
-#these two defs (tree and dicts) from https://gist.github.com/hrldcpr/2012250
-#"One-line Tree in Python"
-def tree(): return defaultdict(tree)
-def dicts(t): return {k: dicts(t[k]) for k in t}
 
 
 
@@ -441,88 +434,9 @@ def patchlocusHierarchyData(locusHierarchyData,patchfilepath):
 
 
 
-#write an object to a pickle file
-def pickleWrite(pPath,o):
-	output = open(pPath, 'wb')
-	# Pickle dictionary using protocol 0.
-	pickle.dump(o, output)
-	output.close()
 
 
 
-
-
-
-
-#read an object from a pickle file
-def pickleRead(pPath):
-	pkl_file = open(pPath, 'rb')
-	data1 = pickle.load(pkl_file)
-	pkl_file.close()
-	return data1
-
-
-
-
-
-
-#from a tree get the total number of counts
-#using the counts map	
-def get_total_tree(tree,this_name,counts_map):
-	subtree_sum=0
-	if this_name in counts_map:
-		subtree_sum+=counts_map[this_name]
-	for child in tree:
-		subtree_sum+=get_total_tree(tree[child],child,counts_map)
-	#print "For subtree rooted at :",this_name,"returning the sum",subtree_sum
-	return subtree_sum
-
-
-
-
-
-
-#zero pad a string e
-#up to length tot
-def zeropad(e,tot):
-	str_e=str(e)
-	if(len(str_e)>=tot):
-		return str_e
-	else:
-		numZ=tot-len(str_e)
-		zeroes=""
-		for n in range(numZ):
-			zeroes+="0"
-		return zeroes+str_e
-
-
-#zero pad a string (of digits)
-#up to a length
-def zeroPadDigitsTo(s,num=8):
-	if(re.search(r'\d',s)):
-		#proceed here
-		reg=re.compile(r'\d+')
-		digits_list=reg.findall(s)
-		nondigits_list=reg.split(s)
-		#print "got digits list : ",digits_list
-		#print "got nondigits list : ",nondigits_list
-		ret=""
-		for i in range(len(nondigits_list)-1):
-			ret+=nondigits_list[i]
-			ret+=zeropad(digits_list[i],num)
-		if(len(nondigits_list)>len(digits_list)):
-			ret+=nondigits_list[len(nondigits_list)-1]
-		#uniq_map=dict()
-		#for digits in digits_list:
-		#	uniq_map[digits]=digits
-		#digits_list=uniq_map.keys()
-		#for digits in digits_list:
-		#	existing=str(digits)
-		#	padded=zeropad(existing,num)
-		#	s=re.sub(digits,padded,s)
-		return ret
-	else:	
-		return s
 
 
 
@@ -557,55 +471,6 @@ def orderAlleicArrayWithZeroPadding(a_arr):
 
 
 
-#JSONIFY from a hierarchy with a counts map
-#the "count_string" is used to make the label for the count in the JSON
-#the "labelString" is used to make the label for the names
-def jsonify_hierarchy(hier_map,name,counts_map,count_string,labelString="label"):
-	#print "\n\n\n\n\n"
-	hier_map_keys=hier_map.keys()
-	original_to_padded=dict()
-	padded_to_original=dict()
-	padded_key_list=list()
-	#the reason for all this "padded" stuff is so that digits are zero-padded
-	#so that ordering (based on ASCII) will put IGHV4 before IGHV40 (and not IGHV40 before IGHV4)
-	for hier_map_key in hier_map_keys:
-		padded_key=zeroPadDigitsTo(hier_map_key)
-		original_to_padded[hier_map_key]=padded_key
-		padded_to_original[padded_key]=hier_map_key
-		padded_key_list.append(padded_key)
-	#print "A key list is :",hier_map_keys
-	#print "A padded list is :",padded_key_list
-	padded_key_list.sort()
-	#print "A sorted padded list is :",padded_key_list
-	#print "\n\n\n"
-	JSON=""
-	JSON+="{\n"
-	JSON+="\""+labelString+"\":\""+name+"\",\n"
-	actual_value=0
-	actual_value=get_total_tree(hier_map,name,counts_map)
-	#JSON+="\"value\":"+str(actual_value)+",\n"
-	#JSON+="\"size\":"+str(actual_value)+"\n"
-	JSON+="\""+count_string+"\":"+str(actual_value)+"\n"
-	num_kids=len(hier_map)
-	if(num_kids>=1):
-		JSON+=",\n"
-		JSON+="\"children\": [\n"
-		kid_num=0
-		#for child in hier_map:
-		for c in range(len(hier_map_keys)):
-			#child=hier_map_keys[c]
-			child=padded_key_list[c]
-			original_child=padded_to_original[child]
-			JSON+=jsonify_hierarchy(hier_map[original_child],original_child,counts_map,count_string)
-			if(kid_num<(num_kids-1)):
-				JSON+=" , \n"
-			kid_num+=1
-		JSON+=" ] \n"
-	else:
-		JSON+=""
-		#num_kids<1
-	JSON+=" }\n"
-	return JSON
 
 
 #from a BLAST hit string, attempt to parse out 
@@ -1241,91 +1106,6 @@ class recombFreqManager():
 		
 
 
-
-
-
-#class for count map
-class IncrementMapWrapper():
-
-	#have a count map
-	count_map=None
-
-	#have a default value
-	default_value=0
-
-	#constructor
-	def __init__(self):
-		self.count_map=dict()
-		self.default_value=0
-
-	#treating the keys as ints, find the max key
-	#return -1 if no keys
-	def getMaxKeyWithIntOrdering(self):
-		keys=self.count_map.keys()
-		int_keys=list()
-		for k in keys:
-			int_keys.append(int(k))
-		int_keys.sort()
-		if(len(int_keys)>0):
-			return max(int_keys)
-		else:
-			return (-1)
-
-	#be able to change the default value
-	def setDefault(self,d):
-		self.default_value=d
-
-	#have a subroutine to return the map
-	def get_map(self):
-		return  self.count_map
-
-
-	#have a getter method for the default value
-	def get_val(self,key):
-		if(key in self.count_map):
-			return self.count_map[key]
-		else:
-			return self.default_value
-	
-	#increment the given value
-	def increment(self,val):
-		if(val in self.count_map):
-			self.count_map[val]+=1
-		else:
-			self.count_map[val]=1
-
-	#print it
-	def printMap(self):
-		print "I am an increment map."
-		for k in self.count_map:
-			print str(k)+"\t"+str(self.count_map[k])
-
-	#zero out at a key
-	def zeroOut(self,key):
-		self.count_map[key]=0
-
-	#given another increment map wrapper, merge its counts into this/self 
-	def mergeInto(self,other):
-		other_map=other.get_map()
-		for k in other_map:
-			k_count=other_map[k]
-			#print "GOT k=",k," and k_count=",k_count," from other map"
-			for i in range(k_count):
-				self.increment(k)
-
-	#write JSON to file
-	def JSONIFYToFile(self,db_base,organism,filePath,filterbyFastaAlleles=False,pickle_file_full_path=None):
-		JSON=self.JSONIFYIntoHierarchy(db_base,organism,filterbyFastaAlleles,pickle_file_full_path)
-		writer=open(filePath,'w')
-		writer.write(JSON)
-		writer.close()
-
-
-	#JSONIFY into hierarchy
-	def JSONIFYIntoHierarchy(self,db_base,organism,filterbyFastaAlleles=False,pickle_file_full_path=None):
-		hierarchy=getHierarchyBy(db_base+"/"+organism+"/GeneTables/",organism,filterbyFastaAlleles,pickle_file_full_path)
-		JSON=jsonify_hierarchy(hierarchy,organism,self.count_map,"value")
-		return JSON
 
 
 

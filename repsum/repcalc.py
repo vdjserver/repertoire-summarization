@@ -11,11 +11,12 @@ import vdjml
 from Bio import SeqIO
 
 # repsum modules
-import utils
 from .version import __version__
+import utils
 import defaults
 import summarize
 import metadata
+import gldb
 
 def calc_types(inputDict):
         """Return set of calculations types in input specification"""
@@ -74,6 +75,7 @@ def make_parser_args():
 	parser = argparse.ArgumentParser();
 	parser.description='Comparison and calculation functions for immune repertoire sequencing data. VERSION '+__version__
 	parser.add_argument('input',type=str,nargs=1,help="Input specification file")
+        parser.add_argument('--gldb',type=str,nargs=1,help="Path to germline database")
 	return parser
 
 
@@ -85,6 +87,11 @@ def main():
 	if (not args):
 		args.print_help()
 		sys.exit()
+
+        # germline db
+        gldb_path = utils.extractAsItemOrFirstFromList(args.gldb)
+        gldb.init_germline_db_root(gldb_path)
+        print(gldb.germline_db_root())
 
 	# Load input specification
 	input_file = utils.extractAsItemOrFirstFromList(args.input)
