@@ -9,7 +9,7 @@ from imgt_utils import imgt_db,get_cdr3_end
 from utils import *
 import vdjml
 from vdjml_utils import getTopVDJItems,getHitInfo
-from igblast_parse import rev_comp_dna
+from vdjml.igblast_parse import rev_comp_dna
 import argparse
 from alignment import alignment,CodonAnalysis,codonAnalyzer
 
