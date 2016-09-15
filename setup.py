@@ -36,6 +36,11 @@ if __license__ is None:
 desc_files = ['README.rst']
 long_description = '\n\n'.join([open(f, 'r').read() for f in desc_files])
 
+# Define installation path for commandline tools
+scripts = ['vdjml_merge.py',
+           'igblast_tsv_merge.py',
+           'Cdr3_clone_identifier.py']
+
 # TODO: check pip version to avoid problem with parse_requirements(session=False)
 # Parse requirements
 if os.environ.get('READTHEDOCS', None) == 'True':
@@ -70,6 +75,7 @@ setup(name='repsum',
         	'repcalc=repsum.repcalc:main',
     	],
 	  },
+      scripts=scripts,
       classifiers=['Development Status :: 4 - Beta',
                    'Environment :: Console',
                    'Intended Audience :: Science/Research',
