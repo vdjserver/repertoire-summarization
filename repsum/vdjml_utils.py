@@ -4,7 +4,7 @@ from alignment import alignment
 from pprint import pprint
 from utils import *
 from segment_utils import getNAProductiveRearrangmentFlagFromVJHitLineData,getRegionAlignmentFromLargerVAlignment,getVRegionsList,getVRegionStartAndStopGivenRefData
-from igblast_parse import extractJunctionRegionSeq,rev_comp_dna
+from vdjml.igblast_parse import extractJunctionRegionSeq,rev_comp_dna
 import vdjml
 
 def getAlignmentString(read_result_obj,meta,query_record=None,imgtdb_obj=None,organism=None):
