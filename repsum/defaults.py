@@ -8,6 +8,7 @@ Default settings
 # Keys in specification file
 metadata_file_key = "metadata"
 filesKey = "files"
+fileMetadataKey = "fileMetadata"
 groupsKey = "groups"
 summaryKey = "summary"
 calculationsKey = "calculations"

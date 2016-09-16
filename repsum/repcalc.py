@@ -50,13 +50,11 @@ def finalize_calculations(inputDict, metadataDict):
 def extract_summary_files(inputDict, metadataDict):
 	"""Extract set of summary files for given input and metadata"""
 	summaryFiles = set()
-	groups = inputDict[defaults.groupsKey]
 	files = inputDict[defaults.filesKey]
-	for group in groups:
-		for sample in groups[group]['samples']:
-			file = files[groups[group]['samples'][sample]]
-                        summaryFiles.add(file[defaults.summaryKey])
-			print(file[defaults.summaryKey])
+	for file in files:
+		print(file)
+		summaryFiles.add(files[file][defaults.summaryKey])
+		print(files[file][defaults.summaryKey])
 	return summaryFiles
 
 def groups_for_file(inputDict, fileKey, uuid):
@@ -122,7 +120,7 @@ def main():
 	summaryFiles = extract_summary_files(inputDict, metadataDict)
         namesDict = metadata.filenames_from_uuids(metadataDict, summaryFiles)
 	#print(summaryFiles)
-        #print(namesDict)
+        print(namesDict)
 
 	# walk through each file and perform calculations
         first = True
