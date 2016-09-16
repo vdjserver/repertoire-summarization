@@ -7,23 +7,22 @@ import sys
 # repsum modules
 import defaults
 
-def file_with_uuid(metadataDict, uuid):
-        """Return file metadata record for given uuid"""
-	for file in metadataDict[defaults.filesKey]:
-		if (file['uuid'] == uuid): return file
-		
-	return None
-
 def filename(file):
         """Extract filename from metadata record"""
-	if (file): return file['value']['name']
+	if (file):
+		# trim compression extension
+		name = file['value']['name']
+		sname = name.split('.')
+		if (sname[-1] == 'zip'): del sname[-1]
+		if (sname[-1] == 'gz'): del sname[-1]
+		if (sname[-1] == 'bz2'): del sname[-1]
+		name = '.'.join(sname)
+		return name
 	else: return None
 
 def filenames_from_uuids(metadataDict, uuidSet):
         """Return dictionary of file name for given set of uuids"""
         nameDict = {}
-        for uuid in uuidSet:
-                mfile = file_with_uuid(metadataDict, uuid)
-                if (mfile): nameDict[uuid] = filename(mfile)
+        for uuid in uuidSet: nameDict[uuid] = filename(metadataDict[defaults.fileMetadataKey][uuid])
         return nameDict
 
