@@ -24,6 +24,7 @@ def makeSummaryParserArgs():
 	parser.add_argument('vdj_db_root',type=str,nargs=1,help="path to the VDJ directory root REQUIRED")
 	parser.add_argument('qry_fasta',type=str,nargs=1,help="path to the input fasta file of query (Rep-Seq) data input to IgBLAST")
 	parser.add_argument('db_organism',type=str,nargs=1,default="human",help="the organism IgBLASTed against;must exist under vdj_db_root",choices=["human","Mus_musculus"])
+	parser.add_argument('-v', '--version', action='version', version='VERSION '+__version__+' COPYRIGHT 2016 UT Southwestern Medical Center')
 	return parser
 
 def main():
