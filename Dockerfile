@@ -72,7 +72,7 @@ RUN cd /repsum-root && python setup.py install
 
 # setup run environment
 ENV DB_DIR "/db"
-ENV VDJ_DB_ROOT "/db/07_11_2014/"
+ENV VDJ_DB_ROOT "/db/10_05_2016/"
 ENV IGDATA "/db"
 ENV VDJSERVER_ROOT "/repsum-root"
 ENV PATH "$PATH:/igblast-root/local/bin"
