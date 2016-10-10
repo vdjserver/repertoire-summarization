@@ -72,7 +72,10 @@
 	},
 	"calculations": [
 		{
-			"type": "gene segment usage"
+			"type": "gene segment usage",
+      			"operations": [ "absolute" ], 
+			"levels": [ "gene" ], 
+			"filters": [ "productive" ]
 		}
 	]
 }

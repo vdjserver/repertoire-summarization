@@ -81,6 +81,7 @@ def make_parser_args():
 	parser.add_argument('input',type=str,nargs=1,help="Input specification file")
         parser.add_argument('--gldb',type=str,nargs=1,help="Path to germline database")
         parser.add_argument('--output',type=str,help="Output specification file")
+	parser.add_argument('-v', '--version', action='version', version='VERSION '+__version__+' COPYRIGHT 2016 UT Southwestern Medical Center')
 	return parser
 
 
