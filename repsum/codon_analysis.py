@@ -4,7 +4,7 @@ from utils import *
 from alignment import *
 from char_utils import *
 from segment_utils import getVRegionStartAndStopGivenRefData,IncrementMapWrapper,getTheFrameForThisReferenceAtThisPosition,getTheFrameForThisJReferenceAtThisPosition
-from igblast_parse import rev_comp_dna
+from vdjml.igblast_parse import rev_comp_dna
 
 #make an instance of the analyzer
 #print "INIT IN CODON_ANALYSIS...."

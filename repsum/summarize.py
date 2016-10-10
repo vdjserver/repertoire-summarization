@@ -4,7 +4,7 @@ Repertoire summarization
 
 import vdjml
 #from igblast_parse import scanOutputToVDJML,makeParserArgs,makeVDJMLDefaultMetaAndFactoryFromArgs,rev_comp_dna
-from igblast_parse import rev_comp_dna
+from vdjml.igblast_parse import rev_comp_dna
 #from utils import printMap,get_domain_modes,biopythonTranslate,makeAllMapValuesVal,getNumberBpInAlnStr,repStr
 from utils import *
 from pprint import pprint
