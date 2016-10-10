@@ -20,7 +20,9 @@
   "calculations": [
     {
       "operations": [
-        "absolute"
+        "absolute",
+        "relative",
+        "average"
       ], 
       "levels": [
         "gene", 
