@@ -11,11 +11,12 @@ import vdjml
 from Bio import SeqIO
 
 # repsum modules
-import utils
 from .version import __version__
+import utils
 import defaults
 import summarize
 import metadata
+import gldb
 
 def calc_types(inputDict):
         """Return set of calculations types in input specification"""
@@ -49,13 +50,11 @@ def finalize_calculations(inputDict, metadataDict):
 def extract_summary_files(inputDict, metadataDict):
 	"""Extract set of summary files for given input and metadata"""
 	summaryFiles = set()
-	groups = inputDict[defaults.groupsKey]
 	files = inputDict[defaults.filesKey]
-	for group in groups:
-		for sample in groups[group]['samples']:
-			file = files[groups[group]['samples'][sample]]
-                        summaryFiles.add(file[defaults.summaryKey])
-			print(file[defaults.summaryKey])
+	for file in files:
+		print(file)
+		summaryFiles.add(files[file][defaults.summaryKey])
+		print(files[file][defaults.summaryKey])
 	return summaryFiles
 
 def groups_for_file(inputDict, fileKey, uuid):
@@ -74,6 +73,7 @@ def make_parser_args():
 	parser = argparse.ArgumentParser();
 	parser.description='Comparison and calculation functions for immune repertoire sequencing data. VERSION '+__version__
 	parser.add_argument('input',type=str,nargs=1,help="Input specification file")
+        parser.add_argument('--gldb',type=str,nargs=1,help="Path to germline database")
 	return parser
 
 
@@ -85,6 +85,11 @@ def main():
 	if (not args):
 		args.print_help()
 		sys.exit()
+
+        # germline db
+        gldb_path = utils.extractAsItemOrFirstFromList(args.gldb)
+        gldb.init_germline_db_root(gldb_path)
+        print(gldb.germline_db_root())
 
 	# Load input specification
 	input_file = utils.extractAsItemOrFirstFromList(args.input)
@@ -115,7 +120,7 @@ def main():
 	summaryFiles = extract_summary_files(inputDict, metadataDict)
         namesDict = metadata.filenames_from_uuids(metadataDict, summaryFiles)
 	#print(summaryFiles)
-        #print(namesDict)
+        print(namesDict)
 
 	# walk through each file and perform calculations
         first = True
