@@ -41,11 +41,11 @@ def initialize_calculations(inputDict, metadataDict, headerMapping):
                 defaults.calculationModules[calc]['module'] = cmod
                 cmod.initialize_calculation_module(inputDict, metadataDict, headerMapping)
 
-def finalize_calculations(inputDict, metadataDict):
+def finalize_calculations(inputDict, metadataDict, outputSpec):
         """Finalize and save the calculations"""
         for mods in defaults.calculationModules:
                 cmod = defaults.calculationModules[mods].get('module')
-                if cmod is not None: cmod.finalize_calculation_module(inputDict, metadataDict)
+                if cmod is not None: cmod.finalize_calculation_module(inputDict, metadataDict, outputSpec)
 
 def extract_summary_files(inputDict, metadataDict):
 	"""Extract set of summary files for given input and metadata"""
@@ -63,9 +63,15 @@ def groups_for_file(inputDict, fileKey, uuid):
         files = inputDict[defaults.filesKey]
         groups = inputDict[defaults.groupsKey]
         for group in groups:
-		for sample in groups[group]['samples']:
-			file = files[groups[group]['samples'][sample]]
-                        if file[fileKey] == uuid: groupSet.add(group)
+		if (groups[group]['type'] == 'file'):
+			for f in groups[group]['files']:
+				file = files[f]
+				print(file)
+				if file[fileKey] == uuid: groupSet.add(group)
+		if (groups[group]['type'] == 'sample'):
+			for sample in groups[group]['samples']:
+				file = files[groups[group]['samples'][sample]]
+				if file[fileKey] == uuid: groupSet.add(group)
         return groupSet
 
 def make_parser_args():
@@ -74,6 +80,7 @@ def make_parser_args():
 	parser.description='Comparison and calculation functions for immune repertoire sequencing data. VERSION '+__version__
 	parser.add_argument('input',type=str,nargs=1,help="Input specification file")
         parser.add_argument('--gldb',type=str,nargs=1,help="Path to germline database")
+        parser.add_argument('--output',type=str,help="Output specification file")
 	return parser
 
 
@@ -116,6 +123,9 @@ def main():
                 infile.close()
 	#print(json.dumps(metadataDict))
 
+	# Output specification
+	outputSpec = { "files": {}, "groups": {} }
+
 	# Extract summary file list
 	summaryFiles = extract_summary_files(inputDict, metadataDict)
         namesDict = metadata.filenames_from_uuids(metadataDict, summaryFiles)
@@ -155,4 +165,8 @@ def main():
                 else:
                         infile.close()
 
-        finalize_calculations(inputDict, metadataDict)
+        finalize_calculations(inputDict, metadataDict, outputSpec)
+
+	if (args.output):
+		with open(args.output, 'w') as output_file:
+			json.dump(outputSpec, output_file, indent=2)
