@@ -20,6 +20,7 @@ def initialize_calculation_module(inputDict, metadataDict, headerMapping):
     return
 
 def process_record(inputDict, metadataDict, headerMapping, groupSet, calc, fields):
+    """Perform calculation from given fields"""
 # # UNCOMMENT FOR DUPCOUNT
 #
 #    if defaults.headerNames['DUPCOUNT'] in headerMapping:	# Check if template counts are available.
@@ -36,7 +37,6 @@ def process_record(inputDict, metadataDict, headerMapping, groupSet, calc, field
 #                if gene is not None:
 #                    if gene in segment_counters[group]: segment_counters[group][gene] += 1
 #                    else: segment_counters[group][gene] = 1
-    """Perform calculation from given fields"""
     for group in groupSet:
         for headerName in ['V_CALL', 'D_CALL', 'J_CALL']:
             gene = fields[headerMapping[defaults.headerNames[headerName]]]
@@ -81,15 +81,26 @@ def makeTree(hierarchy, segment_counters):
 
 def finalize_calculation_module(inputDict, metadataDict, outputSpec):
     """Finalize and save the calculations"""
-    groups = inputDict[defaults.groupsKey]
+ 
+   groups = inputDict[defaults.groupsKey]
+    outputSpec['groups'] = {}
+
     for group in groups:
+
         print("group: " + group)
         organism = 'human'
         hierarchy = gldb.getHierarchyBy(organism)
         tree = makeTree({'human': hierarchy}, segment_counters[group])
+
         JSON = json.dumps(tree[0], indent=2)
         filename = group + "_segment_counts.json"
         writer = open(filename, 'w')
         writer.write(JSON)
         writer.close()
+
+        if (not outputSpec['groups'].get(group)): outputSpec['groups'][group] = {}
+        if (not outputSpec['files'].get(group + "_gene_segment_usage")): outputSpec['files'][group + "_gene_segment_usage"] = {}
+        outputSpec['groups'][group]['gene_segment_usage'] = { "files": group + "_gene_segment_usage", "type": "output" }
+        outputSpec['files'][group + "_gene_segment_usage"]['absolute_counts'] = filename
+
 
