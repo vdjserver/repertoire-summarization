@@ -16,7 +16,6 @@ def initialize_calculation_module(inputDict, metadataDict, headerMapping):
     """Perform any module initialization"""
     groups = inputDict[defaults.groupsKey]
     for group in groups: segment_counters[group] = {}
-
     return
 
 def process_record(inputDict, metadataDict, headerMapping, groupSet, calc, fields):
@@ -81,23 +80,18 @@ def makeTree(hierarchy, segment_counters):
 
 def finalize_calculation_module(inputDict, metadataDict, outputSpec):
     """Finalize and save the calculations"""
- 
-   groups = inputDict[defaults.groupsKey]
+    groups = inputDict[defaults.groupsKey]
     outputSpec['groups'] = {}
-
     for group in groups:
-
         print("group: " + group)
         organism = 'human'
         hierarchy = gldb.getHierarchyBy(organism)
         tree = makeTree({'human': hierarchy}, segment_counters[group])
-
         JSON = json.dumps(tree[0], indent=2)
         filename = group + "_segment_counts.json"
         writer = open(filename, 'w')
         writer.write(JSON)
         writer.close()
-
         if (not outputSpec['groups'].get(group)): outputSpec['groups'][group] = {}
         if (not outputSpec['files'].get(group + "_gene_segment_usage")): outputSpec['files'][group + "_gene_segment_usage"] = {}
         outputSpec['groups'][group]['gene_segment_usage'] = { "files": group + "_gene_segment_usage", "type": "output" }
