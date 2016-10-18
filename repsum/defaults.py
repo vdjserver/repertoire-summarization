@@ -13,6 +13,7 @@ groupsKey = "groups"
 summaryKey = "summary"
 calculationsKey = "calculations"
 calcTypeKey = "type"
+calcOpsKey = "operations"
 
 # Calculation modules
 calculationModules = {
@@ -28,5 +29,6 @@ calculationModules = {
 headerNames = {
     "V_CALL": "V gene",
     "D_CALL": "D gene",
-    "J_CALL": "J gene"
+    "J_CALL": "J gene",
+    "DUPCOUNT": "DUPCOUNT"
 }

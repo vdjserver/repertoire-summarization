@@ -4,7 +4,6 @@ Gene segment calculation module
 
 # repsum modules
 from .version import __version__
-import utils
 import defaults
 import metadata
 import gldb
@@ -51,12 +50,12 @@ def makeTree(hierarchy, segment_counters):
             children = makeTree(sub_hierarchy, segment_counters)
             count = 0
             for child in children:
-                count += child['count']
+                count += child['absolute']
             total_count += count
             siblings.append({
                 'label': label,
                 'children': children,
-                'count': count,
+                'absolute': count,
             })
         else:
             if label in segment_counters:
@@ -64,21 +63,30 @@ def makeTree(hierarchy, segment_counters):
                 total_count += count
                 siblings.append({
                     'label': label,
-                    'count': count,
+                    'absolute': count,
                 })
             else:
                 siblings.append({
                     'label': label,
-                    'count': 0,
+                    'absolute': 0,
                 })
     for sibling in siblings:
         if total_count > 0:
-            sibling['fraction'] = float(sibling['count'])/float(total_count)
+            sibling['relative'] = float(sibling['absolute'])/float(total_count)
         else:
-            sibling['fraction'] = 0.0
+            sibling['relative'] = 0.0
     return siblings
 
-def finalize_calculation_module(inputDict, metadataDict, outputSpec):
+def pruneTree(tree, key):
+    del tree[key]
+    if 'children' in tree:
+        children = []
+        for child in tree['children']:
+            children.append(pruneTree(child, key))
+        tree['children'] = children
+    return tree
+
+def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
     """Finalize and save the calculations"""
     groups = inputDict[defaults.groupsKey]
     outputSpec['groups'] = {}
@@ -86,8 +94,12 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec):
         print("group: " + group)
         organism = 'human'
         hierarchy = gldb.getHierarchyBy(organism)
-        tree = makeTree({'human': hierarchy}, segment_counters[group])
-        JSON = json.dumps(tree[0], indent=2)
+        tree = makeTree({'human': hierarchy}, segment_counters[group])[0]
+        if 'absolute' not in calc[defaults.calcOpsKey]:
+            tree = pruneTree(tree, 'absolute')
+        if 'relative' not in calc[defaults.calcOpsKey]:
+            tree = pruneTree(tree, 'relative')
+        JSON = json.dumps(tree, indent=2)
         filename = group + "_segment_counts.json"
         writer = open(filename, 'w')
         writer.write(JSON)
