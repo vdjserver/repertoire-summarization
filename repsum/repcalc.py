@@ -43,9 +43,10 @@ def initialize_calculations(inputDict, metadataDict, headerMapping):
 
 def finalize_calculations(inputDict, metadataDict, outputSpec):
         """Finalize and save the calculations"""
-        for mods in defaults.calculationModules:
-                cmod = defaults.calculationModules[mods].get('module')
-                if cmod is not None: cmod.finalize_calculation_module(inputDict, metadataDict, outputSpec)
+        calcs = inputDict[defaults.calculationsKey]
+        for calc in calcs:
+             cmod = defaults.calculationModules[calc['type']]['module']
+             if cmod is not None: cmod.finalize_calculation_module(inputDict, metadataDict, outputSpec, calc)
 
 def extract_summary_files(inputDict, metadataDict):
 	"""Extract set of summary files for given input and metadata"""
