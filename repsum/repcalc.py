@@ -85,6 +85,15 @@ def make_parser_args():
 	parser.add_argument('-v', '--version', action='version', version='VERSION '+__version__+' COPYRIGHT 2016 UT Southwestern Medical Center')
 	return parser
 
+def isRecordFunctional(headerMapping, fields):
+    if  fields[headerMapping[defaults.headerNames['NonFuncCondition1']]] == 'True' or \
+        fields[headerMapping[defaults.headerNames['NonFuncCondition2']]] == 'True' or \
+        fields[headerMapping[defaults.headerNames['NonFuncCondition3']]] == 'True' or \
+        fields[headerMapping[defaults.headerNames['NonFuncCondition4']]] == 'True' or \
+        fields[headerMapping[defaults.headerNames['NonFuncCondition5']]] == 'True' or \
+        fields[headerMapping[defaults.headerNames['NonFuncCondition6']]] == 'True':
+            return False
+    return True
 
 def main():
 	"""Perform repertoire calculations and comparison"""
@@ -158,6 +167,7 @@ def main():
                                         sys.exit()
 
                                 for calc in calcs:
+                                        if defaults.calcFilters in calc and 'productive' in calc[defaults.calcFilters] and not isRecordFunctional(headerMapping, fields): continue
                                         cmod = defaults.calculationModules[calc['type']]['module']
                                         cmod.process_record(inputDict, metadataDict, headerMapping, groupSet, calc, fields)
                         
