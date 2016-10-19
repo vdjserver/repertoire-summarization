@@ -67,12 +67,12 @@ def groups_for_file(inputDict, fileKey, uuid):
 		if (groups[group]['type'] == 'file'):
 			for f in groups[group]['files']:
 				file = files[f]
-				print(file)
 				if file[fileKey] == uuid: groupSet.add(group)
 		if (groups[group]['type'] == 'sample'):
 			for sample in groups[group]['samples']:
-				file = files[groups[group]['samples'][sample]]
-				if file[fileKey] == uuid: groupSet.add(group)
+                                for f in groups[group]['samples'][sample]:
+                                        file = files[f]
+                                        if file[fileKey] == uuid: groupSet.add(group)
         return groupSet
 
 def make_parser_args():
