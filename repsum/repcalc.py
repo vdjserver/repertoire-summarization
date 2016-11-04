@@ -6,6 +6,7 @@ import sys
 import argparse
 import json
 import importlib
+import copy
 
 import vdjml
 from Bio import SeqIO
@@ -126,7 +127,8 @@ def main():
 	#print(json.dumps(metadataDict))
 
 	# Output specification
-	outputSpec = { "files": {}, "groups": {} }
+        outputSpec = { "files": copy.deepcopy(inputDict[defaults.filesKey]), "groups": copy.deepcopy(inputDict[defaults.groupsKey]) }
+        #print(outputSpec)
 
 	# Extract summary file list
 	summaryFiles = extract_summary_files(inputDict, metadataDict)
