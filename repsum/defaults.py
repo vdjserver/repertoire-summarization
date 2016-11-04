@@ -14,6 +14,7 @@ summaryKey = "summary"
 calculationsKey = "calculations"
 calcTypeKey = "type"
 calcOpsKey = "operations"
+calcFilters = "filters"
 
 # Calculation modules
 calculationModules = {
@@ -30,5 +31,14 @@ headerNames = {
     "V_CALL": "V gene",
     "D_CALL": "D gene",
     "J_CALL": "J gene",
-    "DUPCOUNT": "DUPCOUNT"
+    "DUPCOUNT": "DUPCOUNT",
+    "NonFuncCondition1": "Out-of-frame junction",
+    "NonFuncCondition2": "Missing CYS",
+    "NonFuncCondition3": "Missing TRP/PHE",
+    "NonFuncCondition4": "Stop Codon?",
+    "NonFuncCondition5": "Indels Found",
+    "NonFuncCondition6": "Only Frame-Preserving Indels Found",
 }
+
+
+
