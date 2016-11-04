@@ -89,7 +89,6 @@ def pruneTree(tree, key):
 def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
     """Finalize and save the calculations"""
     groups = inputDict[defaults.groupsKey]
-    outputSpec['groups'] = {}
     for group in groups:
         print("group: " + group)
         organism = 'human'
@@ -104,7 +103,7 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
         writer = open(filename, 'w')
         writer.write(JSON)
         writer.close()
-        if (not outputSpec['groups'].get(group)): outputSpec['groups'][group] = {}
+        # output specification for process metadata
         if (not outputSpec['files'].get(group + "_gene_segment_usage")): outputSpec['files'][group + "_gene_segment_usage"] = {}
         outputSpec['groups'][group]['gene_segment_usage'] = { "files": group + "_gene_segment_usage", "type": "output" }
         outputSpec['files'][group + "_gene_segment_usage"]['absolute_counts'] = filename
