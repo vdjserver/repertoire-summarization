@@ -55,8 +55,8 @@ def extract_summary_files(inputDict, metadataDict):
 	files = inputDict[defaults.filesKey]
 	for file in files:
 		print(file)
-		summaryFiles.add(files[file][defaults.summaryKey])
-		print(files[file][defaults.summaryKey])
+		summaryFiles.add(files[file][defaults.summaryKey]['value'])
+		print(files[file][defaults.summaryKey]['value'])
 	return summaryFiles
 
 def groups_for_file(inputDict, fileKey, uuid):
@@ -68,12 +68,12 @@ def groups_for_file(inputDict, fileKey, uuid):
 		if (groups[group]['type'] == 'file'):
 			for f in groups[group]['files']:
 				file = files[f]
-				if file[fileKey] == uuid: groupSet.add(group)
+				if file[fileKey]['value'] == uuid: groupSet.add(group)
 		if (groups[group]['type'] == 'sample'):
 			for sample in groups[group]['samples']:
                                 for f in groups[group]['samples'][sample]:
                                         file = files[f]
-                                        if file[fileKey] == uuid: groupSet.add(group)
+                                        if file[fileKey]['value'] == uuid: groupSet.add(group)
         return groupSet
 
 def make_parser_args():
