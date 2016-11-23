@@ -106,6 +106,6 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
         # output specification for process metadata
         if (not outputSpec['files'].get(group + "_gene_segment_usage")): outputSpec['files'][group + "_gene_segment_usage"] = {}
         outputSpec['groups'][group]['gene_segment_usage'] = { "files": group + "_gene_segment_usage", "type": "output" }
-        outputSpec['files'][group + "_gene_segment_usage"]['absolute_counts'] = filename
+        outputSpec['files'][group + "_gene_segment_usage"]['counts'] = { "value": filename, "description":"Gene Segment Usage", "type":"json" }
 
 
