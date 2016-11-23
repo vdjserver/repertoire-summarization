@@ -74,6 +74,11 @@ def groups_for_file(inputDict, fileKey, uuid):
                                 for f in groups[group]['samples'][sample]:
                                         file = files[f]
                                         if file[fileKey]['value'] == uuid: groupSet.add(group)
+		if (groups[group]['type'] == 'sampleGroup'):
+			for sample in groups[group]['samples']:
+                                for f in groups[group]['samples'][sample]:
+                                        file = files[f]
+                                        if file[fileKey]['value'] == uuid: groupSet.add(group)
         return groupSet
 
 def make_parser_args():
