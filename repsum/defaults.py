@@ -38,6 +38,8 @@ headerNames = {
     "NonFuncCondition4": "Stop Codon?",
     "NonFuncCondition5": "Indels Found",
     "NonFuncCondition6": "Only Frame-Preserving Indels Found",
+    "CDR3_AA": "CDR3 AA (imgt)",
+    "CDR3_SEQ": "CDR3 NA (imgt)",
 }
 
 

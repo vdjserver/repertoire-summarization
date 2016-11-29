@@ -90,7 +90,7 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
     """Finalize and save the calculations"""
     groups = inputDict[defaults.groupsKey]
     for group in groups:
-        print("group: " + group)
+        #print("group: " + group)
         organism = 'human'
         hierarchy = gldb.getHierarchyBy(organism)
         tree = makeTree({'human': hierarchy}, segment_counters[group])[0]

@@ -46,7 +46,7 @@ def germline_db_root():
 def getHierarchyBy(org_name):
     geneTablesDirectoryOfHTMLFiles = germline_db_root()+"/"+org_name+"/GeneTables/"
     fullPklPath = IMGT_DB.getPickleFullPath()
-    print "Trying to use " ,fullPklPath
+    #print "Trying to use " ,fullPklPath
     if(not(fullPklPath==None)):
         #print "not none"
         if(os.path.exists(fullPklPath)):
