@@ -54,9 +54,9 @@ def extract_summary_files(inputDict, metadataDict):
 	summaryFiles = set()
 	files = inputDict[defaults.filesKey]
 	for file in files:
-		print(file)
+		#print(file)
 		summaryFiles.add(files[file][defaults.summaryKey]['value'])
-		print(files[file][defaults.summaryKey]['value'])
+		#print(files[file][defaults.summaryKey]['value'])
 	return summaryFiles
 
 def groups_for_file(inputDict, fileKey, uuid):
@@ -113,7 +113,7 @@ def main():
         # germline db
         gldb_path = utils.extractAsItemOrFirstFromList(args.gldb)
         gldb.init_germline_db_root(gldb_path)
-        print(gldb.germline_db_root())
+        #print(gldb.germline_db_root())
 
 	# Load input specification
 	input_file = utils.extractAsItemOrFirstFromList(args.input)
@@ -148,14 +148,15 @@ def main():
 	summaryFiles = extract_summary_files(inputDict, metadataDict)
         namesDict = metadata.filenames_from_uuids(metadataDict, summaryFiles)
 	#print(summaryFiles)
-        print(namesDict)
+        #print(namesDict)
 
 	# walk through each file and perform calculations
         first = True
         for sfile in summaryFiles:
                 input_file = namesDict[sfile]
+                print('Processing file: ' + input_file)
                 groupSet = groups_for_file(inputDict, defaults.summaryKey, sfile)
-                print(groupSet)
+                #print(groupSet)
                 try:
                         infile = open(input_file, 'rt')
                         header = infile.readline()
