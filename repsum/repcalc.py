@@ -59,6 +59,14 @@ def extract_summary_files(inputDict, metadataDict):
 		#print(files[file][defaults.summaryKey]['value'])
 	return summaryFiles
 
+def extract_vdjml_files(inputDict, metadataDict):
+	"""Extract set of summary files for given input and metadata"""
+	summaryFiles = set()
+	files = inputDict[defaults.filesKey]
+	for file in files:
+		summaryFiles.add(files[file][defaults.vdjmlKey]['value'])
+	return summaryFiles
+
 def groups_for_file(inputDict, fileKey, uuid):
         """Return set of applicable groups for a given summary file"""
         groupSet = set()

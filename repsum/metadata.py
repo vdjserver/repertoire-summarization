@@ -26,3 +26,11 @@ def filenames_from_uuids(metadataDict, uuidSet):
         for uuid in uuidSet: nameDict[uuid] = filename(metadataDict[defaults.fileMetadataKey][uuid])
         return nameDict
 
+def sample_for_uuid(inputDict, uuid):
+        groups = inputDict[defaults.groupsKey]
+        for group in groups:
+		if (groups[group]['type'] == 'sample'):
+			for sample in groups[group]['samples']:
+                                if sample == uuid: return group
+        return None
+
