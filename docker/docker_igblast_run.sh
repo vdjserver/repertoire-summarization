@@ -11,13 +11,15 @@
 # Change these:
 
 # your input file
-INPUT=/data/s166813/Downloads/Plate1-unique.fasta
+INPUT=/data/s166813/Downloads/18.fasta
+IGBLAST_OUT=igblast.out
+VDJML_OUT=out.vdjml
 
-#organism="human"
-organism="mouse"
+organism="human"
+#organism="mouse"
 
-#seqType="Ig"
-seqType="TCR"
+seqType="Ig"
+#seqType="TCR"
 
 domainSystem="imgt"
 #domainSystem="kabat"
@@ -28,7 +30,15 @@ OUTFMT="7 qseqid qgi qacc qaccver qlen sseqid sallseqid sgi sallgi sacc saccver 
 # use this for changeo
 #OUTFMT="7 std qseq sseq btop"
 
-# build up the arguments, generally do not need change this
+# Make sure to update these when a new IgBlast or DB is used
+IGBLAST_VERSION=1.4.0
+IGBLAST_URI=http://www.ncbi.nlm.nih.gov/projects/igblast/
+VDJ_DB_VERSION=07_11_2014
+VDJ_DB_URI=http://wiki.vdjserver.org/vdjserver/index.php/VDJServer_IgBlast_Database
+
+######
+
+# build up the arguments, generally do not need change anything below this line
 ARGS="-query $INPUT"
 ARGS="$ARGS -ig_seqtype $seqType"
 if [ "$seqType" == "TCR" ]; then seqType="TR"; fi  
@@ -43,4 +53,16 @@ ARGS="$ARGS -domain_system $domainSystem"
 ARGS="$ARGS -outfmt "
 
 # run igblast
-igblastn $ARGS "$OUTFMT"
+igblastn $ARGS "$OUTFMT" > $IGBLAST_OUT
+
+# generate vdjml
+RCARGS="$IGBLAST_OUT $VDJML_OUT"
+RCARGS="$RCARGS -db_name_igblast ${organism}_${seqType}"
+RCARGS="$RCARGS -db_ver $VDJ_DB_VERSION"
+RCARGS="$RCARGS -db_species_vdjml $organism"
+RCARGS="$RCARGS -db_uri $VDJ_DB_URI"
+RCARGS="$RCARGS -igblast_version $IGBLAST_VERSION"
+RCARGS="$RCARGS -igblast_uri $IGBLAST_URI"
+IGBLAST_PARAMS="$ARGS"
+
+igblast_parse.py $RCARGS -igblast_params "$IGBLAST_PARAMS"
