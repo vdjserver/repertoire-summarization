@@ -1,0 +1,61 @@
+{
+  "files": {
+    "file3": {
+      "vdjml": "1322948674973330970-242ac11f-0001-012", 
+      "summary": "1334459187326610970-242ac11f-0001-012"
+    }, 
+    "file2": {
+      "vdjml": "1346098548698770970-242ac11f-0001-012", 
+      "summary": "1357609061052050970-242ac11f-0001-012"
+    }, 
+    "file1": {
+      "vdjml": "1369119573405330970-242ac11f-0001-012", 
+      "summary": "1379212746550930970-242ac11f-0001-012"
+    }, 
+    "file0": {
+      "vdjml": "1389520668061330970-242ac11f-0001-012", 
+      "summary": "1400859381722770970-242ac11f-0001-012"
+    }
+  }, 
+  "calculations": [
+    {
+      "operations": [
+        "absolute",
+        "relative",
+        "average"
+      ], 
+      "levels": [
+        "gene", 
+        "family"
+      ], 
+      "type": "gene segment usage", 
+      "summarize_by": [
+        "sample", 
+        "group", 
+        "file"
+      ], 
+      "filters": [
+        "productive"
+      ]
+    }
+  ], 
+  "groups": {
+    "file3": {
+      "type": "file",
+      "files": [ "file3" ]
+    }, 
+    "file2": {
+      "type": "file",
+      "files": [ "file2" ]
+    }, 
+    "file1": {
+      "type": "file",
+      "files": [ "file1" ]
+    }, 
+    "file0": {
+      "type": "file",
+      "files": [ "file0" ]
+    }
+  }, 
+  "metadata": "study_metadata.json"
+}
