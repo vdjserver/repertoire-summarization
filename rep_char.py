@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 import vdjml
-from igblast_parse import scanOutputToVDJML,makeParserArgs,makeVDJMLDefaultMetaAndFactoryFromArgs,rev_comp_dna
+#from igblast_parse import scanOutputToVDJML,makeParserArgs,makeVDJMLDefaultMetaAndFactoryFromArgs,rev_comp_dna
+from igblast_parse import rev_comp_dna
 #from utils import printMap,get_domain_modes,biopythonTranslate,makeAllMapValuesVal,getNumberBpInAlnStr,repStr
 from utils import *
 from pprint import pprint
@@ -1021,17 +1022,17 @@ def generateSampleLevelStatsJSON():
 
 
 
-
-#add on the kinds of arguments this program accepts
-def add_rep_char_args_to_parser(parser):
+def makeParserArgs():
+        parser = argparse.ArgumentParser();
 	version_info=getVersionInfo()
-	parser.description+=' Generate read-level repertoire-characterization data. VERSION '+version_info
+	parser.description=' Generate read-level repertoire-characterization data. VERSION '+version_info
 	parser.add_argument('-json_out',type=str,nargs=1,default="/dev/stdout",help="output file for the JSON segment count IMGT hierarchy")
 	parser.add_argument('-combo_out',type=str,nargs=1,default="/dev/stdout",help="output file for JSON segment recombination count data")
 	parser.add_argument('-combo_csv_out',type=str,nargs=1,default="/dev/stdout",help="output file for CSV of segment combination count data")
 	parser.add_argument('-cdr3_hist_out',type=str,nargs=1,default="/dev/stdout",help="output file for the CDR3 histogram of lengths (both kabat and imgt systems)")
 	parser.add_argument('-sample_json_out',type=str,nargs=1,default="/dev/stdout",help="output file for sample-level JSON repertoire data (e.g. R:S over IMGT CDRs)")
 	parser.add_argument('-skip_char',action='store_true', default=False,help="If this is set, then characterization besides germline segment assignment and CDR3 analysis is skipped")
+	parser.add_argument('vdjml_in',type=str,nargs=1,help="the path to the input VDJML file")
 	parser.add_argument('char_out',type=str,nargs=1,help="the path to the output TSV file of read-level repertoire characterization data")
 	parser.add_argument('vdj_db_root',type=str,nargs=1,help="path to the VDJ directory root REQUIRED")
 	parser.add_argument('qry_fasta',type=str,nargs=1,help="path to the input fasta file of query (Rep-Seq) data input to IgBLAST")
@@ -1044,14 +1045,18 @@ def add_rep_char_args_to_parser(parser):
 
 if (__name__=="__main__"):
 	parser=makeParserArgs()
-	parser=add_rep_char_args_to_parser(parser)
+	#parser=add_rep_char_args_to_parser(parser)
 	args = parser.parse_args()
 	if(args):
 		organism=extractAsItemOrFirstFromList(args.db_organism)
-		mf=makeVDJMLDefaultMetaAndFactoryFromArgs(args)
+		#print "the file is ",args.vdjml_in[0]
+                vdjml_file = extractAsItemOrFirstFromList(args.vdjml_in)
+                vr = vdjml.Vdjml_reader(vdjml_file)
+		#mf=makeVDJMLDefaultMetaAndFactoryFromArgs(args)
 		sample_json_path=extractAsItemOrFirstFromList(args.sample_json_out)
-		meta=mf[0]
-		fact=mf[1]
+		#meta=mf[0]
+		#fact=mf[1]
+                meta = vr.meta()
 		imgtdb_obj=imgt_db(extractAsItemOrFirstFromList(args.vdj_db_root))
 		#print "a fact is ",fact
 		#print "the file is ",args.igblast_in[0]
@@ -1071,7 +1076,7 @@ if (__name__=="__main__"):
 		read_num=1
 		segments_json_out=extractAsItemOrFirstFromList(args.json_out)
 		#print "to write vdjml to ",args.vdjml_out
-		rrw = vdjml.Vdjml_writer(extractAsItemOrFirstFromList(args.vdjml_out), meta)
+		#rrw = vdjml.Vdjml_writer(extractAsItemOrFirstFromList(args.vdjml_out), meta)
 		rep_char_out=extractAsItemOrFirstFromList(args.char_out)
 		fHandle=open(rep_char_out,'w')
 		if(False):
@@ -1096,8 +1101,10 @@ if (__name__=="__main__"):
 			print "ERROR IN RELEASE_INFO ?!"
 
 
-
-		for read_result_obj in scanOutputToVDJML(extractAsItemOrFirstFromList(args.igblast_in),fact,query_fasta):
+                while vr.has_result():
+                        read_result_obj = vr.result()
+                        
+		#for read_result_obj in scanOutputToVDJML(extractAsItemOrFirstFromList(args.igblast_in),fact,query_fasta):
 
 			#prepare for the iteration and give a possible status message...
 			if(read_num>1 and read_num%every_read==0):
@@ -1128,13 +1135,14 @@ if (__name__=="__main__"):
 				combo_counter.addVDJRecombination(vseg,dseg,jseg,False)
 
 			#process for writing
-			rrw(read_result_obj)
+			#rrw(read_result_obj)
 
 			#write rep-char
 			appendAnnToFileWithMap(fHandle,read_analysis_results['ann_map'],read_num,query_record.id,None,"None",logHandle)
 
 			#increment the read number
 			read_num+=1
+                        vr.next()
 
 		print "Processed total of",str(read_num-1),"reads!"
 
