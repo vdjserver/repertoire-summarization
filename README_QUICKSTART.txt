@@ -32,7 +32,7 @@ the variables most likely to need editing).
 
 7) run in that directory the tests.sh script to exercise the code.  Note any
 error output as well as the contents of any *.err files or *.out files.
-If no errors are seen in either the output of the .err the .out files (from igblast) then 
+If no errors are seen in either the output of the .err or the .out files (from igblast) then 
 execution has succeded without errors.  See the *.tsv file for read-characterization
 data, CDR3 length/histogram data, the *.json files for segment/hit count data, and
 the *.vdjml files for VDJML output.

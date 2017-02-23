@@ -109,7 +109,7 @@ def obtain_alpha_filtered_CDR3_barcode_blacklist_mapping(alpha,sb_cdr3_pct_file)
 	for bcdr3 in new_black_list_cdr3_bc:
 		for bbs in new_black_list_cdr3_bc[bcdr3]:
 			pair_count+=1
-	print "The number of CDR3-sample-barcode pairse (post-alpha filtered at alpha="+str(alpha)+" ) is ",pair_count
+	print "The number of CDR3-sample-barcode pairs (post-alpha filtered at alpha="+str(alpha)+" ) is ",pair_count
 	return new_black_list_cdr3_bc
 
 
@@ -146,10 +146,15 @@ def TSV_alpha_filter(input_dir,new_black_list_cdr3_bc,output_dir,filter_report_o
 		print "output TSV path is ",output_path
 		tsv_writer=open(output_path,'w')
 		num_reads_OK=0
+		num_reads_OK_weighted=0
 		num_reads_OK_None_CDR3=0
+		num_reads_OK_None_CDR3_weighted=0
 		num_reads_OK_HaveBlankCDR3OrNONACGT=0
+		num_reads_OK_HaveBlankCDR3OrNONACGT_weighted=0
 		num_reads_OK_Have_CDR3_ON_black_list=0
+		num_reads_OK_Have_CDR3_ON_black_list_weighted=0
 		num_written=0
+		num_written_weighted=0
 		line_num=0
 		tsv_reader=open(tsv,'r')
 		myAGSMgr=ags_manager("test")
@@ -169,18 +174,22 @@ def TSV_alpha_filter(input_dir,new_black_list_cdr3_bc,output_dir,filter_report_o
 				count_val=int(pieces[len(pieces)-1])
 				if(status=="OK" and count_val>=min_count_num):
 					num_reads_OK+=1
+					num_reads_OK_weighted+=count_val
 					if(cdr3=="None"):
 						num_reads_OK_None_CDR3+=1
+						num_reads_OK_None_CDR3_weighted+=count_val
 					else:
 						if(not(re.match(r'^[ACGT]+$',cdr3))):
 							#invalid CDR3!
 							num_reads_OK_HaveBlankCDR3OrNONACGT+=1
+							num_reads_OK_HaveBlankCDR3OrNONACGT_weighted+=count_val
 						else:
 							#the read is OK and the CDR3 isn't none.
 							#see if it's blacklisted for this barcode!
 							if(not(cdr3 in new_black_list_cdr3_bc)):
 								#write out the line, not blacklisted for any barcode
 								num_written+=1
+								num_written_weighted+=count_val
 								tsv_writer.write(line)
 								for rm in rm_list:
 									myAGSMgr.receive_numbered_mut(rm)
@@ -189,10 +198,12 @@ def TSV_alpha_filter(input_dir,new_black_list_cdr3_bc,output_dir,filter_report_o
 								if(subject_barcode in new_black_list_cdr3_bc[cdr3]):
 									#it's blacklisted for this barcode!
 									num_reads_OK_Have_CDR3_ON_black_list+=1
+									num_reads_OK_Have_CDR3_ON_black_list_weighted+=count_val
 								else:
 									#write out the line cause the subject-barcode isn't blacklisted for this CDR3
 									tsv_writer.write(line)
 									num_written+=1
+									num_written_weighted+=count_val
 									for rm in rm_list:
 										myAGSMgr.receive_numbered_mut(rm)
 									pass
@@ -202,10 +213,20 @@ def TSV_alpha_filter(input_dir,new_black_list_cdr3_bc,output_dir,filter_report_o
 		ags_6=myAGSMgr.compute_ags("AGS6")
 		ags_5=myAGSMgr.compute_ags("AGS5")
 		if(isFirstTSV):
-			header="BATCH\tSAMPLE\tNUM_READ_OK\tNUM_READ_CDR3_NONE\tNUM_READS_OK_HaveBlankCDR3OrNONACGTCDR3\tNUM_READ_CDR3_BLACKLIST\tNUM_READ_WRITTEN\tAGS6\tAGS6_RM\tTOT_RM\tAGS5\tAGS5_RM\tTOT_RM"
+			header1="BATCH\tSAMPLE\tNUM_READ_OK\tNUM_READ_CDR3_NONE\tNUM_READS_OK_HaveBlankCDR3OrNONACGTCDR3\tNUM_READ_CDR3_BLACKLIST\tNUM_READ_WRITTEN\tAGS6\tAGS6_RM\tTOT_RM\tAGS5\tAGS5_RM\tTOT_RM\t"
+			header2="WT_NUM_READ_OK\tWT_NUM_READ_CDR3_NONE\tWT_NUM_READS_OK_HaveBlankCDR3OrNONACGTCDR3\tWT_NUM_READ_CDR3_BLACKLIST\tWT_NUM_READ_WRITTEN"
+			header=header1+header2
 			report_writer.write(header+"\n")
-			
+
+		#unweighted			
 		report_line=batch+"\t"+sample+"\t"+str(num_reads_OK)+"\t"+str(num_reads_OK_None_CDR3)+"\t"+str(num_reads_OK_HaveBlankCDR3OrNONACGT)+"\t"+str(num_reads_OK_Have_CDR3_ON_black_list)+"\t"+str(num_written)+"\t"+niceAGS(ags_6)+"\t"+niceAGS(ags_5)
+		#weighted
+		report_line+="\t"+str(num_reads_OK_weighted)+"\t"+str(num_reads_OK_None_CDR3_weighted)+"\t"+str(num_reads_OK_HaveBlankCDR3OrNONACGT_weighted)+"\t"+str(num_reads_OK_Have_CDR3_ON_black_list_weighted)+"\t"+str(num_written_weighted)
+
+
+
+
+		#write it
 		report_writer.write(report_line+"\n")
 		isFirstTSV=False
 	return True

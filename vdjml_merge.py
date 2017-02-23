@@ -3,7 +3,7 @@ import argparse
 import os
 import sys
 import re
-from utils import extractAsItemOrFirstFromList
+from repsum.utils import extractAsItemOrFirstFromList
 
 #esalina2@eddiecomp:/home/data/big_sim/mouse/split_tr$ head  --lines=20  group_1.fasta.igblast.out.vdjml
 #<?xml version="1.0" encoding="UTF-8"?>
@@ -113,7 +113,7 @@ if (__name__=="__main__"):
 			#nothing to do!
 			pass
 	else:
-		parser.print_args()
+		parser.print_help()
 
 
 

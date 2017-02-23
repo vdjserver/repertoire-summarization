@@ -51,6 +51,8 @@ def sim_light_recomb(vMap,jMap):
 		'seq':light_seq
 		}
 	#return [vKey,jKey,vj_junc,light_seq]
+
+
 	
 #pick V,D, and J and recombine with junctions
 #note, can currently allow IGHV to combine with IGKJ
@@ -149,7 +151,72 @@ def compatibleForRecombination(c1,c2):
 
 
 
-
+def all_sim(vFasta,dFasta,jFasta,selected_loci_classes,mut_lam):
+	global seg_counts
+	vMap=read_fasta_file_into_map(vFasta)
+	vMom=partitionIntoClassMaps(vMap)
+	num_miss_V=0
+	for v_class in vMom.keys():
+		if(not(v_class in selected_loci_classes)):
+			num_miss_V+=1
+	if(num_miss_V==len(vMom.keys())):
+		print "ERROR, loci classes from selected loci classes is ",selected_loci_classes," but classes read from V FASTA are ",vMom.keys(),". No data found for selected classes ! Abort!"
+		import sys
+		sys.exit(0)
+	jMap=read_fasta_file_into_map(jFasta)
+	jMom=partitionIntoClassMaps(jMap)
+	num_miss_J=0
+	for j_class in jMom.keys():
+		if(not(j_class in selected_loci_classes)):
+			num_miss_J+=1
+	if(num_miss_J==len(jMom.keys())):
+		print "ERROR, loci classes from selected loci classes is ",selected_loci_classes," but classes read from J FASTA are ",jMom.keys(),". No data found for selected classes ! Abort!"
+		import sys
+		sys.exit(0)
+	dMap=None
+	sorted_h_keys=['vKey','dKey','jKey','vd_junc','dj_junc']
+	sorted_l_keys=['vKey','jKey','vj_junc']
+	if(not(dFasta is None) and isAtLeastOneSelectedLocusClassHeavy(selected_loci_classes)):
+		dMap=read_fasta_file_into_map(dFasta)
+		dMom=partitionIntoClassMaps(dMap)
+		num_miss_D=0
+		for d_class in dMom.keys():
+			if(not(d_class in selected_loci_classes)):
+				num_miss_D+=1
+		if(num_miss_D==len(dMom.keys())):
+			print "ERROR, loci classes from selected loci classes is ",selected_loci_classes," but classes read from D FASTA are ",dMom.keys(),". No data found for selected classes ! Abort!"
+			import sys
+			sys.exit(0)
+	num_sim=0
+	fasta_available_loci_classes=list()
+	for m in vMom:
+		if(not(m in fasta_available_loci_classes)):
+			fasta_available_loci_classes.append(m)
+	for m in jMom:
+		if(not(m in fasta_available_loci_classes)):
+			fasta_available_loci_classes.append(m)
+	selected_and_available_loci_classes=list()
+	for a in fasta_available_loci_classes:
+		if(not(a in selected_loci_classes)):
+			#if something is available, but not selected, then give no warning
+			pass
+		else:
+			selected_and_available_loci_classes.append(a)
+	list_of_selected_but_unavailble=list()
+	for s in selected_loci_classes:
+		if(not(s in fasta_available_loci_classes)):
+			list_of_selected_but_unavailble.append(s)
+	if(len(list_of_selected_but_unavailble)>0):
+		import sys
+		warn_msg="WARNING : The following loci are selected, but unavailable from the supplied FASTA files : "+str(list_of_selected_but_unavailble)
+		sys.stderr.write(warn_msg+"\n")
+	if(len(selected_and_available_loci_classes)==0):
+		warn_msg="ERROR : availble loci (from FASTA) are : "+str(fasta_available_loci_classes)+" but selected loci are "+str(selected_loci_classes)+"!"
+		import sys
+		sys.stderr.write(warn_msg+"\n")
+		sys.exit(2)
+	print "need to implement 'all'!!!"
+	sys.exit(0)
 
 
 
@@ -322,6 +389,7 @@ if (__name__=="__main__"):
 	parser.add_argument('-loci',type=str,nargs=1,help="comma-separated list of allowed loci classes (default these 7 : \"IGH,IGK,IGV,TRA,TRB,TRD,TRG\")")
 	parser.add_argument('-num_seqs',type=int,default=float("inf"),nargs=1,help="the number of sequences to simulate (default : infinity!) ")
 	parser.add_argument('-mut_lam',type=float,default=float(0.5),nargs=1,help="the lambda parameter for SHM ; default 0.5")
+	parser.add_argument('-all',default=False,action='store_const',const=True,help="Generate one of each possible combination")
 	args = parser.parse_args()
 	mut_lam=None
 	if(type(args.mut_lam)==list):
@@ -350,6 +418,7 @@ if (__name__=="__main__"):
 	else:
 		max_sim=float("inf")
 	heavyClassItems=returnHeavyClassItems(selected_loci_classes)
+	all_flag=args.all
 	if(len(heavyClassItems)>0):
 		#ensure the dfasta is set
 		if(args.dfasta is None):
@@ -361,13 +430,17 @@ if (__name__=="__main__"):
 	if(args.dfasta):
 		dFasta=args.dfasta[0]
 	jFasta=args.jfasta[0]
-	vdj_sim(vFasta,dFasta,jFasta,selected_loci_classes,mut_lam,max_sim)
-	freqs=get_freqs_from_counts(seg_counts)
-	seg_keys=seg_counts.keys()
-	seg_keys.sort()
-	sys.stderr.write("Segment\tFrequency\n")
-	for seg in seg_keys:
-		sys.stderr.write(seg+"\t"+str(freqs[seg])+"\n")
+	if(not(all_flag)):
+		vdj_sim(vFasta,dFasta,jFasta,selected_loci_classes,mut_lam,max_sim)
+		freqs=get_freqs_from_counts(seg_counts)
+		seg_keys=seg_counts.keys()
+		seg_keys.sort()
+		sys.stderr.write("Segment\tFrequency\n")
+		for seg in seg_keys:
+			sys.stderr.write(seg+"\t"+str(freqs[seg])+"\n")
+	else:
+		#doo all combos
+		pass
 	
 
 	

@@ -1,0 +1,42 @@
+{
+  "files": {
+    "file0_gene_segment_usage": {
+      "absolute_counts": "file0_segment_counts.json"
+    }, 
+    "file2_gene_segment_usage": {
+      "absolute_counts": "file2_segment_counts.json"
+    }, 
+    "file1_gene_segment_usage": {
+      "absolute_counts": "file1_segment_counts.json"
+    }, 
+    "file3_gene_segment_usage": {
+      "absolute_counts": "file3_segment_counts.json"
+    }
+  }, 
+  "groups": {
+    "file3": {
+      "gene_segment_usage": {
+        "files": "file3_gene_segment_usage", 
+        "type": "output"
+      }
+    }, 
+    "file2": {
+      "gene_segment_usage": {
+        "files": "file2_gene_segment_usage", 
+        "type": "output"
+      }
+    }, 
+    "file1": {
+      "gene_segment_usage": {
+        "files": "file1_gene_segment_usage", 
+        "type": "output"
+      }
+    }, 
+    "file0": {
+      "gene_segment_usage": {
+        "files": "file0_gene_segment_usage", 
+        "type": "output"
+      }
+    }
+  }
+}

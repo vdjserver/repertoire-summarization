@@ -131,23 +131,6 @@ def writeRegionsFromIGBLASTResult(k,o):
 			writer.write("\n")
 	writer.close()
 
-if (__name__=="__main__"):
-	#organisms=["Mus_musculus","human"]
-	#organisms=["Mus_musculus"]
-	organisms=["human"]
-
-	for org in organisms:
-		igblast="/home/data/DATABASE/01_22_2014/"+org+"/ReferenceDirectorySet/KABAT_TR/igblastn.kabat.out"
-		out="/home/data/DATABASE/01_22_2014/"+org+"/ReferenceDirectorySet/KABAT_TR/Vlookup.tsv"
-		if(os.path.exists(igblast) and not os.path.exists(out)):
-			print "proceed on kabat V"
-			writeRegionsFromIGBLASTKabatResult(igblast,out)
-		xml="/home/data/DATABASE/01_22_2014/"+org+"/ReferenceDirectorySet/KABAT_TR/blastx.out.xml"
-		out="/home/data/DATABASE/01_22_2014/"+org+"/ReferenceDirectorySet/KABAT_TR/Jlookup.tsv"
-		if(os.path.exists(xml) and not os.path.exists(out)):
-			print "proceed on kabat J"
-			writeKabatJCDR3End(xml,out)
-
 
 
 
