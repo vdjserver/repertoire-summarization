@@ -16,6 +16,10 @@ def getLogPathGivenTSVPath(tsv_path):
 	
 
 
+
+
+
+
 def getRegion(note):
 	note_re=re.compile(r'^[A-Z\*]+(\d+)[A-Z\*]+$',re.IGNORECASE)
 	sr=re.search(note_re,note)
@@ -115,6 +119,19 @@ def readLog(logPath):
 
 
 
+def vAGSRN(vn):
+	if(vn=="IGHV4-38-2"):
+		return "IGHV4-38"
+	if(vn.startswith("IGHV4-30-")):
+		return "IGHV4-30"
+	return vn
+	#vns=["IGHV4-30-1","IGHV4-30-2","IGHV4-30-3","IGHV4-30-4"]
+	#if(vn in vns):
+	#	return "IGHV4-30"
+	#else:
+	#	return vn
+
+
 def printStats(path,logPath,bid,sid,minCountNum,returnInsteadOfPrint=False):
 	reader=open(path,'r')
 	stat_counts=dict()
@@ -160,6 +177,11 @@ def printStats(path,logPath,bid,sid,minCountNum,returnInsteadOfPrint=False):
 	vCounts=dict()
 	for v in vList:
 		vCounts[v]=0
+	vAGS_nms=["IGHV4-30","IGHV4-31","IGHV4-34","IGHV4-39","IGHV4-4","IGHV4-59","IGHV4-61","IGHV4-38"]	
+	vAGS_mgrs=dict()
+	for vn in vAGS_nms:
+		vAGS_mgrs[vn]=ags_manager(vn)
+
 	#J counts
 	jList=list()
 	jList.append("IGHJ1")
@@ -171,6 +193,10 @@ def printStats(path,logPath,bid,sid,minCountNum,returnInsteadOfPrint=False):
 	jCounts=dict()
 	for j in jList:
 		jCounts[j]=0
+	#J-based AGS
+	agsJGeneDict=dict()
+	for j_gene in jList:
+		agsJGeneDict[j_gene]=ags_manager(j_gene)
 	base_bp_count=195
 	base_CDR_nuc_len=63
 	base_FR_AA_len=44
@@ -254,6 +280,10 @@ def printStats(path,logPath,bid,sid,minCountNum,returnInsteadOfPrint=False):
 							raise Exception("Error, unplacable silent mutation ",rm," for read="+pieces[1])
 					num_rms_in_this_row=len(rms)
 					for rm in rms:
+						if(vAGSRN(vHitNA) in vAGS_nms):
+							vAGS_mgrs[vAGSRN(vHitNA)].receive_numbered_mut(rm)
+						if(jHitNA in agsJGeneDict):
+							agsJGeneDict[jHitNA].receive_numbered_mut(rm)
 						mySampleAGSMGR.receive_numbered_mut(rm)
 						rm_reg=getRegion(rm)
 						for min_rm in RMBoundAGSDict:
@@ -327,6 +357,37 @@ def printStats(path,logPath,bid,sid,minCountNum,returnInsteadOfPrint=False):
 	for j in jList:
 		out_pieces_header.append("J GENE "+j+" COUNT")
 		out_pieces.append(jCounts[j])
+	for j in jList:
+		ags5_info=agsJGeneDict[j].compute_ags("AGS5")
+		out_pieces_header.append(j+"_AGS5")
+		out_pieces.append(ags5_info[0])
+		out_pieces_header.append(j+"_AGS5_AGSTOT")		
+		out_pieces.append(ags5_info[1])
+		out_pieces_header.append(j+"_AGS5_TOT")		
+		out_pieces.append(ags5_info[2])
+		ags6_info=agsJGeneDict[j].compute_ags("AGS6")
+		out_pieces_header.append(j+"_AGS6")
+		out_pieces.append(ags6_info[0])
+		out_pieces_header.append(j+"_AGS6_AGSTOT")		
+		out_pieces.append(ags6_info[1])
+		out_pieces_header.append(j+"_AGS6_TOT")		
+		out_pieces.append(ags6_info[2])
+	for cat in vAGS_mgrs:
+		cat5=vAGS_mgrs[cat].compute_ags("AGS5")#[ags5_score,sampAGSTot,sampTot]
+		out_pieces_header.append(cat+"_AGS5")
+		out_pieces.append(cat5[0])	
+		out_pieces_header.append(cat+"_AGS5_TOT")
+		out_pieces.append(cat5[1])			
+		out_pieces_header.append(cat+"_AGS5_SAMPTOT")
+		out_pieces.append(cat5[2])
+		cat6=vAGS_mgrs[cat].compute_ags("AGS6")#[ags5_score,sampAGSTot,sampTot]
+		out_pieces_header.append(cat+"_AGS6")
+		out_pieces.append(cat6[0])	
+		out_pieces_header.append(cat+"_AGS6_TOT")
+		out_pieces.append(cat6[1])			
+		out_pieces_header.append(cat+"_AGS6_SAMPTOT")
+		out_pieces.append(cat6[2])
+		
 
 	#WEIGHTED FILTER COUNTS
 	out_pieces_header.append("Filter Weighted Not an IGHV4 hit")
@@ -482,6 +543,7 @@ if (__name__=="__main__"):
 	args=parser.parse_args()
 	if(not(args)):
 		parser.print_help()
+		import sys
 		sys.exit(0)
 	#input_file_path=extractAsItemOrFirstFromList(args.tsv_in)
 	#log_file_path=extractAsItemOrFirstFromList(args.log_in)

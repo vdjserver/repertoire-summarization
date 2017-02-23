@@ -4,6 +4,11 @@ import fileinput
 from codon_analysis import codonCounter
 
 class ags_manager:
+	"""
+	A class that is 'fed' numbered mutations (e.g. A31BC)
+	keeps track of counts, then, when requested computes
+	AGS and NMO scores
+	"""
 	ags6_count=0
 	ags5_count=0
 	rm_count=0
@@ -17,6 +22,7 @@ class ags_manager:
 		self.ags5_nums=["31B","40","56","57","81"]
 	
 	def receive_numbered_mut(self,numbered_mut):
+		"""add a mutation to count"""
 		mut_pieces=self.appearsToBeNumberedMut(numbered_mut)
 		if(mut_pieces!=None):
 			numbered_pos=mut_pieces[1]
@@ -27,6 +33,11 @@ class ags_manager:
 			self.rm_count+=1
 	
 	def appearsToBeNumberedMut(self,nm):
+		"""
+		return False if it's not a numbered mutation, 
+		but a 3-element array of the FROM, POSITION, and TO 
+		information of the mutation if it is		
+		"""
 		#return self.codonCounterObj.appearsToBeNumberedMut(nm)
 		import re
 		nmRe=re.compile(r'^([A-Z\*])([0-9][0-9][ABC]?)([A-Z\*])$')
@@ -41,7 +52,11 @@ class ags_manager:
 	
 	
 	
-	def compute_ags(self,mode="AGS6",returnThreeZeroesIfDivByZero=True):
+	def compute_ags(self,mode="AGS6",returnThreeZeroesIfDivByZero=False):
+		"""
+		Given the mutations whose countings have been
+		accrued/aggregated, compute AGS scores based on them
+		"""
 		#print "mgr named ",self.name,"giving ags from counter obj named ",self.codonCounterObj.name
 		if(mode=="AGS6"):
 			sampTot=self.rm_count
@@ -49,7 +64,7 @@ class ags_manager:
 				#avoid division by zero error
 				if(returnThreeZeroesIfDivByZero):
 					return [0,0,0]
-				return None			
+				return ["NA",0,0]			
 			sampAGSTot=float(self.ags6_count)
 			pct_ags6=(sampAGSTot/sampTot)*100.0
 			ags_numerator=pct_ags6-1.6*6.0
@@ -62,7 +77,7 @@ class ags_manager:
 				#avoid division by zero error
 				if(returnThreeZeroesIfDivByZero):
 					return [0,0,0]
-				return None	
+				return ["NA",0,0]	
 			sampAGSTot=float(self.ags5_count)
 			pct_ags5=(sampAGSTot/sampTot)*100.0
 			ags_numerator=pct_ags5-1.6*5.0
@@ -80,29 +95,19 @@ class ags_manager:
 
 if (__name__=="__main__"):
 	#myCounter=codonCounter("/home/data/vdj_server/repertoire-summarization/codon_data/codon_pos_IGHV4")
-	import random
-	myAGSMgr=ags_manager("test")
-	print "Enter in RM data "
-	myFirstAGSMgr=ags_manager("test1")
-	mySecndAGSMgr=ags_manager("test2")
+	myAGSMgr=ags_manager("stdin")
+	#print "Enter in RM data "
 	for line in fileinput.input():
     		#print "got '"+line.strip()+"'"
 		pm=line.strip()
 		if(myAGSMgr.appearsToBeNumberedMut(pm)):
 			#print "got a pm ",pm," ",myAGSMgr.appearsToBeNumberedMut(pm)
-			if(random.random()>=0.5):
-				print "Given to 2nd..."
-				mySecndAGSMgr.receive_numbered_mut(pm)
-			else:
-				print "Given to first"
-				myFirstAGSMgr.receive_numbered_mut(pm)
+			myAGSMgr.receive_numbered_mut(pm)
 		else:
 			#print "not a pm"
 			pass
-	#print myAGSMgr.compute_ags()
-	print "First : ",myFirstAGSMgr.compute_ags()
-	print "Secnd : ",mySecndAGSMgr.compute_ags()
-
+	print "AGS5",myAGSMgr.compute_ags("AGS5")
+	print "AGS6",myAGSMgr.compute_ags("AGS5")
 
 
 

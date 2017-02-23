@@ -1,0 +1,3112 @@
+{
+  "project": {
+    "uuid": "3400420302070541850-242ac114-0001-012", 
+    "name": "project", 
+    "created": "2016-08-11T17:06:12.540-05:00", 
+    "schemaId": null, 
+    "lastUpdated": "2016-08-11T17:06:12.540-05:00", 
+    "associationIds": [], 
+    "_links": {
+      "owner": {
+        "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+      }, 
+      "self": {
+        "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/3400420302070541850-242ac114-0001-012"
+      }, 
+      "associationIds": [], 
+      "permissions": {
+        "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/3400420302070541850-242ac114-0001-012/pems"
+      }
+    }, 
+    "value": {
+      "name": "IgBlast, WR Batch 1"
+    }, 
+    "owner": "vdj", 
+    "internalUsername": null
+  }, 
+  "fileMetadata": {
+    "4897456513801523686-242ac114-0001-012": {
+      "uuid": "4897456513801523686-242ac114-0001-012", 
+      "name": "projectFile", 
+      "created": "2016-08-11T17:09:25.740-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-08-11T17:09:25.740-05:00", 
+      "associationIds": [
+        "2566234164878643686-242ac112-0001-002"
+      ], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/4897456513801523686-242ac114-0001-012"
+        }, 
+        "associationIds": [
+          {
+            "href": "https://vdj-agave-api.tacc.utexas.edu/files/v2/media/system/data.vdjserver.org//projects/3400420302070541850-242ac114-0001-012/files/28.fasta", 
+            "rel": "2566234164878643686-242ac112-0001-002", 
+            "title": "file"
+          }
+        ], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/4897456513801523686-242ac114-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "28.fasta", 
+        "fileType": 2, 
+        "length": 286884, 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "3252870586490163686-242ac114-0001-012": {
+      "uuid": "3252870586490163686-242ac114-0001-012", 
+      "name": "projectFile", 
+      "created": "2016-08-11T17:08:47.448-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-08-11T17:08:47.448-05:00", 
+      "associationIds": [
+        "2711618807848243686-242ac112-0001-002"
+      ], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/3252870586490163686-242ac114-0001-012"
+        }, 
+        "associationIds": [
+          {
+            "href": "https://vdj-agave-api.tacc.utexas.edu/files/v2/media/system/data.vdjserver.org//projects/3400420302070541850-242ac114-0001-012/files/31.fasta", 
+            "rel": "2711618807848243686-242ac112-0001-002", 
+            "title": "file"
+          }
+        ], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/3252870586490163686-242ac114-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "31.fasta", 
+        "fileType": 2, 
+        "length": 298002, 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "4527960477326643686-242ac114-0001-012": {
+      "uuid": "4527960477326643686-242ac114-0001-012", 
+      "name": "projectFile", 
+      "created": "2016-08-11T17:09:17.137-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-08-11T17:09:17.137-05:00", 
+      "associationIds": [
+        "2247375792823603686-242ac112-0001-002"
+      ], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/4527960477326643686-242ac114-0001-012"
+        }, 
+        "associationIds": [
+          {
+            "href": "https://vdj-agave-api.tacc.utexas.edu/files/v2/media/system/data.vdjserver.org//projects/3400420302070541850-242ac114-0001-012/files/22.fasta", 
+            "rel": "2247375792823603686-242ac112-0001-002", 
+            "title": "file"
+          }
+        ], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/4527960477326643686-242ac114-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "22.fasta", 
+        "fileType": 2, 
+        "length": 930311, 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "994297777483410970-242ac11f-0001-012": {
+      "uuid": "994297777483410970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:48:00.551-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:48:00.551-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/994297777483410970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/994297777483410970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "17.igblast.out.vdjml.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 95197, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "2846094233886003686-242ac114-0001-012": {
+      "uuid": "2846094233886003686-242ac114-0001-012", 
+      "name": "projectFile", 
+      "created": "2016-08-11T17:08:37.977-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-08-11T17:08:37.977-05:00", 
+      "associationIds": [
+        "1141249915411763686-242ac112-0001-002"
+      ], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/2846094233886003686-242ac114-0001-012"
+        }, 
+        "associationIds": [
+          {
+            "href": "https://vdj-agave-api.tacc.utexas.edu/files/v2/media/system/data.vdjserver.org//projects/3400420302070541850-242ac114-0001-012/files/03.fasta", 
+            "rel": "1141249915411763686-242ac112-0001-002", 
+            "title": "file"
+          }
+        ], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/2846094233886003686-242ac114-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "03.fasta", 
+        "fileType": 2, 
+        "length": 845546, 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "820909947743890970-242ac11f-0001-012": {
+      "uuid": "820909947743890970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:48:04.588-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:48:04.588-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/820909947743890970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/820909947743890970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "26.igblast.out.imgt.rc_out.tsv.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 232343, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "2743959911587123686-242ac114-0001-012": {
+      "uuid": "2743959911587123686-242ac114-0001-012", 
+      "name": "projectFile", 
+      "created": "2016-08-11T17:08:35.600-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-08-11T17:08:35.600-05:00", 
+      "associationIds": [
+        "1079273537330483686-242ac112-0001-002"
+      ], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/2743959911587123686-242ac114-0001-012"
+        }, 
+        "associationIds": [
+          {
+            "href": "https://vdj-agave-api.tacc.utexas.edu/files/v2/media/system/data.vdjserver.org//projects/3400420302070541850-242ac114-0001-012/files/02.fasta", 
+            "rel": "1079273537330483686-242ac112-0001-002", 
+            "title": "file"
+          }
+        ], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/2743959911587123686-242ac114-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "02.fasta", 
+        "fileType": 2, 
+        "length": 831636, 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "1299884700593810970-242ac11f-0001-012": {
+      "uuid": "1299884700593810970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:47:53.436-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:47:53.436-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1299884700593810970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1299884700593810970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "06.igblast.out.vdjml.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 197522, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "670929689767570970-242ac11f-0001-012": {
+      "uuid": "670929689767570970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:48:08.080-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:48:08.080-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/670929689767570970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/670929689767570970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "my-job-16-sep-2016-10-34-29-am-2159301682094346726-242ac115-0001-007.err", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 10456, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "743772335107730970-242ac11f-0001-012": {
+      "uuid": "743772335107730970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:48:06.384-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:48:06.384-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/743772335107730970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/743772335107730970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "28.igblast.out.vdjml.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 141168, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "4097862452305203686-242ac114-0001-012": {
+      "uuid": "4097862452305203686-242ac114-0001-012", 
+      "name": "projectFile", 
+      "created": "2016-08-11T17:09:07.123-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-08-11T17:09:07.123-05:00", 
+      "associationIds": [
+        "1975504362986803686-242ac112-0001-002"
+      ], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/4097862452305203686-242ac114-0001-012"
+        }, 
+        "associationIds": [
+          {
+            "href": "https://vdj-agave-api.tacc.utexas.edu/files/v2/media/system/data.vdjserver.org//projects/3400420302070541850-242ac114-0001-012/files/17.fasta", 
+            "rel": "1975504362986803686-242ac112-0001-002", 
+            "title": "file"
+          }
+        ], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/4097862452305203686-242ac114-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "17.fasta", 
+        "fileType": 2, 
+        "length": 315748, 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "3364797434223923686-242ac114-0001-012": {
+      "uuid": "3364797434223923686-242ac114-0001-012", 
+      "name": "projectFile", 
+      "created": "2016-08-11T17:08:50.055-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-08-11T17:08:50.055-05:00", 
+      "associationIds": [
+        "1435240426822963686-242ac112-0001-002"
+      ], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/3364797434223923686-242ac114-0001-012"
+        }, 
+        "associationIds": [
+          {
+            "href": "https://vdj-agave-api.tacc.utexas.edu/files/v2/media/system/data.vdjserver.org//projects/3400420302070541850-242ac114-0001-012/files/08.fasta", 
+            "rel": "1435240426822963686-242ac112-0001-002", 
+            "title": "file"
+          }
+        ], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/3364797434223923686-242ac114-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "08.fasta", 
+        "fileType": 2, 
+        "length": 968927, 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "943316515679890970-242ac11f-0001-012": {
+      "uuid": "943316515679890970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:48:01.738-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:48:01.738-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/943316515679890970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/943316515679890970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "20.igblast.out.vdjml.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 146960, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "1334459187326610970-242ac11f-0001-012": {
+      "uuid": "1334459187326610970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:47:52.631-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:47:52.631-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1334459187326610970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1334459187326610970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "05.igblast.out.imgt.rc_out.tsv.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 325404, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "1231723569606290970-242ac11f-0001-012": {
+      "uuid": "1231723569606290970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:47:55.023-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:47:55.023-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1231723569606290970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1231723569606290970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "09.igblast.out.imgt.rc_out.tsv.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 337245, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "3846993412545843686-242ac114-0001-012": {
+      "uuid": "3846993412545843686-242ac114-0001-012", 
+      "name": "projectFile", 
+      "created": "2016-08-11T17:09:01.281-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-08-11T17:09:01.281-05:00", 
+      "associationIds": [
+        "1763032330853683686-242ac112-0001-002"
+      ], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/3846993412545843686-242ac114-0001-012"
+        }, 
+        "associationIds": [
+          {
+            "href": "https://vdj-agave-api.tacc.utexas.edu/files/v2/media/system/data.vdjserver.org//projects/3400420302070541850-242ac114-0001-012/files/13.fasta", 
+            "rel": "1763032330853683686-242ac112-0001-002", 
+            "title": "file"
+          }
+        ], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/3846993412545843686-242ac114-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "13.fasta", 
+        "fileType": 2, 
+        "length": 1050075, 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "2648053291867443686-242ac114-0001-012": {
+      "uuid": "2648053291867443686-242ac114-0001-012", 
+      "name": "projectFile", 
+      "created": "2016-08-11T17:08:33.366-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-08-11T17:08:33.366-05:00", 
+      "associationIds": [
+        "2390140505742643686-242ac112-0001-002"
+      ], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/2648053291867443686-242ac114-0001-012"
+        }, 
+        "associationIds": [
+          {
+            "href": "https://vdj-agave-api.tacc.utexas.edu/files/v2/media/system/data.vdjserver.org//projects/3400420302070541850-242ac114-0001-012/files/25.fasta", 
+            "rel": "2390140505742643686-242ac112-0001-002", 
+            "title": "file"
+          }
+        ], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/2648053291867443686-242ac114-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "25.fasta", 
+        "fileType": 2, 
+        "length": 195776, 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "3553904844266803686-242ac114-0001-012": {
+      "uuid": "3553904844266803686-242ac114-0001-012", 
+      "name": "projectFile", 
+      "created": "2016-08-11T17:08:54.458-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-08-11T17:08:54.458-05:00", 
+      "associationIds": [
+        "1545062740581683686-242ac112-0001-002"
+      ], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/3553904844266803686-242ac114-0001-012"
+        }, 
+        "associationIds": [
+          {
+            "href": "https://vdj-agave-api.tacc.utexas.edu/files/v2/media/system/data.vdjserver.org//projects/3400420302070541850-242ac114-0001-012/files/10.fasta", 
+            "rel": "1545062740581683686-242ac112-0001-002", 
+            "title": "file"
+          }
+        ], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/3553904844266803686-242ac114-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "10.fasta", 
+        "fileType": 2, 
+        "length": 490879, 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "896930868883090970-242ac11f-0001-012": {
+      "uuid": "896930868883090970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:48:02.818-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:48:02.818-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/896930868883090970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/896930868883090970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "22.igblast.out.vdjml.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 300645, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "617629145624210970-242ac11f-0001-012": {
+      "uuid": "617629145624210970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:48:09.321-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:48:09.321-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/617629145624210970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/617629145624210970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "study_metadata.json", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 27506, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "727623258074770970-242ac11f-0001-012": {
+      "uuid": "727623258074770970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:48:06.759-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:48:06.759-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/727623258074770970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/727623258074770970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "30.igblast.out.imgt.rc_out.tsv.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 367854, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "4200555120352563686-242ac114-0001-012": {
+      "uuid": "4200555120352563686-242ac114-0001-012", 
+      "name": "projectFile", 
+      "created": "2016-08-11T17:09:09.513-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-08-11T17:09:09.513-05:00", 
+      "associationIds": [
+        "2046543122062643686-242ac112-0001-002"
+      ], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/4200555120352563686-242ac114-0001-012"
+        }, 
+        "associationIds": [
+          {
+            "href": "https://vdj-agave-api.tacc.utexas.edu/files/v2/media/system/data.vdjserver.org//projects/3400420302070541850-242ac114-0001-012/files/19.fasta", 
+            "rel": "2046543122062643686-242ac112-0001-002", 
+            "title": "file"
+          }
+        ], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/4200555120352563686-242ac114-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "19.fasta", 
+        "fileType": 2, 
+        "length": 1530034, 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "784402725727890970-242ac11f-0001-012": {
+      "uuid": "784402725727890970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:48:05.438-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:48:05.438-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/784402725727890970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/784402725727890970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "27.igblast.out.imgt.rc_out.tsv.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 104877, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "3148116334140723686-242ac114-0001-012": {
+      "uuid": "3148116334140723686-242ac114-0001-012", 
+      "name": "projectFile", 
+      "created": "2016-08-11T17:08:45.010-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-08-11T17:08:45.010-05:00", 
+      "associationIds": [
+        "1363729221344563686-242ac112-0001-002"
+      ], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/3148116334140723686-242ac114-0001-012"
+        }, 
+        "associationIds": [
+          {
+            "href": "https://vdj-agave-api.tacc.utexas.edu/files/v2/media/system/data.vdjserver.org//projects/3400420302070541850-242ac114-0001-012/files/07.fasta", 
+            "rel": "1363729221344563686-242ac112-0001-002", 
+            "title": "file"
+          }
+        ], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/3148116334140723686-242ac114-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "07.fasta", 
+        "fileType": 2, 
+        "length": 1325197, 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "4308960094903603686-242ac114-0001-012": {
+      "uuid": "4308960094903603686-242ac114-0001-012", 
+      "name": "projectFile", 
+      "created": "2016-08-11T17:09:12.038-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-08-11T17:09:12.038-05:00", 
+      "associationIds": [
+        "2139142616964403686-242ac112-0001-002"
+      ], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/4308960094903603686-242ac114-0001-012"
+        }, 
+        "associationIds": [
+          {
+            "href": "https://vdj-agave-api.tacc.utexas.edu/files/v2/media/system/data.vdjserver.org//projects/3400420302070541850-242ac114-0001-012/files/20.fasta", 
+            "rel": "2139142616964403686-242ac112-0001-002", 
+            "title": "file"
+          }
+        ], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/4308960094903603686-242ac114-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "20.fasta", 
+        "fileType": 2, 
+        "length": 309607, 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "1264751868112530970-242ac11f-0001-012": {
+      "uuid": "1264751868112530970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:47:54.253-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:47:54.253-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1264751868112530970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1264751868112530970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "08.igblast.out.imgt.rc_out.tsv.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 175580, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "1044634794192530970-242ac11f-0001-012": {
+      "uuid": "1044634794192530970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:47:59.379-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:47:59.379-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1044634794192530970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1044634794192530970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "16.igblast.out.imgt.rc_out.tsv.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 265471, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "773149911412370970-242ac11f-0001-012": {
+      "uuid": "773149911412370970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:48:05.700-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:48:05.700-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/773149911412370970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/773149911412370970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "27.igblast.out.vdjml.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 264519, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "3915412241571123686-242ac114-0001-012": {
+      "uuid": "3915412241571123686-242ac114-0001-012", 
+      "name": "projectFile", 
+      "created": "2016-08-11T17:09:02.874-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-08-11T17:09:02.874-05:00", 
+      "associationIds": [
+        "1830076770344243686-242ac112-0001-002"
+      ], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/3915412241571123686-242ac114-0001-012"
+        }, 
+        "associationIds": [
+          {
+            "href": "https://vdj-agave-api.tacc.utexas.edu/files/v2/media/system/data.vdjserver.org//projects/3400420302070541850-242ac114-0001-012/files/15.fasta", 
+            "rel": "1830076770344243686-242ac112-0001-002", 
+            "title": "file"
+          }
+        ], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/3915412241571123686-242ac114-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "15.fasta", 
+        "fileType": 2, 
+        "length": 167882, 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "977032008953490970-242ac11f-0001-012": {
+      "uuid": "977032008953490970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:48:00.953-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:48:00.953-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/977032008953490970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/977032008953490970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "19.igblast.out.imgt.rc_out.tsv.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 359936, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "1094456414826130970-242ac11f-0001-012": {
+      "uuid": "1094456414826130970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:47:58.219-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:47:58.219-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1094456414826130970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1094456414826130970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "13.igblast.out.vdjml.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 444238, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "1079724677000850970-242ac11f-0001-012": {
+      "uuid": "1079724677000850970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:47:58.562-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:47:58.562-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1079724677000850970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1079724677000850970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "15.igblast.out.imgt.rc_out.tsv.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 43031, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "635066712845970970-242ac11f-0001-012": {
+      "uuid": "635066712845970970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:48:08.914-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:48:08.914-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/635066712845970970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/635066712845970970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "process_metadata.json", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 8110, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "933051543842450970-242ac11f-0001-012": {
+      "uuid": "933051543842450970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:48:01.977-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:48:01.977-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/933051543842450970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/933051543842450970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "21.igblast.out.imgt.rc_out.tsv.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 58350, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "1400859381722770970-242ac11f-0001-012": {
+      "uuid": "1400859381722770970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:47:51.085-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:47:51.085-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1400859381722770970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1400859381722770970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "01.igblast.out.imgt.rc_out.tsv.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 225044, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "1117434489859730970-242ac11f-0001-012": {
+      "uuid": "1117434489859730970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:47:57.684-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:47:57.684-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1117434489859730970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1117434489859730970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "12.igblast.out.vdjml.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 61941, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "1357609061052050970-242ac11f-0001-012": {
+      "uuid": "1357609061052050970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:47:52.091-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:47:52.091-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1357609061052050970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1357609061052050970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "03.igblast.out.imgt.rc_out.tsv.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 85531, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "2527837157252403686-242ac114-0001-012": {
+      "uuid": "2527837157252403686-242ac114-0001-012", 
+      "name": "projectFile", 
+      "created": "2016-08-11T17:08:30.568-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-08-11T17:08:30.568-05:00", 
+      "associationIds": [
+        "1027476231740723686-242ac112-0001-002"
+      ], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/2527837157252403686-242ac114-0001-012"
+        }, 
+        "associationIds": [
+          {
+            "href": "https://vdj-agave-api.tacc.utexas.edu/files/v2/media/system/data.vdjserver.org//projects/3400420302070541850-242ac114-0001-012/files/01.fasta", 
+            "rel": "1027476231740723686-242ac112-0001-002", 
+            "title": "file"
+          }
+        ], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/2527837157252403686-242ac114-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "01.fasta", 
+        "fileType": 2, 
+        "length": 1480904, 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "1369119573405330970-242ac11f-0001-012": {
+      "uuid": "1369119573405330970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:47:51.824-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:47:51.824-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1369119573405330970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1369119573405330970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "02.igblast.out.vdjml.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 363670, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "1106052826525330970-242ac11f-0001-012": {
+      "uuid": "1106052826525330970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:47:57.949-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:47:57.949-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1106052826525330970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1106052826525330970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "13.igblast.out.imgt.rc_out.tsv.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 189461, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "4736781787258163686-242ac114-0001-012": {
+      "uuid": "4736781787258163686-242ac114-0001-012", 
+      "name": "projectFile", 
+      "created": "2016-08-11T17:09:21.999-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-08-11T17:09:21.999-05:00", 
+      "associationIds": [
+        "2444128244653363686-242ac112-0001-002"
+      ], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/4736781787258163686-242ac114-0001-012"
+        }, 
+        "associationIds": [
+          {
+            "href": "https://vdj-agave-api.tacc.utexas.edu/files/v2/media/system/data.vdjserver.org//projects/3400420302070541850-242ac114-0001-012/files/26.fasta", 
+            "rel": "2444128244653363686-242ac112-0001-002", 
+            "title": "file"
+          }
+        ], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/4736781787258163686-242ac114-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "26.fasta", 
+        "fileType": 2, 
+        "length": 1011790, 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "1128902052540050970-242ac11f-0001-012": {
+      "uuid": "1128902052540050970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:47:57.417-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:47:57.417-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1128902052540050970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1128902052540050970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "12.igblast.out.imgt.rc_out.tsv.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 23729, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "3736011457617203686-242ac114-0001-012": {
+      "uuid": "3736011457617203686-242ac114-0001-012", 
+      "name": "projectFile", 
+      "created": "2016-08-11T17:08:58.698-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-08-11T17:08:58.698-05:00", 
+      "associationIds": [
+        "1685422271814963686-242ac112-0001-002"
+      ], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/3736011457617203686-242ac114-0001-012"
+        }, 
+        "associationIds": [
+          {
+            "href": "https://vdj-agave-api.tacc.utexas.edu/files/v2/media/system/data.vdjserver.org//projects/3400420302070541850-242ac114-0001-012/files/12.fasta", 
+            "rel": "1685422271814963686-242ac112-0001-002", 
+            "title": "file"
+          }
+        ], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/3736011457617203686-242ac114-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "12.fasta", 
+        "fileType": 2, 
+        "length": 171650, 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "4436091126865203686-242ac114-0001-012": {
+      "uuid": "4436091126865203686-242ac114-0001-012", 
+      "name": "projectFile", 
+      "created": "2016-08-11T17:09:14.997-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-08-11T17:09:14.997-05:00", 
+      "associationIds": [
+        "2193345104239923686-242ac112-0001-002"
+      ], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/4436091126865203686-242ac114-0001-012"
+        }, 
+        "associationIds": [
+          {
+            "href": "https://vdj-agave-api.tacc.utexas.edu/files/v2/media/system/data.vdjserver.org//projects/3400420302070541850-242ac114-0001-012/files/21.fasta", 
+            "rel": "2193345104239923686-242ac112-0001-002", 
+            "title": "file"
+          }
+        ], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/4436091126865203686-242ac114-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "21.fasta", 
+        "fileType": 2, 
+        "length": 627965, 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "690257042599570970-242ac11f-0001-012": {
+      "uuid": "690257042599570970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:48:07.630-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:48:07.630-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/690257042599570970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/690257042599570970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "31.igblast.out.vdjml.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 121502, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "885377406856850970-242ac11f-0001-012": {
+      "uuid": "885377406856850970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:48:03.087-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:48:03.087-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/885377406856850970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/885377406856850970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "23.igblast.out.imgt.rc_out.tsv.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 1010563, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "2954799856147763686-242ac114-0001-012": {
+      "uuid": "2954799856147763686-242ac114-0001-012", 
+      "name": "projectFile", 
+      "created": "2016-08-11T17:08:40.509-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-08-11T17:08:40.509-05:00", 
+      "associationIds": [
+        "1205416726814003686-242ac112-0001-002"
+      ], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/2954799856147763686-242ac114-0001-012"
+        }, 
+        "associationIds": [
+          {
+            "href": "https://vdj-agave-api.tacc.utexas.edu/files/v2/media/system/data.vdjserver.org//projects/3400420302070541850-242ac114-0001-012/files/05.fasta", 
+            "rel": "1205416726814003686-242ac112-0001-002", 
+            "title": "file"
+          }
+        ], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/2954799856147763686-242ac114-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "05.fasta", 
+        "fileType": 2, 
+        "length": 1473443, 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "873952793849490970-242ac11f-0001-012": {
+      "uuid": "873952793849490970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:48:03.352-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:48:03.352-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/873952793849490970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/873952793849490970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "23.igblast.out.vdjml.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 1671624, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "4999805584465203686-242ac114-0001-012": {
+      "uuid": "4999805584465203686-242ac114-0001-012", 
+      "name": "projectFile", 
+      "created": "2016-08-11T17:09:28.122-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-08-11T17:09:28.122-05:00", 
+      "associationIds": [
+        "2644101921955123686-242ac112-0001-002"
+      ], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/4999805584465203686-242ac114-0001-012"
+        }, 
+        "associationIds": [
+          {
+            "href": "https://vdj-agave-api.tacc.utexas.edu/files/v2/media/system/data.vdjserver.org//projects/3400420302070541850-242ac114-0001-012/files/30.fasta", 
+            "rel": "2644101921955123686-242ac112-0001-002", 
+            "title": "file"
+          }
+        ], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/4999805584465203686-242ac114-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "30.fasta", 
+        "fileType": 2, 
+        "length": 1599047, 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "1196934334508690970-242ac11f-0001-012": {
+      "uuid": "1196934334508690970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:47:55.832-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:47:55.832-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1196934334508690970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1196934334508690970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "10.igblast.out.imgt.rc_out.tsv.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 135743, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "1346098548698770970-242ac11f-0001-012": {
+      "uuid": "1346098548698770970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:47:52.360-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:47:52.360-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1346098548698770970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1346098548698770970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "03.igblast.out.vdjml.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 251529, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "965607395946130970-242ac11f-0001-012": {
+      "uuid": "965607395946130970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:48:01.219-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:48:01.219-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/965607395946130970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/965607395946130970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "19.igblast.out.vdjml.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 678841, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "713578715016850970-242ac11f-0001-012": {
+      "uuid": "713578715016850970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:48:07.087-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:48:07.087-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/713578715016850970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/713578715016850970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "30.igblast.out.vdjml.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 769490, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "1389520668061330970-242ac11f-0001-012": {
+      "uuid": "1389520668061330970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:47:51.349-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:47:51.349-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1389520668061330970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1389520668061330970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "01.igblast.out.vdjml.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 570646, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "761124002983570970-242ac11f-0001-012": {
+      "uuid": "761124002983570970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:48:05.980-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:48:05.980-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/761124002983570970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/761124002983570970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "28.igblast.out.imgt.rc_out.tsv.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 70743, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "1062029411741330970-242ac11f-0001-012": {
+      "uuid": "1062029411741330970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:47:58.973-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:47:58.973-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1062029411741330970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1062029411741330970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "15.igblast.out.vdjml.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 84016, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "802785185754770970-242ac11f-0001-012": {
+      "uuid": "802785185754770970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:48:05.010-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:48:05.010-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/802785185754770970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/802785185754770970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "26.igblast.out.vdjml.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 455146, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "856085729898130970-242ac11f-0001-012": {
+      "uuid": "856085729898130970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:48:03.769-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:48:03.769-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/856085729898130970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/856085729898130970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "25.igblast.out.imgt.rc_out.tsv.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 32357, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "1145222928264850970-242ac11f-0001-012": {
+      "uuid": "1145222928264850970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:47:57.036-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:47:57.036-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1145222928264850970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1145222928264850970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "11.igblast.out.vdjml.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 51160, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "4824957465845043686-242ac114-0001-012": {
+      "uuid": "4824957465845043686-242ac114-0001-012", 
+      "name": "projectFile", 
+      "created": "2016-08-11T17:09:24.051-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-08-11T17:09:24.051-05:00", 
+      "associationIds": [
+        "2505975773715763686-242ac112-0001-002"
+      ], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/4824957465845043686-242ac114-0001-012"
+        }, 
+        "associationIds": [
+          {
+            "href": "https://vdj-agave-api.tacc.utexas.edu/files/v2/media/system/data.vdjserver.org//projects/3400420302070541850-242ac114-0001-012/files/27.fasta", 
+            "rel": "2505975773715763686-242ac112-0001-002", 
+            "title": "file"
+          }
+        ], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/4824957465845043686-242ac114-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "27.fasta", 
+        "fileType": 2, 
+        "length": 892147, 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "1311352263274130970-242ac11f-0001-012": {
+      "uuid": "1311352263274130970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:47:53.168-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:47:53.168-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1311352263274130970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1311352263274130970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "06.igblast.out.imgt.rc_out.tsv.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 101583, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "1010360955170450970-242ac11f-0001-012": {
+      "uuid": "1010360955170450970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:48:00.177-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:48:00.177-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1010360955170450970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1010360955170450970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "17.igblast.out.imgt.rc_out.tsv.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 36483, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "1288245339221650970-242ac11f-0001-012": {
+      "uuid": "1288245339221650970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:47:53.707-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:47:53.707-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1288245339221650970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1288245339221650970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "07.igblast.out.imgt.rc_out.tsv.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 340171, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "4007367491378483686-242ac114-0001-012": {
+      "uuid": "4007367491378483686-242ac114-0001-012", 
+      "name": "projectFile", 
+      "created": "2016-08-11T17:09:05.016-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-08-11T17:09:05.016-05:00", 
+      "associationIds": [
+        "1915374820842803686-242ac112-0001-002"
+      ], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/4007367491378483686-242ac114-0001-012"
+        }, 
+        "associationIds": [
+          {
+            "href": "https://vdj-agave-api.tacc.utexas.edu/files/v2/media/system/data.vdjserver.org//projects/3400420302070541850-242ac114-0001-012/files/16.fasta", 
+            "rel": "1915374820842803686-242ac112-0001-002", 
+            "title": "file"
+          }
+        ], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/4007367491378483686-242ac114-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "16.fasta", 
+        "fileType": 2, 
+        "length": 1209920, 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "1249590633557650970-242ac11f-0001-012": {
+      "uuid": "1249590633557650970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:47:54.607-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:47:54.607-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1249590633557650970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1249590633557650970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "08.igblast.out.vdjml.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 418044, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "1379212746550930970-242ac11f-0001-012": {
+      "uuid": "1379212746550930970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:47:51.589-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:47:51.589-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1379212746550930970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1379212746550930970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "02.igblast.out.imgt.rc_out.tsv.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 160857, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "1322948674973330970-242ac11f-0001-012": {
+      "uuid": "1322948674973330970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:47:52.898-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:47:52.898-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1322948674973330970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1322948674973330970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "05.igblast.out.vdjml.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 788344, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "1276520078503570970-242ac11f-0001-012": {
+      "uuid": "1276520078503570970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:47:53.979-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:47:53.979-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1276520078503570970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1276520078503570970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "07.igblast.out.vdjml.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 695918, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "4635377609399603686-242ac114-0001-012": {
+      "uuid": "4635377609399603686-242ac114-0001-012", 
+      "name": "projectFile", 
+      "created": "2016-08-11T17:09:19.637-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-08-11T17:09:19.637-05:00", 
+      "associationIds": [
+        "2319917790453043686-242ac112-0001-002"
+      ], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/4635377609399603686-242ac114-0001-012"
+        }, 
+        "associationIds": [
+          {
+            "href": "https://vdj-agave-api.tacc.utexas.edu/files/v2/media/system/data.vdjserver.org//projects/3400420302070541850-242ac114-0001-012/files/23.fasta", 
+            "rel": "2319917790453043686-242ac112-0001-002", 
+            "title": "file"
+          }
+        ], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/4635377609399603686-242ac114-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "23.fasta", 
+        "fileType": 2, 
+        "length": 2974484, 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "1026252334165650970-242ac11f-0001-012": {
+      "uuid": "1026252334165650970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:47:59.807-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:47:59.807-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1026252334165650970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1026252334165650970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "16.igblast.out.vdjml.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 560516, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "1163218841235090970-242ac11f-0001-012": {
+      "uuid": "1163218841235090970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:47:56.617-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:47:56.617-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1163218841235090970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1163218841235090970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "11.igblast.out.imgt.rc_out.tsv.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 25099, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "3646590238514483686-242ac114-0001-012": {
+      "uuid": "3646590238514483686-242ac114-0001-012", 
+      "name": "projectFile", 
+      "created": "2016-08-11T17:08:56.616-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-08-11T17:08:56.616-05:00", 
+      "associationIds": [
+        "1614297613393203686-242ac112-0001-002"
+      ], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/3646590238514483686-242ac114-0001-012"
+        }, 
+        "associationIds": [
+          {
+            "href": "https://vdj-agave-api.tacc.utexas.edu/files/v2/media/system/data.vdjserver.org//projects/3400420302070541850-242ac114-0001-012/files/11.fasta", 
+            "rel": "1614297613393203686-242ac112-0001-002", 
+            "title": "file"
+          }
+        ], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/3646590238514483686-242ac114-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "11.fasta", 
+        "fileType": 2, 
+        "length": 187225, 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "909772821098130970-242ac11f-0001-012": {
+      "uuid": "909772821098130970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:48:02.519-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:48:02.519-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/909772821098130970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/909772821098130970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "22.igblast.out.imgt.rc_out.tsv.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 99904, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "1215016146824850970-242ac11f-0001-012": {
+      "uuid": "1215016146824850970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:47:55.411-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:47:55.411-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1215016146824850970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1215016146824850970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "09.igblast.out.vdjml.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 670607, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "653234424508050970-242ac11f-0001-012": {
+      "uuid": "653234424508050970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:48:08.492-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:48:08.492-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/653234424508050970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/653234424508050970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "my-job-16-sep-2016-10-34-29-am-2159301682094346726-242ac115-0001-007.out", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 77813, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "702025252990610970-242ac11f-0001-012": {
+      "uuid": "702025252990610970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:48:07.356-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:48:07.356-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/702025252990610970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/702025252990610970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "31.igblast.out.imgt.rc_out.tsv.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 56139, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "3062603535277363686-242ac114-0001-012": {
+      "uuid": "3062603535277363686-242ac114-0001-012", 
+      "name": "projectFile", 
+      "created": "2016-08-11T17:08:43.018-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-08-11T17:08:43.018-05:00", 
+      "associationIds": [
+        "1272504115977523686-242ac112-0001-002"
+      ], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/3062603535277363686-242ac114-0001-012"
+        }, 
+        "associationIds": [
+          {
+            "href": "https://vdj-agave-api.tacc.utexas.edu/files/v2/media/system/data.vdjserver.org//projects/3400420302070541850-242ac114-0001-012/files/06.fasta", 
+            "rel": "1272504115977523686-242ac112-0001-002", 
+            "title": "file"
+          }
+        ], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/3062603535277363686-242ac114-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "06.fasta", 
+        "fileType": 2, 
+        "length": 417063, 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "3470496579378483686-242ac114-0001-012": {
+      "uuid": "3470496579378483686-242ac114-0001-012", 
+      "name": "projectFile", 
+      "created": "2016-08-11T17:08:52.515-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-08-11T17:08:52.515-05:00", 
+      "associationIds": [
+        "1497646301633843686-242ac112-0001-002"
+      ], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/3470496579378483686-242ac114-0001-012"
+        }, 
+        "associationIds": [
+          {
+            "href": "https://vdj-agave-api.tacc.utexas.edu/files/v2/media/system/data.vdjserver.org//projects/3400420302070541850-242ac114-0001-012/files/09.fasta", 
+            "rel": "1497646301633843686-242ac112-0001-002", 
+            "title": "file"
+          }
+        ], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/3470496579378483686-242ac114-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "09.fasta", 
+        "fileType": 2, 
+        "length": 1376679, 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "1180312811073170970-242ac11f-0001-012": {
+      "uuid": "1180312811073170970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:47:56.220-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:47:56.220-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1180312811073170970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/1180312811073170970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "10.igblast.out.vdjml.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 263569, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "953968034573970970-242ac11f-0001-012": {
+      "uuid": "953968034573970970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:48:01.490-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:48:01.490-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/953968034573970970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/953968034573970970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "20.igblast.out.imgt.rc_out.tsv.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 79704, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "837875068563090970-242ac11f-0001-012": {
+      "uuid": "837875068563090970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:48:04.192-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:48:04.192-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/837875068563090970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/837875068563090970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "25.igblast.out.vdjml.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 64810, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }, 
+    "921498081816210970-242ac11f-0001-012": {
+      "uuid": "921498081816210970-242ac11f-0001-012", 
+      "name": "projectJobFile", 
+      "created": "2016-09-16T10:48:02.246-05:00", 
+      "schemaId": null, 
+      "lastUpdated": "2016-09-16T10:48:02.246-05:00", 
+      "associationIds": [], 
+      "_links": {
+        "owner": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/profiles/v2/vdj"
+        }, 
+        "self": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/921498081816210970-242ac11f-0001-012"
+        }, 
+        "associationIds": [], 
+        "permissions": {
+          "href": "https://vdj-agave-api.tacc.utexas.edu/meta/v2/data/921498081816210970-242ac11f-0001-012/pems"
+        }
+      }, 
+      "value": {
+        "name": "21.igblast.out.vdjml.zip", 
+        "fileType": 2, 
+        "relativeArchivePath": "2016-09-16-15-34-49-88-my-job-16-sep-2016-10:34:29-am", 
+        "jobName": "My Job 16-Sep-2016 10:34:29 am", 
+        "length": 178675, 
+        "jobUuid": "2159301682094346726-242ac115-0001-007", 
+        "publicAttributes": {
+          "tags": []
+        }, 
+        "readDirection": "", 
+        "projectUuid": "3400420302070541850-242ac114-0001-012", 
+        "isDeleted": false
+      }, 
+      "owner": "vdj", 
+      "internalUsername": null
+    }
+  }, 
+  "samples": []
+}
