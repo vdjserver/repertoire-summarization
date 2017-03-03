@@ -183,7 +183,7 @@ def main():
                                         sys.exit()
 
                                 for calc in calcs:
-                                        if defaults.calcFilters in calc and 'productive' in calc[defaults.calcFilters] and not isRecordFunctional(headerMapping, fields): continue
+                                        if defaults.calcFilters in calc and calc[defaults.calcFilters] is not None and 'productive' in calc[defaults.calcFilters] and not isRecordFunctional(headerMapping, fields): continue
                                         cmod = defaults.calculationModules[calc['type']]['module']
                                         cmod.process_record(inputDict, metadataDict, headerMapping, groupSet, calc, fields)
                         
