@@ -92,11 +92,11 @@ def groups_for_file(inputDict, fileKey, uuid):
 def make_parser_args():
 	"""Command line arguments for repcalc"""
 	parser = argparse.ArgumentParser();
-	parser.description='Comparison and calculation functions for immune repertoire sequencing data. VERSION '+__version__
+	parser.description='Comparison and calculation functions for immune repertoire sequencing data.'
 	parser.add_argument('input',type=str,nargs=1,help="Input specification file")
         parser.add_argument('--gldb',type=str,nargs=1,help="Path to germline database")
         parser.add_argument('--output',type=str,help="Output specification file")
-	parser.add_argument('-v', '--version', action='version', version='VERSION '+__version__+' COPYRIGHT 2016 UT Southwestern Medical Center')
+	parser.add_argument('-v', '--version', action='version', version='%(prog)s '+__version__)
 	return parser
 
 def isRecordFunctional(headerMapping, fields):
