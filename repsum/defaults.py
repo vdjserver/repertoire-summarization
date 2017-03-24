@@ -7,6 +7,7 @@ Default settings
 
 # Keys in specification file
 metadata_file_key = "metadata"
+organismKey = "organism"
 filesKey = "files"
 fileMetadataKey = "fileMetadata"
 groupsKey = "groups"

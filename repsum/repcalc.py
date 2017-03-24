@@ -133,6 +133,9 @@ def main():
                 raise
 	else:
                 infile.close()
+        if inputDict.get(defaults.organismKey) is None:
+                print("WARNING: No organism defined, assuming human")
+                inputDict[defaults.organismKey] = 'human'
 	#print(json.dumps(inputDict))
 
 	# Metadata
