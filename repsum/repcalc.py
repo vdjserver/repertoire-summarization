@@ -170,7 +170,7 @@ def main():
                 #print(groupSet)
                 try:
                         infile = open(input_file, 'rt')
-                        header = infile.readline()
+                        header = infile.readline().rstrip('\n')
                         headerMapping = summarize.summary_file_header_mappings(header)
                         if first:
                                 initialize_calculations(inputDict, metadataDict, headerMapping)
@@ -178,7 +178,7 @@ def main():
                         calcs = inputDict[defaults.calculationsKey]
                         #print(headerMapping)
                         while True:
-                                line = infile.readline()
+                                line = infile.readline().rstrip('\n')
                                 if not line: break
                                 fields = line.split('\t')
                                 if len(fields) != len(headerMapping):
