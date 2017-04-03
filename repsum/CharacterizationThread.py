@@ -8,7 +8,7 @@ from segment_utils import getTheFrameForThisReferenceAtThisPosition,getVRegionSt
 import re
 from utils import printMap
 
-#thread class for parallel charactgerization of regions
+#thread class for parallel characterization of regions
 class CharacterizationThread(threading.Thread):
 
 	def clear_result(self):
