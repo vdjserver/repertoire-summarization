@@ -460,8 +460,22 @@ class alignment:
 		aa_slnt=0
 		length_in_codons=0
 
+		#if there is a frame, load it
+		#otherwise, load a dummy frame
+		#print "self.s_frame_mask",self.s_frame_mask
+		if(not(self.s_frame_mask==None)):
+			#print "loading own mask cause it's non-none"
+			frame_mask=self.s_frame_mask
+		else:
+			#print "loading empty mask cause own mask is none"
+			frame_mask=makeEmptyArrayOfDigitsOfLen(len(self.s_aln))
 
-
+		#Save alignment strings with insertions removed for proper numbering
+		q_aln2=self.q_aln
+		s_aln2=self.s_aln
+		frame_mask2=list(frame_mask)
+		ins_count=0
+		
 		#do counts that are independent of codons/translations 
 		#(bsb, indels, and their frequencies)
 		tot_num_base_to_base_alns=0
@@ -470,6 +484,10 @@ class alignment:
 				tot_num_base_to_base_alns+=1
 			if(self.s_aln[i]=="-"):
 				num_ins+=1
+				s_aln2=s_aln2[:i-ins_count] + s_aln2[i-ins_count+1:]
+				q_aln2=q_aln2[:i-ins_count] + q_aln2[i-ins_count+1:]
+				frame_mask2.pop(i-ins_count)
+				ins_count+=1
 			elif(self.q_aln[i]=="-"):
 				num_del+=1
 			elif(self.q_aln[i]!=self.s_aln[i]):
@@ -492,29 +510,75 @@ class alignment:
 			char_map['indel frequency']=indel_rate
 			char_map['base substitution freq%']=0
 			char_map['homology%']=0
+		
 		#fill in the map
 		char_map['insertion count']=num_ins
 		char_map['deletion count']=num_del
 		char_map['base substitutions']=num_bsb
 		char_map['mutations']=num_bsb+num_del+num_ins
 		
-
-		#if there is a frame, load it
-		#otherwise, load a dummy frame
-		#print "self.s_frame_mask",self.s_frame_mask
-		if(not(self.s_frame_mask==None)):
-			#print "loading own mask cause it's non-none"
-			frame_mask=self.s_frame_mask
-		else:
-			#print "loading empty mask cause own mask is none"
-			frame_mask=makeEmptyArrayOfDigitsOfLen(len(self.s_aln))
-
+#		print self.s_aln
+#		print s_aln2
+#		print self.q_aln
+#		print q_aln2
+#		print frame_mask
+#		print frame_mask2
+		
 		#do frame-dependent calculations
 		temp_index=0
 		codon_list=list()
 		s_codon_list=list()
 		amino_list=list()
 		s_amino_list=list()
+		
+		
+#		number_list=list()
+		temp_index2=0
+		codon_list2=list()
+		s_codon_list2=list()
+		amino_list2=list()
+		s_amino_list2=list()
+		
+		
+		while(temp_index2<len(s_aln2)):
+			if(
+			temp_index2<len(s_aln2)-2 and 
+			frame_mask2[temp_index2]==0 and 
+			frame_mask2[temp_index2+1]==1 and 
+			frame_mask2[temp_index2+2]==2 
+			):
+				s_codon2=s_aln2[temp_index2:(temp_index2+3)]
+				s_codon_list2.append(str(s_codon2))
+				q_codon2=q_aln2[temp_index2:(temp_index2+3)]
+				codon_list2.append(str(q_codon2))
+				if(s_codon2.find("-")==(-1) and q_codon2.find("-")==(-1)):
+					#ANALYSIS FOR TWO CODONS WITH NO GAPS
+					#no gaps, perform analysis
+					s_amino2=codonAnalyzer.fastTrans(s_codon2)
+					s_amino_list2.append(str(s_amino2))
+					q_amino2=str(codonAnalyzer.fastTrans(q_codon2))
+					amino_list2.append(str(q_amino2))
+				else:
+					#ANALYSIS FOR CODONS WITH any gap
+					if(q_codon2.find("-")==(-1)):
+						#insertion in query sequence
+						print "insertion in query sequence"
+					else:
+						#deletion in query sequence
+						#print "deletion in query sequence"
+						amino_list2.append("X")
+				temp_index2+=3
+			else:
+#				print "encountered a single.... temp_index=",temp_index
+#				codon_list.append("("+self.q_aln[temp_index]+")")
+#				amino_list.append("(-)")
+#				if(self.s_aln[temp_index]!=self.q_aln[temp_index] and self.s_aln[temp_index]!="-" and self.q_aln[temp_index]!="-"):
+#					#num_bsb+=1
+#					pass
+				temp_index2+=1
+		
+		
+		
 		while(temp_index<len(self.s_aln)):
 			if(
 			temp_index<len(self.s_aln)-2 and 
@@ -580,9 +644,15 @@ class alignment:
 				else:
 					#ANALYSIS FOR CODONS WITH any gap
 					if(q_codon.find("-")==(-1)):
+						#insertion in query sequence
+#						print "insertion in query sequence"
 						q_amino=str(codonAnalyzer.fastTrans(q_codon))
 						amino_list.append(q_amino)
+						
+						
 					else:
+						#deletion in query sequence
+#						print "deletion in query sequence"
 						amino_list.append("X")
 					for cp in range(3):
 						if(s_codon[cp]!="-" and q_codon[cp]!="-" and s_codon[cp]!=q_codon[cp]):
@@ -599,6 +669,7 @@ class alignment:
 					#num_bsb+=1
 					pass
 				temp_index+=1
+		
 		#fill in the map
 		char_map['synonymous base substitutions']=num_syn
 		char_map['nonsynonymous base substitutions']=num_nsy
@@ -624,6 +695,10 @@ class alignment:
 		char_map['AA_ref']=j_str.join(s_amino_list)
 		char_map['nucleotide read']=codon_list
 		char_map['subject_read']=s_codon_list
+		char_map['AA2']=j_str.join(amino_list2)
+		char_map['AA_ref2']=j_str.join(s_amino_list2)
+		char_map['nucleotide read2']=codon_list2
+		char_map['subject_read2']=s_codon_list2
 		char_map['length']=abs(int(self.q_start)-int(self.q_end))+1
 		if(len(self.q_aln)==0):
 			char_map['length']=0
@@ -686,7 +761,7 @@ class alignment:
 
 
 	#given an alignment, and a position of a sequence IN the alignment
-	#return the porition of the alignment whose bp are <= or >= that position in the alignment
+	#return the position of the alignment whose bp are <= or >= that position in the alignment
 	#has been tested with the TEST method of this class
 	def getAlnAtAndCond(self,a_pos,st="query",cond="geq"):
 

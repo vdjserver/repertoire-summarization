@@ -27,7 +27,6 @@ import multiprocessing
 import math
 
 global_key_base="vdj_server_ann_"
-myCodonCounter=codonCounter("/home/data/vdj_server/repertoire-summarization/codon_data/codon_pos_IGHV4")
 release_info_tag=None
 release_info_hash=None
 
@@ -145,8 +144,8 @@ def readAnnotate_cdr3(read_result_obj,meta,organism,imgtdb_obj,read_rec,read_ann
 			read_ann_map[global_key_base+mode+'_cdr3_na_len']=len(query_cdr3)
 			read_ann_map[len_key_aa]=len(read_ann_map[aa_key])
 			read_ann_map[len_key_na]=len(read_ann_map[na_key])
-			#this stuff below was once in here becuase we might've done some CDR3 specific annotation...but
-			#it is commented out for now because such goals are either postponed or canceled
+			#this stuff below was once in here because we might've done some CDR3 specific annotation...but
+			#it is commented out for now because such goals are either postponed or cancelled
 			#vMap=getHitInfo(read_result_obj,meta,read_ann_map['top_V'],read_rec,imgtdb_obj,organism)
 			#dMap=None
 			#if(read_ann_map['top_D'] is not None):
@@ -601,8 +600,8 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 			get_res+=1
 
 	#get mutation map
-	#mut_map_info=annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted_jobs,imgtdb_obj,myCodonCounter,organism,read_rec,cdr3_map,0.85)
-	mut_map_info=annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted_jobs,imgtdb_obj,myCodonCounter,organism,read_rec,cdr3_map,0)
+	mut_map_info=annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted_jobs,imgtdb_obj,organism,read_rec,cdr3_map,0)
+	
 	qualifNote=mut_map_info[0]
 	maps=mut_map_info[1]
 	amino_map=maps['aminos']
@@ -610,10 +609,10 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 	amino_silent_map=maps['aminos_silent']
 	codon_silent_map=maps['codons_silent']
 	annMap["AGS Q Note"]=qualifNote
-	annMap["Codon Muts (kabat)"]=codon_map
-	annMap["Amino Muts (kabat)"]=amino_map
-	annMap["Silent Codon Muts (kabat)"]=codon_silent_map
-	annMap["Silent Amino Muts (kabat)"]=amino_silent_map
+	annMap["Codon RM (imgt)"]=codon_map
+	annMap["Amino RM (imgt)"]=amino_map
+	annMap["Codon SM (imgt)"]=codon_silent_map
+	annMap["Amino SM (imgt)"]=amino_silent_map
 
 
 
@@ -789,7 +788,7 @@ def prodRearrangmentVJ(vInfo,jInfo,imgtdb_obj,organism):
 		query_max_j=jInfo['q. end']
 		query_min_v=vInfo['q. start']
 		if(query_max_j<=query_min_v):
-			#J aligns before V! Nooooooooo!
+			#J aligns before V!
 			return False
 		else:
 			pass	
@@ -899,13 +898,12 @@ def appendAnnToFileWithMap(fHandle,m,rid,read_name,desiredKeys=None,defaultValue
 		keys_to_append.append(alt_key)
 
 	#keys_to_append.append("AGS Q Note")
-	keys_to_append.append("Codon Muts (kabat)")
-	keys_to_append.append("Amino Muts (kabat)")
-	keys_to_append.append("Silent Codon Muts (kabat)")
-	keys_to_append.append("Silent Amino Muts (kabat)")
+	keys_to_append.append("Codon RM (imgt)")
+	keys_to_append.append("Amino RM (imgt)")
+	keys_to_append.append("Codon SM (imgt)")
+	keys_to_append.append("Amino SM (imgt)")
 	#keys_to_append.append("Release Version Tag")
 	#keys_to_append.append("Release Version Hash")
-
 
 
 
