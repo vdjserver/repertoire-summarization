@@ -73,13 +73,6 @@ cdr3_shared = { "aa": {}, "nucleotide": {} }
 share_summary = {}
 share_summary_cdr3 = {}
 
-def get_dupcount(headerMapping, fields):
-    #print(defaults.headerNames['DUPCOUNT'])
-    dupcount_field = headerMapping.get(defaults.headerNames['DUPCOUNT'])
-    #print(dupcount_field)
-    if dupcount_field is None: return 1
-    else: return int(fields[dupcount_field])
-
 def level_share_summary(inputDict, cdr3_shared_level, share_summary_level, share_summary_cdr3_level):
     # generate summary for each group
     # samples and files are just a count
@@ -495,7 +488,7 @@ def process_record(inputDict, metadataDict, headerMapping, groupSet, calc, field
                             cdr3_entry[group] = { 'count': 0, 'total_count': 0 }
                             group_entry = cdr3_entry[group]
                         group_entry['count'] = group_entry['count'] + 1
-                        group_entry['total_count'] = group_entry['total_count'] + get_dupcount(headerMapping, fields)
+                        group_entry['total_count'] = group_entry['total_count'] + defaults.get_dupcount(headerMapping, fields)
 
             elif l == 'nucleotide':
                 cdr3 = fields[headerMapping[defaults.headerNames['CDR3_SEQ']]]
@@ -510,7 +503,7 @@ def process_record(inputDict, metadataDict, headerMapping, groupSet, calc, field
                             cdr3_entry[group] = { 'count': 0, 'total_count': 0 }
                             group_entry = cdr3_entry[group]
                         group_entry['count'] = group_entry['count'] + 1
-                        group_entry['total_count'] = group_entry['total_count'] + get_dupcount(headerMapping, fields)
+                        group_entry['total_count'] = group_entry['total_count'] + defaults.get_dupcount(headerMapping, fields)
 
             elif l == 'v,aa':
                 level = 'v'
@@ -537,7 +530,7 @@ def process_record(inputDict, metadataDict, headerMapping, groupSet, calc, field
                             cdr3_entry[group] = { 'count': 0, 'total_count': 0 }
                             group_entry = cdr3_entry[group]
                         group_entry['count'] = group_entry['count'] + 1
-                        group_entry['total_count'] = group_entry['total_count'] + get_dupcount(headerMapping, fields)
+                        group_entry['total_count'] = group_entry['total_count'] + defaults.get_dupcount(headerMapping, fields)
 
             elif l == 'v,nucleotide':
                 level = 'v'
@@ -565,7 +558,7 @@ def process_record(inputDict, metadataDict, headerMapping, groupSet, calc, field
                             cdr3_entry[group] = { 'count': 0, 'total_count': 0 }
                             group_entry = cdr3_entry[group]
                         group_entry['count'] = group_entry['count'] + 1
-                        group_entry['total_count'] = group_entry['total_count'] + get_dupcount(headerMapping, fields)
+                        group_entry['total_count'] = group_entry['total_count'] + defaults.get_dupcount(headerMapping, fields)
 
             elif l == 'vj,aa':
                 level = 'vj'
@@ -599,7 +592,7 @@ def process_record(inputDict, metadataDict, headerMapping, groupSet, calc, field
                             cdr3_entry[group] = { 'count': 0, 'total_count': 0 }
                             group_entry = cdr3_entry[group]
                         group_entry['count'] = group_entry['count'] + 1
-                        group_entry['total_count'] = group_entry['total_count'] + get_dupcount(headerMapping, fields)
+                        group_entry['total_count'] = group_entry['total_count'] + defaults.get_dupcount(headerMapping, fields)
 
             elif l == 'vj,nucleotide':
                 level = 'vj'
@@ -633,7 +626,7 @@ def process_record(inputDict, metadataDict, headerMapping, groupSet, calc, field
                             cdr3_entry[group] = { 'count': 0, 'total_count': 0 }
                             group_entry = cdr3_entry[group]
                         group_entry['count'] = group_entry['count'] + 1
-                        group_entry['total_count'] = group_entry['total_count'] + get_dupcount(headerMapping, fields)
+                        group_entry['total_count'] = group_entry['total_count'] + defaults.get_dupcount(headerMapping, fields)
 
 def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
     """Finalize and save the calculations"""
