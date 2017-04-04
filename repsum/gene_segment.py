@@ -20,30 +20,14 @@ def initialize_calculation_module(inputDict, metadataDict, headerMapping):
 
 def process_record(inputDict, metadataDict, headerMapping, groupSet, calc, fields):
     """Perform calculation from given fields"""
-# # UNCOMMENT FOR DUPCOUNT
-#
-#    if defaults.headerNames['DUPCOUNT'] in headerMapping:	# Check if template counts are available.
-#        for group in groupSet:
-#            for headerName in ['V_CALL', 'D_CALL', 'J_CALL']:
-#                gene = fields[headerMapping[defaults.headerNames[headerName]]]
-#                if gene is not None:
-#                    if gene in segment_counters[group]: segment_counters[group][gene] += fields[headerMapping[defaults.headerNames['DUPCOUNT']]]
-#                    else: segment_counters[group][gene] = fields[headerMapping[defaults.headerNames['DUPCOUNT']]]
-#    else:
-#        for group in groupSet:
-#            for headerName in ['V_CALL', 'D_CALL', 'J_CALL']:
-#                gene = fields[headerMapping[defaults.headerNames[headerName]]]
-#                if gene is not None:
-#                    if gene in segment_counters[group]: segment_counters[group][gene] += 1
-#                    else: segment_counters[group][gene] = 1
     groups = inputDict[defaults.groupsKey]
     for group in groupSet: 
         if (groups[group]['type'] == 'sampleGroup'): continue
         for headerName in ['V_CALL', 'D_CALL', 'J_CALL']:
             gene = fields[headerMapping[defaults.headerNames[headerName]]]
             if gene is not None:
-                if gene in segment_counters[group]: segment_counters[group][gene] += 1
-                else: segment_counters[group][gene] = 1
+                if gene in segment_counters[group]: segment_counters[group][gene] += defaults.get_dupcount(headerMapping, fields)
+                else: segment_counters[group][gene] = defaults.get_dupcount(headerMapping, fields)
 
 def make_tree(hierarchy, segment_counters, depth):
     siblings = []
