@@ -92,3 +92,10 @@ def getHierarchyBy(org_name):
             hierarchy[locus]=locusHierarchyData
     return hierarchy
 
+def invertHierarchy(hierarchy, invertDict, key, parent):
+    for k in hierarchy.keys():
+        if not hierarchy[k].keys():
+            invertDict[k] = parent
+        else:
+            a = { k: parent}
+            invertHierarchy(hierarchy[k], invertDict, k, a)

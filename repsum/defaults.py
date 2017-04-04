@@ -47,3 +47,7 @@ headerNames = {
 
 
 
+def get_dupcount(headerMapping, fields):
+    dupcount_field = headerMapping.get(headerNames['DUPCOUNT'])
+    if dupcount_field is None: return 1
+    else: return int(fields[dupcount_field])
