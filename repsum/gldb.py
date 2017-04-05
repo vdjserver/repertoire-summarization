@@ -13,6 +13,8 @@ import utils
 
 GERMLINE_DB_ROOT = None
 IMGT_DB = None
+gldb_hierarchy = {}
+gldb_invert_hierarchy = {}
 
 def init_germline_db_root(db_path=None):
     """Determine the path to germline database files"""
@@ -44,6 +46,9 @@ def germline_db_root():
 
 #rooted at an organism get the hierarchy from the gene tables
 def getHierarchyBy(org_name):
+    # already cached?
+    if gldb_hierarchy.get(org_name): return gldb_hierarchy[org_name]
+
     geneTablesDirectoryOfHTMLFiles = germline_db_root()+"/"+org_name+"/GeneTables/"
     fullPklPath = IMGT_DB.getPickleFullPath()
     #print "Trying to use " ,fullPklPath
@@ -90,6 +95,7 @@ def getHierarchyBy(org_name):
             html_data=hierarchyTreeFromGenetableURL("file://"+geneTableHTMLFiles[1],locus,fastaAlleleList,locusHierarchyData)
             locusHierarchyData=html_data[0]
             hierarchy[locus]=locusHierarchyData
+    gldb_hierarchy[org_name] = hierarchy
     return hierarchy
 
 def invertHierarchy(hierarchy, invertDict, key, parent):
@@ -99,3 +105,11 @@ def invertHierarchy(hierarchy, invertDict, key, parent):
         else:
             a = { k: parent}
             invertHierarchy(hierarchy[k], invertDict, k, a)
+
+def getInvertHierarchyBy(org_name):
+    # already cached?
+    if gldb_invert_hierarchy.get(org_name): return gldb_invert_hierarchy[org_name]
+
+    gldb_invert_hierarchy[org_name] = {}
+    invertHierarchy(getHierarchyBy(org_name), gldb_invert_hierarchy[org_name], None, None)
+    return gldb_invert_hierarchy[org_name]
