@@ -15,9 +15,6 @@ import numpy
 lengthKey = "length"
 sharedKey = "shared"
 
-gene_hierarchy = None
-invert_hierarchy = {}
-
 cdr3_histograms = {}
 
 def increment_count(anArray, sequence):
@@ -454,10 +451,6 @@ def initialize_calculation_module(inputDict, metadataDict, headerMapping):
     groups = inputDict[defaults.groupsKey]
     for group in groups: cdr3_histograms[group] = { 'aa': [], 'nucleotide': [] }
 
-    gene_hierarchy = gldb.getHierarchyBy(inputDict[defaults.organismKey])
-    gldb.invertHierarchy(gene_hierarchy, invert_hierarchy, None, None)
-    return
-
 def process_record(inputDict, metadataDict, headerMapping, groupSet, calc, fields):
     """Perform calculation from given fields"""
     # length operations
@@ -472,6 +465,7 @@ def process_record(inputDict, metadataDict, headerMapping, groupSet, calc, field
 
     # share/unique sequence operations
     if sharedKey in calc['operations']:
+        invert_hierarchy = gldb.getInvertHierarchyBy(inputDict[defaults.organismKey])
         for l in calc['levels']:
             sublevel = None
             level = None
