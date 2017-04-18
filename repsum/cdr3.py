@@ -120,7 +120,7 @@ def generate_share_summary(inputDict, level, sublevel):
                 share_summary_cdr3[level][sublevel][sl] = {}
             level_share_summary(inputDict, cdr3_shared[level][sublevel][sl], share_summary[level][sublevel][sl], share_summary_cdr3[level][sublevel][sl])
 
-def write_share_summary(inputDict, level, sublevel):
+def write_share_summary(inputDict, outputSpec, level, sublevel):
     cdr3_shared_level = cdr3_shared[level]
     share_summary_level = share_summary[level]
     share_summary_cdr3_level = share_summary_cdr3[level]
@@ -136,7 +136,15 @@ def write_share_summary(inputDict, level, sublevel):
     if sublevel == 'nucleotide': cdr3_text = defaults.headerNames['CDR3_SEQ']
 
     groups = inputDict[defaults.groupsKey]
-    writer = open("summary_cdr3_" + fileTxt + "_sharing.tsv", 'w')
+    filename = "summary_cdr3_" + fileTxt + "_sharing.tsv"
+    writer = open(filename, 'w')
+
+    # output specification for process metadata
+    # TODO: Cheat with app name of RepCalc, we should use the app name in process metadata
+    if (not outputSpec['groups'].get("RepCalc")): outputSpec['groups']["RepCalc"] = {}
+    outputSpec['groups']['RepCalc']['cdr3_shared'] = { "files": "RepCalc_cdr3_shared", "type": "output" }
+    if (not outputSpec['files'].get("RepCalc_cdr3_shared")): outputSpec['files']["RepCalc_cdr3_shared"] = {}
+    outputSpec['files']["RepCalc_cdr3_shared"]["summary_cdr3_" + fileTxt] = { "value": filename, "description":"CDR3 Summary", "type":"tsv" }
 
     # inner function for summary group values
     def write_summary(group, summary_level):
@@ -166,6 +174,12 @@ def write_share_summary(inputDict, level, sublevel):
     for group in groups:
         filename = group + "_cdr3_" + fileTxt + "_sharing.tsv"
         writer = open(filename, 'w')
+
+        # output specification for process metadata
+        if (not outputSpec['files'].get(group + "_cdr3_shared")): outputSpec['files'][group + "_cdr3_shared"] = {}
+        outputSpec['groups'][group]['cdr3_shared'] = { "files": group + "_cdr3_shared", "type": "output" }
+        outputSpec['files'][group + "_cdr3_shared"][fileTxt] = { "value": filename, "description":"CDR3 Detail", "type":"tsv" }
+
         writer.write(cdr3_text)
         if sublevel is not None: writer.write("\tLEVEL")
         if (groups[group]['type'] == 'sampleGroup'):
@@ -212,7 +226,7 @@ def write_share_summary(inputDict, level, sublevel):
 
         writer.close()
 
-def generate_share_comparison(inputDict, level, sublevel):
+def generate_share_comparison(inputDict, outputSpec, level, sublevel):
     # pairwise group comparison
     groups = inputDict[defaults.groupsKey]
     sampleGroups = []
@@ -231,8 +245,18 @@ def generate_share_comparison(inputDict, level, sublevel):
     # single groups are directly compared to each other
     singleShared = None
     singleDiff = None
-    writer1 = open("group_comparison_cdr3_" + fileTxt + "_sharing.tsv", 'w')
-    writer2 = open("group_diff_cdr3_" + fileTxt + "_sharing.tsv", 'w')
+    filename1 = "group_comparison_cdr3_" + fileTxt + "_sharing.tsv"
+    filename2 = "group_diff_cdr3_" + fileTxt + "_sharing.tsv"
+    writer1 = open(filename1, 'w')
+    writer2 = open(filename2, 'w')
+
+    # output specification for process metadata
+    # TODO: Cheat with app name of RepCalc, we should use the app name in process metadata
+    if (not outputSpec['groups'].get("RepCalc")): outputSpec['groups']["RepCalc"] = {}
+    outputSpec['groups']['RepCalc']['cdr3_shared'] = { "files": "RepCalc_cdr3_shared", "type": "output" }
+    if (not outputSpec['files'].get("RepCalc_cdr3_shared")): outputSpec['files']["RepCalc_cdr3_shared"] = {}
+    outputSpec['files']["RepCalc_cdr3_shared"]["group_comparison_cdr3_" + fileTxt] = { "value": filename1, "description":"Shared CDR3 Comparison", "type":"tsv" }
+    outputSpec['files']["RepCalc_cdr3_shared"]["group_diff_cdr3_" + fileTxt] = { "value": filename2, "description":"Unique CDR3 Comparison", "type":"tsv" }
 
     def single_comparison():
         writer1.write('SHARED')
@@ -300,9 +324,19 @@ def generate_share_comparison(inputDict, level, sublevel):
     # sample groups are compared at each level
 
     def group_comparison():
-        writer1 = open("sampleGroup_summary_comparison_cdr3_" + fileTxt + "_sharing.tsv", 'w')
-        writer2 = open("sampleGroup_diff_cdr3_" + fileTxt + "_sharing.tsv", 'w')
-        writer3 = open("sampleGroup_comparison_cdr3_" + fileTxt + "_sharing.tsv", 'w')
+        filename1 = "sampleGroup_summary_comparison_cdr3_" + fileTxt + "_sharing.tsv"
+        filename2 = "sampleGroup_diff_cdr3_" + fileTxt + "_sharing.tsv"
+        filename3 = "sampleGroup_comparison_cdr3_" + fileTxt + "_sharing.tsv"
+        writer1 = open(filename1, 'w')
+        writer2 = open(filename2, 'w')
+        writer3 = open(filename3, 'w')
+
+        # output specification for process metadata
+        # TODO: Cheat with app name of RepCalc, we should use the app name in process metadata
+        outputSpec['files']["RepCalc_cdr3_shared"]["sampleGroup_summary_comparison_cdr3_" + fileTxt] = { "value": filename1, "description":"CDR3 Summary Comparison", "type":"tsv" }
+        outputSpec['files']["RepCalc_cdr3_shared"]["sampleGroup_diff_cdr3_" + fileTxt] = { "value": filename2, "description":"Unique CDR3 Comparison", "type":"tsv" }
+        outputSpec['files']["RepCalc_cdr3_shared"]["sampleGroup_comparison_cdr3_" + fileTxt] = { "value": filename3, "description":"Shared CDR3 Comparison", "type":"tsv" }
+
         numGroups = len(sampleGroups)
         for row_i in range(0, numGroups, 1):
             rowGroup = sampleGroups[row_i]
@@ -326,11 +360,15 @@ def generate_share_comparison(inputDict, level, sublevel):
                 diff_count_array = []
                 diff_string_array = []
                 for i in range(0, numRows, 1):
-                    A = set(share_summary_cdr3[level][rowGroup][i+1].keys())
+                    if not share_summary_cdr3[level][rowGroup].get(i+1): A = set()
+                    else: A = set(share_summary_cdr3[level][rowGroup][i+1].keys())
                     groupDiff = A
                     writer1.write(str(i+1))
                     for j in range(0, numCols, 1):
-                        B = set(share_summary_cdr3[level][colGroup][j+1].keys())
+                        #print(j+1)
+                        #print(share_summary_cdr3[level][colGroup][j+1])
+                        if not share_summary_cdr3[level][colGroup].get(j+1): B = set()
+                        else: B = set(share_summary_cdr3[level][colGroup][j+1].keys())
                         groupShared = A & B
                         groupDiff = groupDiff - B
                         sharedMatrix[i,j] = len(groupShared)
@@ -368,8 +406,16 @@ def generate_share_comparison(inputDict, level, sublevel):
         writer3.close()
 
     def group_level_comparison():
-        writer1 = open("sampleGroup_comparison_cdr3_" + fileTxt + "_sharing.tsv", 'w')
-        writer2 = open("sampleGroup_diff_cdr3_" + fileTxt + "_sharing.tsv", 'w')
+        filename1 = "sampleGroup_comparison_cdr3_" + fileTxt + "_sharing.tsv"
+        filename2 = "sampleGroup_diff_cdr3_" + fileTxt + "_sharing.tsv"
+        writer1 = open(filename1, 'w')
+        writer2 = open(filename2, 'w')
+ 
+        # output specification for process metadata
+        # TODO: Cheat with app name of RepCalc, we should use the app name in process metadata
+        outputSpec['files']["RepCalc_cdr3_shared"]["sampleGroup_comparison_cdr3_" + fileTxt] = { "value": filename1, "description":"Shared CDR3 Comparison", "type":"tsv" }
+        outputSpec['files']["RepCalc_cdr3_shared"]["sampleGroup_diff_cdr3_" + fileTxt] = { "value": filename2, "description":"Unique CDR3 Comparison", "type":"tsv" }
+
         writer1.write(cdr3_text + '\tGROUP_A\tLEVEL_A\tSHARE_LEVEL_A\tCOUNT_A\tTOTAL_COUNT_A\tGROUP_B\tLEVEL_B\tSHARE_LEVEL_B\tCOUNT_B\tTOTAL_COUNT_B\n')
         writer2.write(cdr3_text + '\tGROUP_A\tLEVEL_A\tSHARE_LEVEL_A\tCOUNT_A\tTOTAL_COUNT_A\tGROUP_B\n')
         numGroups = len(sampleGroups)
@@ -683,25 +729,25 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
         for level in calc['levels']:
             if level == 'aa':
                 generate_share_summary(inputDict, level, None)
-                write_share_summary(inputDict, level, None)
-                generate_share_comparison(inputDict, level, None)
+                write_share_summary(inputDict, outputSpec, level, None)
+                generate_share_comparison(inputDict, outputSpec, level, None)
             if level == 'nucleotide':
                 generate_share_summary(inputDict, level, None)
-                write_share_summary(inputDict, level, None)
-                generate_share_comparison(inputDict, level, None)
+                write_share_summary(inputDict, outputSpec, level, None)
+                generate_share_comparison(inputDict, outputSpec, level, None)
             if level == 'v,aa':
                 generate_share_summary(inputDict, 'v', 'aa')
-                write_share_summary(inputDict, 'v', 'aa')
-                generate_share_comparison(inputDict, 'v', 'aa')
+                write_share_summary(inputDict, outputSpec, 'v', 'aa')
+                generate_share_comparison(inputDict, outputSpec, 'v', 'aa')
             if level == 'v,nucleotide':
                 generate_share_summary(inputDict, 'v', 'nucleotide')
-                write_share_summary(inputDict, 'v', 'nucleotide')
-                generate_share_comparison(inputDict, 'v', 'nucleotide')
+                write_share_summary(inputDict, outputSpec, 'v', 'nucleotide')
+                generate_share_comparison(inputDict, outputSpec, 'v', 'nucleotide')
             if level == 'vj,aa':
                 generate_share_summary(inputDict, 'vj', 'aa')
-                write_share_summary(inputDict, 'vj', 'aa')
-                generate_share_comparison(inputDict, 'vj', 'aa')
+                write_share_summary(inputDict, outputSpec, 'vj', 'aa')
+                generate_share_comparison(inputDict, outputSpec, 'vj', 'aa')
             if level == 'vj,nucleotide':
                 generate_share_summary(inputDict, 'vj', 'nucleotide')
-                write_share_summary(inputDict, 'vj', 'nucleotide')
-                generate_share_comparison(inputDict, 'vj', 'nucleotide')
+                write_share_summary(inputDict, outputSpec, 'vj', 'nucleotide')
+                generate_share_comparison(inputDict, outputSpec, 'vj', 'nucleotide')

@@ -254,6 +254,10 @@ def generate_combo_detail(inputDict, outputSpec, calc):
                 for idx in reversed(sort_array):
                     writer.write(string_array[idx])
             writer.close()
+            # output specification for process metadata
+            if (not outputSpec['files'].get(group + "_gene_segment_combos")): outputSpec['files'][group + "_gene_segment_combos"] = {}
+            outputSpec['groups'][group]['gene_segment_combos'] = { "files": group + "_gene_segment_combos", "type": "output" }
+            outputSpec['files'][group + "_gene_segment_combos"][level] = { "value": filename, "description":"Gene Segment Combos", "type":"tsv" }
 
 def generate_combo_comparison(inputDict, outputSpec, calc):
     groups = inputDict[defaults.groupsKey]
@@ -267,8 +271,10 @@ def generate_combo_comparison(inputDict, outputSpec, calc):
 
     # single groups
     for level in calc['levels']:
-        writer1 = open("group_shared_" + level + "_segment_combos.tsv", 'w')
-        writer2 = open("group_diff_" + level + "_segment_combos.tsv", 'w')
+        filename1 = "group_shared_" + level + "_segment_combos.tsv"
+        filename2 = "group_diff_" + level + "_segment_combos.tsv"
+        writer1 = open(filename1, 'w')
+        writer2 = open(filename2, 'w')
         for rowGroup in singleGroups:
             row_entry = combo_counters[rowGroup][level]
             A = set(row_entry.keys())
@@ -310,11 +316,20 @@ def generate_combo_comparison(inputDict, outputSpec, calc):
                 writer2.write(diff_string_array[idx])
         writer1.close()
         writer2.close()
+        # output specification for process metadata
+        # TODO: Cheat with app name of RepCalc, we should use the app name in process metadata
+        if (not outputSpec['groups'].get("RepCalc")): outputSpec['groups']["RepCalc"] = {}
+        outputSpec['groups']['RepCalc']['gene_segment_combos'] = { "files": "RepCalc_gene_segment_combos", "type": "output" }
+        if (not outputSpec['files'].get("RepCalc_gene_segment_combos")): outputSpec['files']["RepCalc_gene_segment_combos"] = {}
+        outputSpec['files']["RepCalc_gene_segment_combos"]['group_shared'] = { "value": filename1, "description":"Gene Segment Combos", "type":"tsv" }
+        outputSpec['files']["RepCalc_gene_segment_combos"]['group_diff'] = { "value": filename2, "description":"Gene Segment Combos", "type":"tsv" }
 
     # sample groups
     for level in calc['levels']:
-        writer1 = open("sampleGroup_shared_" + level + "_segment_combos.tsv", 'w')
-        writer2 = open("sampleGroup_diff_" + level + "_segment_combos.tsv", 'w')
+        filename1 = "sampleGroup_shared_" + level + "_segment_combos.tsv"
+        filename2 = "sampleGroup_diff_" + level + "_segment_combos.tsv"
+        writer1 = open(filename1, 'w')
+        writer2 = open(filename2, 'w')
         for rowGroup in sampleGroups:
             row_entry = summary_combo_counters[rowGroup][level]
             A = set(row_entry.keys())
@@ -359,6 +374,13 @@ def generate_combo_comparison(inputDict, outputSpec, calc):
                     writer2.write(diff_string_array[idx])
         writer1.close()
         writer2.close()
+        # output specification for process metadata
+        # TODO: Cheat with app name of RepCalc, we should use the app name in process metadata
+        if (not outputSpec['groups'].get("RepCalc")): outputSpec['groups']["RepCalc"] = {}
+        outputSpec['groups']['RepCalc']['gene_segment_combos'] = { "files": "RepCalc_gene_segment_combos", "type": "output" }
+        if (not outputSpec['files'].get("RepCalc_gene_segment_combos")): outputSpec['files']["RepCalc_gene_segment_combos"] = {}
+        outputSpec['files']["RepCalc_gene_segment_combos"]['sampleGroup_shared'] = { "value": filename1, "description":"Gene Segment Combos", "type":"tsv" }
+        outputSpec['files']["RepCalc_gene_segment_combos"]['sampleGroup_diff'] = { "value": filename2, "description":"Gene Segment Combos", "type":"tsv" }
 
 
 
