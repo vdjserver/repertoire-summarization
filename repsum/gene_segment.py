@@ -321,8 +321,8 @@ def generate_combo_comparison(inputDict, outputSpec, calc):
         if (not outputSpec['groups'].get("RepCalc")): outputSpec['groups']["RepCalc"] = {}
         outputSpec['groups']['RepCalc']['gene_segment_combos'] = { "files": "RepCalc_gene_segment_combos", "type": "output" }
         if (not outputSpec['files'].get("RepCalc_gene_segment_combos")): outputSpec['files']["RepCalc_gene_segment_combos"] = {}
-        outputSpec['files']["RepCalc_gene_segment_combos"]['group_shared'] = { "value": filename1, "description":"Gene Segment Combos", "type":"tsv" }
-        outputSpec['files']["RepCalc_gene_segment_combos"]['group_diff'] = { "value": filename2, "description":"Gene Segment Combos", "type":"tsv" }
+        outputSpec['files']["RepCalc_gene_segment_combos"]['group_shared_' + level] = { "value": filename1, "description":"Gene Segment Combos", "type":"tsv" }
+        outputSpec['files']["RepCalc_gene_segment_combos"]['group_diff_' + level] = { "value": filename2, "description":"Gene Segment Combos", "type":"tsv" }
 
     # sample groups
     for level in calc['levels']:
@@ -379,8 +379,8 @@ def generate_combo_comparison(inputDict, outputSpec, calc):
         if (not outputSpec['groups'].get("RepCalc")): outputSpec['groups']["RepCalc"] = {}
         outputSpec['groups']['RepCalc']['gene_segment_combos'] = { "files": "RepCalc_gene_segment_combos", "type": "output" }
         if (not outputSpec['files'].get("RepCalc_gene_segment_combos")): outputSpec['files']["RepCalc_gene_segment_combos"] = {}
-        outputSpec['files']["RepCalc_gene_segment_combos"]['sampleGroup_shared'] = { "value": filename1, "description":"Gene Segment Combos", "type":"tsv" }
-        outputSpec['files']["RepCalc_gene_segment_combos"]['sampleGroup_diff'] = { "value": filename2, "description":"Gene Segment Combos", "type":"tsv" }
+        outputSpec['files']["RepCalc_gene_segment_combos"]['sampleGroup_shared_' + level] = { "value": filename1, "description":"Gene Segment Combos", "type":"tsv" }
+        outputSpec['files']["RepCalc_gene_segment_combos"]['sampleGroup_diff_' + level] = { "value": filename2, "description":"Gene Segment Combos", "type":"tsv" }
 
 
 
