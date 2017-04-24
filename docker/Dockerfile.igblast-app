@@ -46,12 +46,17 @@ RUN cd /igblast-root && tar zxf ../ncbi-igblast-1.4.0-src.tar.gz
 RUN cd /igblast-root/ncbi-igblast-1.4.0-src/c++ && ./configure --prefix=/igblast-root/local && make
 RUN cd /igblast-root/ncbi-igblast-1.4.0-src/c++ && make install
 
+# VDJML
+ENV VDJML_VERSION 1.0.0
+RUN wget https://bitbucket.org/vdjserver/vdjml/get/v$VDJML_VERSION.tar.gz
+RUN mkdir /vdjml-root
+RUN tar zxvf v$VDJML_VERSION.tar.gz -C /vdjml-root --strip-components=1
+
 # Boost
 ENV BOOST_VERSION 1.57.0
 ENV BOOST_VERSION_LINK 1_57_0
 
-RUN git clone https://bitbucket.org/vdjserver/vdjml.git vdjml-root
-RUN cd /vdjml-root && git checkout develop
+# setup boost build environment
 RUN cp /vdjml-root/docker/boost/boost-build.jam /
 RUN cp /vdjml-root/docker/boost/user-config.jam /root/
 
@@ -66,26 +71,26 @@ RUN cd /boost_$BOOST_VERSION_LINK/tools/build && ./b2 install --prefix=/usr/loca
 # VDJML
 RUN cd /vdjml-root && b2
 RUN cd /vdjml-root && b2 distro-bindings-py
-RUN tar zxvf /vdjml-root/out/VDJMLpy-0.1.3.tar.gz
+RUN tar zxvf /vdjml-root/out/VDJMLpy-0.0.0.tar.gz
+RUN mv /VDJMLpy-0.0.0 /VDJMLpy-$VDJML_VERSION
+RUN cd /VDJMLpy-$VDJML_VERSION && python setup.py install
 
 # extract database
 COPY db.tgz /
 RUN tar zxvf db.tgz
 
-# Copy source
-#RUN git clone https://bitbucket.org/vdjserver/repertoire-summarization.git repsum-root
-#RUN cd /repsum-root && git checkout develop
+RUN mkdir /repsum-root
 COPY . /repsum-root
 
-# Create release
-RUN cd /repsum-root && ./release.pl
+# install repsum
+RUN cd /repsum-root && python setup.py install
 
 # setup run environment
 ENV DB_DIR "/db"
-ENV VDJ_DB_ROOT "/db/07_11_2014/"
+ENV VDJ_DB_ROOT "/db/10_05_2016/"
 ENV IGDATA "/db"
 ENV VDJSERVER_ROOT "/repsum-root"
-ENV PATH "$PATH:/igblast-root/local/bin:/VDJMLpy-0.1.3/vdjml"
-ENV PYTHONPATH="/VDJMLpy-0.1.3:$PYTHONPATH"
-ENV PYTHONPATH="/VDJMLpy-0.1.3/vdjml:$PYTHONPATH"
-ENV LD_LIBRARY_PATH="/VDJMLpy-0.1.3/vdjml:$LD_LIBRARY_PATH"
+ENV PATH "$PATH:/igblast-root/local/bin"
+ENV PYTHONPATH "/VDJMLpy-$VDJML_VERSION:$PYTHONPATH"
+ENV PYTHONPATH "/VDJMLpy-$VDJML_VERSION/vdjml:$PYTHONPATH"
+ENV LD_LIBRARY_PATH "/VDJMLpy-$VDJML_VERSION/vdjml:$LD_LIBRARY_PATH"

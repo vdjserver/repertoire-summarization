@@ -18,13 +18,13 @@ from segment_utils import recombFreqManager
 def makeSummaryParserArgs():
 	"""Command line arguments for repsum"""
 	parser = argparse.ArgumentParser();
-	parser.description='Summarize VDJ assignment in VDJML for immune repertoire sequencing data. VERSION '+__version__
+	parser.description='Summarize VDJ assignment in VDJML for immune repertoire sequencing data.'
 	parser.add_argument('vdjml_in',type=str,nargs=1,help="the path to the input VDJML file")
 	parser.add_argument('char_out',type=str,nargs=1,help="the path to the output TSV file of read-level repertoire characterization data")
 	parser.add_argument('vdj_db_root',type=str,nargs=1,help="path to the VDJ directory root REQUIRED")
 	parser.add_argument('qry_fasta',type=str,nargs=1,help="path to the input fasta file of query (Rep-Seq) data input to IgBLAST")
 	parser.add_argument('db_organism',type=str,nargs=1,default="human",help="the organism IgBLASTed against;must exist under vdj_db_root",choices=["human","Mus_musculus"])
-	parser.add_argument('-v', '--version', action='version', version='VERSION '+__version__+' COPYRIGHT 2016 UT Southwestern Medical Center')
+	parser.add_argument('-v', '--version', action='version', version='%(prog)s '+__version__)
 	return parser
 
 def main():

@@ -11,7 +11,7 @@
 # Change these:
 
 # your input file
-INPUT=/data/s166813/Downloads/18.fasta
+INPUT=/data/Projects/research/immune/data/igblast-app-test/18.fasta
 IGBLAST_OUT=igblast.out
 VDJML_OUT=out.vdjml
 
@@ -33,8 +33,10 @@ OUTFMT="7 qseqid qgi qacc qaccver qlen sseqid sallseqid sgi sallgi sacc saccver 
 # Make sure to update these when a new IgBlast or DB is used
 IGBLAST_VERSION=1.4.0
 IGBLAST_URI=http://www.ncbi.nlm.nih.gov/projects/igblast/
-VDJ_DB_VERSION=07_11_2014
+VDJ_DB_VERSION=10_05_2016
 VDJ_DB_URI=http://wiki.vdjserver.org/vdjserver/index.php/VDJServer_IgBlast_Database
+
+IGBLAST_PARSE_PY="python /usr/local/lib/python2.7/dist-packages/vdjml/igblast_parse.py"
 
 ######
 
@@ -65,4 +67,4 @@ RCARGS="$RCARGS -igblast_version $IGBLAST_VERSION"
 RCARGS="$RCARGS -igblast_uri $IGBLAST_URI"
 IGBLAST_PARAMS="$ARGS"
 
-igblast_parse.py $RCARGS -igblast_params "$IGBLAST_PARAMS"
+$IGBLAST_PARSE_PY $RCARGS -igblast_params "$IGBLAST_PARAMS"

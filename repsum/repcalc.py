@@ -92,11 +92,11 @@ def groups_for_file(inputDict, fileKey, uuid):
 def make_parser_args():
 	"""Command line arguments for repcalc"""
 	parser = argparse.ArgumentParser();
-	parser.description='Comparison and calculation functions for immune repertoire sequencing data. VERSION '+__version__
+	parser.description='Comparison and calculation functions for immune repertoire sequencing data.'
 	parser.add_argument('input',type=str,nargs=1,help="Input specification file")
         parser.add_argument('--gldb',type=str,nargs=1,help="Path to germline database")
         parser.add_argument('--output',type=str,help="Output specification file")
-	parser.add_argument('-v', '--version', action='version', version='VERSION '+__version__+' COPYRIGHT 2016 UT Southwestern Medical Center')
+	parser.add_argument('-v', '--version', action='version', version='%(prog)s '+__version__)
 	return parser
 
 def isRecordFunctional(headerMapping, fields):
@@ -133,6 +133,9 @@ def main():
                 raise
 	else:
                 infile.close()
+        if inputDict.get(defaults.organismKey) is None:
+                print("WARNING: No organism defined, assuming human")
+                inputDict[defaults.organismKey] = 'human'
 	#print(json.dumps(inputDict))
 
 	# Metadata
@@ -167,7 +170,7 @@ def main():
                 #print(groupSet)
                 try:
                         infile = open(input_file, 'rt')
-                        header = infile.readline()
+                        header = infile.readline().rstrip('\n')
                         headerMapping = summarize.summary_file_header_mappings(header)
                         if first:
                                 initialize_calculations(inputDict, metadataDict, headerMapping)
@@ -175,7 +178,7 @@ def main():
                         calcs = inputDict[defaults.calculationsKey]
                         #print(headerMapping)
                         while True:
-                                line = infile.readline()
+                                line = infile.readline().rstrip('\n')
                                 if not line: break
                                 fields = line.split('\t')
                                 if len(fields) != len(headerMapping):
@@ -183,7 +186,7 @@ def main():
                                         sys.exit()
 
                                 for calc in calcs:
-                                        if defaults.calcFilters in calc and 'productive' in calc[defaults.calcFilters] and not isRecordFunctional(headerMapping, fields): continue
+                                        if defaults.calcFilters in calc and calc[defaults.calcFilters] is not None and 'productive' in calc[defaults.calcFilters] and not isRecordFunctional(headerMapping, fields): continue
                                         cmod = defaults.calculationModules[calc['type']]['module']
                                         cmod.process_record(inputDict, metadataDict, headerMapping, groupSet, calc, fields)
                         
