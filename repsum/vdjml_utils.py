@@ -147,7 +147,7 @@ def getHitInfo(read_result_obj,meta,alleleName,query_record=None,imgtdb_obj=None
 				#print "the hit name is ",hit_name
 				if(hit_name==alleleName):
 					#print "TARGET FOUND!"
-					match_range=segment_match.gl_range()
+					match_range=segment_match.gl_range(gls_match)
 					#print "got a range : ",match_range," for GL in ",alleleName," for query=",read_result_obj.id()
 					pos1=match_range.pos1()
 					pose=pos1+match_range.length()
