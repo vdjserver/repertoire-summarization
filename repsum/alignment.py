@@ -560,13 +560,13 @@ class alignment:
 					amino_list2.append(str(q_amino2))
 				else:
 					#ANALYSIS FOR CODONS WITH any gap
-					if(q_codon2.find("-")==(-1)):
-						#insertion in query sequence
-						print "insertion in query sequence"
-					else:
+					if(s_codon2.find("-")==(-1)):
 						#deletion in query sequence
 						#print "deletion in query sequence"
 						amino_list2.append("X")
+						s_amino2=codonAnalyzer.fastTrans(s_codon2)
+						s_amino_list2.append(str(s_amino2))
+					#No else because insertions are already removed by frame_mask2 fix and will never have a 0, 1, 2 frame mask.
 				temp_index2+=3
 			else:
 #				print "encountered a single.... temp_index=",temp_index

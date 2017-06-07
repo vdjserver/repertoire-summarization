@@ -17,6 +17,7 @@ import traceback
 import pickle
 from Bio import SeqIO
 import glob
+import math
 
 
 #find the number of leaves
@@ -461,6 +462,7 @@ class imgt_db:
 	ref_dir_set_desc_seqs_map=None
 	ol=["human","Mus_musculus"]
 	pickle_file_name="hierarchy_data.pkl"
+	numbering_map=None
 
 	####################
 	#constructor(s)
@@ -471,9 +473,70 @@ class imgt_db:
 	####################
 	#function members
 
+	#Lookup gene specific IMGT number map
+	def getGermlineNumberMap(self,organism,Vgene):
+		if(self.numbering_map==None):
+			self.buildGermlineNumberMap(organism)
+		gene_numbers=self.numbering_map[organism].get(Vgene)
+		#print Vgene,gene_numbers
+		return gene_numbers
+
+	#Create a cached IMGT number map for all receptors of a specific organism.
+	def buildGermlineNumberMap(self,organism):
+		filenames=['IGHV.fna','IGKV.fna','IGLV.fna','TRAV.fna','TRBV.fna','TRDV.fna','TRGV.fna']
+		
+		#Generate numbering_map cache
+		self.numbering_map=dict()
+		self.numbering_map[organism]=dict()
+		
+		for fname in filenames:
+			lookupPath=self.getBaseDir()+"/"+organism+"/ReferenceDirectorySet/"+fname
+			if(not(os.path.exists(lookupPath)) or not(os.path.isfile(lookupPath))):
+				raise Exception("Error, failed to find germline file "+lookupPath+" for organism = "+organism)
+			else:
+				germline_reader=open(lookupPath,'r')
+				germline_found=False
+				germline_name=""
+				
+				for line in germline_reader:
+					line=line.strip()
+					if(germline_found==True):
+						self.numbering_map[organism][germline_name]=dict()
+						self.numbering_map[organism][germline_name]['FR1_imgt']=list()
+						self.numbering_map[organism][germline_name]['CDR1_imgt']=list()
+						self.numbering_map[organism][germline_name]['FR2_imgt']=list()
+						self.numbering_map[organism][germline_name]['CDR2_imgt']=list()
+						self.numbering_map[organism][germline_name]['FR3_imgt']=list()
+						
+						#Iterate number map which ignores gaps over whole germline up to last full codon
+						for r in range(1,int(math.floor(len(line)/3.0))+1):
+							#Parse germline by codon starting from positions (0;1;2)
+							index_start=(r-1)*3
+							index_end=r*3
+							#Remove codons with any gaps ("."), since partial codon alignments are discarded for replacement and silent mutation reporting.
+							if(line[index_start:index_end].find(".")==(-1)):
+								if(r<27):
+									self.numbering_map[organism][germline_name]['FR1_imgt'].append(r)
+								elif(r<39):
+									self.numbering_map[organism][germline_name]['CDR1_imgt'].append(r)
+								elif(r<56):
+									self.numbering_map[organism][germline_name]['FR2_imgt'].append(r)
+								elif(r<66):
+									self.numbering_map[organism][germline_name]['CDR2_imgt'].append(r)
+								else:
+									self.numbering_map[organism][germline_name]['FR3_imgt'].append(r)
+						germline_found=False
+					elif(line[0]==">"):
+						line_pieces=line.split('|')
+						germline_name=line_pieces[1]
+						germline_found=True
+				germline_reader.close()
+	
+
+
+
 	def getPickleFullPath(self):
 		return self.getBaseDir()+"/"+self.pickle_file_name
-
 
 
 	def formAlignmentOfAllelesURL(self,organism,gene):

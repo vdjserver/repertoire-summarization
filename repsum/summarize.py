@@ -602,13 +602,10 @@ def readAnnotate(read_result_obj,meta,organism,imgtdb_obj,read_rec,cdr3_map,skip
 	#get mutation map
 	mut_map_info=annotationMutationMap(vInfo,dInfo,jInfo,alignment_output_queue,num_submitted_jobs,imgtdb_obj,organism,read_rec,cdr3_map,0)
 	
-	qualifNote=mut_map_info[0]
-	maps=mut_map_info[1]
-	amino_map=maps['aminos']
-	codon_map=maps['codons']
-	amino_silent_map=maps['aminos_silent']
-	codon_silent_map=maps['codons_silent']
-	annMap["AGS Q Note"]=qualifNote
+	amino_map=mut_map_info['aminos']
+	codon_map=mut_map_info['codons']
+	amino_silent_map=mut_map_info['aminos_silent']
+	codon_silent_map=mut_map_info['codons_silent']
 	annMap["Codon RM (imgt)"]=codon_map
 	annMap["Amino RM (imgt)"]=amino_map
 	annMap["Codon SM (imgt)"]=codon_silent_map
@@ -897,7 +894,6 @@ def appendAnnToFileWithMap(fHandle,m,rid,read_name,desiredKeys=None,defaultValue
 		alt_key="Alternate "+segment+" gene"
 		keys_to_append.append(alt_key)
 
-	#keys_to_append.append("AGS Q Note")
 	keys_to_append.append("Codon RM (imgt)")
 	keys_to_append.append("Amino RM (imgt)")
 	keys_to_append.append("Codon SM (imgt)")
