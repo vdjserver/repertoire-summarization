@@ -14,6 +14,7 @@ import numpy
 # module operations
 lengthKey = "length"
 sharedKey = "shared"
+compareKey = "compare"
 
 cdr3_histograms = {}
 
@@ -32,10 +33,10 @@ def group_average(inputDict, sampleGroup, level):
     # average/std
     N = float(len(samples))
     for sample in samples:
-        sampleName = metadata.sample_for_uuid(inputDict, sample)
-        #print(sampleGroup, sampleName)
+        #sampleName = metadata.sample_for_uuid(inputDict, sample)
+        #print(sampleGroup, sample, sampleName)
 
-        sampleArray = cdr3_histograms[sampleName][level]
+        sampleArray = cdr3_histograms[sample][level]
         groupArray = cdr3_histograms[sampleGroup][level]
         stdArray = cdr3_histograms[sampleGroup][level + '_std']
         if len(sampleArray) >= len(groupArray):
@@ -78,27 +79,34 @@ def level_share_summary(inputDict, cdr3_shared_level, share_summary_level, share
     for key in cdr3_shared_level.keys():
         #print(cdr3_shared_level[key])
         group_set = cdr3_shared_level[key].keys()
+        #print(group_set)
+        #print(share_summary_level)
         for group in group_set:
             entry = share_summary_level.get(group)
-            if entry is None:
-                if (groups[group]['type'] == 'sampleGroup'):
-                    share_summary_level[group] = []
-                    share_summary_cdr3_level[group] = {}
-                else:
+            if not groups.get(group):
+                if entry is None:
                     share_summary_level[group] = 0
                     share_summary_cdr3_level[group] = {}
+                share_summary_level[group] = share_summary_level[group] + 1
+                share_summary_cdr3_level[group][key] = cdr3_shared_level[key][group]
+                continue
             if (groups[group]['type'] == 'sampleGroup'):
+                if entry is None:
+                    share_summary_level[group] = []
+                    share_summary_cdr3_level[group] = {}
                 samples = groups[group]['samples']
                 count = 0
                 for sample in samples:
-                    sampleName = metadata.sample_for_uuid(inputDict, sample)
-                    if sampleName in group_set: count += 1
+                    if sample in group_set: count += 1
                 if count >= len(share_summary_level[group]): 
                     for i in range(len(share_summary_level[group]), count+1, 1): share_summary_level[group].append(0)
                 share_summary_level[group][count] = share_summary_level[group][count] + 1
                 if share_summary_cdr3_level[group].get(count) is None: share_summary_cdr3_level[group][count] = {}
                 share_summary_cdr3_level[group][count][key] = cdr3_shared_level[key][group]
             else:
+                if entry is None:
+                    share_summary_level[group] = 0
+                    share_summary_cdr3_level[group] = {}
                 share_summary_level[group] = share_summary_level[group] + 1
                 share_summary_cdr3_level[group][key] = cdr3_shared_level[key][group]
             #print(share_summary_level[group])
@@ -192,6 +200,10 @@ def write_share_summary(inputDict, outputSpec, level, sublevel):
             if (groups[group]['type'] == 'sampleGroup'):
                 #print(summary_cdr3_level[group])
                 #for i in range(1, len(summary_cdr3_level[group]), 1):
+                #print(sl)
+                #print(summary_level)
+                #print(summary_cdr3_level)
+                #print(cdr3_level)
                 for i in summary_cdr3_level[group].keys():
                     #print(i)
                     cdr3_set = summary_cdr3_level[group][i]
@@ -200,10 +212,12 @@ def write_share_summary(inputDict, outputSpec, level, sublevel):
                         if sl: writer.write('\t' + sl)
                         group_set = cdr3_level[cdr3].keys()
                         samples = groups[group]['samples']
+                        #print(cdr3_level[cdr3])
+                        #print(group_set)
+                        #print(samples)
                         sampleSet = []
                         for sample in samples:
-                            sampleName = metadata.sample_for_uuid(inputDict, sample)
-                            if sampleName in group_set: sampleSet.append(sampleName)
+                            if sample in group_set: sampleSet.append(sample)
                         writer.write('\t' + ','.join(sampleSet))
                         for sample in sampleSet:
                             writer.write('\t' + str(cdr3_level[cdr3][sample]['count']))
@@ -226,7 +240,92 @@ def write_share_summary(inputDict, outputSpec, level, sublevel):
 
         writer.close()
 
-def generate_share_comparison(inputDict, outputSpec, level, sublevel):
+def read_share_detail(inputDict, group, level, sublevel):
+    groups = inputDict[defaults.groupsKey]
+
+    fileTxt = level
+    if sublevel is not None:
+        fileTxt = level + '_' + sublevel
+
+    filename = group + "_cdr3_" + fileTxt + "_sharing.tsv"
+    with open(filename, 'rt') as infile:
+        header = infile.readline().rstrip('\n')
+        if groups[group]['type'] == 'sampleGroup':
+            while True:
+                line = infile.readline().rstrip('\n')
+                if not line: break
+                fields = line.split('\t')
+                cdr3 = fields[0]
+                #print(cdr3)
+                if cdr3_shared.get(level) is None: cdr3_shared[level] = {}
+                if sublevel is not None:
+                    samples = fields[2].split(',')
+                    countStart = 3
+                    if cdr3_shared[level].get(sublevel) is None: cdr3_shared[level][sublevel] = {}
+                    sublevel_value = fields[1]
+                    if cdr3_shared[level].get(sublevel) is None: cdr3_shared[level][sublevel] = {}
+                    if cdr3_shared[level][sublevel].get(sublevel_value) is None: cdr3_shared[level][sublevel][sublevel_value] = {}
+                    cdr3_shared_level = cdr3_shared[level][sublevel][sublevel_value]
+                    cdr3_entry = cdr3_shared_level.get(cdr3)
+                    if cdr3_entry is None:
+                        cdr3_shared_level[cdr3] = {}
+                        cdr3_entry = cdr3_shared_level[cdr3]
+                else:
+                    samples = fields[1].split(',')
+                    countStart = 2
+                    cdr3_entry = cdr3_shared[level].get(cdr3)
+                    if cdr3_entry is None:
+                        cdr3_shared[level][cdr3] = {}
+                        cdr3_entry = cdr3_shared[level].get(cdr3)
+                i = 0
+                field_count = 0
+                field_total = 0
+                for sample in samples:
+                    field_count += int(fields[countStart + i])
+                    field_total += int(fields[countStart + i + 1])
+                    sample_entry = cdr3_entry.get(sample)
+                    if sample_entry is None:
+                        cdr3_entry[sample] = { 'count': int(fields[countStart + i]), 'total_count': int(fields[countStart + i + 1]) }
+                    i += 2
+                group_entry = cdr3_entry.get(group)
+                if group_entry is None:
+                    cdr3_entry[group] = { 'count': int(field_count), 'total_count': int(field_total) }
+                #print(cdr3_entry)
+                #print(field_count)
+                #print(field_total)
+        else:
+            while True:
+                line = infile.readline().rstrip('\n')
+                if not line: break
+                fields = line.split('\t')
+                cdr3 = fields[0]
+                if cdr3_shared.get(level) is None: cdr3_shared[level] = {}
+                if sublevel is not None:
+                    if cdr3_shared[level].get(sublevel) is None: cdr3_shared[level][sublevel] = {}
+                    sublevel_value = fields[1]
+                    if cdr3_shared[level].get(sublevel) is None: cdr3_shared[level][sublevel] = {}
+                    if cdr3_shared[level][sublevel].get(sublevel_value) is None: cdr3_shared[level][sublevel][sublevel_value] = {}
+                    cdr3_shared_level = cdr3_shared[level][sublevel][sublevel_value]
+                    cdr3_entry = cdr3_shared_level.get(cdr3)
+                    if cdr3_entry is None:
+                        cdr3_shared_level[cdr3] = {}
+                        cdr3_entry = cdr3_shared_level[cdr3]
+                    field_count = fields[2]
+                    field_total = fields[3]
+                else:
+                    cdr3_entry = cdr3_shared[level].get(cdr3)
+                    if cdr3_entry is None:
+                        cdr3_shared[level][cdr3] = {}
+                        cdr3_entry = cdr3_shared[level].get(cdr3)
+                    field_count = fields[1]
+                    field_total = fields[2]
+
+                group_entry = cdr3_entry.get(group)
+                if group_entry is None:
+                    cdr3_entry[group] = { 'count': int(field_count), 'total_count': int(field_total) }
+
+
+def generate_share_comparison(inputDict, outputSpec, filePrefix, level, sublevel):
     # pairwise group comparison
     groups = inputDict[defaults.groupsKey]
     sampleGroups = []
@@ -245,8 +344,8 @@ def generate_share_comparison(inputDict, outputSpec, level, sublevel):
     # single groups are directly compared to each other
     singleShared = None
     singleDiff = None
-    filename1 = "group_comparison_cdr3_" + fileTxt + "_sharing.tsv"
-    filename2 = "group_diff_cdr3_" + fileTxt + "_sharing.tsv"
+    filename1 = filePrefix + "_comparison_cdr3_" + fileTxt + "_sharing.tsv"
+    filename2 = filePrefix + "_diff_cdr3_" + fileTxt + "_sharing.tsv"
     writer1 = open(filename1, 'w')
     writer2 = open(filename2, 'w')
 
@@ -280,15 +379,26 @@ def generate_share_comparison(inputDict, outputSpec, level, sublevel):
                 B = set(share_summary_cdr3[level][colGroup].keys())
                 singleShared[i,j] = len(A & B)
                 singleDiff[i,j] = len(A - B)
+                #print(singleShared[i,j])
+                #print(singleDiff[i,j])
                 writer1.write('\t' + str(int(singleShared[i,j])))
                 writer2.write('\t' + str(int(singleDiff[i,j])))
             writer1.write('\n')
             writer2.write('\n')
     
     def single_sublevel_comparison():
+        writer1.write('SHARED')
+        writer2.write('DIFF')
+        numSingle = len(singleGroups)
+        for j in range(0, numSingle, 1):
+            colGroup = singleGroups[j]
+            writer1.write('\t' + colGroup)
+            writer2.write('\t' + colGroup)
+        writer1.write('\n')
+        writer2.write('\n')
         writer1.write(cdr3_text + '\tGROUP_A\tLEVEL_A\tCOUNT_A\tTOTAL_COUNT_A\tGROUP_B\tLEVEL_B\tCOUNT_B\tTOTAL_COUNT_B\n')
         writer2.write('GROUP_A\tLEVEL_A\tGROUP_B\tLEVEL_B\tDIFF\n')
-        numSingle = len(singleGroups)
+
         for i in range(0, numSingle, 1):
             rowGroup = singleGroups[i]
             for rowLevel in share_summary_cdr3[level][sublevel]:
@@ -316,17 +426,18 @@ def generate_share_comparison(inputDict, outputSpec, level, sublevel):
                             writer2.write('\t' + str(len(singleDiff)))
                             writer2.write('\n')
 
-    if sublevel is None: single_comparison()
-    else: single_sublevel_comparison()
+    if len(singleGroups) != 0:
+        if sublevel is None: single_comparison()
+        else: single_sublevel_comparison()
     writer1.close()
     writer2.close()
 
     # sample groups are compared at each level
 
     def group_comparison():
-        filename1 = "sampleGroup_summary_comparison_cdr3_" + fileTxt + "_sharing.tsv"
-        filename2 = "sampleGroup_diff_cdr3_" + fileTxt + "_sharing.tsv"
-        filename3 = "sampleGroup_comparison_cdr3_" + fileTxt + "_sharing.tsv"
+        filename1 = filePrefix + "_summary_comparison_cdr3_" + fileTxt + "_sharing.tsv"
+        filename2 = filePrefix + "_diff_cdr3_" + fileTxt + "_sharing.tsv"
+        filename3 = filePrefix + "_comparison_cdr3_" + fileTxt + "_sharing.tsv"
         writer1 = open(filename1, 'w')
         writer2 = open(filename2, 'w')
         writer3 = open(filename3, 'w')
@@ -337,6 +448,8 @@ def generate_share_comparison(inputDict, outputSpec, level, sublevel):
         outputSpec['files']["RepCalc_cdr3_shared"]["sampleGroup_diff_cdr3_" + fileTxt] = { "value": filename2, "description":"Unique CDR3 Comparison", "type":"tsv" }
         outputSpec['files']["RepCalc_cdr3_shared"]["sampleGroup_comparison_cdr3_" + fileTxt] = { "value": filename3, "description":"Shared CDR3 Comparison", "type":"tsv" }
 
+        #print(sampleGroups)
+        #print(share_summary)
         numGroups = len(sampleGroups)
         for row_i in range(0, numGroups, 1):
             rowGroup = sampleGroups[row_i]
@@ -406,8 +519,8 @@ def generate_share_comparison(inputDict, outputSpec, level, sublevel):
         writer3.close()
 
     def group_level_comparison():
-        filename1 = "sampleGroup_comparison_cdr3_" + fileTxt + "_sharing.tsv"
-        filename2 = "sampleGroup_diff_cdr3_" + fileTxt + "_sharing.tsv"
+        filename1 = filePrefix + "_comparison_cdr3_" + fileTxt + "_sharing.tsv"
+        filename2 = filePrefix + "_diff_cdr3_" + fileTxt + "_sharing.tsv"
         writer1 = open(filename1, 'w')
         writer2 = open(filename2, 'w')
  
@@ -416,14 +529,16 @@ def generate_share_comparison(inputDict, outputSpec, level, sublevel):
         outputSpec['files']["RepCalc_cdr3_shared"]["sampleGroup_comparison_cdr3_" + fileTxt] = { "value": filename1, "description":"Shared CDR3 Comparison", "type":"tsv" }
         outputSpec['files']["RepCalc_cdr3_shared"]["sampleGroup_diff_cdr3_" + fileTxt] = { "value": filename2, "description":"Unique CDR3 Comparison", "type":"tsv" }
 
-        writer1.write(cdr3_text + '\tGROUP_A\tLEVEL_A\tSHARE_LEVEL_A\tCOUNT_A\tTOTAL_COUNT_A\tGROUP_B\tLEVEL_B\tSHARE_LEVEL_B\tCOUNT_B\tTOTAL_COUNT_B\n')
-        writer2.write(cdr3_text + '\tGROUP_A\tLEVEL_A\tSHARE_LEVEL_A\tCOUNT_A\tTOTAL_COUNT_A\tGROUP_B\n')
         numGroups = len(sampleGroups)
         for row_i in range(0, numGroups, 1):
             rowGroup = sampleGroups[row_i]
             for row_j in range(0, numGroups, 1):
                 if row_i == row_j: continue
                 colGroup = sampleGroups[row_j]
+                writer1.write('GROUPS\t' + rowGroup + '\t' + colGroup + '\n')
+                writer1.write(cdr3_text + '\tGROUP_A\tLEVEL_A\tSHARE_LEVEL_A\tCOUNT_A\tTOTAL_COUNT_A\tGROUP_B\tLEVEL_B\tSHARE_LEVEL_B\tCOUNT_B\tTOTAL_COUNT_B\n')
+                writer2.write('GROUPS\t' + rowGroup + '\t' + colGroup + '\n')
+                writer2.write(cdr3_text + '\tGROUP_A\tLEVEL_A\tSHARE_LEVEL_A\tCOUNT_A\tTOTAL_COUNT_A\tGROUP_B\n')
                 count_array = []
                 string_array = []
                 diff_count_array = []
@@ -488,8 +603,9 @@ def generate_share_comparison(inputDict, outputSpec, level, sublevel):
         writer1.close()
         writer2.close()
 
-    if sublevel is None: group_comparison()
-    else: group_level_comparison()
+    if len(sampleGroups) != 0:
+        if sublevel is None: group_comparison()
+        else: group_level_comparison()
 
 def initialize_calculation_module(inputDict, metadataDict, headerMapping):
     """Perform any module initialization"""
@@ -497,32 +613,49 @@ def initialize_calculation_module(inputDict, metadataDict, headerMapping):
     groups = inputDict[defaults.groupsKey]
     for group in groups: cdr3_histograms[group] = { 'aa': [], 'nucleotide': [] }
 
-def process_record(inputDict, metadataDict, headerMapping, groupSet, calc, fields):
+def process_record(inputDict, metadataDict, currentFile, headerMapping, groupSet, calc, fields):
     """Perform calculation from given fields"""
     # length operations
     if lengthKey in calc['operations']:
         groups = inputDict[defaults.groupsKey]
         for group in groupSet:
-            if (groups[group]['type'] == 'sampleGroup'): continue
-            cdr3 = fields[headerMapping[defaults.headerNames['CDR3_AA']]]
-            if cdr3 is not None: increment_count(cdr3_histograms[group]['aa'], cdr3)
-            cdr3 = fields[headerMapping[defaults.headerNames['CDR3_SEQ']]]
-            if cdr3 is not None: increment_count(cdr3_histograms[group]['nucleotide'], cdr3)
+            if (groups[group]['type'] == 'sampleGroup'):
+                for sample in groups[group]['samples']:
+                    if not cdr3_histograms.get(sample): cdr3_histograms[sample] = { 'aa': [], 'nucleotide': [] }
+                    if metadata.file_in_sample(inputDict, defaults.summaryKey, currentFile, group, sample):
+                        cdr3 = fields[headerMapping[defaults.headerNames['CDR3_AA']]]
+                        if cdr3 is not None: increment_count(cdr3_histograms[sample]['aa'], cdr3)
+                        cdr3 = fields[headerMapping[defaults.headerNames['CDR3_SEQ']]]
+                        if cdr3 is not None: increment_count(cdr3_histograms[sample]['nucleotide'], cdr3)
+            else:
+                cdr3 = fields[headerMapping[defaults.headerNames['CDR3_AA']]]
+                if cdr3 is not None: increment_count(cdr3_histograms[group]['aa'], cdr3)
+                cdr3 = fields[headerMapping[defaults.headerNames['CDR3_SEQ']]]
+                if cdr3 is not None: increment_count(cdr3_histograms[group]['nucleotide'], cdr3)
 
     # share/unique sequence operations
     if sharedKey in calc['operations']:
+        groups = inputDict[defaults.groupsKey]
         invert_hierarchy = gldb.getInvertHierarchyBy(inputDict[defaults.organismKey])
         for l in calc['levels']:
             sublevel = None
             level = None
             if l == 'aa':
+                if len(groupSet) == 0: continue
                 cdr3 = fields[headerMapping[defaults.headerNames['CDR3_AA']]]
                 if cdr3 is not None and len(cdr3) > 0:
+                    if len(groupSet) == 0: continue
                     cdr3_entry = cdr3_shared[l].get(cdr3)
                     if cdr3_entry is None:
                         cdr3_shared[l][cdr3] = {}
                         cdr3_entry = cdr3_shared[l].get(cdr3)
+                    moreGroups = set(groupSet)
                     for group in groupSet:
+                        if (groups[group]['type'] == 'sampleGroup'):
+                            for sample in groups[group]['samples']:
+                                if metadata.file_in_sample(inputDict, defaults.summaryKey, currentFile, group, sample):
+                                    moreGroups.add(sample)
+                    for group in moreGroups:
                         group_entry = cdr3_entry.get(group)
                         if group_entry is None:
                             cdr3_entry[group] = { 'count': 0, 'total_count': 0 }
@@ -531,13 +664,21 @@ def process_record(inputDict, metadataDict, headerMapping, groupSet, calc, field
                         group_entry['total_count'] = group_entry['total_count'] + defaults.get_dupcount(headerMapping, fields)
 
             elif l == 'nucleotide':
+                if len(groupSet) == 0: continue
                 cdr3 = fields[headerMapping[defaults.headerNames['CDR3_SEQ']]]
                 if cdr3 is not None and len(cdr3) > 0:
+                    if len(groupSet) == 0: continue
                     cdr3_entry = cdr3_shared[l].get(cdr3)
                     if cdr3_entry is None:
                         cdr3_shared[l][cdr3] = {}
                         cdr3_entry = cdr3_shared[l].get(cdr3)
+                    moreGroups = set(groupSet)
                     for group in groupSet:
+                        if (groups[group]['type'] == 'sampleGroup'):
+                            for sample in groups[group]['samples']:
+                                if metadata.file_in_sample(inputDict, defaults.summaryKey, currentFile, group, sample):
+                                    moreGroups.add(sample)
+                    for group in moreGroups:
                         group_entry = cdr3_entry.get(group)
                         if group_entry is None:
                             cdr3_entry[group] = { 'count': 0, 'total_count': 0 }
@@ -546,6 +687,7 @@ def process_record(inputDict, metadataDict, headerMapping, groupSet, calc, field
                         group_entry['total_count'] = group_entry['total_count'] + defaults.get_dupcount(headerMapping, fields)
 
             elif l == 'v,aa':
+                if len(groupSet) == 0: continue
                 level = 'v'
                 sublevel = 'aa'
                 cdr3 = fields[headerMapping[defaults.headerNames['CDR3_AA']]]
@@ -564,7 +706,13 @@ def process_record(inputDict, metadataDict, headerMapping, groupSet, calc, field
                     if cdr3_entry is None:
                         cdr3_shared_level[cdr3] = {}
                         cdr3_entry = cdr3_shared_level[cdr3]
+                    moreGroups = set(groupSet)
                     for group in groupSet:
+                        if (groups[group]['type'] == 'sampleGroup'):
+                            for sample in groups[group]['samples']:
+                                if metadata.file_in_sample(inputDict, defaults.summaryKey, currentFile, group, sample):
+                                    moreGroups.add(sample)
+                    for group in moreGroups:
                         group_entry = cdr3_entry.get(group)
                         if group_entry is None:
                             cdr3_entry[group] = { 'count': 0, 'total_count': 0 }
@@ -573,13 +721,13 @@ def process_record(inputDict, metadataDict, headerMapping, groupSet, calc, field
                         group_entry['total_count'] = group_entry['total_count'] + defaults.get_dupcount(headerMapping, fields)
 
             elif l == 'v,nucleotide':
+                if len(groupSet) == 0: continue
                 level = 'v'
                 sublevel = 'nucleotide'
                 cdr3 = fields[headerMapping[defaults.headerNames['CDR3_SEQ']]]
                 if cdr3 is not None and cdr3 != 'None' and len(cdr3) > 0:
                     vcall = fields[headerMapping[defaults.headerNames['V_CALL']]]
                     if not vcall or vcall == 'None': continue
-                    #print(fields)
                     vgene = invert_hierarchy[vcall]
                     if not vgene: continue
                     vgene = vgene.keys()[0]
@@ -592,7 +740,13 @@ def process_record(inputDict, metadataDict, headerMapping, groupSet, calc, field
                     if cdr3_entry is None:
                         cdr3_shared_level[cdr3] = {}
                         cdr3_entry = cdr3_shared_level[cdr3]
+                    moreGroups = set(groupSet)
                     for group in groupSet:
+                        if (groups[group]['type'] == 'sampleGroup'):
+                            for sample in groups[group]['samples']:
+                                if metadata.file_in_sample(inputDict, defaults.summaryKey, currentFile, group, sample):
+                                    moreGroups.add(sample)
+                    for group in moreGroups:
                         group_entry = cdr3_entry.get(group)
                         if group_entry is None:
                             cdr3_entry[group] = { 'count': 0, 'total_count': 0 }
@@ -601,6 +755,7 @@ def process_record(inputDict, metadataDict, headerMapping, groupSet, calc, field
                         group_entry['total_count'] = group_entry['total_count'] + defaults.get_dupcount(headerMapping, fields)
 
             elif l == 'vj,aa':
+                if len(groupSet) == 0: continue
                 level = 'vj'
                 sublevel = 'aa'
                 cdr3 = fields[headerMapping[defaults.headerNames['CDR3_AA']]]
@@ -626,7 +781,13 @@ def process_record(inputDict, metadataDict, headerMapping, groupSet, calc, field
                     if cdr3_entry is None:
                         cdr3_shared_level[cdr3] = {}
                         cdr3_entry = cdr3_shared_level[cdr3]
+                    moreGroups = set(groupSet)
                     for group in groupSet:
+                        if (groups[group]['type'] == 'sampleGroup'):
+                            for sample in groups[group]['samples']:
+                                if metadata.file_in_sample(inputDict, defaults.summaryKey, currentFile, group, sample):
+                                    moreGroups.add(sample)
+                    for group in moreGroups:
                         group_entry = cdr3_entry.get(group)
                         if group_entry is None:
                             cdr3_entry[group] = { 'count': 0, 'total_count': 0 }
@@ -635,6 +796,7 @@ def process_record(inputDict, metadataDict, headerMapping, groupSet, calc, field
                         group_entry['total_count'] = group_entry['total_count'] + defaults.get_dupcount(headerMapping, fields)
 
             elif l == 'vj,nucleotide':
+                if len(groupSet) == 0: continue
                 level = 'vj'
                 sublevel = 'nucleotide'
                 cdr3 = fields[headerMapping[defaults.headerNames['CDR3_SEQ']]]
@@ -660,7 +822,13 @@ def process_record(inputDict, metadataDict, headerMapping, groupSet, calc, field
                     if cdr3_entry is None:
                         cdr3_shared_level[cdr3] = {}
                         cdr3_entry = cdr3_shared_level[cdr3]
+                    moreGroups = set(groupSet)
                     for group in groupSet:
+                        if (groups[group]['type'] == 'sampleGroup'):
+                            for sample in groups[group]['samples']:
+                                if metadata.file_in_sample(inputDict, defaults.summaryKey, currentFile, group, sample):
+                                    moreGroups.add(sample)
+                    for group in moreGroups:
                         group_entry = cdr3_entry.get(group)
                         if group_entry is None:
                             cdr3_entry[group] = { 'count': 0, 'total_count': 0 }
@@ -676,6 +844,11 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
         for group in groups:
             compute_relative(group, 'aa')
             compute_relative(group, 'nucleotide')
+            if (groups[group]['type'] == 'sampleGroup'):
+                for sample in groups[group]['samples']:
+                    compute_relative(sample, 'aa')
+                    compute_relative(sample, 'nucleotide')
+                    
         for group in groups:
             # output specification for process metadata
             if (not outputSpec['files'].get(group + "_cdr3_length")): outputSpec['files'][group + "_cdr3_length"] = {}
@@ -730,24 +903,62 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
             if level == 'aa':
                 generate_share_summary(inputDict, level, None)
                 write_share_summary(inputDict, outputSpec, level, None)
-                generate_share_comparison(inputDict, outputSpec, level, None)
+                #generate_share_comparison(inputDict, outputSpec, level, None)
             if level == 'nucleotide':
                 generate_share_summary(inputDict, level, None)
                 write_share_summary(inputDict, outputSpec, level, None)
-                generate_share_comparison(inputDict, outputSpec, level, None)
+                #generate_share_comparison(inputDict, outputSpec, level, None)
             if level == 'v,aa':
                 generate_share_summary(inputDict, 'v', 'aa')
                 write_share_summary(inputDict, outputSpec, 'v', 'aa')
-                generate_share_comparison(inputDict, outputSpec, 'v', 'aa')
+                #generate_share_comparison(inputDict, outputSpec, 'v', 'aa')
             if level == 'v,nucleotide':
                 generate_share_summary(inputDict, 'v', 'nucleotide')
                 write_share_summary(inputDict, outputSpec, 'v', 'nucleotide')
-                generate_share_comparison(inputDict, outputSpec, 'v', 'nucleotide')
+                #generate_share_comparison(inputDict, outputSpec, 'v', 'nucleotide')
             if level == 'vj,aa':
                 generate_share_summary(inputDict, 'vj', 'aa')
                 write_share_summary(inputDict, outputSpec, 'vj', 'aa')
-                generate_share_comparison(inputDict, outputSpec, 'vj', 'aa')
+                #generate_share_comparison(inputDict, outputSpec, 'vj', 'aa')
             if level == 'vj,nucleotide':
                 generate_share_summary(inputDict, 'vj', 'nucleotide')
                 write_share_summary(inputDict, outputSpec, 'vj', 'nucleotide')
-                generate_share_comparison(inputDict, outputSpec, 'vj', 'nucleotide')
+                #generate_share_comparison(inputDict, outputSpec, 'vj', 'nucleotide')
+
+    # shared/unique pairwise comparison
+    if compareKey in calc['operations']:
+        groups = inputDict[defaults.groupsKey]
+        filePrefix = 'group'
+        if len(groups) == 2: filePrefix = '_'.join(groups.keys())
+        for level in calc['levels']:
+            if level == 'aa':
+                for group in groups:
+                    read_share_detail(inputDict, group, level, None)
+                #print(cdr3_shared)
+                generate_share_summary(inputDict, level, None)
+                generate_share_comparison(inputDict, outputSpec, filePrefix, level, None)
+            if level == 'nucleotide':
+                for group in groups:
+                    read_share_detail(inputDict, group, level, None)
+                generate_share_summary(inputDict, level, None)
+                generate_share_comparison(inputDict, outputSpec, filePrefix, level, None)
+            if level == 'v,aa':
+                for group in groups:
+                    read_share_detail(inputDict, group, 'v', 'aa')
+                generate_share_summary(inputDict, 'v', 'aa')
+                generate_share_comparison(inputDict, outputSpec, filePrefix, 'v', 'aa')
+            if level == 'v,nucleotide':
+                for group in groups:
+                    read_share_detail(inputDict, group, 'v', 'nucleotide')
+                generate_share_summary(inputDict, 'v', 'nucleotide')
+                generate_share_comparison(inputDict, outputSpec, filePrefix, 'v', 'nucleotide')
+            if level == 'vj,aa':
+                for group in groups:
+                    read_share_detail(inputDict, group, 'vj', 'aa')
+                generate_share_summary(inputDict, 'vj', 'aa')
+                generate_share_comparison(inputDict, outputSpec, filePrefix, 'vj', 'aa')
+            if level == 'vj,nucleotide':
+                for group in groups:
+                    read_share_detail(inputDict, group, 'vj', 'nucleotide')
+                generate_share_summary(inputDict, 'vj', 'nucleotide')
+                generate_share_comparison(inputDict, outputSpec, filePrefix, 'vj', 'nucleotide')

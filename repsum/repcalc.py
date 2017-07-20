@@ -165,7 +165,7 @@ def main():
         first = True
         for sfile in summaryFiles:
                 input_file = namesDict[sfile]
-                print('Processing file: ' + input_file)
+                #print('Processing file: ' + input_file)
                 groupSet = groups_for_file(inputDict, defaults.summaryKey, sfile)
                 #print(groupSet)
                 try:
@@ -188,7 +188,7 @@ def main():
                                 for calc in calcs:
                                         if defaults.calcFilters in calc and calc[defaults.calcFilters] is not None and 'productive' in calc[defaults.calcFilters] and not isRecordFunctional(headerMapping, fields): continue
                                         cmod = defaults.calculationModules[calc['type']]['module']
-                                        cmod.process_record(inputDict, metadataDict, headerMapping, groupSet, calc, fields)
+                                        cmod.process_record(inputDict, metadataDict, sfile, headerMapping, groupSet, calc, fields)
                         
                 except:
                         print("ERROR: Could not process summary file: " + input_file)
