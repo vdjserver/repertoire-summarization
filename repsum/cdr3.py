@@ -397,33 +397,38 @@ def generate_share_comparison(inputDict, outputSpec, filePrefix, level, sublevel
         writer1.write('\n')
         writer2.write('\n')
         writer1.write(cdr3_text + '\tGROUP_A\tLEVEL_A\tCOUNT_A\tTOTAL_COUNT_A\tGROUP_B\tLEVEL_B\tCOUNT_B\tTOTAL_COUNT_B\n')
-        writer2.write('GROUP_A\tLEVEL_A\tGROUP_B\tLEVEL_B\tDIFF\n')
+        writer2.write(cdr3_text + '\tGROUP_A\tLEVEL_A\tGROUP_B\tLEVEL_B\tCOUNT_A\tTOTAL_COUNT_A\n')
 
         for i in range(0, numSingle, 1):
             rowGroup = singleGroups[i]
             for rowLevel in share_summary_cdr3[level][sublevel]:
                 if not share_summary_cdr3[level][sublevel][rowLevel].get(rowGroup): continue
                 for j in range(0, numSingle, 1):
+                    if i == j: continue
                     colGroup = singleGroups[j]
-                    if metadata.sample_contains_file(inputDict, rowGroup, colGroup): continue
-                    for colLevel in share_summary_cdr3[level][sublevel]:
-                        if not share_summary_cdr3[level][sublevel][colLevel].get(colGroup): continue
-                        A = set(share_summary_cdr3[level][sublevel][rowLevel][rowGroup].keys())
-                        B = set(share_summary_cdr3[level][sublevel][colLevel][colGroup].keys())
-                        singleShared = A & B
-                        singleDiff = A - B
-                        if len(singleShared) > 0:
-                            for cdr3 in singleShared:
-                                writer1.write(cdr3)
-                                writer1.write('\t' + rowGroup + '\t' + rowLevel)
-                                writer1.write('\t' + str(share_summary_cdr3[level][sublevel][rowLevel][rowGroup][cdr3]['count']))
-                                writer1.write('\t' + str(share_summary_cdr3[level][sublevel][rowLevel][rowGroup][cdr3]['total_count']))
-                                writer1.write('\t' + colGroup + '\t' + colLevel)
-                                writer1.write('\t' + str(share_summary_cdr3[level][sublevel][colLevel][colGroup][cdr3]['count']))
-                                writer1.write('\t' + str(share_summary_cdr3[level][sublevel][colLevel][colGroup][cdr3]['total_count']))
-                                writer1.write('\n')
-                            writer2.write(rowGroup + '\t' + rowLevel + '\t' + colGroup + '\t' + colLevel)
-                            writer2.write('\t' + str(len(singleDiff)))
+                    #if metadata.sample_contains_file(inputDict, rowGroup, colGroup): continue
+                    if not share_summary_cdr3[level][sublevel][rowLevel].get(colGroup): continue
+                    A = set(share_summary_cdr3[level][sublevel][rowLevel][rowGroup].keys())
+                    B = set(share_summary_cdr3[level][sublevel][rowLevel][colGroup].keys())
+                    singleShared = A & B
+                    singleDiff = A - B
+                    if len(singleShared) > 0:
+                        for cdr3 in singleShared:
+                            writer1.write(cdr3)
+                            writer1.write('\t' + rowGroup + '\t' + rowLevel)
+                            writer1.write('\t' + str(share_summary_cdr3[level][sublevel][rowLevel][rowGroup][cdr3]['count']))
+                            writer1.write('\t' + str(share_summary_cdr3[level][sublevel][rowLevel][rowGroup][cdr3]['total_count']))
+                            writer1.write('\t' + colGroup + '\t' + rowLevel)
+                            writer1.write('\t' + str(share_summary_cdr3[level][sublevel][rowLevel][colGroup][cdr3]['count']))
+                            writer1.write('\t' + str(share_summary_cdr3[level][sublevel][rowLevel][colGroup][cdr3]['total_count']))
+                            writer1.write('\n')
+                    if len(singleDiff) > 0:
+                        for cdr3 in singleDiff:
+                            writer2.write(cdr3)
+                            writer2.write('\t' + rowGroup + '\t' + rowLevel)
+                            writer2.write('\t' + colGroup + '\t' + rowLevel)
+                            writer2.write('\t' + str(share_summary_cdr3[level][sublevel][rowLevel][rowGroup][cdr3]['count']))
+                            writer2.write('\t' + str(share_summary_cdr3[level][sublevel][rowLevel][rowGroup][cdr3]['total_count']))
                             writer2.write('\n')
 
     if len(singleGroups) != 0:
