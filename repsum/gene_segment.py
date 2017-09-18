@@ -27,7 +27,7 @@ def initialize_calculation_module(inputDict, metadataDict, headerMapping):
         combo_counters[group] = {}
     return
 
-def process_record(inputDict, metadataDict, headerMapping, groupSet, calc, fields):
+def process_record(inputDict, metadataDict, currentFile, headerMapping, groupSet, calc, fields):
     """Perform calculation from given fields"""
     groups = inputDict[defaults.groupsKey]
     for group in groupSet: 
