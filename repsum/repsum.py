@@ -93,7 +93,7 @@ def main():
 					combo_counter.addVDJRecombination(vseg,dseg,jseg,False)
 
 			#write rep-char
-			summarize.appendAnnToFileWithMap(fHandle,read_analysis_results['ann_map'],read_num,query_record.id,None,"None",logHandle)
+			summarize.appendAnnToFileWithMap(fHandle,read_analysis_results['ann_map'],read_num,read_result_obj.id(),None,"None",logHandle)
 
 			#increment the read number
 			read_num+=1

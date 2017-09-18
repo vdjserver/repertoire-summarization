@@ -915,12 +915,15 @@ def appendAnnToFileWithMap(fHandle,m,rid,read_name,desiredKeys=None,defaultValue
         read_new_name = read_name
         read_split = read_name.split('|')
         if len(read_split) > 1:
+		name_list = [ read_split[0] ]
                 read_new_name = read_split[0]
                 for i in range(1, len(read_split), 1):
                         field_split = read_split[i].split('=')
                         if len(field_split) == 2:
                                 keys_to_append.append(field_split[0])
                                 m[field_split[0]] = field_split[1]
+			else: name_list.append(read_split[i])
+		read_new_name = '|'.join(name_list)
 
 	#use the keys in the to_append list and add them as keys
 	keys=list()
