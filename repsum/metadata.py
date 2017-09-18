@@ -34,3 +34,22 @@ def sample_for_uuid(inputDict, uuid):
                                 if sample == uuid: return group
         return None
 
+# Determine if a sample contains a file
+# sample/file group id can be passed in either parameter
+def sample_contains_file(inputDict, group1, group2):
+        if group1 == group2: return True
+        if not inputDict[defaults.groupsKey].get(group1): return False
+        if not inputDict[defaults.groupsKey].get(group2): return False
+        group1_type = inputDict[defaults.groupsKey][group1]['type']
+        if group1_type == 'sampleGroup': return False
+        group2_type = inputDict[defaults.groupsKey][group2]['type']
+        if group2_type == 'sampleGroup': return False
+        if group1_type == 'sample' and group2_type == 'file':
+                for sampleKey in inputDict[defaults.groupsKey][group1]['samples']:
+                        for sampleFile in inputDict[defaults.groupsKey][group1]['samples'][sampleKey]:
+                                if sampleFile == group2: return True
+        elif group1_type == 'file' and group2_type == 'sample':
+                for sampleKey in inputDict[defaults.groupsKey][group2]['samples']:
+                        for sampleFile in inputDict[defaults.groupsKey][group2]['samples'][sampleKey]:
+                                if sampleFile == group1: return True
+        return False

@@ -911,12 +911,24 @@ def appendAnnToFileWithMap(fHandle,m,rid,read_name,desiredKeys=None,defaultValue
 #	"FR1 homology% (imgt)",
 #	"FR1 nucleotide read (imgt)"
 
+        # add fields encoded in read_name
+        read_new_name = read_name
+        read_split = read_name.split('|')
+        if len(read_split) > 1:
+                read_new_name = read_split[0]
+                for i in range(1, len(read_split), 1):
+                        field_split = read_split[i].split('=')
+                        if len(field_split) == 2:
+                                keys_to_append.append(field_split[0])
+                                m[field_split[0]] = field_split[1]
+
 	#use the keys in the to_append list and add them as keys
 	keys=list()
 	for ki in range(len(keys_to_append)):
 		keys.append(keys_to_append[ki])
+
 	#set the READ ID in the map
-	m[keys[0]]=read_name
+	m[keys[0]]=read_new_name
 	global release_info_tag
 	global release_info_hash	
 	#m[keys[len(keys)-2]]=release_info_tag
