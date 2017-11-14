@@ -305,7 +305,7 @@ def create_config():
             flatMetadata = flatten_study_metadata(studyMetadata)
             #print(derivationMap)
             #print(jobMetadata)
-            print(json.dumps(flatMetadata, indent=2))
+            #print(json.dumps(flatMetadata, indent=2))
 
             # samples
             sampleList = []
