@@ -47,9 +47,6 @@ COPY . /repsum-root
 # install repsum
 RUN cd /repsum-root && python setup.py install
 
-# changeo setup for germline database
-RUN cd /repsum-root/docker && bash changeo_setup.sh
-
 # setup run environment
 ENV DB_DIR "/db"
 ENV VDJ_DB_ROOT "/db/10_05_2016/"
@@ -59,3 +56,6 @@ ENV PATH "$PATH:/igblast-root/local/bin"
 ENV PYTHONPATH "/VDJMLpy-$VDJML_VERSION:$PYTHONPATH"
 ENV PYTHONPATH "/VDJMLpy-$VDJML_VERSION/vdjml:$PYTHONPATH"
 ENV LD_LIBRARY_PATH "/VDJMLpy-$VDJML_VERSION/vdjml:$LD_LIBRARY_PATH"
+
+# changeo setup for germline database
+RUN cd /repsum-root/docker && bash changeo_setup.sh
