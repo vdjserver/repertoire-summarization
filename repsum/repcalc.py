@@ -121,25 +121,20 @@ def flatten_study_metadata(studyMetadata):
     attach_records(records, 'cellProcessing', 'sample', studyMetadata.get('sampleMetadata'), 'sample_uuid')
     attach_records(records, 'sample', 'subject', studyMetadata.get('subjectMetadata'), 'subject_uuid')
 
-    return records
+    results = {}
+    for r in records:
+        results[r['nucleicAcidProcessing']['uuid']] = r
 
-def restrict_by_logical(sampleList, studyMetadata, sampleGroup):
+    return results
+
+def restrict_by_logical(sampleList, flatMetadata, sampleGroup):
     newList = []
     for sampleKey in sampleList:
-        sample = studyMetadata['samples'][sampleKey]
+        sample = flatMetadata[sampleKey]
         # get the field value
         logicalSplit = sampleGroup['value']['logical_field'].split('.')
-        if logicalSplit[0] == 'sample': fieldValue = sample['value'][logicalSplit[1]]
-        elif logicalSplit[0] == 'subject':
-            subjectKey = sample['value'].get('subject_id')
-            if subjectKey: subject = studyMetadata['subjects'][subjectKey]
-            else:
-                print('WARNING: sample group (', sampleGroup['uuid'],
-                      ') has logical on (', sampleGroup['value']['logical_field'],
-                      ') but sample (', sample['uuid'],
-                      ') does not have associated subject metadata')
-                continue
-            fieldValue = subject['value'][logicalSplit[1]]
+        if sample.get(logicalSplit[0]):
+            fieldValue = sample[logicalSplit[0]].get(logicalSplit[1])
         else:
             print('WARNING: sample group (', sampleGroup['uuid'],
                   ') has unknown logical field (', sampleGroup['value']['logical_field'], ')')
@@ -158,22 +153,13 @@ def restrict_by_logical(sampleList, studyMetadata, sampleGroup):
         if result: newList.append(sampleKey)
     return newList
 
-def group_by_category(sampleList, studyMetadata, sampleGroup):
+def group_by_category(sampleList, flatMetadata, sampleGroup):
     categorySplit = sampleGroup['value']['category'].split('.')
     groupBy = {}
     for sampleKey in sampleList:
-        sample = studyMetadata['samples'][sampleKey]
-        if categorySplit[0] == 'sample': fieldValue = sample['value'][categorySplit[1]]
-        elif categorySplit[0] == 'subject':
-            subjectKey = sample['value'].get('subject_id')
-            if subjectKey: subject = studyMetadata['subjects'][subjectKey]
-            else:
-                print('WARNING: sample group (', sampleGroup['uuid'],
-                      ') has category on (', sampleGroup['value']['category'],
-                      ') but sample (', sample['uuid'],
-                      ') does not have associated subject metadata')
-                continue
-            fieldValue = subject['value'][categorySplit[1]]
+        sample = flatMetadata[sampleKey]
+        if sample.get(categorySplit[0]):
+            fieldValue = sample[categorySplit[0]].get(categorySplit[1])
         else:
             print('WARNING: sample group (', sampleGroup['uuid'],
                   ') has unknown category field (', sampleGroup['value']['category'], ')')
@@ -325,15 +311,14 @@ def create_config():
             sampleList = []
             sampleFiles = {}
             sampleCount = 0
-            for sample in flatMetadata:
-                projectFile = sample.get('nucleicAcidProcessing').get('filename_uuid')
+            for key in flatMetadata:
+                projectFile = flatMetadata[key].get('nucleicAcidProcessing').get('filename_uuid')
                 if not projectFile: continue
 
                 # we can only include the samples for which we have data files in the job
                 fileList = file_list_for_sample(config, studyMetadata, derivationMap, projectFile)
                 #print(fileList)
                 if len(fileList) > 0:
-                    key = sample.get('nucleicAcidProcessing').get('uuid')
                     sampleName = 'sample' + str(sampleCount)
                     sampleList.append(key)
                     sampleFiles[key] = fileList
@@ -351,7 +336,7 @@ def create_config():
                 else: sList = sampleList
                 # restrict by logical
                 if len(sampleGroup['value']['logical_field']) > 0:
-                    sList = restrict_by_logical(sList, studyMetadata, sampleGroup)
+                    sList = restrict_by_logical(sList, flatMetadata, sampleGroup)
                 # exclude samples not available in input
                 groupSet = set(sList)
                 iSet = groupSet & sampleSet
@@ -361,7 +346,7 @@ def create_config():
                 # group by category
                 groupBy = None
                 if len(sampleGroup['value']['category']) > 0:
-                    groupBy = group_by_category(sList, studyMetadata, sampleGroup)
+                    groupBy = group_by_category(sList, flatMetadata, sampleGroup)
                     for groupKey in groupBy:
                         groupName = 'sampleGroup' + str(groupCount)
                         #print(groupName)
