@@ -188,7 +188,7 @@ def generate_combo_summary(inputDict, outputSpec, calc):
     for group in groups:
         if (groups[group]['type'] == 'sampleGroup'):
             for level in calc['levels']:
-                if combo_counters[group][level] is None: continue
+                if combo_counters[group].get(level) is None: continue
                 if summary_combo_counters.get(group) is None: summary_combo_counters[group] = {}
                 if summary_combo_counters[group].get(level) is None: summary_combo_counters[group][level] = {}
                 for entry in combo_counters[group][level]:
@@ -213,8 +213,8 @@ def generate_combo_detail(inputDict, outputSpec, calc):
     groups = inputDict[defaults.groupsKey]
     for level in calc['levels']:
         for group in groups:
-            if combo_counters[group] is None: continue
-            if combo_counters[group][level] is None: continue
+            if combo_counters.get(group) is None: continue
+            if combo_counters[group].get(level) is None: continue
             combo_entry = combo_counters[group][level]
             #print(combo_entry)
             filename = group + "_" + level + "_segment_combos.tsv"
@@ -276,7 +276,9 @@ def generate_combo_comparison(inputDict, outputSpec, calc):
         writer1 = open(filename1, 'w')
         writer2 = open(filename2, 'w')
         for rowGroup in singleGroups:
-            row_entry = combo_counters[rowGroup][level]
+            if combo_counters.get(rowGroup) is None: continue
+            row_entry = combo_counters[rowGroup].get(level)
+            if not row_entry: continue
             A = set(row_entry.keys())
             string_array = []
             count_array = []
@@ -284,7 +286,9 @@ def generate_combo_comparison(inputDict, outputSpec, calc):
             diff_count_array = []
             for colGroup in singleGroups:
                 if metadata.sample_contains_file(inputDict, rowGroup, colGroup): continue
-                col_entry = combo_counters[colGroup][level]
+                if combo_counters.get(colGroup) is None: continue
+                col_entry = combo_counters[colGroup].get(level)
+                if not col_entry: continue
                 B = set(col_entry.keys())
                 singleShared = A & B
                 singleDiff = A - B
