@@ -73,6 +73,7 @@ setup(name='repsum',
 		'console_scripts': [
         	'repsum=repsum.repsum:main',
         	'repcalc=repsum.repcalc:main',
+        	'repcalc_create_config=repsum.repcalc:create_config',
     	],
 	  },
       scripts=scripts,

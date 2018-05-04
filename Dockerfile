@@ -1,5 +1,5 @@
 # Base Image
-FROM debian:jessie
+FROM vdjserver/igblast
 
 MAINTAINER VDJServer <vdjserver@utsouthwestern.edu>
 
@@ -11,57 +11,34 @@ MAINTAINER VDJServer <vdjserver@utsouthwestern.edu>
 
 # Install OS Dependencies
 RUN apt-get update && apt-get install -y \
-    build-essential \
-    doxygen \
-    git \
-    graphviz \
-    libbz2-dev \
-    libxml2-dev \
-    libxslt-dev \
-    python \
-    python-dev \
-    python-sphinx \
-    python-pip \
-    vim \
-    wget \
-    zlib1g-dev \
-    cpio \
-    emacs
+    libssl-dev \
+    python3 \
+    python3-pip \
+    python3-scipy \
+    r-base \
+    r-base-dev \
+    libssh2-1-dev \
+    libcurl4-openssl-dev \
+    libyaml-dev \
+    mercurial
 
 RUN pip install \
-    biopython \
-    lxml \
     numpy \
+    lxml \
     argparse \
     BeautifulSoup4 \
-    reportlab
+    reportlab \
+    biopython
 
-# Boost
-ENV BOOST_VERSION 1.57.0
-ENV BOOST_VERSION_LINK 1_57_0
-
-# Install/bootstrap boost
-RUN wget http://downloads.sourceforge.net/project/boost/boost/$BOOST_VERSION/boost_$BOOST_VERSION_LINK.tar.gz
-RUN tar -xvzf boost_$BOOST_VERSION_LINK.tar.gz
-RUN cd /boost_$BOOST_VERSION_LINK && ./bootstrap.sh --prefix=/usr/local
-RUN cd /boost_$BOOST_VERSION_LINK && ./b2 install
-RUN cd /boost_$BOOST_VERSION_LINK/tools/build && ./bootstrap.sh
-RUN cd /boost_$BOOST_VERSION_LINK/tools/build && ./b2 install --prefix=/usr/local
-
-# VDJML
-ENV VDJML_VERSION 0.1.4
-RUN git clone https://bitbucket.org/vdjserver/vdjml.git vdjml-root
-RUN cd /vdjml-root && git checkout develop
-RUN cp /vdjml-root/docker/boost/boost-build.jam /
-RUN cp /vdjml-root/docker/boost/user-config.jam /root/
-
-RUN cd /vdjml-root && b2
-RUN cd /vdjml-root && b2 distro-bindings-py
-RUN tar zxvf /vdjml-root/out/VDJMLpy-$VDJML_VERSION.tar.gz
+RUN pip3 install \
+    pandas \
+    biopython \
+    presto \
+    changeo
 
 # extract database
-COPY db.tgz /
-RUN tar zxvf db.tgz
+RUN wget http://wiki.vdjserver.org/db/db_10_05_2016.tgz
+RUN tar zxvf db_10_05_2016.tgz
 
 # Copy source
 RUN mkdir /repsum-root
@@ -79,3 +56,6 @@ ENV PATH "$PATH:/igblast-root/local/bin"
 ENV PYTHONPATH "/VDJMLpy-$VDJML_VERSION:$PYTHONPATH"
 ENV PYTHONPATH "/VDJMLpy-$VDJML_VERSION/vdjml:$PYTHONPATH"
 ENV LD_LIBRARY_PATH "/VDJMLpy-$VDJML_VERSION/vdjml:$LD_LIBRARY_PATH"
+
+# changeo setup for germline database
+RUN cd /repsum-root/docker && bash changeo_setup.sh
