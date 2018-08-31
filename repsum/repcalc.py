@@ -229,7 +229,7 @@ def create_config():
     template = { "groups": {}, "files": {}, "calculations": [] }
 
     parser = argparse.ArgumentParser(description='Generate RepCalc config.')
-    parser.add_argument('--init', type=str, nargs=3, help='Create initial config with metadata file', metavar=('metadata file', 'organism', 'seqtype'))
+    parser.add_argument('--init', type=str, nargs=3, help='Create initial config with metadata file', metavar=('metadata_file', 'organism', 'seqtype'))
     parser.add_argument('json_file', type=str, help='Output JSON file name')
 
     parser.add_argument('--geneSegmentLevels', type=str, nargs='*', help='Gene segment levels')
