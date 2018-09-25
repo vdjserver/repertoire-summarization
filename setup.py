@@ -9,12 +9,12 @@ import versioneer
 try:
     from setuptools import setup, find_packages
 except ImportError:
-    sys.exit('Please install setuptools before installing repsum.\n')
+    sys.exit('Please install setuptools before installing repcalc.\n')
 
 try:
     from pip.req import parse_requirements
 except ImportError:
-    sys.exit('Please install pip before installing repsum.\n')
+    sys.exit('Please install pip before installing repcalc.\n')
 
 with open('README.rst', 'r') as ip:
     long_description = ip.read()
@@ -28,7 +28,7 @@ else:
         install_requires = req.read().splitlines()
 
 # Setup
-setup(name='repsum',
+setup(name='repcalc',
       version=versioneer.get_version(),
       cmdclass=versioneer.get_cmdclass(),
       author='VDJServer Team',
@@ -44,10 +44,10 @@ setup(name='repsum',
       install_requires=install_requires,
       packages=find_packages(),
       entry_points={
-		'console_scripts': [
-        	'repcalc=repsum.repcalc:main',
-        	'repcalc_create_config=repsum.repcalc:create_config',
-                'repcalc_group_map=repsum.repcalc:generate_group_map',
+                'console_scripts': [
+                'repcalc=repcalc.repcalc:main',
+                'repcalc_create_config=repcalc.repcalc:create_config',
+                'repcalc_group_map=repcalc.repcalc:generate_group_map',
                 ]},
       classifiers=['Environment :: Console',
                    'Intended Audience :: Science/Research',
