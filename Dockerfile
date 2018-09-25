@@ -43,21 +43,21 @@ RUN wget http://wiki.vdjserver.org/db/db_10_05_2016.tgz
 RUN tar zxvf db_10_05_2016.tgz
 
 # Copy source
-RUN mkdir /repsum-root
-COPY . /repsum-root
+RUN mkdir /repcalc-root
+COPY . /repcalc-root
 
-# install repsum
-RUN cd /repsum-root && python setup.py install
+# install repcalc
+RUN cd /repcalc-root && python setup.py install
 
 # setup run environment
 ENV DB_DIR "/db"
 ENV VDJ_DB_ROOT "/db/10_05_2016/"
 ENV IGDATA "/db"
-ENV VDJSERVER_ROOT "/repsum-root"
+ENV VDJSERVER_ROOT "/repcalc-root"
 ENV PATH "$PATH:/igblast-root/local/bin"
 ENV PYTHONPATH "/VDJMLpy-$VDJML_VERSION:$PYTHONPATH"
 ENV PYTHONPATH "/VDJMLpy-$VDJML_VERSION/vdjml:$PYTHONPATH"
 ENV LD_LIBRARY_PATH "/VDJMLpy-$VDJML_VERSION/vdjml:$LD_LIBRARY_PATH"
 
 # changeo setup for germline database
-RUN cd /repsum-root/docker && bash changeo_setup.sh
+RUN cd /repcalc-root/docker && bash changeo_setup.sh
