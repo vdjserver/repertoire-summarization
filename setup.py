@@ -1,5 +1,5 @@
 """
-Repertoire-summarization setup
+Repertoire calculations
 """
 # Imports
 import os
@@ -45,7 +45,6 @@ setup(name='repsum',
       packages=find_packages(),
       entry_points={
 		'console_scripts': [
-        	'repsum=repsum.repsum:main',
         	'repcalc=repsum.repcalc:main',
         	'repcalc_create_config=repsum.repcalc:create_config',
                 'repcalc_group_map=repsum.repcalc:generate_group_map',
