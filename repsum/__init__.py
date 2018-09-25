@@ -2,15 +2,8 @@
 Repertoire-summarization
 """
 
-# Set package info
-from .version import __author__
-from .version import __email__
-from .version import __version__
-from .version import __date__
-from .version import __copyright__
-from .version import __license__
+__copyright__ = 'Copyright (C) 2014-2018 The University of Texas Southwestern Medical Center'
 
-# Set package level imports
-#__all__ = ['defaults']
-#from .defaults import *
-
+from ._version import get_versions
+__version__ = get_versions()['version']
+del get_versions

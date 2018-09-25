@@ -1,13 +1,13 @@
-#!/usr/bin/env python
 """
 Repertoire-summarization setup
 """
 # Imports
 import os
 import sys
+import versioneer
 
 try:
-    from setuptools import setup
+    from setuptools import setup, find_packages
 except ImportError:
     sys.exit('Please install setuptools before installing repsum.\n')
 
@@ -16,72 +16,44 @@ try:
 except ImportError:
     sys.exit('Please install pip before installing repsum.\n')
 
-# Get version, author and license information
-info_file = os.path.join('repsum', 'version.py')
-__version__, __author__, __license__ = None, None, None
-try:
-    exec(open(info_file).read())
-except:
-    sys.exit('Failed to load package information from %s.\n' % info_file)
+with open('README.rst', 'r') as ip:
+    long_description = ip.read()
 
-if __version__ is None:
-    sys.exit('Missing version information in %s\n.' % info_file)
-if __author__ is None:
-    sys.exit('Missing author information in %s\n.' % info_file)
-if __license__ is None:
-    sys.exit('Missing license information in %s\n.' % info_file)
-
-# Load long package description
-#desc_files = ['README.rst', 'INSTALL.rst', 'NEWS.rst']
-desc_files = ['README.rst']
-long_description = '\n\n'.join([open(f, 'r').read() for f in desc_files])
-
-# Define installation path for commandline tools
-scripts = ['vdjml_merge.py',
-           'igblast_tsv_merge.py',
-           'Cdr3_clone_identifier.py']
-
-# TODO: check pip version to avoid problem with parse_requirements(session=False)
 # Parse requirements
 if os.environ.get('READTHEDOCS', None) == 'True':
     # Set empty install_requires to get install to work on readthedocs
     install_requires = []
 else:
-    require_file = 'requirements.txt'
-    try:
-        requirements = parse_requirements(require_file, session=False)
-    except TypeError:
-        requirements = parse_requirements(require_file)
-    install_requires = [str(r.req) for r in requirements]
+    with open('requirements.txt') as req:
+        install_requires = req.read().splitlines()
 
 # Setup
 setup(name='repsum',
-      version=__version__,
-      author=__author__,
-      author_email=__email__,
+      version=versioneer.get_version(),
+      cmdclass=versioneer.get_cmdclass(),
+      author='VDJServer Team',
+      author_email='vdjserver@utsouthwestern.edu',
       description='Summarization functions for immune repertoire sequencing data.',
       long_description=long_description,
       zip_safe=False,
-      license=__license__,
+      license='GNU General Public License v3.0',
       url='https://vdjserver.org',
       download_url='https://bitbucket.org/vdjserver/repertoire-summarization/downloads',
-      keywords='bioinformatics immunoglobulin lymphocyte sequencing TCR CDR3',
+      keywords=['bioinformatics', 'sequencing', 'immunoglobulin', 'antibody', 'lymphocyte',
+                'adaptive immunity', 'T cell', 'B cell', 'BCR', 'TCR', 'CDR3'],
       install_requires=install_requires,
-      packages=['repsum'],
-      package_dir={'repsum': 'repsum'},
+      packages=find_packages(),
       entry_points={
 		'console_scripts': [
         	'repsum=repsum.repsum:main',
         	'repcalc=repsum.repcalc:main',
         	'repcalc_create_config=repsum.repcalc:create_config',
                 'repcalc_group_map=repsum.repcalc:generate_group_map',
-    	],
-	  },
-      scripts=scripts,
-      classifiers=['Development Status :: 4 - Beta',
-                   'Environment :: Console',
+                ]},
+      classifiers=['Environment :: Console',
                    'Intended Audience :: Science/Research',
                    'Natural Language :: English',
                    'Operating System :: OS Independent',
                    'Programming Language :: Python :: 2.7',
+                   'Programming Language :: Python :: 3',
                    'Topic :: Scientific/Engineering :: Bio-Informatics'])
