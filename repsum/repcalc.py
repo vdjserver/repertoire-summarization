@@ -229,7 +229,7 @@ def create_config():
     template = { "groups": {}, "files": {}, "calculations": [] }
 
     parser = argparse.ArgumentParser(description='Generate RepCalc config.')
-    parser.add_argument('--init', type=str, nargs=3, help='Create initial config with metadata file', metavar=('metadata file', 'organism', 'seqtype'))
+    parser.add_argument('--init', type=str, nargs=3, help='Create initial config with metadata file', metavar=('metadata_file', 'organism', 'seqtype'))
     parser.add_argument('json_file', type=str, help='Output JSON file name')
 
     parser.add_argument('--geneSegmentLevels', type=str, nargs='*', help='Gene segment levels')
@@ -442,6 +442,67 @@ def create_config():
         # save the json
         with open(args.json_file, 'w') as json_file:
             json.dump(config, json_file, indent=2)
+
+    else:
+        # invalid arguments
+        parser.print_help()
+
+
+def generate_group_map():
+    """Generate mapping of group names for config"""
+    parser = argparse.ArgumentParser(description='Generate RepCalc group map.')
+    parser.add_argument('json_file', type=str, help='RepCalc config file')
+
+    args = parser.parse_args()
+    if args:
+        # load json
+	try:
+                infile = open(args.json_file, 'rt')
+                inputDict = json.load(infile)
+	except:
+                print("Could not read input specification file: " + input_file)
+                raise
+	else:
+                infile.close()
+
+	input_file = inputDict[defaults.metadata_file_key]
+	try:
+                infile = open(input_file, 'rt')
+                metadataDict = json.load(infile)
+	except:
+                print("Could not read metadata file: " + input_file)
+                raise
+	else:
+                infile.close()
+
+        groups = inputDict[defaults.groupsKey]
+	files = inputDict[defaults.filesKey]
+        for group in groups:
+            if (groups[group]['type'] == 'file'):
+                uuid = files[group][defaults.summaryKey]['value']
+                name = metadata.filenames_from_uuids(metadataDict, [uuid])
+                print(group, name[uuid])
+        for group in groups:
+            if (groups[group]['type'] == 'sample'):
+                for sample in groups[group]['samples']:
+                    file = groups[group]['samples'][sample][0]
+                    uuid = files[file][defaults.summaryKey]['value']
+                    name = metadata.filenames_from_uuids(metadataDict, [uuid])
+                    print(group, name[uuid], sample)
+        for group in groups:
+            if (groups[group]['type'] == 'sampleGroup'):
+                key = groups[group]['sampleGroup']
+                sampleGroup = metadataDict['sampleGroups'][key]
+                desc = ''
+                if sampleGroup['value'].get('description') is not None:
+                    desc = 'description: ' + sampleGroup['value']['description']
+                category = ''
+                if groups[group].get('category') is not None:
+                    category = ', group by: ' + sampleGroup['value']['category'] + ' = ' + groups[group]['category']
+                logical = ''
+                if len(sampleGroup['value']['logical_field']) > 0:
+                    logical = ', logical: ' + sampleGroup['value']['logical_field'] + ' ' + sampleGroup['value']['logical_operator'] + ' ' + sampleGroup['value']['logical_value']
+                print(group, desc, category, logical)
 
     else:
         # invalid arguments

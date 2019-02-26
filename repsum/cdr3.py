@@ -13,6 +13,7 @@ import numpy
 
 # module operations
 lengthKey = "length"
+distributionKey = "distribution"
 sharedKey = "shared"
 compareKey = "compare"
 
@@ -60,6 +61,132 @@ def compute_relative(group, level):
     relArray = []
     for i in range(0, len(lenArray), 1): relArray.append(lenArray[i] / totalCount)
     cdr3_histograms[group]['rel_' + level] = relArray
+
+#
+# AA/NT distribution operations
+#
+aa_list = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y']
+nt_list = ['A', 'C', 'G', 'T']
+
+# first key is group
+# second key is aa/nt
+# third key is length
+# fourth key is position
+dist_counters = {}
+
+def aa_distribution(counter, cdr3):
+    l = len(cdr3)
+    if l < 1: return
+
+    # skip CDR3 if any invalid residues
+    for aa in cdr3:
+        if aa not in aa_list:
+            return
+
+    # initialize counters if necessary
+    cnt_dict = counter.get(l)
+    if cnt_dict is None:
+        counter[l] = {}
+        cnt_dict = counter[l]
+        for pos in range(l):
+            cnt_dict[pos] = {}
+            for aa in aa_list:
+                cnt_dict[pos][aa] = 0
+
+    for pos in range(l):
+        aa = cdr3[pos]
+        cnt_dict[pos][aa] = cnt_dict[pos][aa] + 1
+
+def nt_distribution(counter, cdr3):
+    l = len(cdr3)
+    if l < 1: return
+
+    # skip CDR3 if any invalid nucleotides
+    for nt in cdr3:
+        if nt not in nt_list:
+            return
+
+    # initialize counters if necessary
+    cnt_dict = counter.get(l)
+    if cnt_dict is None:
+        counter[l] = {}
+        cnt_dict = counter[l]
+        for pos in range(l):
+            cnt_dict[pos] = {}
+            for nt in nt_list:
+                cnt_dict[pos][nt] = 0
+
+    for pos in range(l):
+        nt = cdr3[pos]
+        cnt_dict[pos][nt] = cnt_dict[pos][nt] + 1
+
+def compute_relative_distribution(group, level, symbol_list):
+    cntArray = dist_counters[group][level]
+    relArray = {}
+    for l in cntArray:
+        if relArray.get(l) is None: relArray[l] = {}
+        for pos in cntArray[l]:
+            if relArray[l].get(pos) is None: relArray[l][pos] = {}
+            totalCount = 0.0
+            for symbol in symbol_list:
+                totalCount += cntArray[l][pos][symbol]
+            if totalCount == 0: totalCount = 1.0
+            for symbol in symbol_list:
+                relArray[l][pos][symbol] = cntArray[l][pos][symbol] / totalCount
+    dist_counters[group]['rel_' + level] = relArray
+
+def group_total_distribution(inputDict, sampleGroup, level, symbol_list):
+    groups = inputDict[defaults.groupsKey]
+    samples = groups[sampleGroup]['samples']
+
+    # totals
+    for sampleUuid in samples:
+        sample = metadata.sample_for_uuid(inputDict, sampleUuid)
+        sampleArray = dist_counters[sample][level]
+        groupArray = dist_counters[sampleGroup][level]
+        for l in sampleArray:
+            if groupArray.get(l) is None: groupArray[l] = {}
+            for pos in sampleArray[l]:
+                if groupArray[l].get(pos) is None: groupArray[l][pos] = {}
+                for symbol in symbol_list:
+                    if groupArray[l][pos].get(symbol) is None: groupArray[l][pos][symbol] = 0
+                    groupArray[l][pos][symbol] += sampleArray[l][pos][symbol]
+                        
+def group_average_distribution(inputDict, sampleGroup, level, symbol_list):
+    groups = inputDict[defaults.groupsKey]
+    samples = groups[sampleGroup]['samples']
+
+    dist_counters[sampleGroup][level + '_std'] = {}
+
+    # average/std
+    N = float(len(samples))
+    for sample in samples:
+        sampleArray = dist_counters[sample][level]
+        groupArray = dist_counters[sampleGroup][level]
+        stdArray = dist_counters[sampleGroup][level + '_std']
+        for l in sampleArray:
+            if groupArray.get(l) is None:
+                groupArray[l] = {}
+                stdArray[l] = {}
+            for pos in sampleArray[l]:
+                if groupArray[l].get(pos) is None:
+                    groupArray[l][pos] = {}
+                    stdArray[l][pos] = {}
+                for symbol in symbol_list:
+                    if groupArray[l][pos].get(symbol) is None:
+                        groupArray[l][pos][symbol] = 0
+                        stdArray[l][pos][symbol] = 0.0
+                    groupArray[l][pos][symbol] += sampleArray[l][pos][symbol]
+                    stdArray[l][pos][symbol] += sampleArray[l][pos][symbol] * sampleArray[l][pos][symbol]
+
+    groupArray = dist_counters[sampleGroup][level]
+    stdArray = dist_counters[sampleGroup][level + '_std']
+    for l in groupArray:
+        for pos in groupArray[l]:
+            for symbol in symbol_list:
+                if N > 1: stdArray[l][pos][symbol] = math.sqrt((stdArray[l][pos][symbol] - groupArray[l][pos][symbol] * groupArray[l][pos][symbol] / N) / (N - 1.0))
+                else: stdArray[l][pos][symbol] = 0.0
+                groupArray[l][pos][symbol] /= N
 
 #
 # shared/unique sequence operations
@@ -640,9 +767,11 @@ def generate_share_comparison(inputDict, outputSpec, filePrefix, level, sublevel
 
 def initialize_calculation_module(inputDict, metadataDict, headerMapping):
     """Perform any module initialization"""
-    # length operations
+    # length and AA/NT distribution operations
     groups = inputDict[defaults.groupsKey]
-    for group in groups: cdr3_histograms[group] = { 'aa': [], 'nucleotide': [] }
+    for group in groups:
+        cdr3_histograms[group] = { 'aa': [], 'nucleotide': [] }
+        dist_counters[group] = { 'aa': {}, 'nucleotide': {} }
 
 def process_record(inputDict, metadataDict, currentFile, headerMapping, groupSet, calc, fields):
     """Perform calculation from given fields"""
@@ -663,6 +792,19 @@ def process_record(inputDict, metadataDict, currentFile, headerMapping, groupSet
                 if cdr3 is not None: increment_count(cdr3_histograms[group]['aa'], cdr3)
                 cdr3 = fields[headerMapping[defaults.headerNames['CDR3_SEQ']]]
                 if cdr3 is not None: increment_count(cdr3_histograms[group]['nucleotide'], cdr3)
+
+    # AA/NT distribution operations
+    if distributionKey in calc['operations']:
+        groups = inputDict[defaults.groupsKey]
+        for group in groupSet:
+            if (groups[group]['type'] == 'sampleGroup'):
+                # samples groups are aggregated at the end
+                continue
+            else:
+                cdr3 = fields[headerMapping[defaults.headerNames['CDR3_AA']]]
+                if cdr3 is not None: aa_distribution(dist_counters[group]['aa'], cdr3)
+                cdr3 = fields[headerMapping[defaults.headerNames['CDR3_SEQ']]]
+                if cdr3 is not None: nt_distribution(dist_counters[group]['nucleotide'], cdr3)
 
     # share/unique sequence operations
     if sharedKey in calc['operations']:
@@ -926,6 +1068,73 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
                     writer.write(str(i) + '\t' + str(cntArray[i]) + '\t' + str(relArray[i]) + '\n')
             writer.close()
             outputSpec['files'][group + "_cdr3_length"]['nucleotide'] = { "value": filename, "description":"CDR3 Nucleotide Length Histogram", "type":"tsv" }
+
+    # AA/NT distribution operations
+    if distributionKey in calc['operations']:
+        groups = inputDict[defaults.groupsKey]
+
+        # sample group totals
+        for group in groups:
+            if (groups[group]['type'] == 'sampleGroup'):
+                group_total_distribution(inputDict, group, 'aa', aa_list)
+                group_total_distribution(inputDict, group, 'nucleotide', nt_list)
+
+        # relative calculations
+        for group in groups:
+            compute_relative_distribution(group, 'aa', aa_list)
+            compute_relative_distribution(group, 'nucleotide', nt_list)
+
+        # write output
+        for group in groups:
+            # output specification for process metadata
+            if (not outputSpec['files'].get(group + "_cdr3_distribution")): outputSpec['files'][group + "_cdr3_distribution"] = {}
+            outputSpec['groups'][group]['cdr3_distribution'] = { "files": group + "_cdr3_distribution", "type": "output" }
+
+            # aa distribution
+            filename1 = group + "_cdr3_aa_distribution.tsv"
+            filename2 = group + "_cdr3_aa_relative_distribution.tsv"
+            writer1 = open(filename1, 'w')
+            writer2 = open(filename2, 'w')
+            cntArray = dist_counters[group]['aa']
+            relArray = dist_counters[group]['rel_aa']
+            writer1.write('CDR3_LENGTH\tCDR3_POSITION\t' + '\t'.join(aa_list) + '\n')
+            writer2.write('CDR3_LENGTH\tCDR3_POSITION\t' + '\t'.join(aa_list) + '\n')
+            for l in cntArray:
+                for pos in cntArray[l]:
+                    writer1.write(str(l) + '\t' + str(pos))
+                    writer2.write(str(l) + '\t' + str(pos))
+                    for aa in aa_list:
+                        writer1.write('\t' + str(cntArray[l][pos][aa]))
+                        writer2.write('\t' + str(relArray[l][pos][aa]))
+                    writer1.write('\n')
+                    writer2.write('\n')
+            writer1.close()
+            writer2.close()
+            outputSpec['files'][group + "_cdr3_distribution"]['aa'] = { "value": filename1, "description":"CDR3 AA Distribution", "type":"tsv" }
+            outputSpec['files'][group + "_cdr3_distribution"]['rel_aa'] = { "value": filename2, "description":"CDR3 AA Relative Distribution", "type":"tsv" }
+
+            # nucleotide histogram
+            filename1 = group + "_cdr3_nucleotide_distribution.tsv"
+            filename2 = group + "_cdr3_nucleotide_relative_distribution.tsv"
+            writer1 = open(filename1, 'w')
+            writer2 = open(filename2, 'w')
+            cntArray = dist_counters[group]['nucleotide']
+            relArray = dist_counters[group]['rel_nucleotide']
+            writer1.write('CDR3_LENGTH\tCDR3_POSITION\t' + '\t'.join(nt_list) + '\n')
+            writer2.write('CDR3_LENGTH\tCDR3_POSITION\t' + '\t'.join(nt_list) + '\n')
+            for l in cntArray:
+                for pos in cntArray[l]:
+                    writer1.write(str(l) + '\t' + str(pos))
+                    writer2.write(str(l) + '\t' + str(pos))
+                    for symbol in nt_list:
+                        writer1.write('\t' + str(cntArray[l][pos][symbol]))
+                        writer2.write('\t' + str(relArray[l][pos][symbol]))
+                    writer1.write('\n')
+                    writer2.write('\n')
+            writer1.close()
+            writer2.close()
+            outputSpec['files'][group + "_cdr3_distribution"]['nucleotide'] = { "value": filename1, "description":"CDR3 Nucleotide Distribution", "type":"tsv" }
+            outputSpec['files'][group + "_cdr3_distribution"]['rel_nucleotide'] = { "value": filename2, "description":"CDR3 Nucleotide Relative Distribution", "type":"tsv" }
 
     # share/unique sequence operations
     if sharedKey in calc['operations']:

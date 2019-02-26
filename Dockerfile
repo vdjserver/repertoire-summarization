@@ -28,11 +28,13 @@ RUN pip install \
     argparse \
     BeautifulSoup4 \
     reportlab \
-    biopython
+    biopython \
+    airr
 
 RUN pip3 install \
     pandas \
     biopython \
+    airr \
     presto \
     changeo
 
