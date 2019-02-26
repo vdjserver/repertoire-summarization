@@ -357,6 +357,8 @@ def generate_share_comparison(inputDict, outputSpec, filePrefix, level, sublevel
     outputSpec['files']["RepCalc_cdr3_shared"]["group_comparison_cdr3_" + fileTxt] = { "value": filename1, "description":"Shared CDR3 Comparison", "type":"tsv" }
     outputSpec['files']["RepCalc_cdr3_shared"]["group_diff_cdr3_" + fileTxt] = { "value": filename2, "description":"Unique CDR3 Comparison", "type":"tsv" }
 
+    #print(singleGroups)
+
     def single_comparison():
         writer1.write('SHARED')
         writer2.write('DIFF')
@@ -367,22 +369,46 @@ def generate_share_comparison(inputDict, outputSpec, filePrefix, level, sublevel
             writer2.write('\t' + colGroup)
         writer1.write('\n')
         writer2.write('\n')
-        singleShared = numpy.zeros([numSingle, numSingle])
-        singleDiff = numpy.zeros([numSingle, numSingle])
+        writer1.write(cdr3_text + '\tGROUP_A\tCOUNT_A\tTOTAL_COUNT_A\tGROUP_B\tCOUNT_B\tTOTAL_COUNT_B\n')
+        writer2.write(cdr3_text + '\tGROUP_A\tGROUP_B\tCOUNT_A\tTOTAL_COUNT_A\n')
+
+        #singleShared = numpy.zeros([numSingle, numSingle])
+        #singleDiff = numpy.zeros([numSingle, numSingle])
         for i in range(0, numSingle, 1):
             rowGroup = singleGroups[i]
-            writer1.write(rowGroup)
-            writer2.write(rowGroup)
+            #writer1.write(rowGroup)
+            #writer2.write(rowGroup)
             for j in range(0, numSingle, 1):
+                if i == j: continue
                 colGroup = singleGroups[j]
                 A = set(share_summary_cdr3[level][rowGroup].keys())
                 B = set(share_summary_cdr3[level][colGroup].keys())
-                singleShared[i,j] = len(A & B)
-                singleDiff[i,j] = len(A - B)
+                singleShared = A & B
+                singleDiff = A - B
+                #singleShared[i,j] = len(A & B)
+                #singleDiff[i,j] = len(A - B)
                 #print(singleShared[i,j])
                 #print(singleDiff[i,j])
-                writer1.write('\t' + str(int(singleShared[i,j])))
-                writer2.write('\t' + str(int(singleDiff[i,j])))
+                #writer1.write('\t' + str(int(singleShared[i,j])))
+                #writer2.write('\t' + str(int(singleDiff[i,j])))
+                if len(singleShared) > 0:
+                    for cdr3 in singleShared:
+                        writer1.write(cdr3)
+                        writer1.write('\t' + rowGroup)
+                        writer1.write('\t' + str(share_summary_cdr3[level][rowGroup][cdr3]['count']))
+                        writer1.write('\t' + str(share_summary_cdr3[level][rowGroup][cdr3]['total_count']))
+                        writer1.write('\t' + colGroup)
+                        writer1.write('\t' + str(share_summary_cdr3[level][colGroup][cdr3]['count']))
+                        writer1.write('\t' + str(share_summary_cdr3[level][colGroup][cdr3]['total_count']))
+                        writer1.write('\n')
+                if len(singleDiff) > 0:
+                    for cdr3 in singleDiff:
+                        writer2.write(cdr3)
+                        writer2.write('\t' + rowGroup)
+                        writer2.write('\t' + colGroup)
+                        writer2.write('\t' + str(share_summary_cdr3[level][rowGroup][cdr3]['count']))
+                        writer2.write('\t' + str(share_summary_cdr3[level][rowGroup][cdr3]['total_count']))
+                        writer2.write('\n')
             writer1.write('\n')
             writer2.write('\n')
     
@@ -935,9 +961,11 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
         groups = inputDict[defaults.groupsKey]
         filePrefix = 'group'
         if len(groups) == 2: filePrefix = '_'.join(groups.keys())
+        #print(filePrefix)
         for level in calc['levels']:
             if level == 'aa':
                 for group in groups:
+                    #print(group)
                     read_share_detail(inputDict, group, level, None)
                 #print(cdr3_shared)
                 generate_share_summary(inputDict, level, None)
