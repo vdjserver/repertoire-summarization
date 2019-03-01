@@ -140,8 +140,7 @@ def group_total_distribution(inputDict, sampleGroup, level, symbol_list):
     samples = groups[sampleGroup]['samples']
 
     # totals
-    for sampleUuid in samples:
-        sample = metadata.sample_for_uuid(inputDict, sampleUuid)
+    for sample in samples:
         sampleArray = dist_counters[sample][level]
         groupArray = dist_counters[sampleGroup][level]
         for l in sampleArray:
@@ -798,8 +797,13 @@ def process_record(inputDict, metadataDict, currentFile, headerMapping, groupSet
         groups = inputDict[defaults.groupsKey]
         for group in groupSet:
             if (groups[group]['type'] == 'sampleGroup'):
-                # samples groups are aggregated at the end
-                continue
+                for sample in groups[group]['samples']:
+                    if not dist_counters.get(sample): dist_counters[sample] = { 'aa': {}, 'nucleotide': {} }
+                    if metadata.file_in_sample(inputDict, defaults.summaryKey, currentFile, group, sample):
+                        cdr3 = fields[headerMapping[defaults.headerNames['CDR3_AA']]]
+                        if cdr3 is not None: aa_distribution(dist_counters[sample]['aa'], cdr3)
+                        cdr3 = fields[headerMapping[defaults.headerNames['CDR3_SEQ']]]
+                        if cdr3 is not None: aa_distribution(dist_counters[sample]['nucleotide'], cdr3)
             else:
                 cdr3 = fields[headerMapping[defaults.headerNames['CDR3_AA']]]
                 if cdr3 is not None: aa_distribution(dist_counters[group]['aa'], cdr3)
