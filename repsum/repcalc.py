@@ -91,14 +91,14 @@ def groups_for_file(inputDict, fileKey, uuid):
         return groupSet
 
 def isRecordFunctional(headerMapping, fields):
-    if  fields[headerMapping[defaults.headerNames['NonFuncCondition1']]] == 'True' or \
-        fields[headerMapping[defaults.headerNames['NonFuncCondition2']]] == 'True' or \
-        fields[headerMapping[defaults.headerNames['NonFuncCondition3']]] == 'True' or \
-        fields[headerMapping[defaults.headerNames['NonFuncCondition4']]] == 'True' or \
-        fields[headerMapping[defaults.headerNames['NonFuncCondition5']]] == 'True' or \
-        fields[headerMapping[defaults.headerNames['NonFuncCondition6']]] == 'True':
-            return False
-    return True
+    if  fields[headerMapping[defaults.headerNames['NonFuncCondition1']]] == 'False' and \
+        fields[headerMapping[defaults.headerNames['NonFuncCondition2']]] == 'False' and \
+        fields[headerMapping[defaults.headerNames['NonFuncCondition3']]] == 'False' and \
+        fields[headerMapping[defaults.headerNames['NonFuncCondition4']]] == 'False' and \
+        fields[headerMapping[defaults.headerNames['NonFuncCondition5']]] == 'False' and \
+        fields[headerMapping[defaults.headerNames['NonFuncCondition6']]] == 'False':
+            return True
+    return False
 
 def attach_records(records, name, rel_name, obj_dict, uuid_name):
     for entry in records:
