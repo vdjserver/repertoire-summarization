@@ -1,0 +1,14 @@
+{
+    "metadata": "Eugster_Theil.airr.json",
+    "rearrangement_files": [
+        "hold.airr.tsv"
+    ],
+    "calculations": [
+        {
+            "type": "CDR3",
+            "operations": [ "length" ], 
+            "levels": [ ], 
+            "filters": [ "productive" ]
+        }
+    ]
+}

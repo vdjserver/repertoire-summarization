@@ -11,11 +11,6 @@ try:
 except ImportError:
     sys.exit('Please install setuptools before installing repcalc.\n')
 
-try:
-    from pip.req import parse_requirements
-except ImportError:
-    sys.exit('Please install pip before installing repcalc.\n')
-
 with open('README.rst', 'r') as ip:
     long_description = ip.read()
 
@@ -45,9 +40,7 @@ setup(name='repcalc',
       packages=find_packages(),
       entry_points={
                 'console_scripts': [
-                'repcalc=repcalc.repcalc:main',
-                'repcalc_create_config=repcalc.repcalc:create_config',
-                'repcalc_group_map=repcalc.repcalc:generate_group_map',
+                'repcalc=repcalc.repcalc:main'
                 ]},
       classifiers=['Environment :: Console',
                    'Intended Audience :: Science/Research',

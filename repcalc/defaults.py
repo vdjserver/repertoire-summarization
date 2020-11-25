@@ -7,6 +7,7 @@ Default settings
 
 # Keys in specification file
 metadata_file_key = "metadata"
+rearrangement_files_key = "rearrangement_files"
 organismKey = "organism"
 filesKey = "files"
 fileMetadataKey = "fileMetadata"
@@ -25,7 +26,7 @@ calculationModules = {
     "CDR3": {"filename":"cdr3"},
     "diversity": {"filename":"diversity"},
     "mutations": {"filename":"mutations"},
-    "clonality": {"filename":"clones"},
+    "clonal_assignment": {"filename":"tcr_clone"},
     "lineage": {"filename":"lineage"}
 }
 

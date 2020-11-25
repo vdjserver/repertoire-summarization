@@ -1,0 +1,200 @@
+{
+  "Info": {
+    "title": "Repertoire metadata",
+    "description": "Repertoire metadata written by AIRR Standards Python Library",
+    "version": 1.3,
+    "contact": {
+      "name": "AIRR Community",
+      "url": "https://github.com/airr-community"
+    },
+    "license": {
+      "name": "Creative Commons Attribution 4.0 International",
+      "url": "https://creativecommons.org/licenses/by/4.0/"
+    }
+  },
+  "Repertoire": [
+    {
+      "repertoire_id": "7769654456084459030-242ac116-0001-012",
+      "study": {
+        "study_id": "1371444213709729305-242ac11c-0001-012",
+        "study_title": "T cell receptor repertoires after adoptive transfer of expanded allogeneic regulatory T cells",
+        "study_type": {
+          "id": "C147138",
+          "value": "Observational Study Model"
+        },
+        "study_description": "T regulatory cell (Treg) therapy has been exploited in autoimmune disease, solid organ transplantation and in efforts to prevent or treat graft-versus-host disease (GvHD). However, our knowledge on in vivo persistence of transfused Treg is limited. Whether Treg transfusion leads to notable changes in the overall Treg repertoire and or whether longevity of Treg in the periphery is restricted to certain clones is unknown. Here we use T cell receptor alpha chain sequencing (TCR\u03b1-NGS) to monitor changes in the repertoire of Treg upon polyclonal expansion and after subsequent adoptive transfer. We applied TCR\u03b1-NGS to samples from two patients with chronic GvHD who received comparable doses of stem cell donor derived expanded Treg. We found that in vitro polyclonal expansion led to notable repertoire changes in vitro and that Treg cell therapy considerably altered peripheral Treg repertoire toward that of the infused cell product, to different degrees in each patient. Clonal changes in the peripheral blood were transient and correlated well with the clinical parameters. We suggest that T cell clonotype analyses using TCR sequencing should be considered as a means to monitor longevity and fate of adoptively transferred T cells.",
+        "inclusion_exclusion_criteria": "",
+        "lab_name": "Anne Eugster",
+        "lab_address": "DFG-Center for Regenerative Therapies Dresden (CRTD)",
+        "submitted_by": "Scott Christley <scott.christley@utsouthwestern.edu>",
+        "collected_by": "",
+        "grants": "",
+        "pub_ids": "Theil et al. 2016",
+        "keywords_study": [
+          "contains_tcr"
+        ],
+        "vdjserver_uuid": "1371444213709729305-242ac11c-0001-012"
+      },
+      "subject": {
+        "subject_id": "Patient 1",
+        "synthetic": false,
+        "organism": {
+          "id": "9606",
+          "value": "Homo sapiens"
+        },
+        "sex": "male",
+        "age_min": 54,
+        "age_max": 54,
+        "age_unit": {
+          "id": "UO_0000036",
+          "value": "year"
+        },
+        "age_event": "sampling",
+        "ancestry_population": null,
+        "ethnicity": null,
+        "race": null,
+        "strain_name": null,
+        "linked_subjects": "Donor 1",
+        "link_type": "patient",
+        "diagnosis": [
+          {
+            "study_group_description": "graft-versus-host disease",
+            "disease_diagnosis": "B-cell chronic lymphocytic leukemia",
+            "disease_length": "",
+            "disease_stage": "",
+            "prior_therapies": "",
+            "immunogen": "",
+            "intervention": "adoptive T cell therapy",
+            "medical_history": ""
+          }
+        ]
+      },
+      "sample": [
+        {
+          "sample_processing_id": "",
+          "sample_id": "P1_pre",
+          "sample_type": null,
+          "tissue": "peripheral blood",
+          "anatomic_site": null,
+          "disease_state_sample": "treatment-refractory chronic GvHD",
+          "collection_time_point_relative": "Treg infusion",
+          "collection_time_point_reference": "Pre",
+          "biomaterial_provider": null,
+          "tissue_processing": null,
+          "cell_subset": {
+            "id": "CL_0000625",
+            "value": "CD8-positive, alpha-beta T cell"
+          },
+          "cell_phenotype": "CD8+",
+          "single_cell": false,
+          "cell_number": 470000,
+          "cells_per_reaction": null,
+          "cell_storage": true,
+          "cell_quality": null,
+          "cell_isolation": "FACS",
+          "cell_processing_protocol": null,
+          "template_class": "RNA",
+          "template_quality": null,
+          "template_amount": null,
+          "library_generation_method": "RT(specific)+PCR",
+          "library_generation_protocol": null,
+          "library_generation_kit_version": null,
+          "pcr_target": [
+            {
+              "pcr_target_locus": "TRA",
+              "forward_pcr_primer_target_location": null,
+              "reverse_pcr_primer_target_location": null
+            }
+          ],
+          "complete_sequences": "partial",
+          "physical_linkage": "none",
+          "sequencing_run_id": null,
+          "total_reads_passing_qc_filter": null,
+          "sequencing_platform": "Illumina HiSeq 2500 ",
+          "sequencing_facility": null,
+          "sequencing_run_date": null,
+          "sequencing_kit": null,
+          "sequencing_files": {
+            "file_type": "fastq",
+            "filename": "L4921_L4921_Treg73_R1.fastq.gz",
+            "read_direction": null,
+            "paired_filename": "",
+            "paired_read_direction": "",
+            "read_length": 300
+          }
+        },
+        {
+          "sample_processing_id": "",
+          "sample_id": "P1_pre",
+          "sample_type": null,
+          "tissue": "peripheral blood",
+          "anatomic_site": null,
+          "disease_state_sample": "treatment-refractory chronic GvHD",
+          "collection_time_point_relative": "Treg infusion",
+          "collection_time_point_reference": "Pre",
+          "biomaterial_provider": null,
+          "tissue_processing": null,
+          "cell_subset": {
+            "id": "CL_0000625",
+            "value": "CD8-positive, alpha-beta T cell"
+          },
+          "cell_phenotype": "CD8+",
+          "single_cell": false,
+          "cell_number": 470000,
+          "cells_per_reaction": null,
+          "cell_storage": true,
+          "cell_quality": null,
+          "cell_isolation": "FACS",
+          "cell_processing_protocol": null,
+          "template_class": "RNA",
+          "template_quality": null,
+          "template_amount": null,
+          "library_generation_method": "RT(specific)+PCR",
+          "library_generation_protocol": null,
+          "library_generation_kit_version": null,
+          "pcr_target": [
+            {
+              "pcr_target_locus": "TRA",
+              "forward_pcr_primer_target_location": null,
+              "reverse_pcr_primer_target_location": null
+            }
+          ],
+          "complete_sequences": "partial",
+          "physical_linkage": "none",
+          "sequencing_run_id": null,
+          "total_reads_passing_qc_filter": null,
+          "sequencing_platform": "Illumina HiSeq 2500 ",
+          "sequencing_facility": null,
+          "sequencing_run_date": null,
+          "sequencing_kit": null,
+          "sequencing_files": {
+            "file_type": "fastq",
+            "filename": "L6164_Treg73_R1.fastq.gz",
+            "read_direction": null,
+            "paired_filename": "",
+            "paired_read_direction": "",
+            "read_length": 300
+          }
+        }
+      ],
+      "data_processing": [
+        {
+          "data_processing_id": "397ff470-1562-4e25-9fac-6000dc97546b-007",
+          "primary_annotation": true,
+          "software_versions": "",
+          "paired_reads_assembly": "",
+          "quality_thresholds": "",
+          "primer_match_cutoffs": "",
+          "collapsing_method": "",
+          "data_processing_protocols": "",
+          "germline_database": "",
+          "analysis_provenance_id": "",
+          "data_processing_files": [
+            "L4921_L4921_Treg73_R1.fastq.unique.igblast.airr.tsv",
+            "L6164_Treg73_R1.fastq.unique.igblast.airr.tsv"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -10,7 +10,7 @@ MAINTAINER VDJServer <vdjserver@utsouthwestern.edu>
 #ENV HTTPS_PROXY 'https://proxy.swmed.edu:3128/'
 
 # Install OS Dependencies
-RUN apt-get update && apt-get install -y \
+RUN export DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get install -y \
     libssl-dev \
     python3 \
     python3-pip \
@@ -36,7 +36,19 @@ RUN pip3 install \
     biopython \
     airr \
     presto \
-    changeo
+    changeo \
+    sphinx \
+    sphinxcontrib-autoprogram \
+    prov \
+    recommonmark \
+    rdflib \
+    networkx \
+    lxml \
+    commonmark \
+    isodate \
+    decorator \
+    future \
+    agavepy
 
 # extract database
 RUN wget http://wiki.vdjserver.org/db/db_10_05_2016.tgz
@@ -47,7 +59,7 @@ RUN mkdir /repcalc-root
 COPY . /repcalc-root
 
 # install repcalc
-RUN cd /repcalc-root && python setup.py install
+RUN cd /repcalc-root && python3 setup.py install
 
 # setup run environment
 ENV DB_DIR "/db"
@@ -60,4 +72,4 @@ ENV PYTHONPATH "/VDJMLpy-$VDJML_VERSION/vdjml:$PYTHONPATH"
 ENV LD_LIBRARY_PATH "/VDJMLpy-$VDJML_VERSION/vdjml:$LD_LIBRARY_PATH"
 
 # changeo setup for germline database
-RUN cd /repcalc-root/docker && bash changeo_setup.sh
+#RUN cd /repcalc-root/docker && bash changeo_setup.sh

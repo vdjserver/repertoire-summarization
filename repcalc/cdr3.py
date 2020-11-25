@@ -2,11 +2,37 @@
 CDR3 calculation module
 """
 
-# repsum modules
-from .version import __version__
-import defaults
-import metadata
-import gldb
+#
+# cdr3.py
+# CDR3 junction analysis
+#
+# VDJServer Analysis Portal
+# Repertoire calculations and comparison
+# https://vdjserver.org
+#
+# Copyright (C) 2020 The University of Texas Southwestern Medical Center
+#
+# Author: Scott Christley <scott.christley@utsouthwestern.edu>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+# repcalc modules
+from repcalc import __version__
+import repcalc.defaults as defaults
+import repcalc.metadata as metadata
+#import gldb
 import json
 import math
 import numpy
@@ -19,11 +45,11 @@ compareKey = "compare"
 
 cdr3_histograms = {}
 
-def increment_count(anArray, sequence):
-    if len(sequence) == 0: return
-    if len(sequence) >= len(anArray):
-        for i in range(len(anArray), len(sequence)+1, 1): anArray.append(0.0)
-    anArray[len(sequence)] += 1
+def increment_count(anArray, length):
+    if length == 0: return
+    if length >= len(anArray):
+        for i in range(len(anArray), length+1, 1): anArray.append(0.0)
+    anArray[length] += 1
 
 def group_average(inputDict, sampleGroup, level):
     groups = inputDict[defaults.groupsKey]
@@ -742,30 +768,31 @@ def generate_share_comparison(inputDict, outputSpec, filePrefix, level, sublevel
 def initialize_calculation_module(inputDict, metadataDict, headerMapping):
     """Perform any module initialization"""
     # length and AA/NT distribution operations
-    groups = inputDict[defaults.groupsKey]
-    for group in groups:
-        cdr3_histograms[group] = { 'aa': [], 'nucleotide': [] }
-        dist_counters[group] = { 'aa': {}, 'nucleotide': {} }
+    for rep_id in metadataDict:
+        cdr3_histograms[rep_id] = { 'aa': [], 'nucleotide': [] }
+        #dist_counters[group] = { 'aa': {}, 'nucleotide': {} }
 
-def process_record(inputDict, metadataDict, currentFile, headerMapping, groupSet, calc, fields):
+def process_record(inputDict, metadataDict, currentFile, calc, fields):
     """Perform calculation from given fields"""
     # length operations
     if lengthKey in calc['operations']:
-        groups = inputDict[defaults.groupsKey]
-        for group in groupSet:
-            if (groups[group]['type'] == 'sampleGroup'):
-                for sample in groups[group]['samples']:
-                    if not cdr3_histograms.get(sample): cdr3_histograms[sample] = { 'aa': [], 'nucleotide': [] }
-                    if metadata.file_in_sample(inputDict, defaults.summaryKey, currentFile, group, sample):
-                        cdr3 = fields[headerMapping[defaults.headerNames['CDR3_AA']]]
-                        if cdr3 is not None: increment_count(cdr3_histograms[sample]['aa'], cdr3)
-                        cdr3 = fields[headerMapping[defaults.headerNames['CDR3_SEQ']]]
-                        if cdr3 is not None: increment_count(cdr3_histograms[sample]['nucleotide'], cdr3)
-            else:
-                cdr3 = fields[headerMapping[defaults.headerNames['CDR3_AA']]]
-                if cdr3 is not None: increment_count(cdr3_histograms[group]['aa'], cdr3)
-                cdr3 = fields[headerMapping[defaults.headerNames['CDR3_SEQ']]]
-                if cdr3 is not None: increment_count(cdr3_histograms[group]['nucleotide'], cdr3)
+        rep_id = fields['repertoire_id']
+        if metadataDict.get(rep_id) is None:
+            return
+        #if (groups[group]['type'] == 'sampleGroup'):
+        if False:
+            for sample in groups[group]['samples']:
+                if not cdr3_histograms.get(sample): cdr3_histograms[sample] = { 'aa': [], 'nucleotide': [] }
+                if metadata.file_in_sample(inputDict, defaults.summaryKey, currentFile, group, sample):
+                    cdr3 = fields[headerMapping[defaults.headerNames['CDR3_AA']]]
+                    if cdr3 is not None: increment_count(cdr3_histograms[sample]['aa'], cdr3)
+                    cdr3 = fields[headerMapping[defaults.headerNames['CDR3_SEQ']]]
+                    if cdr3 is not None: increment_count(cdr3_histograms[sample]['nucleotide'], cdr3)
+        else:
+            length = fields.get('junction_aa_length')
+            if length is not None: increment_count(cdr3_histograms[rep_id]['aa'], length)
+            length = fields.get('junction_length')
+            if length is not None: increment_count(cdr3_histograms[rep_id]['nucleotide'], length)
 
     # AA/NT distribution operations
     if distributionKey in calc['operations']:
@@ -987,26 +1014,28 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
     """Finalize and save the calculations"""
     # length operations
     if lengthKey in calc['operations']:
-        groups = inputDict[defaults.groupsKey]
-        for group in groups:
-            compute_relative(group, 'aa')
-            compute_relative(group, 'nucleotide')
-            if (groups[group]['type'] == 'sampleGroup'):
-                for sample in groups[group]['samples']:
-                    compute_relative(sample, 'aa')
-                    compute_relative(sample, 'nucleotide')
+        for rep_id in metadataDict:
+            rep = metadataDict[rep_id]
+            compute_relative(rep_id, 'aa')
+            compute_relative(rep_id, 'nucleotide')
+            #if (groups[group]['type'] == 'sampleGroup'):
+            #    for sample in groups[group]['samples']:
+            #        compute_relative(sample, 'aa')
+            #        compute_relative(sample, 'nucleotide')
                     
-        for group in groups:
+        for rep_id in metadataDict:
+            rep = metadataDict[rep_id]
             # output specification for process metadata
-            if (not outputSpec['files'].get(group + "_cdr3_length")): outputSpec['files'][group + "_cdr3_length"] = {}
-            outputSpec['groups'][group]['cdr3_length'] = { "files": group + "_cdr3_length", "type": "output" }
+            #if (not outputSpec['files'].get(group + "_cdr3_length")): outputSpec['files'][group + "_cdr3_length"] = {}
+            #outputSpec['groups'][group]['cdr3_length'] = { "files": group + "_cdr3_length", "type": "output" }
 
             # aa histogram
-            filename = group + "_cdr3_aa_length.tsv"
+            filename = rep_id + ".junction_aa_length.tsv"
             writer = open(filename, 'w')
-            cntArray = cdr3_histograms[group]['aa']
-            relArray = cdr3_histograms[group]['rel_aa']
-            if (groups[group]['type'] == 'sampleGroup'):
+            cntArray = cdr3_histograms[rep_id]['aa']
+            relArray = cdr3_histograms[rep_id]['rel_aa']
+            #if (groups[group]['type'] == 'sampleGroup'):
+            if False:
                 group_average(inputDict, group, 'aa')
                 group_average(inputDict, group, 'rel_aa')
                 stdArray = cdr3_histograms[group]['aa_std']
@@ -1020,14 +1049,15 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
                 for i in range(0, len(cntArray), 1):
                     writer.write(str(i) + '\t' + str(cntArray[i]) + '\t' + str(relArray[i]) + '\n')
             writer.close()
-            outputSpec['files'][group + "_cdr3_length"]['aa'] = { "value": filename, "description":"CDR3 AA Length Histogram", "type":"tsv" }
+            #outputSpec['files'][group + "_cdr3_length"]['aa'] = { "value": filename, "description":"CDR3 AA Length Histogram", "type":"tsv" }
 
             # nucleotide histogram
-            filename = group + "_cdr3_nucleotide_length.tsv"
+            filename = rep_id + ".junction_nucleotide_length.tsv"
             writer = open(filename, 'w')
-            cntArray = cdr3_histograms[group]['nucleotide']
-            relArray = cdr3_histograms[group]['rel_nucleotide']
-            if (groups[group]['type'] == 'sampleGroup'):
+            cntArray = cdr3_histograms[rep_id]['nucleotide']
+            relArray = cdr3_histograms[rep_id]['rel_nucleotide']
+            #if (groups[group]['type'] == 'sampleGroup'):
+            if False:
                 group_average(inputDict, group, 'nucleotide')
                 group_average(inputDict, group, 'rel_nucleotide')
                 stdArray = cdr3_histograms[group]['nucleotide_std']
@@ -1041,7 +1071,7 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
                 for i in range(0, len(cntArray), 1):
                     writer.write(str(i) + '\t' + str(cntArray[i]) + '\t' + str(relArray[i]) + '\n')
             writer.close()
-            outputSpec['files'][group + "_cdr3_length"]['nucleotide'] = { "value": filename, "description":"CDR3 Nucleotide Length Histogram", "type":"tsv" }
+            #outputSpec['files'][group + "_cdr3_length"]['nucleotide'] = { "value": filename, "description":"CDR3 Nucleotide Length Histogram", "type":"tsv" }
 
     # AA/NT distribution operations
     if distributionKey in calc['operations']:
