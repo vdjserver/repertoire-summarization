@@ -96,7 +96,7 @@ def assign_clone(rep_id, fields):
                 clone['clone_count'] += 1
                 if fields['duplicate_count']:
                     clone['duplicate_count'] += fields['duplicate_count']
-                    print(fields['duplicate_count'])
+                    #print(fields['duplicate_count'])
                 else:
                     clone['duplicate_count'] += 1
                 return clone
