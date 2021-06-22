@@ -7,6 +7,7 @@ Default settings
 
 # Keys in specification file
 metadata_file_key = "metadata"
+repertoire_key = "repertoire_ids"
 rearrangement_files_key = "rearrangement_files"
 organismKey = "organism"
 filesKey = "files"
