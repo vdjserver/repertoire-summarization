@@ -37,6 +37,7 @@ import json
 import math
 import numpy
 import csv
+import airr
 
 # module operations
 tcrKey = "TCR"
@@ -44,6 +45,7 @@ tcrKey = "TCR"
 cdr3_dict = {}
 clone_dict = {}
 collapse_dict = {}
+file_writers = {}
 
 def intersect_genes(g1, g2):
     ga1 = set(g1.split(','))
@@ -122,32 +124,46 @@ def initialize_calculation_module(inputDict, metadataDict, headerMapping):
         cdr3_dict[rep_id] = {}
         clone_dict[rep_id] = { 'clone_id': 1 }
 
-def process_record(inputDict, metadataDict, currentFile, calc, fields):
+def process_record(inputDict, metadataDict, currentFile, calc, row):
     """Perform calculation from given fields"""
     # TCR clonal assignment
     if tcrKey in calc['operations']:
         # get repertoire
         # TODO: does the repertoire have to be in the metadata file?
-        rep_id = fields['repertoire_id']
+        rep_id = row['repertoire_id']
         if metadataDict.get(rep_id) is None:
             return
 
         # verify TCR locus
-        if 'TR' not in fields['locus']:
+        if 'TR' not in row['locus']:
             return
 
         # productive
-        if not fields['productive']:
+        if not row['productive']:
             return
 
         # non empty junction
-        if len(fields['junction_aa']) == 0:
+        if len(row['junction_aa']) == 0:
             return
 
-        #
-        assign_clone(rep_id, fields)
+        # assign the rearrangement to a clone
+        clone = assign_clone(rep_id, row)
 
-
+        # write rearrangement with clone_id
+        writer = file_writers.get(currentFile)
+        if writer is None:
+            fields = currentFile.split('.')
+            if len(fields) > 2 and fields[-1] == 'tsv' and fields[-2] == 'airr':
+                fields = fields[:-2] + ['clone'] + fields[-2:]
+                filename = '.'.join(fields)
+            else:
+                fields = fields[:-1] + ['clone'] + fields[-1:]
+                filename = '.'.join(fields)
+            print('Output file: ' + filename)
+            writer = airr.derive_rearrangement(filename, currentFile, fields=['clone_id'])
+            file_writers[currentFile] = writer
+        row['clone_id'] = clone['clone_id']
+        writer.write(row)
 
 def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
     """Finalize and save the calculations"""
