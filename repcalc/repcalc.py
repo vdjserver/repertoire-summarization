@@ -2,6 +2,32 @@
 Repertoire calculations and comparison
 """
 
+#
+# repcalc.py
+# Main function
+#
+# VDJServer Analysis Portal
+# Repertoire calculations and comparison
+# https://vdjserver.org
+#
+# Copyright (C) 2020 The University of Texas Southwestern Medical Center
+#
+# Author: Scott Christley <scott.christley@utsouthwestern.edu>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
 from __future__ import print_function
 import sys
 import argparse
@@ -20,7 +46,7 @@ from repcalc import __version__
 import repcalc.defaults as defaults
 #import summarize
 import repcalc.metadata as metadata
-#import gldb
+import repcalc.gldb as gldb
 
 def calc_types(inputDict):
     """Return set of calculations types in input specification"""
@@ -71,11 +97,6 @@ def main():
         args.print_help()
         sys.exit()
 
-    # germline db
-    #gldb_path = utils.extractAsItemOrFirstFromList(args.gldb)
-    #gldb.init_germline_db_root(gldb_path)
-    #print(gldb.germline_db_root())
-
     # Load input specification
     inputDict = None
     try:
@@ -100,6 +121,14 @@ def main():
         print("Could not read metadata file: " + input_file)
         raise
     #print(json.dumps(metadataDict))
+
+    # germline db
+    if inputDict.get(defaults.germline_file_key) is not None:
+        germline = gldb.loadGermline(inputDict[defaults.germline_file_key])
+        if germline is None:
+            raise
+        else:
+            inputDict[defaults.germline_key] = germline
 
     # Output specification
     #outputSpec = { "files": copy.deepcopy(inputDict[defaults.filesKey]), "groups": copy.deepcopy(inputDict[defaults.groupsKey]) }

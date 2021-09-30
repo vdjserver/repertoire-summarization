@@ -788,8 +788,10 @@ def process_record(inputDict, metadataDict, currentFile, calc, fields):
     if lengthKey in calc['operations']:
         rep_id = fields.get('repertoire_id')
         if rep_id is None:
+            # TODO: error
             return
         if metadataDict.get(rep_id) is None:
+            # TODO: error
             return
         #if (groups[group]['type'] == 'sampleGroup'):
         if False:
