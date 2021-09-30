@@ -105,10 +105,8 @@ def main():
     except:
         print("Could not read input specification file: " + args.input)
         raise
-    #print(json.dumps(inputDict))
 
     # Metadata
-    #print(inputDict[defaults.metadata_file_key])
     input_file = inputDict[defaults.metadata_file_key]
     metadataDict = None
     try:
@@ -120,7 +118,18 @@ def main():
     except:
         print("Could not read metadata file: " + input_file)
         raise
-    #print(json.dumps(metadataDict))
+    inputDict[defaults.full_metadata_key] = metadataDict
+
+    # check if specific repertoires are requested
+    if inputDict.get(defaults.repertoire_key) is not None:
+        newDict = {}
+        for rep in inputDict[defaults.repertoire_key]:
+            if metadataDict.get(rep) is None:
+                print("Repertoire", rep, "is missing from metadata file.")
+                raise
+            else:
+                newDict[rep] = metadataDict[rep]
+        metadataDict = newDict
 
     # germline db
     if inputDict.get(defaults.germline_file_key) is not None:
