@@ -1,7 +1,12 @@
 {
-    "metadata": "Eugster_Theil.airr.json",
+    "metadata": "repertoire.airr.json",
+    "repertoires": [
+        "8064755271837946346-242ac113-0001-012",
+        "8118141715327226346-242ac113-0001-012"
+    ],
     "rearrangement_files": [
-        "hold.airr.tsv"
+        "8064755271837946346-242ac113-0001-012.airr.tsv",
+        "8118141715327226346-242ac113-0001-012.airr.tsv"
     ],
     "calculations": [
         {
