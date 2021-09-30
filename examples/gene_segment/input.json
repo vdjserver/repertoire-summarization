@@ -1,81 +1,20 @@
 {
-	"metadata": "metadata.json",
-	"groups": {
-		"group1": {
-			"type": "sample",
-			"samples": {
-				"3341309460382618086-242ac114-0001-012": "file1"
-			}
-		},
-		"group2": {
-			"type": "sample",
-			"samples": {
-				"2489746294604698086-242ac114-0001-012": "file2"
-			}
-		},
-		"group3": {
-			"type": "sample",
-			"samples": {
-				"4403929655562015206-242ac114-0001-012": "file3"
-			}
-		},
-		"group4": {
-			"type": "sample",
-			"samples": {
-				"6984671734661246490-242ac114-0001-012": "file4"
-			}
-		},
-		"group5": {
-			"type": "sample",
-			"samples": {
-				"3341309460382618086-242ac114-0001-012": "file1",
-				"2489746294604698086-242ac114-0001-012": "file2"
-			}
-		},
-		"group6": {
-			"type": "sample",
-			"samples": {
-				"4403929655562015206-242ac114-0001-012": "file3",
-				"6984671734661246490-242ac114-0001-012": "file4"
-			}
-		}
-	},
-	"files": {
-		"file1": {
-			"raw_sequence": "3370168138574729701-242ac118-0001-012",
-			"processed_sequence": "3524744011557769701-242ac118-0001-013",
-			"assignment_sequence": "3524744011557769701-242ac118-0001-014",
-			"vdjml": "3524744011557769701-242ac118-0001-015",
-			"summary": "3524744011557769701-242ac118-0001-016"
-		},
-		"file2": {
-			"raw_sequence": "3587536433425289701-242ac1111-0001-012",
-			"processed_sequence": "3587536433425289701-242ac1111-0001-013",
-			"assignment_sequence": "3587536433425289701-242ac1111-0001-014",
-			"vdjml": "3587536433425289701-242ac1111-0001-015",
-			"summary": "3587536433425289701-242ac1111-0001-016"
-		},
-		"file3": {
-			"raw_sequence": "3731031290784649701-242ac1111-0001-012",
-			"processed_sequence": "3731031290784649701-242ac1111-0001-013",
-			"assignment_sequence": "3731031290784649701-242ac1111-0001-014",
-			"vdjml": "3731031290784649701-242ac1111-0001-015",
-			"summary": "3731031290784649701-242ac1111-0001-016"
-		},
-		"file4": {
-			"raw_sequence": "3906867251882889701-242ac1111-0001-012",
-			"processed_sequence": "3906867251882889701-242ac1111-0001-013",
-			"assignment_sequence": "3906867251882889701-242ac1111-0001-014",
-			"vdjml": "3906867251882889701-242ac1111-0001-015",
-			"summary": "3906867251882889701-242ac1111-0001-016"
-		}
-	},
-	"calculations": [
-		{
-			"type": "gene segment usage",
-      			"operations": [ "absolute" ], 
-			"levels": [ "gene" ], 
-			"filters": [ "productive" ]
-		}
-	]
+    "metadata": "repertoire.airr.json",
+    "germline": "vdjserver_human_germline.airr.json",
+    "repertoires": [
+        "8064755271837946346-242ac113-0001-012",
+        "8118141715327226346-242ac113-0001-012"
+    ],
+    "rearrangement_files": [
+        "8064755271837946346-242ac113-0001-012.airr.tsv",
+        "8118141715327226346-242ac113-0001-012.airr.tsv"
+    ],
+    "calculations": [
+        {
+            "type": "gene_segment",
+            "operations": [ "usage" ], 
+            "levels": [ "allele", "gene", "subgroup" ], 
+            "filters": [ "productive" ]
+        }
+    ]
 }
