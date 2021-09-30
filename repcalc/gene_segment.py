@@ -69,25 +69,40 @@ def add_segment_count(germline, segment, level, counters, amount):
     if len(distinct_names) == 1:
         segment_name = distinct_names[0]
         if counters['unique'].get(segment_name) is None:
-            counters['unique'][segment_name] = { "seq_count":0, "seq_freq":0.0, "copy_count":0, "copy_freq":0.0 }
-        counters['unique'][segment_name]['seq_count'] += 1
-        counters['unique'][segment_name]['copy_count'] += amount
+            counters['unique'][segment_name] = { "sequence_count":0, "sequence_frequency":0.0, "duplicate_count":0, "duplicate_frequency":0.0 }
+        counters['unique'][segment_name]['sequence_count'] += 1
+        counters['unique'][segment_name]['duplicate_count'] += amount
 
     # exists mode
     for segment_name in distinct_names:
         if counters['exists'].get(segment_name) is None:
-            counters['exists'][segment_name] = { "seq_count":0, "seq_freq":0.0, "copy_count":0, "copy_freq":0.0 }
-        counters['exists'][segment_name]['seq_count'] += 1
-        counters['exists'][segment_name]['copy_count'] += amount
+            counters['exists'][segment_name] = { "sequence_count":0, "sequence_frequency":0.0, "duplicate_count":0, "duplicate_frequency":0.0 }
+        counters['exists'][segment_name]['sequence_count'] += 1
+        counters['exists'][segment_name]['duplicate_count'] += amount
 
     # proportion
     for segment_name in distinct_names:
         if counters['proportion'].get(segment_name) is None:
-            counters['proportion'][segment_name] = { "seq_count":0.0, "seq_freq":0.0, "copy_count":0.0, "copy_freq":0.0 }
-        counters['proportion'][segment_name]['seq_count'] += 1.0 / len_float
-        counters['proportion'][segment_name]['copy_count'] += float(amount) / len_float
+            counters['proportion'][segment_name] = { "sequence_count":0.0, "sequence_frequency":0.0, "duplicate_count":0.0, "duplicate_frequency":0.0 }
+        counters['proportion'][segment_name]['sequence_count'] += 1.0 / len_float
+        counters['proportion'][segment_name]['duplicate_count'] += float(amount) / len_float
     
     #print(counters)
+    return
+
+def compute_frequency(counters):
+    """Compute frequencies for segment counters"""
+    total = 0.0
+    dup_total = 0.0
+    for value in counters:
+        entry = counters[value]
+        total = total + float(entry['sequence_count'])
+        dup_total = dup_total + float(entry['duplicate_count'])
+    for value in counters:
+        entry = counters[value]
+        entry['sequence_frequency'] = float(entry['sequence_count']) / total
+        entry['duplicate_frequency'] = float(entry['duplicate_count']) / dup_total
+
     return
 
 def initialize_calculation_module(inputDict, metadataDict, headerMapping):
@@ -488,44 +503,43 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
 
     # usage operations
     if usageKey in calc['operations']:
-        # TODO: compute frequencies
-        for rep_id in metadataDict:
-            rep = metadataDict[rep_id]
-            #compute_relative(cdr3_histograms, rep_id, 'aa')
-            #compute_relative(cdr3_histograms_productive, rep_id, 'aa')
-            #compute_relative(cdr3_histograms, rep_id, 'nucleotide')
-            #compute_relative(cdr3_histograms_productive, rep_id, 'nucleotide')
-
         for rep_id in metadataDict:
             rep = metadataDict[rep_id]
             for gene in gene_fields:
+                filename = rep_id + '.' + gene + '.tsv'
+                writer = open(filename, 'w')
+                writer.write('repertoire_id\tlevel\tmode\tproductive\tgene\tsequence_count\tduplicate_count\tsequence_frequency\tduplicate_frequency\n')
                 for level in module_levels:
                     for mode in calc_modes:
-                        filename = rep_id + '.' + mode + '.' + level + '.' + gene + '.tsv'
-                        writer = open(filename, 'w')
-                        writer.write('repertoire_id\tgene\tseq_count\tcopy_count\tseq_freq\tcopy_freq\n')
+                        # compute frequencies
+                        compute_frequency(segment_counters[rep_id][gene][level][mode])
+                        # output data
                         for value in segment_counters[rep_id][gene][level][mode]:
                             entry = segment_counters[rep_id][gene][level][mode][value]
                             writer.write(rep_id + '\t')
+                            writer.write(mode + '\t')
+                            writer.write(level + '\t')
+                            writer.write('\t')
                             writer.write(value + '\t')
-                            writer.write(str(entry['seq_count']) + '\t')
-                            writer.write(str(entry['copy_count']) + '\t')
-                            writer.write(str(entry['seq_freq']) + '\t')
-                            writer.write(str(entry['copy_freq']) + '\n')
-                        writer.close()
-
-                        filename = rep_id + '.productive.' + mode + '.' + level + '.' + gene + '.tsv'
-                        writer = open(filename, 'w')
-                        writer.write('repertoire_id\tgene\tseq_count\tcopy_count\tseq_freq\tcopy_freq\n')
+                            writer.write(str(entry['sequence_count']) + '\t')
+                            writer.write(str(entry['duplicate_count']) + '\t')
+                            writer.write(str(entry['sequence_frequency']) + '\t')
+                            writer.write(str(entry['duplicate_frequency']) + '\n')
+                        # productive
+                        compute_frequency(segment_counters_productive[rep_id][gene][level][mode])
+                        # output data
                         for value in segment_counters_productive[rep_id][gene][level][mode]:
                             entry = segment_counters_productive[rep_id][gene][level][mode][value]
                             writer.write(rep_id + '\t')
+                            writer.write(mode + '\t')
+                            writer.write(level + '\t')
+                            writer.write('TRUE\t')
                             writer.write(value + '\t')
-                            writer.write(str(entry['seq_count']) + '\t')
-                            writer.write(str(entry['copy_count']) + '\t')
-                            writer.write(str(entry['seq_freq']) + '\t')
-                            writer.write(str(entry['copy_freq']) + '\n')
-                        writer.close()
+                            writer.write(str(entry['sequence_count']) + '\t')
+                            writer.write(str(entry['duplicate_count']) + '\t')
+                            writer.write(str(entry['sequence_frequency']) + '\t')
+                            writer.write(str(entry['duplicate_frequency']) + '\n')
+                writer.close()
 
     if comboKey in calc['operations']:
         generate_combo_summary(inputDict, outputSpec, calc)
