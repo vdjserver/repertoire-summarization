@@ -44,14 +44,29 @@ distributionKey = "distribution"
 sharedKey = "shared"
 compareKey = "compare"
 
+#
+# junction length functions
+#
+
+# first key is repertoire_id or repertoire_group_id
+# second key is aa/nt
 cdr3_histograms = {}
 cdr3_histograms_productive = {}
+group_cdr3_histograms = {}
+group_cdr3_histograms_productive = {}
 
 def increment_count(anArray, length):
     if length == 0: return
     if length >= len(anArray):
         for i in range(len(anArray), length+1, 1): anArray.append(0.0)
     anArray[length] += 1
+
+def group_counts(groupArray, repArray):
+    if len(repArray) > len(groupArray):
+        for i in range(len(groupArray), len(repArray), 1):
+            groupArray.append(0.0)
+    for i in range(0, len(repArray)):
+        groupArray[i] += repArray[i]
 
 def group_average(inputDict, sampleGroup, level):
     groups = inputDict[defaults.groupsKey]
@@ -89,6 +104,13 @@ def compute_relative(data_dict, group, level):
     relArray = []
     for i in range(0, len(lenArray), 1): relArray.append(lenArray[i] / totalCount)
     data_dict[group]['rel_' + level] = relArray
+
+def output_counts(filename, cntArray, relArray):
+    writer = open(filename, 'w')
+    writer.write('CDR3_LENGTH\tCDR3_COUNT\tCDR3_RELATIVE\n')
+    for i in range(0, len(cntArray), 1):
+        writer.write(str(i) + '\t' + str(cntArray[i]) + '\t' + str(relArray[i]) + '\n')
+    writer.close()
 
 #
 # AA/NT distribution operations
@@ -777,10 +799,14 @@ def generate_share_comparison(inputDict, outputSpec, filePrefix, level, sublevel
 def initialize_calculation_module(inputDict, metadataDict, headerMapping):
     """Perform any module initialization"""
     # length and AA/NT distribution operations
-    for rep_id in metadataDict:
+    for rep_id in inputDict[defaults.full_metadata_key]:
         cdr3_histograms[rep_id] = { 'aa': [], 'nucleotide': [] }
         cdr3_histograms_productive[rep_id] = { 'aa': [], 'nucleotide': [] }
-        #dist_counters[group] = { 'aa': {}, 'nucleotide': {} }
+    if inputDict.get(defaults.groups_key) is not None:
+        for group in inputDict[defaults.groups_key]:
+            group_cdr3_histograms[group] = { 'aa': [], 'nucleotide': [] }
+            group_cdr3_histograms_productive[group] = { 'aa': [], 'nucleotide': [] }
+    #dist_counters[group] = { 'aa': {}, 'nucleotide': {} }
 
 def process_record(inputDict, metadataDict, currentFile, calc, fields):
     """Perform calculation from given fields"""
@@ -788,31 +814,21 @@ def process_record(inputDict, metadataDict, currentFile, calc, fields):
     if lengthKey in calc['operations']:
         rep_id = fields.get('repertoire_id')
         if rep_id is None:
-            # TODO: error
+            # TODO: error?
             return
-        if metadataDict.get(rep_id) is None:
-            # TODO: error
+        if inputDict[defaults.full_metadata_key].get(rep_id) is None:
+            # TODO: error?
             return
-        #if (groups[group]['type'] == 'sampleGroup'):
-        if False:
-            for sample in groups[group]['samples']:
-                if not cdr3_histograms.get(sample): cdr3_histograms[sample] = { 'aa': [], 'nucleotide': [] }
-                if metadata.file_in_sample(inputDict, defaults.summaryKey, currentFile, group, sample):
-                    cdr3 = fields[headerMapping[defaults.headerNames['CDR3_AA']]]
-                    if cdr3 is not None: increment_count(cdr3_histograms[sample]['aa'], cdr3)
-                    cdr3 = fields[headerMapping[defaults.headerNames['CDR3_SEQ']]]
-                    if cdr3 is not None: increment_count(cdr3_histograms[sample]['nucleotide'], cdr3)
-        else:
-            length = fields.get('junction_aa_length')
-            if length is not None:
-                increment_count(cdr3_histograms[rep_id]['aa'], length)
-                if fields.get('productive'):
-                    increment_count(cdr3_histograms_productive[rep_id]['aa'], length)
-            length = fields.get('junction_length')
-            if length is not None:
-                increment_count(cdr3_histograms[rep_id]['nucleotide'], length)
-                if fields.get('productive'):
-                    increment_count(cdr3_histograms_productive[rep_id]['nucleotide'], length)
+        length = fields.get('junction_aa_length')
+        if length is not None:
+            increment_count(cdr3_histograms[rep_id]['aa'], length)
+            if fields.get('productive'):
+                increment_count(cdr3_histograms_productive[rep_id]['aa'], length)
+        length = fields.get('junction_length')
+        if length is not None:
+            increment_count(cdr3_histograms[rep_id]['nucleotide'], length)
+            if fields.get('productive'):
+                increment_count(cdr3_histograms_productive[rep_id]['nucleotide'], length)
 
     # AA/NT distribution operations
     if distributionKey in calc['operations']:
@@ -1034,86 +1050,41 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
     """Finalize and save the calculations"""
     # length operations
     if lengthKey in calc['operations']:
+        # group counts
+        if inputDict.get(defaults.groups_key) is not None:
+            for group in inputDict[defaults.groups_key]:
+                for rep in inputDict[defaults.groups_key][group]['repertoires']:
+                    group_counts(group_cdr3_histograms[group]['aa'], cdr3_histograms[rep['repertoire_id']]['aa'])
+                    group_counts(group_cdr3_histograms_productive[group]['aa'], cdr3_histograms_productive[rep['repertoire_id']]['aa'])
+                    group_counts(group_cdr3_histograms[group]['nucleotide'], cdr3_histograms[rep['repertoire_id']]['nucleotide'])
+                    group_counts(group_cdr3_histograms_productive[group]['nucleotide'], cdr3_histograms_productive[rep['repertoire_id']]['nucleotide'])
+            for group in inputDict[defaults.groups_key]:
+                compute_relative(group_cdr3_histograms, group, 'aa')
+                compute_relative(group_cdr3_histograms_productive, group, 'aa')
+                compute_relative(group_cdr3_histograms, group, 'nucleotide')
+                compute_relative(group_cdr3_histograms_productive, group, 'nucleotide')
+                output_counts(group + ".junction_aa_length.tsv", group_cdr3_histograms[group]['aa'], group_cdr3_histograms[group]['rel_aa'])
+                output_counts(group + ".productive.junction_aa_length.tsv", group_cdr3_histograms_productive[group]['aa'], group_cdr3_histograms_productive[group]['rel_aa'])
+                output_counts(group + ".junction_nt_length.tsv", group_cdr3_histograms[group]['nucleotide'], group_cdr3_histograms[group]['rel_nucleotide'])
+                output_counts(group + ".productive.junction_nt_length.tsv", group_cdr3_histograms_productive[group]['nucleotide'], group_cdr3_histograms_productive[group]['rel_nucleotide'])
+
+        # repertoire counts
         for rep_id in metadataDict:
-            rep = metadataDict[rep_id]
             compute_relative(cdr3_histograms, rep_id, 'aa')
             compute_relative(cdr3_histograms_productive, rep_id, 'aa')
             compute_relative(cdr3_histograms, rep_id, 'nucleotide')
             compute_relative(cdr3_histograms_productive, rep_id, 'nucleotide')
-            #if (groups[group]['type'] == 'sampleGroup'):
-            #    for sample in groups[group]['samples']:
-            #        compute_relative(sample, 'aa')
-            #        compute_relative(sample, 'nucleotide')
-                    
-        for rep_id in metadataDict:
-            rep = metadataDict[rep_id]
-            # output specification for process metadata
+            output_counts(rep_id + ".junction_aa_length.tsv", cdr3_histograms[rep_id]['aa'], cdr3_histograms[rep_id]['rel_aa'])
+            output_counts(rep_id + ".productive.junction_aa_length.tsv", cdr3_histograms_productive[rep_id]['aa'], cdr3_histograms_productive[rep_id]['rel_aa'])
+            output_counts(rep_id + ".junction_nt_length.tsv", cdr3_histograms[rep_id]['nucleotide'], cdr3_histograms[rep_id]['rel_nucleotide'])
+            output_counts(rep_id + ".productive.junction_nt_length.tsv", cdr3_histograms_productive[rep_id]['nucleotide'], cdr3_histograms_productive[rep_id]['rel_nucleotide'])
+
+            # TODO: output specification for process metadata
             #if (not outputSpec['files'].get(group + "_cdr3_length")): outputSpec['files'][group + "_cdr3_length"] = {}
             #outputSpec['groups'][group]['cdr3_length'] = { "files": group + "_cdr3_length", "type": "output" }
-
-            # aa histogram
-            filename = rep_id + ".junction_aa_length.tsv"
-            writer = open(filename, 'w')
-            cntArray = cdr3_histograms[rep_id]['aa']
-            relArray = cdr3_histograms[rep_id]['rel_aa']
-            #if (groups[group]['type'] == 'sampleGroup'):
-            if False:
-                group_average(inputDict, group, 'aa')
-                group_average(inputDict, group, 'rel_aa')
-                stdArray = cdr3_histograms[group]['aa_std']
-                stdRelArray = cdr3_histograms[group]['rel_aa_std']
-                writer.write('CDR3_LENGTH\tCDR3_COUNT\tCDR3_COUNT_STD\tCDR3_RELATIVE\tCDR3_RELATIVE_STD\n')
-                for i in range(0, len(cntArray), 1):
-                    writer.write(str(i) + '\t' + str(cntArray[i]) + '\t' + str(stdArray[i])
-                                 + '\t' + str(relArray[i]) + '\t' + str(stdRelArray[i]) + '\n')
-            else:
-                writer.write('CDR3_LENGTH\tCDR3_COUNT\tCDR3_RELATIVE\n')
-                for i in range(0, len(cntArray), 1):
-                    writer.write(str(i) + '\t' + str(cntArray[i]) + '\t' + str(relArray[i]) + '\n')
-            writer.close()
             #outputSpec['files'][group + "_cdr3_length"]['aa'] = { "value": filename, "description":"CDR3 AA Length Histogram", "type":"tsv" }
-
-            # aa productive histogram
-            filename = rep_id + ".productive.junction_aa_length.tsv"
-            writer = open(filename, 'w')
-            cntArray = cdr3_histograms_productive[rep_id]['aa']
-            relArray = cdr3_histograms_productive[rep_id]['rel_aa']
-            writer.write('CDR3_LENGTH\tCDR3_COUNT\tCDR3_RELATIVE\n')
-            for i in range(0, len(cntArray), 1):
-                writer.write(str(i) + '\t' + str(cntArray[i]) + '\t' + str(relArray[i]) + '\n')
-            writer.close()
-
-            # nucleotide histogram
-            filename = rep_id + ".junction_nt_length.tsv"
-            writer = open(filename, 'w')
-            cntArray = cdr3_histograms[rep_id]['nucleotide']
-            relArray = cdr3_histograms[rep_id]['rel_nucleotide']
-            #if (groups[group]['type'] == 'sampleGroup'):
-            if False:
-                group_average(inputDict, group, 'nucleotide')
-                group_average(inputDict, group, 'rel_nucleotide')
-                stdArray = cdr3_histograms[group]['nucleotide_std']
-                stdRelArray = cdr3_histograms[group]['rel_nucleotide_std']
-                writer.write('CDR3_LENGTH\tCDR3_COUNT\tCDR3_COUNT_STD\tCDR3_RELATIVE\tCDR3_RELATIVE_STD\n')
-                for i in range(0, len(cntArray), 1):
-                    writer.write(str(i) + '\t' + str(cntArray[i]) + '\t' + str(stdArray[i])
-                                 + '\t' + str(relArray[i]) + '\t' + str(stdRelArray[i]) + '\n')
-            else:
-                writer.write('CDR3_LENGTH\tCDR3_COUNT\tCDR3_RELATIVE\n')
-                for i in range(0, len(cntArray), 1):
-                    writer.write(str(i) + '\t' + str(cntArray[i]) + '\t' + str(relArray[i]) + '\n')
-            writer.close()
             #outputSpec['files'][group + "_cdr3_length"]['nucleotide'] = { "value": filename, "description":"CDR3 Nucleotide Length Histogram", "type":"tsv" }
 
-            # nucleotide productive histogram
-            filename = rep_id + ".productive.junction_nt_length.tsv"
-            writer = open(filename, 'w')
-            cntArray = cdr3_histograms_productive[rep_id]['nucleotide']
-            relArray = cdr3_histograms_productive[rep_id]['rel_nucleotide']
-            writer.write('CDR3_LENGTH\tCDR3_COUNT\tCDR3_RELATIVE\n')
-            for i in range(0, len(cntArray), 1):
-                writer.write(str(i) + '\t' + str(cntArray[i]) + '\t' + str(relArray[i]) + '\n')
-            writer.close()
 
     # AA/NT distribution operations
     if distributionKey in calc['operations']:

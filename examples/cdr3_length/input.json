@@ -1,5 +1,6 @@
 {
     "metadata": "repertoire.airr.json",
+    "groups": "groups.airr.yaml",
     "repertoires": [
         "8064755271837946346-242ac113-0001-012",
         "8118141715327226346-242ac113-0001-012"

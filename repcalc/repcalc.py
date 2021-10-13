@@ -34,6 +34,8 @@ import argparse
 import json
 import importlib
 import copy
+import yaml
+import yamlordereddictloader
 
 import airr
 
@@ -47,6 +49,20 @@ import repcalc.defaults as defaults
 #import summarize
 import repcalc.metadata as metadata
 import repcalc.gldb as gldb
+
+def load_data_file(filename):
+    ext = filename.split('.')[-1]
+    if ext in ('yaml', 'yml'):
+        with open(filename, 'r', encoding='utf-8') as handle:
+            data = yaml.load(handle, Loader=yamlordereddictloader.Loader)
+    elif ext == 'json':
+        with open(filename, 'r', encoding='utf-8') as handle:
+            data = json.load(handle)
+    else:
+        if debug:
+            sys.stderr.write('Unknown file type: %s. Supported file extensions are "yaml", "yml" or "json"\n' % (ext))
+        raise TypeError('Unknown file type: %s. Supported file extensions are "yaml", "yml" or "json"\n' % (ext))
+    return data
 
 def calc_types(inputDict):
     """Return set of calculations types in input specification"""
@@ -130,6 +146,29 @@ def main():
             else:
                 newDict[rep] = metadataDict[rep]
         metadataDict = newDict
+
+    # check if repertoire groups
+    if inputDict.get(defaults.groups_file_key) is not None:
+        try:
+            # Load the repertoire groups
+            # TODO: should be able to use AIRR library to load
+            #data = airr.load_repertoire(inputDict[defaults.groups_file_key])
+            data = load_data_file(inputDict[defaults.groups_file_key])
+
+            # put groups in dictionary keyed by their id
+            groupDict = { obj['repertoire_group_id'] : obj for obj in data['RepertoireGroup'] }
+
+            # verify that all repertoires exist
+            for group in groupDict:
+                for rep in groupDict[group]['repertoires']:
+                    if inputDict[defaults.full_metadata_key].get(rep['repertoire_id']) is None:
+                        print("Repertoire", rep['repertoire_id'], "for group", group, "is missing from metadata file.")
+                        raise
+
+            inputDict[defaults.groups_key] = groupDict
+        except:
+            print("Could not read repertoire group file: " + inputDict[defaults.groups_file_key])
+            raise
 
     # germline db
     if inputDict.get(defaults.germline_file_key) is not None:

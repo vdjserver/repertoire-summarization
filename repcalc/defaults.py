@@ -33,6 +33,7 @@ Default settings
 
 # Keys in specification file
 metadata_file_key = "metadata"
+groups_file_key = "groups"
 germline_file_key = "germline"
 germline_key = "gldb"
 repertoire_key = "repertoires"
@@ -41,7 +42,7 @@ rearrangement_files_key = "rearrangement_files"
 organismKey = "organism"
 filesKey = "files"
 fileMetadataKey = "fileMetadata"
-groupsKey = "groups"
+groups_key = "repertoire_groups"
 summaryKey = "summary"
 vdjmlKey = "vdjml"
 changeoKey = "changeo"
