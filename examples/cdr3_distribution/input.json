@@ -1,0 +1,20 @@
+{
+    "metadata": "repertoire.airr.json",
+    "groups": "groups.airr.yaml",
+    "repertoires": [
+        "8064755271837946346-242ac113-0001-012",
+        "8118141715327226346-242ac113-0001-012"
+    ],
+    "rearrangement_files": [
+        "8064755271837946346-242ac113-0001-012.airr.tsv",
+        "8118141715327226346-242ac113-0001-012.airr.tsv"
+    ],
+    "calculations": [
+        {
+            "type": "CDR3",
+            "operations": [ "distribution" ], 
+            "levels": [ ], 
+            "filters": [ "productive" ]
+        }
+    ]
+}
