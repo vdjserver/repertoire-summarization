@@ -76,14 +76,18 @@ def getDisplayName(germline, allele_call, level):
             print('Germline data is missing allele description:', field)
             sys.exit(1)
 
+        segment_name = None
         if level == "allele":
-            segment_name = allele_call
+            segment_name = field
 
         if level == "gene":
             segment_name = getGene(allele_description)
 
         if level == "subgroup":
             segment_name = getSubgroup(allele_description)
+
+        if segment_name is None:
+            continue
 
         if segment_name not in distinct_names:
             distinct_names.append(segment_name)

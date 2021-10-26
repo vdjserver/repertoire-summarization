@@ -58,7 +58,7 @@ def add_segment_count(germline, segment, level, counters, amount):
         return
     distinct_names = gldb.getDisplayName(germline, segment, level)
     len_float = float(len(distinct_names))
-    #print(len(fields), distinct_names, len(distinct_names))
+    #print(segment, distinct_names, len(distinct_names))
 
     # unique mode
     if len(distinct_names) == 1:
