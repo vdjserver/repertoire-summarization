@@ -32,7 +32,7 @@ CDR3 calculation module
 from repcalc import __version__
 import repcalc.defaults as defaults
 import repcalc.metadata as metadata
-#import gldb
+import repcalc.gldb as gldb
 import json
 import math
 import numpy
@@ -255,20 +255,20 @@ def group_average_distribution(inputDict, sampleGroup, level, symbol_list):
 cdr3_shared = { "aa": {}, "nucleotide": {} }
 # accumulates count of number of unique CDR3s within a metadata group
 # if sublevel is defined then counts are per sublevel
-# for metadata sampleGroups, counts indicate sharing level between samples in the group
+# for metadata repertoire groups, counts indicate sharing level between repertoires in the group
 share_summary = {}
 share_summary_cdr3 = {}
 
 def level_share_summary(inputDict, cdr3_shared_level, share_summary_level, share_summary_cdr3_level):
     # generate summary for each group
-    # samples and files are just a count
-    # sample groups produce an array with sharing counts among samples
-    groups = inputDict[defaults.groupsKey]
+    # repertoires are just a count
+    # groups produce an array with sharing counts among repertoires
+    groups = inputDict[defaults.groups_key]
+    # iterate over each CDR3
+    #print(len(cdr3_shared_level.keys()))
     for key in cdr3_shared_level.keys():
-        #print(cdr3_shared_level[key])
         group_set = cdr3_shared_level[key].keys()
-        #print(group_set)
-        #print(share_summary_level)
+        # iterate across each repertoire/group
         for group in group_set:
             entry = share_summary_level.get(group)
             if not groups.get(group):
@@ -278,29 +278,22 @@ def level_share_summary(inputDict, cdr3_shared_level, share_summary_level, share
                 share_summary_level[group] = share_summary_level[group] + 1
                 share_summary_cdr3_level[group][key] = cdr3_shared_level[key][group]
                 continue
-            if (groups[group]['type'] == 'sampleGroup'):
+            else:
                 if entry is None:
                     share_summary_level[group] = []
                     share_summary_cdr3_level[group] = {}
-                samples = groups[group]['samples']
+                repertoires = groups[group]['repertoires']
                 count = 0
-                for sample in samples:
-                    if sample in group_set: count += 1
+                for rep in repertoires:
+                    if rep['repertoire_id'] in group_set: count += 1
                 if count >= len(share_summary_level[group]): 
                     for i in range(len(share_summary_level[group]), count+1, 1): share_summary_level[group].append(0)
                 share_summary_level[group][count] = share_summary_level[group][count] + 1
                 if share_summary_cdr3_level[group].get(count) is None: share_summary_cdr3_level[group][count] = {}
                 share_summary_cdr3_level[group][count][key] = cdr3_shared_level[key][group]
-            else:
-                if entry is None:
-                    share_summary_level[group] = 0
-                    share_summary_cdr3_level[group] = {}
-                share_summary_level[group] = share_summary_level[group] + 1
-                share_summary_cdr3_level[group][key] = cdr3_shared_level[key][group]
-            #print(share_summary_level[group])
-            #print(share_summary_cdr3_level[group])
 
 def generate_share_summary(inputDict, level, sublevel):
+    #print(level, sublevel)
     if share_summary.get(level) is None:
         share_summary[level] = {}
         share_summary_cdr3[level] = {}
@@ -320,6 +313,7 @@ def write_share_summary(inputDict, outputSpec, level, sublevel):
     cdr3_shared_level = cdr3_shared[level]
     share_summary_level = share_summary[level]
     share_summary_cdr3_level = share_summary_cdr3[level]
+
     fileTxt = level
     if sublevel is not None:
         cdr3_shared_level = cdr3_shared_level[sublevel]
@@ -327,24 +321,29 @@ def write_share_summary(inputDict, outputSpec, level, sublevel):
         share_summary_cdr3_level = share_summary_cdr3_level[sublevel]
         fileTxt = level + '_' + sublevel
 
-    cdr3_text = defaults.headerNames['CDR3_AA']
-    if level == 'nucleotide': cdr3_text = defaults.headerNames['CDR3_SEQ']
-    if sublevel == 'nucleotide': cdr3_text = defaults.headerNames['CDR3_SEQ']
+    #print(level, sublevel)
+    #print(len(cdr3_shared_level.keys()))
+    #print(len(share_summary_level.keys()))
+    #print(len(share_summary_cdr3_level.keys()))
 
-    groups = inputDict[defaults.groupsKey]
+    cdr3_text = 'junction_aa'
+    if level == 'nucleotide': cdr3_text = 'junction'
+    if sublevel == 'nucleotide': cdr3_text = 'junction'
+
+    groups = inputDict[defaults.groups_key]
     filename = "summary_cdr3_" + fileTxt + "_sharing.tsv"
     writer = open(filename, 'w')
 
     # output specification for process metadata
     # TODO: Cheat with app name of RepCalc, we should use the app name in process metadata
-    if (not outputSpec['groups'].get("RepCalc")): outputSpec['groups']["RepCalc"] = {}
-    outputSpec['groups']['RepCalc']['cdr3_shared'] = { "files": "RepCalc_cdr3_shared", "type": "output" }
-    if (not outputSpec['files'].get("RepCalc_cdr3_shared")): outputSpec['files']["RepCalc_cdr3_shared"] = {}
-    outputSpec['files']["RepCalc_cdr3_shared"]["summary_cdr3_" + fileTxt] = { "value": filename, "description":"CDR3 Summary", "type":"tsv" }
+    #if (not outputSpec['groups'].get("RepCalc")): outputSpec['groups']["RepCalc"] = {}
+    #outputSpec['groups']['RepCalc']['cdr3_shared'] = { "files": "RepCalc_cdr3_shared", "type": "output" }
+    #if (not outputSpec['files'].get("RepCalc_cdr3_shared")): outputSpec['files']["RepCalc_cdr3_shared"] = {}
+    #outputSpec['files']["RepCalc_cdr3_shared"]["summary_cdr3_" + fileTxt] = { "value": filename, "description":"CDR3 Summary", "type":"tsv" }
 
     # inner function for summary group values
     def write_summary(group, summary_level):
-        if (groups[group]['type'] == 'sampleGroup'):
+        if groups.get(group) is not None:
             for i in range(1, len(summary_level[group]), 1): writer.write('\t' + str(summary_level[group][i]))
         else:
             writer.write('\t' + str(summary_level[group]))
@@ -368,24 +367,24 @@ def write_share_summary(inputDict, outputSpec, level, sublevel):
 
     # write detail
     for group in groups:
-        filename = group + "_cdr3_" + fileTxt + "_sharing.tsv"
+        filename = group + ".cdr3_" + fileTxt + "_sharing.tsv"
         writer = open(filename, 'w')
 
         # output specification for process metadata
-        if (not outputSpec['files'].get(group + "_cdr3_shared")): outputSpec['files'][group + "_cdr3_shared"] = {}
-        outputSpec['groups'][group]['cdr3_shared'] = { "files": group + "_cdr3_shared", "type": "output" }
-        outputSpec['files'][group + "_cdr3_shared"][fileTxt] = { "value": filename, "description":"CDR3 Detail", "type":"tsv" }
+        #if (not outputSpec['files'].get(group + "_cdr3_shared")): outputSpec['files'][group + "_cdr3_shared"] = {}
+        #outputSpec['groups'][group]['cdr3_shared'] = { "files": group + "_cdr3_shared", "type": "output" }
+        #outputSpec['files'][group + "_cdr3_shared"][fileTxt] = { "value": filename, "description":"CDR3 Detail", "type":"tsv" }
 
         writer.write(cdr3_text)
         if sublevel is not None: writer.write("\tLEVEL")
-        if (groups[group]['type'] == 'sampleGroup'):
+        if groups.get(group) is not None:
             writer.write("\tSAMPLES\tCOUNT\tTOTAL_COUNT\n")
         else:
             writer.write("\tCOUNT\tTOTAL_COUNT\n")
 
         # inner function for detail group values
         def write_detail(sl, summary_level, summary_cdr3_level, cdr3_level):
-            if (groups[group]['type'] == 'sampleGroup'):
+            if groups.get(group) is not None:
                 #print(summary_cdr3_level[group])
                 #for i in range(1, len(summary_cdr3_level[group]), 1):
                 #print(sl)
@@ -399,17 +398,17 @@ def write_share_summary(inputDict, outputSpec, level, sublevel):
                         writer.write(cdr3)
                         if sl: writer.write('\t' + sl)
                         group_set = cdr3_level[cdr3].keys()
-                        samples = groups[group]['samples']
+                        repertoires = groups[group]['repertoires']
                         #print(cdr3_level[cdr3])
                         #print(group_set)
                         #print(samples)
-                        sampleSet = []
-                        for sample in samples:
-                            if sample in group_set: sampleSet.append(sample)
-                        writer.write('\t' + ','.join(sampleSet))
-                        for sample in sampleSet:
-                            writer.write('\t' + str(cdr3_level[cdr3][sample]['count']))
-                            writer.write('\t' + str(cdr3_level[cdr3][sample]['total_count']))
+                        repSet = []
+                        for rep in repertoires:
+                            if rep['repertoire_id'] in group_set: repSet.append(rep['repertoire_id'])
+                        writer.write('\t' + ','.join(repSet))
+                        for rep in repSet:
+                            writer.write('\t' + str(cdr3_level[cdr3][rep]['count']))
+                            writer.write('\t' + str(cdr3_level[cdr3][rep]['total_count']))
                         writer.write('\n')
             else:
                 cdr3_set = summary_cdr3_level[group]
@@ -824,15 +823,17 @@ def initialize_calculation_module(inputDict, metadataDict, headerMapping):
 
 def process_record(inputDict, metadataDict, currentFile, calc, fields):
     """Perform calculation from given fields"""
+
+    rep_id = fields.get('repertoire_id')
+    if rep_id is None:
+        # TODO: error?
+        return
+    if inputDict[defaults.full_metadata_key].get(rep_id) is None:
+        # TODO: error?
+        return
+
     # length operations
     if lengthKey in calc['operations']:
-        rep_id = fields.get('repertoire_id')
-        if rep_id is None:
-            # TODO: error?
-            return
-        if inputDict[defaults.full_metadata_key].get(rep_id) is None:
-            # TODO: error?
-            return
         length = fields.get('junction_aa_length')
         if length is not None:
             increment_count(cdr3_histograms[rep_id]['aa'], length)
@@ -846,13 +847,6 @@ def process_record(inputDict, metadataDict, currentFile, calc, fields):
 
     # AA/NT distribution operations
     if distributionKey in calc['operations']:
-        rep_id = fields.get('repertoire_id')
-        if rep_id is None:
-            # TODO: error?
-            return
-        if inputDict[defaults.full_metadata_key].get(rep_id) is None:
-            # TODO: error?
-            return
         cdr3 = fields.get('junction_aa')
         if cdr3 is not None:
             aa_distribution(dist_counters[rep_id]['aa'], cdr3)
@@ -866,69 +860,46 @@ def process_record(inputDict, metadataDict, currentFile, calc, fields):
 
     # share/unique sequence operations
     if sharedKey in calc['operations']:
-        groups = inputDict[defaults.groupsKey]
-        invert_hierarchy = gldb.getInvertHierarchyBy(inputDict[defaults.organismKey])
+        germline = inputDict.get(defaults.germline_key)
+        groups = metadata.groupsWithRepertoire(inputDict, rep_id)
+
+        if "productive" in calc['filters']:
+            if not fields.get('productive'):
+                return
+
         for l in calc['levels']:
+            cdr3_entry = None
             sublevel = None
             level = None
+            # get appropriate entry
             if l == 'aa':
-                if len(groupSet) == 0: continue
-                cdr3 = fields[headerMapping[defaults.headerNames['CDR3_AA']]]
+                cdr3 = fields.get('junction_aa')
                 if cdr3 is not None and len(cdr3) > 0:
-                    if len(groupSet) == 0: continue
                     cdr3_entry = cdr3_shared[l].get(cdr3)
                     if cdr3_entry is None:
                         cdr3_shared[l][cdr3] = {}
                         cdr3_entry = cdr3_shared[l].get(cdr3)
-                    moreGroups = set(groupSet)
-                    for group in groupSet:
-                        if (groups[group]['type'] == 'sampleGroup'):
-                            for sample in groups[group]['samples']:
-                                if metadata.file_in_sample(inputDict, defaults.summaryKey, currentFile, group, sample):
-                                    moreGroups.add(sample)
-                    for group in moreGroups:
-                        group_entry = cdr3_entry.get(group)
-                        if group_entry is None:
-                            cdr3_entry[group] = { 'count': 0, 'total_count': 0 }
-                            group_entry = cdr3_entry[group]
-                        group_entry['count'] = group_entry['count'] + 1
-                        group_entry['total_count'] = group_entry['total_count'] + defaults.get_dupcount(headerMapping, fields)
+#                    if cdr3_entry.get(rep_id) is None:
+#                        cdr3_entry[rep_id] = { 'count': 0, 'total_count': 0 }
 
             elif l == 'nucleotide':
-                if len(groupSet) == 0: continue
-                cdr3 = fields[headerMapping[defaults.headerNames['CDR3_SEQ']]]
+                cdr3 = fields.get('junction')
                 if cdr3 is not None and len(cdr3) > 0:
-                    if len(groupSet) == 0: continue
                     cdr3_entry = cdr3_shared[l].get(cdr3)
                     if cdr3_entry is None:
                         cdr3_shared[l][cdr3] = {}
                         cdr3_entry = cdr3_shared[l].get(cdr3)
-                    moreGroups = set(groupSet)
-                    for group in groupSet:
-                        if (groups[group]['type'] == 'sampleGroup'):
-                            for sample in groups[group]['samples']:
-                                if metadata.file_in_sample(inputDict, defaults.summaryKey, currentFile, group, sample):
-                                    moreGroups.add(sample)
-                    for group in moreGroups:
-                        group_entry = cdr3_entry.get(group)
-                        if group_entry is None:
-                            cdr3_entry[group] = { 'count': 0, 'total_count': 0 }
-                            group_entry = cdr3_entry[group]
-                        group_entry['count'] = group_entry['count'] + 1
-                        group_entry['total_count'] = group_entry['total_count'] + defaults.get_dupcount(headerMapping, fields)
 
             elif l == 'v,aa':
-                if len(groupSet) == 0: continue
                 level = 'v'
                 sublevel = 'aa'
-                cdr3 = fields[headerMapping[defaults.headerNames['CDR3_AA']]]
-                if cdr3 is not None and cdr3!= 'None' and len(cdr3) > 0:
-                    vcall = fields[headerMapping[defaults.headerNames['V_CALL']]]
-                    if not vcall or vcall == 'None': continue
-                    vgene = invert_hierarchy[vcall]
+                cdr3 = fields.get('junction_aa')
+                if cdr3 is not None and len(cdr3) > 0:
+                    vcall = fields.get('v_call')
+                    if not vcall or len(vcall) == 0: continue
+                    vgene = gldb.getDisplayName(germline, vcall, "gene")
                     if not vgene: continue
-                    vgene = vgene.keys()[0]
-                    if not vgene: continue
+                    vgene = vgene[0]
                     if cdr3_shared.get(level) is None: cdr3_shared[level] = {}
                     if cdr3_shared[level].get(sublevel) is None: cdr3_shared[level][sublevel] = {}
                     if cdr3_shared[level][sublevel].get(vgene) is None: cdr3_shared[level][sublevel][vgene] = {}
@@ -937,32 +908,17 @@ def process_record(inputDict, metadataDict, currentFile, calc, fields):
                     if cdr3_entry is None:
                         cdr3_shared_level[cdr3] = {}
                         cdr3_entry = cdr3_shared_level[cdr3]
-                    moreGroups = set(groupSet)
-                    for group in groupSet:
-                        if (groups[group]['type'] == 'sampleGroup'):
-                            for sample in groups[group]['samples']:
-                                if metadata.file_in_sample(inputDict, defaults.summaryKey, currentFile, group, sample):
-                                    moreGroups.add(sample)
-                    for group in moreGroups:
-                        group_entry = cdr3_entry.get(group)
-                        if group_entry is None:
-                            cdr3_entry[group] = { 'count': 0, 'total_count': 0 }
-                            group_entry = cdr3_entry[group]
-                        group_entry['count'] = group_entry['count'] + 1
-                        group_entry['total_count'] = group_entry['total_count'] + defaults.get_dupcount(headerMapping, fields)
 
             elif l == 'v,nucleotide':
-                if len(groupSet) == 0: continue
                 level = 'v'
                 sublevel = 'nucleotide'
-                cdr3 = fields[headerMapping[defaults.headerNames['CDR3_SEQ']]]
-                if cdr3 is not None and cdr3 != 'None' and len(cdr3) > 0:
-                    vcall = fields[headerMapping[defaults.headerNames['V_CALL']]]
-                    if not vcall or vcall == 'None': continue
-                    vgene = invert_hierarchy[vcall]
+                cdr3 = fields.get('junction')
+                if cdr3 is not None and len(cdr3) > 0:
+                    vcall = fields.get('v_call')
+                    if not vcall or len(vcall) == 0: continue
+                    vgene = gldb.getDisplayName(germline, vcall, "gene")
                     if not vgene: continue
-                    vgene = vgene.keys()[0]
-                    if not vgene: continue
+                    vgene = vgene[0]
                     if cdr3_shared.get(level) is None: cdr3_shared[level] = {}
                     if cdr3_shared[level].get(sublevel) is None: cdr3_shared[level][sublevel] = {}
                     if cdr3_shared[level][sublevel].get(vgene) is None: cdr3_shared[level][sublevel][vgene] = {}
@@ -971,38 +927,22 @@ def process_record(inputDict, metadataDict, currentFile, calc, fields):
                     if cdr3_entry is None:
                         cdr3_shared_level[cdr3] = {}
                         cdr3_entry = cdr3_shared_level[cdr3]
-                    moreGroups = set(groupSet)
-                    for group in groupSet:
-                        if (groups[group]['type'] == 'sampleGroup'):
-                            for sample in groups[group]['samples']:
-                                if metadata.file_in_sample(inputDict, defaults.summaryKey, currentFile, group, sample):
-                                    moreGroups.add(sample)
-                    for group in moreGroups:
-                        group_entry = cdr3_entry.get(group)
-                        if group_entry is None:
-                            cdr3_entry[group] = { 'count': 0, 'total_count': 0 }
-                            group_entry = cdr3_entry[group]
-                        group_entry['count'] = group_entry['count'] + 1
-                        group_entry['total_count'] = group_entry['total_count'] + defaults.get_dupcount(headerMapping, fields)
 
             elif l == 'vj,aa':
-                if len(groupSet) == 0: continue
                 level = 'vj'
                 sublevel = 'aa'
-                cdr3 = fields[headerMapping[defaults.headerNames['CDR3_AA']]]
-                if cdr3 is not None and cdr3!= 'None' and len(cdr3) > 0:
-                    vcall = fields[headerMapping[defaults.headerNames['V_CALL']]]
-                    if not vcall or vcall == 'None': continue
-                    vgene = invert_hierarchy.get(vcall)
+                cdr3 = fields.get('junction_aa')
+                if cdr3 is not None and len(cdr3) > 0:
+                    vcall = fields.get('v_call')
+                    if not vcall or len(vcall) == 0: continue
+                    vgene = gldb.getDisplayName(germline, vcall, "gene")
                     if not vgene: continue
-                    vgene = vgene.keys()[0]
-                    if not vgene: continue
-                    jcall = fields[headerMapping[defaults.headerNames['J_CALL']]]
-                    if not jcall or jcall == 'None': continue
-                    jgene = invert_hierarchy.get(jcall)
+                    vgene = vgene[0]
+                    jcall = fields.get('j_call')
+                    if not jcall or len(jcall) == 0: continue
+                    jgene = gldb.getDisplayName(germline, jcall, "gene")
                     if not jgene: continue
-                    jgene = jgene.keys()[0]
-                    if not jgene: continue
+                    jgene = jgene[0]
                     combo = vgene + '|' + jgene
                     if cdr3_shared.get(level) is None: cdr3_shared[level] = {}
                     if cdr3_shared[level].get(sublevel) is None: cdr3_shared[level][sublevel] = {}
@@ -1012,38 +952,22 @@ def process_record(inputDict, metadataDict, currentFile, calc, fields):
                     if cdr3_entry is None:
                         cdr3_shared_level[cdr3] = {}
                         cdr3_entry = cdr3_shared_level[cdr3]
-                    moreGroups = set(groupSet)
-                    for group in groupSet:
-                        if (groups[group]['type'] == 'sampleGroup'):
-                            for sample in groups[group]['samples']:
-                                if metadata.file_in_sample(inputDict, defaults.summaryKey, currentFile, group, sample):
-                                    moreGroups.add(sample)
-                    for group in moreGroups:
-                        group_entry = cdr3_entry.get(group)
-                        if group_entry is None:
-                            cdr3_entry[group] = { 'count': 0, 'total_count': 0 }
-                            group_entry = cdr3_entry[group]
-                        group_entry['count'] = group_entry['count'] + 1
-                        group_entry['total_count'] = group_entry['total_count'] + defaults.get_dupcount(headerMapping, fields)
 
             elif l == 'vj,nucleotide':
-                if len(groupSet) == 0: continue
                 level = 'vj'
                 sublevel = 'nucleotide'
-                cdr3 = fields[headerMapping[defaults.headerNames['CDR3_SEQ']]]
-                if cdr3 is not None and cdr3!= 'None' and len(cdr3) > 0:
-                    vcall = fields[headerMapping[defaults.headerNames['V_CALL']]]
-                    if not vcall or vcall == 'None': continue
-                    vgene = invert_hierarchy.get(vcall)
+                cdr3 = fields.get('junction')
+                if cdr3 is not None and len(cdr3) > 0:
+                    vcall = fields.get('v_call')
+                    if not vcall or len(vcall) == 0: continue
+                    vgene = gldb.getDisplayName(germline, vcall, "gene")
                     if not vgene: continue
-                    vgene = vgene.keys()[0]
-                    if not vgene: continue
-                    jcall = fields[headerMapping[defaults.headerNames['J_CALL']]]
-                    if not jcall or jcall == 'None': continue
-                    jgene = invert_hierarchy.get(jcall)
+                    vgene = vgene[0]
+                    jcall = fields.get('j_call')
+                    if not jcall or len(jcall) == 0: continue
+                    jgene = gldb.getDisplayName(germline, jcall, "gene")
                     if not jgene: continue
-                    jgene = jgene.keys()[0]
-                    if not jgene: continue
+                    jgene = jgene[0]
                     combo = vgene + '|' + jgene
                     if cdr3_shared.get(level) is None: cdr3_shared[level] = {}
                     if cdr3_shared[level].get(sublevel) is None: cdr3_shared[level][sublevel] = {}
@@ -1053,19 +977,25 @@ def process_record(inputDict, metadataDict, currentFile, calc, fields):
                     if cdr3_entry is None:
                         cdr3_shared_level[cdr3] = {}
                         cdr3_entry = cdr3_shared_level[cdr3]
-                    moreGroups = set(groupSet)
-                    for group in groupSet:
-                        if (groups[group]['type'] == 'sampleGroup'):
-                            for sample in groups[group]['samples']:
-                                if metadata.file_in_sample(inputDict, defaults.summaryKey, currentFile, group, sample):
-                                    moreGroups.add(sample)
-                    for group in moreGroups:
+
+            else:
+                # unknown level so just ignore
+                continue
+
+            # increment counts for entry
+            if cdr3_entry is not None:
+                if cdr3_entry.get(rep_id) is None:
+                    cdr3_entry[rep_id] = { 'count': 0, 'total_count': 0 }
+                cdr3_entry[rep_id]['count'] = cdr3_entry[rep_id]['count'] + 1
+                cdr3_entry[rep_id]['total_count'] = cdr3_entry[rep_id]['total_count'] + defaults.get_duplicate_count(fields)
+                for group in groups:
+                    group_entry = cdr3_entry.get(group)
+                    if group_entry is None:
+                        cdr3_entry[group] = { 'count': 0, 'total_count': 0 }
                         group_entry = cdr3_entry.get(group)
-                        if group_entry is None:
-                            cdr3_entry[group] = { 'count': 0, 'total_count': 0 }
-                            group_entry = cdr3_entry[group]
-                        group_entry['count'] = group_entry['count'] + 1
-                        group_entry['total_count'] = group_entry['total_count'] + defaults.get_dupcount(headerMapping, fields)
+                    group_entry['count'] = group_entry['count'] + 1
+                    group_entry['total_count'] = group_entry['total_count'] + defaults.get_duplicate_count(fields)
+
 
 def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
     """Finalize and save the calculations"""

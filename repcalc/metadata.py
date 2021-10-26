@@ -31,7 +31,8 @@ Metadata functions
 import sys
 
 # repsum modules
-#import defaults
+from repcalc import __version__
+import repcalc.defaults as defaults
 
 def filename(file):
     """Extract filename from metadata record"""
@@ -46,3 +47,17 @@ def filename(file):
         return name
     else:
         return None
+
+def groupsWithRepertoire(inputDict, rep_id):
+    """Return set of groups that contain repertoire"""
+    groupDict = inputDict.get(defaults.groups_key)
+    if groupDict is None:
+        return null
+
+    groupList = []
+    for group in groupDict:
+        for rep in groupDict[group]['repertoires']:
+            if rep['repertoire_id'] == rep_id:
+                groupList.append(group)
+                break
+    return groupList
