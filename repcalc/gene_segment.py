@@ -56,12 +56,7 @@ def add_segment_count(germline, segment, level, counters, amount):
     """Add segment counts to counters"""
     if segment is None or len(segment) == 0:
         return
-    fields = segment.split(',')
-    distinct_names = []
-    for field in fields:
-        segment_name = gldb.getDisplayName(germline, field, level)
-        if segment_name not in distinct_names:
-            distinct_names.append(segment_name)
+    distinct_names = gldb.getDisplayName(germline, segment, level)
     len_float = float(len(distinct_names))
     #print(len(fields), distinct_names, len(distinct_names))
 

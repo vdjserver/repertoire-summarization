@@ -67,17 +67,25 @@ def getDisplayName(germline, allele_call, level):
         print('Required germline database is missing.')
         sys.exit(1)
 
-    allele_description = germline['allele_descriptions'].get(allele_call)
-    if allele_description is None:
-        print('Germline data is missing allele description:', allele_call)
-        sys.exit(1)
+    # handle multiple allele calls
+    fields = allele_call.split(',')
+    distinct_names = []
+    for field in fields:
+        allele_description = germline['allele_descriptions'].get(field)
+        if allele_description is None:
+            print('Germline data is missing allele description:', field)
+            sys.exit(1)
 
-    if level == "allele":
-        return allele_call
+        if level == "allele":
+            segment_name = allele_call
 
-    if level == "gene":
-        return getGene(allele_description)
+        if level == "gene":
+            segment_name = getGene(allele_description)
 
-    if level == "subgroup":
-        return getSubgroup(allele_description)
-    return None
+        if level == "subgroup":
+            segment_name = getSubgroup(allele_description)
+
+        if segment_name not in distinct_names:
+            distinct_names.append(segment_name)
+
+    return distinct_names
