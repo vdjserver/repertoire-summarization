@@ -1,0 +1,13 @@
+{
+    "metadata": "repertoires.airr.json",
+    "groups": "groups.airr.yaml",
+    "germline": "vdjserver_human_germline.airr.json",
+    "calculations": [
+        {
+            "type": "CDR3",
+            "operations": [ "compare" ], 
+            "levels": [ "aa", "nucleotide", "v,aa", "v,nucleotide", "vj,aa", "vj,nucleotide" ], 
+            "filters": [ "productive" ]
+        }
+    ]
+}

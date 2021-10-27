@@ -99,7 +99,6 @@ def make_parser_args():
     parser = argparse.ArgumentParser();
     parser.description='Comparison and calculation functions for immune repertoire sequencing data.'
     parser.add_argument('input',type=str,help="Input command file")
-    #parser.add_argument('--gldb',type=str,nargs=1,help="Path to germline database")
     #parser.add_argument('--output',type=str,help="Output specification file")
     parser.add_argument('-v', '--version', action='version', version='%(prog)s '+__version__)
     return parser
@@ -183,7 +182,9 @@ def main():
     #print(outputSpec)
 
     # AIRR TSV rearrangement files
-    airrFiles = inputDict[defaults.rearrangement_files_key]
+    airrFiles = inputDict.get(defaults.rearrangement_files_key)
+    if airrFiles is None:
+        airrFiles = []
 
     # Extract summary file list
     #summaryFiles = extract_summary_files(inputDict, metadataDict)
