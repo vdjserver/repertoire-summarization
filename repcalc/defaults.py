@@ -53,11 +53,11 @@ calcFilters = "filters"
 
 # Calculation modules
 calculationModules = {
-    "gene_segment": {"filename":"gene_segment"},
-    "CDR3": {"filename":"cdr3"},
+    "gene_segment": {"filename":"gene_segment", "require_germline":True},
+    "CDR3": {"filename":"cdr3", "require_germline":True},
     "diversity": {"filename":"diversity"},
     "mutations": {"filename":"mutations"},
-    "clonal_assignment": {"filename":"tcr_clone"},
+    "clonal_assignment": {"filename":"tcr_clone", "require_germline":True},
     "lineage": {"filename":"lineage"}
 }
 

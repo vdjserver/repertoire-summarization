@@ -39,14 +39,9 @@ import yamlordereddictloader
 
 import airr
 
-#import vdjml
-from Bio import SeqIO
-
-# repsum modules
+# repcalc modules
 from repcalc import __version__
-#import utils
 import repcalc.defaults as defaults
-#import summarize
 import repcalc.metadata as metadata
 import repcalc.gldb as gldb
 
@@ -80,6 +75,10 @@ def initialize_calculations(inputDict, metadataDict, headerMapping):
             print("ERROR: Unknown calculation module type: " + calc)
             sys.exit()
         try:
+            if defaults.calculationModules[calc].get('require_germline'):
+                if inputDict.get(defaults.germline_file_key) is None:
+                    print("ERROR: calculation module", calc, "requires germline database.")
+                    sys.exit()
             cmod = importlib.import_module("repcalc." + defaults.calculationModules[calc]['filename'])
         except:
             print("ERROR: Could not load calculation module type: " + calc + "(" + defaults.calculationModules[calc]['filename'] + ".py)")
