@@ -64,7 +64,7 @@ def getSubgroup(allele_description):
 def getDisplayName(germline, allele_call, level):
     """Return display name for allele call"""
     if germline is None:
-        print('Required germline database is missing.')
+        print('ERROR: Required germline database is missing.', file=sys.stderr)
         sys.exit(1)
 
     # handle multiple allele calls
@@ -73,8 +73,8 @@ def getDisplayName(germline, allele_call, level):
     for field in fields:
         allele_description = germline['allele_descriptions'].get(field)
         if allele_description is None:
-            print('Germline data is missing allele description:', field)
-            sys.exit(1)
+            print('WARNING: Germline data is missing allele description:', field, file=sys.stderr)
+            continue
 
         segment_name = None
         if level == "allele":
