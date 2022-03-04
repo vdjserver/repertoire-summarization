@@ -1,0 +1,22 @@
+{
+    "metadata": "repertoire.airr.json",
+    "germline": "vdjserver_human_germline.airr.json",
+    "repertoires": [
+        "6096696254733292012-242ac114-0001-012",
+        "6079859978638004716-242ac114-0001-012",
+        "6085958832198324716-242ac114-0001-012"
+    ],
+    "rearrangement_files": [
+        "6096696254733292012-242ac114-0001-012.airr.tsv",
+        "6079859978638004716-242ac114-0001-012.airr.tsv",
+        "6085958832198324716-242ac114-0001-012.airr.tsv"
+    ],
+    "calculations": [
+        {
+            "type": "gene_segment",
+            "operations": [ "usage" ], 
+            "levels": [ "allele", "gene", "subgroup" ], 
+            "filters": [ "productive" ]
+        }
+    ]
+}
