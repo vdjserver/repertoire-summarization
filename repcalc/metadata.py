@@ -52,7 +52,7 @@ def groupsWithRepertoire(inputDict, rep_id):
     """Return set of groups that contain repertoire"""
     groupDict = inputDict.get(defaults.groups_key)
     if groupDict is None:
-        return null
+        return None
 
     groupList = []
     for group in groupDict:
