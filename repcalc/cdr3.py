@@ -346,6 +346,8 @@ def write_share_summary(inputDict, metadataDict, outputSpec, level, sublevel):
 
     # inner function for summary group values
     def write_summary(group, summary_level):
+        if summary_level.get(group) is None:
+            return
         if groups.get(group) is not None:
             for i in range(1, len(summary_level[group]), 1): writer.write('\t' + str(summary_level[group][i]))
         else:
@@ -384,6 +386,8 @@ def write_share_summary(inputDict, metadataDict, outputSpec, level, sublevel):
 
         # inner function for detail group values
         def write_group_detail(sl, summary_level, summary_cdr3_level, cdr3_level):
+            if summary_cdr3_level.get(group) is None:
+                return
             for i in summary_cdr3_level[group].keys():
                 #print(i)
                 cdr3_set = summary_cdr3_level[group][i]
