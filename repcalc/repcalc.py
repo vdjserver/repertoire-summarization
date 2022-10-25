@@ -1,5 +1,5 @@
 """
-Repertoire calculations and comparison
+Repertoire calculations, comparisons and summaries
 """
 
 #
@@ -7,10 +7,10 @@ Repertoire calculations and comparison
 # Main function
 #
 # VDJServer Analysis Portal
-# Repertoire calculations and comparison
+# Repertoire calculations, comparisons and summaries
 # https://vdjserver.org
 #
-# Copyright (C) 2020 The University of Texas Southwestern Medical Center
+# Copyright (C) 2020-2022 The University of Texas Southwestern Medical Center
 #
 # Author: Scott Christley <scott.christley@utsouthwestern.edu>
 #
@@ -176,20 +176,36 @@ def main():
         else:
             inputDict[defaults.germline_key] = germline
 
-    # Output specification
+    # Output prov model
     #outputSpec = { "files": copy.deepcopy(inputDict[defaults.filesKey]), "groups": copy.deepcopy(inputDict[defaults.groupsKey]) }
     #print(outputSpec)
 
     # AIRR TSV rearrangement files
     airrFiles = inputDict.get(defaults.rearrangement_files_key)
     if airrFiles is None:
-        airrFiles = []
+        # check if processing stage is provided
+        if inputDict.get(defaults.processing_stage_key) is not None:
+            # autogenerate file names from repertoire_id and processing stage
+            airrFiles = []
+            for rep_id in metadataDict:
+                airrFiles.append(rep_id + '.' + inputDict.get(defaults.processing_stage_key) + '.airr.tsv')
+        else:
+            # autogenerate file names from repertoire_id
+            airrFiles = []
+            for rep_id in metadataDict:
+                airrFiles.append(rep_id + '.airr.tsv')
 
-    # Extract summary file list
-    #summaryFiles = extract_summary_files(inputDict, metadataDict)
-    #namesDict = metadata.filenames_from_uuids(metadataDict, summaryFiles)
-    #print(summaryFiles)
-    #print(namesDict)
+    # make sure each rearrangement file is available before running full calculation
+    found_all = True
+    for airrFile in airrFiles:
+        try:
+            # Create an iterable for rearrangement data
+            reader = airr.read_rearrangement(airrFile)
+        except:
+            print("ERROR: Could not find rearrangement file: " + airrFile)
+            found_all = False
+    if not found_all:
+        sys.exit(1)
 
     # initialize calculations
     # load and initialize calculation modules
@@ -203,9 +219,12 @@ def main():
             # the calculations to be performed
             calcs = inputDict[defaults.calculationsKey]
 
-            # Create an iteratable for rearrangement data
+            # Create an iterable for rearrangement data
             reader = airr.read_rearrangement(airrFile)
             for row in reader:
+                # apply filter
+
+                # perform calculations
                 for calc in calcs:
                     cmod = defaults.calculationModules[calc['type']]['module']
                     cmod.process_record(inputDict, metadataDict, airrFile, calc, row)

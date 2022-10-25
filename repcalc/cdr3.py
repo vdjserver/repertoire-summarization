@@ -867,6 +867,10 @@ def process_record(inputDict, metadataDict, currentFile, calc, fields):
     # length operations
     if lengthKey in calc['operations']:
         length = fields.get('junction_aa_length')
+        if length is None:
+            # define it if field does not exist
+            fields['junction_aa_length'] = len(fields['junction_aa'])
+            length = fields.get('junction_aa_length')
         if length is not None:
             increment_count(cdr3_histograms[rep_id]['aa'], length)
             if fields.get('productive'):
@@ -1031,7 +1035,9 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
     """Finalize and save the calculations"""
     # length operations
     if lengthKey in calc['operations']:
-        # group counts
+        # group counts, total and relative total
+        # TODO: need to calculate and output average, std, N for each group
+        # TODO: and need list of individual repertoire totals for each group
         if inputDict.get(defaults.groups_key) is not None:
             for group in inputDict[defaults.groups_key]:
                 for rep in inputDict[defaults.groups_key][group]['repertoires']:

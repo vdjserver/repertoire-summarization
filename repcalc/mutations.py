@@ -665,12 +665,15 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
             writer.writeheader()
             for rep_id in mutation_counts['clone']:
                 for clone_id in mutation_counts['clone'][rep_id]:
-                    clone_freq = mutation_frequency['clone'].get(rep_id)
-                    if clone_freq is None:
-                        mutation_frequency['clone'][rep_id] = {}
-                    mutation_frequency['clone'][rep_id][clone_id] = { 'repertoire_id':rep_id, 'clone_id':clone_id }
-                    generate_frequency(mutation_frequency['clone'][rep_id][clone_id], mutation_counts['clone'][rep_id][clone_id])
-                    writer.writerow(mutation_frequency['clone'][rep_id][clone_id])
+                    clone_freq = { 'repertoire_id':rep_id, 'clone_id':clone_id }
+                    #clone_freq = mutation_frequency['clone'].get(rep_id)
+                    #if clone_freq is None:
+                    #    mutation_frequency['clone'][rep_id] = {}
+                    #mutation_frequency['clone'][rep_id][clone_id] = { 'repertoire_id':rep_id, 'clone_id':clone_id }
+                    #generate_frequency(mutation_frequency['clone'][rep_id][clone_id], mutation_counts['clone'][rep_id][clone_id])
+                    #writer.writerow(mutation_frequency['clone'][rep_id][clone_id])
+                    generate_frequency(clone_freq, mutation_counts['clone'][rep_id][clone_id])
+                    writer.writerow(clone_freq)
 
         # group frequencies
         if 'repertoire_group' in calc['levels']:
