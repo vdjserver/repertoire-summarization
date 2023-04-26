@@ -60,9 +60,8 @@ region_total_names_aa = ['mu_total_count_fwr1_aa', 'mu_total_count_cdr1_aa', 'mu
 alignment_total_names = region_total_names_nt + region_total_names_aa
 
 # global counts
-total_names = ['mu_seq_count','mu_total_count','mu_unique_r','mu_unique_s']
-global_count_names = ['mu_total_count', 'mu_total_count_aa']
-count_names = total_names + global_count_names + ['mu_count_r_aa','mu_count_r','mu_count_s_aa','mu_count_s'] + alignment_total_names
+total_names = ['mu_seq_count','mu_duplicate_count','mu_total_count','mu_total_count_aa','mu_unique_r','mu_unique_s']
+count_names = total_names + ['mu_count_r_aa','mu_count_r','mu_count_s_aa','mu_count_s'] + alignment_total_names
 freq_names_nt = ['mu_freq_r', 'mu_freq_s']
 freq_names_aa = ['mu_freq_r_aa', 'mu_freq_s_aa']
 freq_names = freq_names_nt + freq_names_aa
@@ -84,6 +83,7 @@ for i in range(1,105):
     aa_pos_names.append(f + '_aa')
     nt_pos_names.append(f)
     pos_total_names.append('mu_total_count_' + str(i))
+    pos_total_names.append('mu_total_count_' + str(i) + '_aa')
 pos_names = pos_total_names + nt_pos_names + aa_pos_names
 
 # region frequencies
@@ -129,6 +129,11 @@ def add_alignment_fields_to_row(row):
         nt_n = n.replace('_aa','')
         seq_nt = row[nt_n].replace('-','.')
         seq = seq_nt.replace('.','N')
+        row['mu_seq_nt_' + n] = seq
+        for i in range(0,len(seq)):
+            if seq[i] != 'N':
+                #row['mu_total_count'] += 1
+                pass
         try:
             seq_aa = str(Seq(seq).translate())
         except Exception as e:
@@ -162,7 +167,7 @@ def add_mutation_count_to_row(row):
     # multiplicity counts
     # TODO: do we need these, they seem redundant?
     row['mu_seq_count'] = 1
-    row['mu_total_count'] = defaults.get_duplicate_count(row)
+    row['mu_duplicate_count'] = defaults.get_duplicate_count(row)
 
     # position and total counts
     row['mu_count_r_aa'] = 0
@@ -244,7 +249,7 @@ def add_mutation_count(counts, row):
     duplicate_count = defaults.get_duplicate_count(row)
     # total counts
     counts['mu_seq_count'] += 1
-    counts['mu_total_count'] += duplicate_count
+    counts['mu_duplicate_count'] += duplicate_count
 
     # position counts
     for i in range(1,105):
@@ -265,11 +270,12 @@ def add_mutation_count(counts, row):
     for i in range(1,27):
         if row['fwr1_aa'][i - 1] != '.':
             # mutable position
-            counts['mu_total_count'] += duplicate_count
+            counts['mu_total_count'] += 3 * duplicate_count
             counts['mu_total_count_aa'] += duplicate_count
-            counts['mu_total_count_fwr1'] += duplicate_count
+            counts['mu_total_count_fwr1'] += 3 * duplicate_count
             counts['mu_total_count_fwr1_aa'] += duplicate_count
-            counts['mu_total_count_' + str(i)] += duplicate_count
+            counts['mu_total_count_' + str(i)] += 3 * duplicate_count
+            counts['mu_total_count_' + str(i) + '_aa'] += duplicate_count
         f = 'mu_count_' + str(i) + '_r'
         if int(row[f]) > 0:
             counts['mu_count_fwr1_r_aa'] += duplicate_count
@@ -282,11 +288,12 @@ def add_mutation_count(counts, row):
     for i in range(27,39):
         if row['cdr1_aa'][i - 27] != '.':
             # mutable position
-            counts['mu_total_count'] += duplicate_count
+            counts['mu_total_count'] += 3 * duplicate_count
             counts['mu_total_count_aa'] += duplicate_count
-            counts['mu_total_count_cdr1'] += duplicate_count
+            counts['mu_total_count_cdr1'] += 3 * duplicate_count
             counts['mu_total_count_cdr1_aa'] += duplicate_count
-            counts['mu_total_count_' + str(i)] += duplicate_count
+            counts['mu_total_count_' + str(i)] += 3 * duplicate_count
+            counts['mu_total_count_' + str(i) + '_aa'] += duplicate_count
         f = 'mu_count_' + str(i) + '_r'
         if int(row[f]) > 0:
             counts['mu_count_cdr1_r_aa'] += duplicate_count
@@ -299,11 +306,12 @@ def add_mutation_count(counts, row):
     for i in range(39,56):
         if row['fwr2_aa'][i - 39] != '.':
             # mutable position
-            counts['mu_total_count'] += duplicate_count
+            counts['mu_total_count'] += 3 * duplicate_count
             counts['mu_total_count_aa'] += duplicate_count
-            counts['mu_total_count_fwr2'] += duplicate_count
+            counts['mu_total_count_fwr2'] += 3 * duplicate_count
             counts['mu_total_count_fwr2_aa'] += duplicate_count
-            counts['mu_total_count_' + str(i)] += duplicate_count
+            counts['mu_total_count_' + str(i)] += 3 * duplicate_count
+            counts['mu_total_count_' + str(i) + '_aa'] += duplicate_count
         f = 'mu_count_' + str(i) + '_r'
         if int(row[f]) > 0:
             counts['mu_count_fwr2_r_aa'] += duplicate_count
@@ -316,11 +324,12 @@ def add_mutation_count(counts, row):
     for i in range(56,66):
         if row['cdr2_aa'][i - 56] != '.':
             # mutable position
-            counts['mu_total_count'] += duplicate_count
+            counts['mu_total_count'] += 3 * duplicate_count
             counts['mu_total_count_aa'] += duplicate_count
-            counts['mu_total_count_cdr2'] += duplicate_count
+            counts['mu_total_count_cdr2'] += 3 * duplicate_count
             counts['mu_total_count_cdr2_aa'] += duplicate_count
-            counts['mu_total_count_' + str(i)] += duplicate_count
+            counts['mu_total_count_' + str(i)] += 3 * duplicate_count
+            counts['mu_total_count_' + str(i) + '_aa'] += duplicate_count
         f = 'mu_count_' + str(i) + '_r'
         if int(row[f]) > 0:
             counts['mu_count_cdr2_r_aa'] += duplicate_count
@@ -333,11 +342,12 @@ def add_mutation_count(counts, row):
     for i in range(66,105):
         if row['fwr3_aa'][i - 66] != '.':
             # mutable position
-            counts['mu_total_count'] += duplicate_count
+            counts['mu_total_count'] += 3 * duplicate_count
             counts['mu_total_count_aa'] += duplicate_count
-            counts['mu_total_count_fwr3'] += duplicate_count
+            counts['mu_total_count_fwr3'] += 3 * duplicate_count
             counts['mu_total_count_fwr3_aa'] += duplicate_count
-            counts['mu_total_count_' + str(i)] += duplicate_count
+            counts['mu_total_count_' + str(i)] += 3 * duplicate_count
+            counts['mu_total_count_' + str(i) + '_aa'] += duplicate_count
         f = 'mu_count_' + str(i) + '_r'
         if int(row[f]) > 0:
             counts['mu_count_fwr3_r_aa'] += duplicate_count
@@ -622,7 +632,10 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
         # repertoire counts
         if 'repertoire' in calc['levels']:
             names = ['repertoire_id'] + transfer_names
-            writer = csv.DictWriter(open('mutational_report.repertoire.csv', 'w'), fieldnames=names)
+            filename = 'repertoire.count.mutational_report.csv'
+            if inputDict.get(defaults.processing_stage_key) is not None:
+                filename = inputDict.get(defaults.processing_stage_key) + '.' + filename
+            writer = csv.DictWriter(open(filename, 'w'), fieldnames=names)
             writer.writeheader()
             for rep_id in mutation_counts['repertoire']: 
                 writer.writerow(mutation_counts['repertoire'][rep_id])
@@ -630,28 +643,43 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
         # clone counts
         if 'clone' in calc['levels']:
             names = ['repertoire_id', 'clone_id'] + transfer_names
-            writer = csv.DictWriter(open('mutational_report.clone.csv', 'w'), fieldnames=names)
+            filename = 'clone.count.mutational_report.csv'
+            if inputDict.get(defaults.processing_stage_key) is not None:
+                filename = inputDict.get(defaults.processing_stage_key) + '.' + filename
+            writer = csv.DictWriter(open(filename, 'w'), fieldnames=names)
             writer.writeheader()
             for rep_id in mutation_counts['clone']: 
                 for clone_id in mutation_counts['clone'][rep_id]: 
                     writer.writerow(mutation_counts['clone'][rep_id][clone_id])
 
-        # group counts
-#        if 'repertoire_group' in calc['levels']:
-#            if inputDict.get(defaults.groups_key) is not None:
-#                names = ['repertoire_group_id', 'N'] + group_names
-#                writer = csv.DictWriter(open('mutational_report.group.csv', 'w'), fieldnames=names)
-#                writer.writeheader()
-#                for group in inputDict[defaults.groups_key]:
-#                    compute_group_usage(inputDict[defaults.groups_key][group], group_mutation_counts[group], mutation_counts['repertoire'])
-#                    writer.writerow(group_mutation_counts[group])
+        # repertoire counts by group
+        if 'repertoire_group' in calc['levels']:
+            if inputDict.get(defaults.groups_key) is not None:
+                for group in inputDict[defaults.groups_key]:
+                    names = ['repertoire_id'] + transfer_names
+                    filename = 'repertoire.count.mutational_report.csv'
+                    if inputDict.get(defaults.processing_stage_key) is not None:
+                        filename = inputDict.get(defaults.processing_stage_key) + '.' + filename
+                    filename = group + '.' + filename
+                    writer = csv.DictWriter(open(filename, 'w'), fieldnames=names)
+                    writer.writeheader()
+                    for rep in inputDict[defaults.groups_key][group]['repertoires']:
+                        rep_id = rep['repertoire_id']
+                        if mutation_counts['repertoire'].get(rep_id):
+                            writer.writerow(mutation_counts['repertoire'][rep_id])
+
+        # TODO: clone counts by group
+        # TODO: other levels
 
     # Mutation frequencies
     if frequencyKey in calc['operations']:
         # repertoire frequencies
         if 'repertoire' in calc['levels']:
             names = ['repertoire_id'] + freq_transfer_names
-            writer = csv.DictWriter(open('mutational_report.frequency.repertoire.csv', 'w'), fieldnames=names)
+            filename = 'repertoire.frequency.mutational_report.csv'
+            if inputDict.get(defaults.processing_stage_key) is not None:
+                filename = inputDict.get(defaults.processing_stage_key) + '.' + filename
+            writer = csv.DictWriter(open(filename, 'w'), fieldnames=names)
             writer.writeheader()
             for rep_id in mutation_counts['repertoire']: 
                 mutation_frequency['repertoire'][rep_id] = { 'repertoire_id':rep_id }
@@ -661,17 +689,14 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
         # clone frequencies
         if 'clone' in calc['levels']:
             names = ['repertoire_id', 'clone_id'] + freq_transfer_names
-            writer = csv.DictWriter(open('mutational_report.frequency.clone.csv', 'w'), fieldnames=names)
+            filename = 'clone.frequency.mutational_report.csv'
+            if inputDict.get(defaults.processing_stage_key) is not None:
+                filename = inputDict.get(defaults.processing_stage_key) + '.' + filename
+            writer = csv.DictWriter(open(filename, 'w'), fieldnames=names)
             writer.writeheader()
             for rep_id in mutation_counts['clone']:
                 for clone_id in mutation_counts['clone'][rep_id]:
                     clone_freq = { 'repertoire_id':rep_id, 'clone_id':clone_id }
-                    #clone_freq = mutation_frequency['clone'].get(rep_id)
-                    #if clone_freq is None:
-                    #    mutation_frequency['clone'][rep_id] = {}
-                    #mutation_frequency['clone'][rep_id][clone_id] = { 'repertoire_id':rep_id, 'clone_id':clone_id }
-                    #generate_frequency(mutation_frequency['clone'][rep_id][clone_id], mutation_counts['clone'][rep_id][clone_id])
-                    #writer.writerow(mutation_frequency['clone'][rep_id][clone_id])
                     generate_frequency(clone_freq, mutation_counts['clone'][rep_id][clone_id])
                     writer.writerow(clone_freq)
 
@@ -679,8 +704,31 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
         if 'repertoire_group' in calc['levels']:
             if inputDict.get(defaults.groups_key) is not None:
                 names = ['repertoire_group_id', 'N'] + group_freq_names
-                writer = csv.DictWriter(open('mutational_report.frequency.group.csv', 'w'), fieldnames=names)
+                filename = 'repertoire_group.frequency.mutational_report.csv'
+                if inputDict.get(defaults.processing_stage_key) is not None:
+                    filename = inputDict.get(defaults.processing_stage_key) + '.' + filename
+                writer = csv.DictWriter(open(filename, 'w'), fieldnames=names)
                 writer.writeheader()
                 for group in inputDict[defaults.groups_key]:
                     compute_group_frequency(inputDict[defaults.groups_key][group], group_mutation_frequency[group], mutation_frequency['repertoire'], mutation_counts['repertoire'])
                     writer.writerow(group_mutation_frequency[group])
+
+        # repertoire frequencies by group
+        if 'repertoire_group' in calc['levels']:
+            if inputDict.get(defaults.groups_key) is not None:
+                for group in inputDict[defaults.groups_key]:
+                    names = ['repertoire_id'] + freq_transfer_names
+                    filename = 'repertoire.frequency.mutational_report.csv'
+                    if inputDict.get(defaults.processing_stage_key) is not None:
+                        filename = inputDict.get(defaults.processing_stage_key) + '.' + filename
+                    filename = group + '.' + filename
+                    writer = csv.DictWriter(open(filename, 'w'), fieldnames=names)
+                    writer.writeheader()
+                    for rep in inputDict[defaults.groups_key][group]['repertoires']:
+                        rep_id = rep['repertoire_id']
+                        if mutation_counts['repertoire'].get(rep_id):
+                            mutation_frequency['repertoire'][rep_id] = { 'repertoire_id':rep_id }
+                            generate_frequency(mutation_frequency['repertoire'][rep_id], mutation_counts['repertoire'][rep_id])
+                            writer.writerow(mutation_frequency['repertoire'][rep_id])
+
+        # TODO: other levels
