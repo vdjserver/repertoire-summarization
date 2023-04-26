@@ -47,6 +47,8 @@ compareKey = "compare"
 #
 # junction length functions
 #
+length_levels = [ 'nucleotide', 'nucleotide_wo_duplicates', 'aa', 'aa_wo_duplicates' ]
+rel_length_levels = [ 'rel_' + obj for obj in length_levels ]
 
 # first key is repertoire_id or repertoire_group_id
 # second key is aa/nt
@@ -60,6 +62,12 @@ def increment_count(anArray, length):
     if length >= len(anArray):
         for i in range(len(anArray), length+1, 1): anArray.append(0.0)
     anArray[length] += 1
+
+def increment_duplicate_count(anArray, length, duplicate_count):
+    if length == 0: return
+    if length >= len(anArray):
+        for i in range(len(anArray), length+1, 1): anArray.append(0.0)
+    anArray[length] += duplicate_count;
 
 def group_counts(groupArray, repArray):
     if len(repArray) > len(groupArray):
@@ -106,11 +114,30 @@ def compute_relative(data_dict, group, level):
     data_dict[group]['rel_' + level] = relArray
 
 def output_counts(filename, cntArray, relArray):
+    #print(filename)
+    #print(cntArray)
+    #print(relArray)
     writer = open(filename, 'w')
     writer.write('CDR3_LENGTH\tCDR3_COUNT\tCDR3_RELATIVE\n')
     for i in range(0, len(cntArray), 1):
         writer.write(str(i) + '\t' + str(cntArray[i]) + '\t' + str(relArray[i]) + '\n')
     writer.close()
+
+def output_counts_table(filename, groupCounts, reps, repCounts, level):
+    names = [ 'repertoire_id', 'total' ]
+    for i in range(0, len(groupCounts), 1):
+        names.append(str(i))
+    writer = csv.DictWriter(open(filename, 'w'), fieldnames=names)
+    writer.writeheader()
+    for rep in reps:
+        total = 0
+        entry = { 'repertoire_id': rep['repertoire_id'] }
+        cntArray = repCounts[entry['repertoire_id']][level]
+        for i in range(0, len(cntArray), 1):
+            entry[str(i)] = cntArray[i]
+            total += cntArray[i]
+        entry['total'] = total
+        writer.writerow(entry);
 
 #
 # AA/NT distribution operations
@@ -842,44 +869,53 @@ def initialize_calculation_module(inputDict, metadataDict, headerMapping):
     """Perform any module initialization"""
     # length and AA/NT distribution operations
     for rep_id in inputDict[defaults.full_metadata_key]:
-        cdr3_histograms[rep_id] = { 'aa': [], 'nucleotide': [] }
-        cdr3_histograms_productive[rep_id] = { 'aa': [], 'nucleotide': [] }
-        dist_counters[rep_id] = { 'aa': {}, 'nucleotide': {} }
-        dist_counters_productive[rep_id] = { 'aa': {}, 'nucleotide': {} }
+        cdr3_histograms[rep_id] = { obj: [] for obj in length_levels }
+        cdr3_histograms_productive[rep_id] = { obj: [] for obj in length_levels }
+        dist_counters[rep_id] = { obj: [] for obj in length_levels }
+        dist_counters_productive[rep_id] = { obj: [] for obj in length_levels }
+#            cdr3_histograms_productive[rep_id] = { 'aa': [], 'nucleotide': [] }
+#            dist_counters[rep_id] = { 'aa': {}, 'nucleotide': {} }
+#            dist_counters_productive[rep_id] = { 'aa': {}, 'nucleotide': {} }
     if inputDict.get(defaults.groups_key) is not None:
         for group in inputDict[defaults.groups_key]:
-            group_cdr3_histograms[group] = { 'aa': [], 'nucleotide': [] }
-            group_cdr3_histograms_productive[group] = { 'aa': [], 'nucleotide': [] }
-            group_dist_counters[group] = { 'aa': {}, 'nucleotide': {} }
-            group_dist_counters_productive[group] = { 'aa': {}, 'nucleotide': {} }
+            group_cdr3_histograms[group] = { obj: [] for obj in length_levels }
+            group_cdr3_histograms_productive[group] = { obj: [] for obj in length_levels }
+            group_dist_counters[group] = { obj: [] for obj in length_levels }
+            group_dist_counters_productive[group] = { obj: [] for obj in length_levels }
 
 def process_record(inputDict, metadataDict, currentFile, calc, fields):
     """Perform calculation from given fields"""
 
     rep_id = fields.get('repertoire_id')
     if rep_id is None:
-        # TODO: error?
+        print('WARNING: sequence id', fields.get('sequence_id'), 'is missing repertoire_id')
         return
     if inputDict[defaults.full_metadata_key].get(rep_id) is None:
-        # TODO: error?
+        print('WARNING: sequence id', fields.get('sequence_id'), 'has repertoire_id not in repertoire list')
         return
 
     # length operations
     if lengthKey in calc['operations']:
+        #print(fields)
         length = fields.get('junction_aa_length')
         if length is None:
             # define it if field does not exist
             fields['junction_aa_length'] = len(fields['junction_aa'])
             length = fields.get('junction_aa_length')
+        #print(length)
         if length is not None:
-            increment_count(cdr3_histograms[rep_id]['aa'], length)
+            increment_count(cdr3_histograms[rep_id]['aa_wo_duplicates'], length)
+            increment_duplicate_count(cdr3_histograms[rep_id]['aa'], length, defaults.get_duplicate_count(fields))
             if fields.get('productive'):
-                increment_count(cdr3_histograms_productive[rep_id]['aa'], length)
+                increment_count(cdr3_histograms_productive[rep_id]['aa_wo_duplicates'], length)
+                increment_duplicate_count(cdr3_histograms_productive[rep_id]['aa'], length, defaults.get_duplicate_count(fields))
         length = fields.get('junction_length')
         if length is not None:
-            increment_count(cdr3_histograms[rep_id]['nucleotide'], length)
+            increment_count(cdr3_histograms[rep_id]['nucleotide_wo_duplicates'], length)
+            increment_duplicate_count(cdr3_histograms[rep_id]['nucleotide'], length, defaults.get_duplicate_count(fields))
             if fields.get('productive'):
-                increment_count(cdr3_histograms_productive[rep_id]['nucleotide'], length)
+                increment_count(cdr3_histograms_productive[rep_id]['nucleotide_wo_duplicates'], length)
+                increment_duplicate_count(cdr3_histograms_productive[rep_id]['nucleotide'], length, defaults.get_duplicate_count(fields))
 
     # AA/NT distribution operations
     if distributionKey in calc['operations']:
@@ -1038,33 +1074,37 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
         # group counts, total and relative total
         # TODO: need to calculate and output average, std, N for each group
         # TODO: and need list of individual repertoire totals for each group
+        # repertoire counts
+        for rep_id in metadataDict:
+            for level in length_levels:
+                compute_relative(cdr3_histograms, rep_id, level)
+                compute_relative(cdr3_histograms_productive, rep_id, level)
+                output_counts(rep_id + ".junction_" + level + "_length.tsv", cdr3_histograms[rep_id][level], cdr3_histograms[rep_id]['rel_' + level])
+                output_counts(rep_id + ".productive.junction_" + level + "_length.tsv", cdr3_histograms_productive[rep_id][level], cdr3_histograms_productive[rep_id]['rel_' + level])
+
         if inputDict.get(defaults.groups_key) is not None:
             for group in inputDict[defaults.groups_key]:
                 for rep in inputDict[defaults.groups_key][group]['repertoires']:
-                    group_counts(group_cdr3_histograms[group]['aa'], cdr3_histograms[rep['repertoire_id']]['aa'])
-                    group_counts(group_cdr3_histograms_productive[group]['aa'], cdr3_histograms_productive[rep['repertoire_id']]['aa'])
-                    group_counts(group_cdr3_histograms[group]['nucleotide'], cdr3_histograms[rep['repertoire_id']]['nucleotide'])
-                    group_counts(group_cdr3_histograms_productive[group]['nucleotide'], cdr3_histograms_productive[rep['repertoire_id']]['nucleotide'])
+                    for level in length_levels:
+                        group_counts(group_cdr3_histograms[group][level], cdr3_histograms[rep['repertoire_id']][level])
+                        group_counts(group_cdr3_histograms_productive[group][level], cdr3_histograms_productive[rep['repertoire_id']][level])
             for group in inputDict[defaults.groups_key]:
-                compute_relative(group_cdr3_histograms, group, 'aa')
-                compute_relative(group_cdr3_histograms_productive, group, 'aa')
-                compute_relative(group_cdr3_histograms, group, 'nucleotide')
-                compute_relative(group_cdr3_histograms_productive, group, 'nucleotide')
-                output_counts(group + ".junction_aa_length.tsv", group_cdr3_histograms[group]['aa'], group_cdr3_histograms[group]['rel_aa'])
-                output_counts(group + ".productive.junction_aa_length.tsv", group_cdr3_histograms_productive[group]['aa'], group_cdr3_histograms_productive[group]['rel_aa'])
-                output_counts(group + ".junction_nt_length.tsv", group_cdr3_histograms[group]['nucleotide'], group_cdr3_histograms[group]['rel_nucleotide'])
-                output_counts(group + ".productive.junction_nt_length.tsv", group_cdr3_histograms_productive[group]['nucleotide'], group_cdr3_histograms_productive[group]['rel_nucleotide'])
+                for level in length_levels:
+                    # group totals
+                    compute_relative(group_cdr3_histograms, group, level)
+                    compute_relative(group_cdr3_histograms_productive, group, level)
+                    output_counts(group + ".group.junction_" + level + "_length.tsv", group_cdr3_histograms[group][level], group_cdr3_histograms[group]['rel_' + level])
+                    output_counts(group + ".group.productive.junction_" + level + "_length.tsv", group_cdr3_histograms_productive[group][level], group_cdr3_histograms_productive[group]['rel_' + level])
+                    # repertoire totals by group
+                    output_counts_table(group + ".repertoire.count.junction_" + level + "_length.csv", group_cdr3_histograms[group][level], inputDict[defaults.groups_key][group]['repertoires'], cdr3_histograms, level)
+                    output_counts_table(group + ".repertoire.frequency.junction_" + level + "_length.csv", group_cdr3_histograms[group][level], inputDict[defaults.groups_key][group]['repertoires'], cdr3_histograms, 'rel_' + level)
+                    output_counts_table(group + ".repertoire.count.productive.junction_" + level + "_length.csv", group_cdr3_histograms_productive[group][level], inputDict[defaults.groups_key][group]['repertoires'], cdr3_histograms_productive, level)
+                    output_counts_table(group + ".repertoire.frequency.productive.junction_" + level + "_length.csv", group_cdr3_histograms_productive[group][level], inputDict[defaults.groups_key][group]['repertoires'], cdr3_histograms_productive, 'rel_' + level)
+#                output_counts_table(group + ".repertoire.count.junction_length.csv", group_cdr3_histograms[group]['nucleotide'], inputDict[defaults.groups_key][group]['repertoires'], cdr3_histograms, 'nucleotide')
+#                output_counts_table(group + ".repertoire.frequency.junction_length.csv", group_cdr3_histograms[group]['nucleotide'], inputDict[defaults.groups_key][group]['repertoires'], cdr3_histograms, 'rel_nucleotide')
+#                output_counts_table(group + ".repertoire.count.productive.junction_length.csv", group_cdr3_histograms_productive[group]['nucleotide'], inputDict[defaults.groups_key][group]['repertoires'], cdr3_histograms_productive, 'nucleotide')
+#                output_counts_table(group + ".repertoire.frequency.productive.junction_length.csv", group_cdr3_histograms_productive[group]['nucleotide'], inputDict[defaults.groups_key][group]['repertoires'], cdr3_histograms_productive, 'rel_nucleotide')
 
-        # repertoire counts
-        for rep_id in metadataDict:
-            compute_relative(cdr3_histograms, rep_id, 'aa')
-            compute_relative(cdr3_histograms_productive, rep_id, 'aa')
-            compute_relative(cdr3_histograms, rep_id, 'nucleotide')
-            compute_relative(cdr3_histograms_productive, rep_id, 'nucleotide')
-            output_counts(rep_id + ".junction_aa_length.tsv", cdr3_histograms[rep_id]['aa'], cdr3_histograms[rep_id]['rel_aa'])
-            output_counts(rep_id + ".productive.junction_aa_length.tsv", cdr3_histograms_productive[rep_id]['aa'], cdr3_histograms_productive[rep_id]['rel_aa'])
-            output_counts(rep_id + ".junction_nt_length.tsv", cdr3_histograms[rep_id]['nucleotide'], cdr3_histograms[rep_id]['rel_nucleotide'])
-            output_counts(rep_id + ".productive.junction_nt_length.tsv", cdr3_histograms_productive[rep_id]['nucleotide'], cdr3_histograms_productive[rep_id]['rel_nucleotide'])
 
             # TODO: output specification for process metadata
             #if (not outputSpec['files'].get(group + "_cdr3_length")): outputSpec['files'][group + "_cdr3_length"] = {}
