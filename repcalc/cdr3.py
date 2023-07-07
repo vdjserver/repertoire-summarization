@@ -290,7 +290,9 @@ def level_share_summary(inputDict, cdr3_shared_level, share_summary_level, share
     # generate summary for each group
     # repertoires are just a count
     # groups produce an array with sharing counts among repertoires
-    groups = inputDict[defaults.groups_key]
+    groups = inputDict.get(defaults.groups_key)
+    if groups is None:
+        return
     # iterate over each CDR3
     #print(len(cdr3_shared_level.keys()))
     for key in cdr3_shared_level.keys():
@@ -360,7 +362,9 @@ def write_share_summary(inputDict, metadataDict, outputSpec, level, sublevel):
     if level == 'nucleotide': cdr3_text = 'junction'
     if sublevel == 'nucleotide': cdr3_text = 'junction'
 
-    groups = inputDict[defaults.groups_key]
+    groups = inputDict.get(defaults.groups_key)
+    if groups is None:
+        groups = []
     filename = "summary_cdr3_" + fileTxt + "_sharing.tsv"
     writer = open(filename, 'w')
 
