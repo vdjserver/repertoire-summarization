@@ -19,7 +19,7 @@ gunzip 8118141715327226346-242ac113-0001-012.airr.tsv.gz
 # query VDJServer ADC to get repertoire metadata
 # this actually pulls all metadata for the study but technically only the one repertoire
 # is needed. This allows us to test that repcalc only processes the one repertoire.
-curl -k --data '{"filters":{"op":"=","content":{"field":"study.study_id","value":"1371444213709729305-242ac11c-0001-012"}}}' https://vdjserver.org/airr/v1/repertoire | jq '.' > repertoire.airr.json
+curl -k -H 'content-type:application/json' --data '{"filters":{"op":"=","content":{"field":"study.study_id","value":"1371444213709729305-242ac11c-0001-012"}}}' https://vdjserver.org/airr/v1/repertoire | jq '.' > repertoire.airr.json
 
 # TODO: we should be able to download this
 # get germline database

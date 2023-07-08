@@ -152,13 +152,10 @@ def process_record(inputDict, metadataDict, currentFile, calc, row):
         # write rearrangement with clone_id
         writer = file_writers.get(currentFile)
         if writer is None:
-            fields = currentFile.split('.')
-            if len(fields) > 2 and fields[-1] == 'tsv' and fields[-2] == 'airr':
-                fields = fields[:-2] + ['clone'] + fields[-2:]
-                filename = '.'.join(fields)
-            else:
-                fields = fields[:-1] + ['clone'] + fields[-1:]
-                filename = '.'.join(fields)
+            filename = rep_id
+            if inputDict.get(defaults.processing_stage_key) is not None:
+                filename = filename + '.' + inputDict.get(defaults.processing_stage_key)
+            filename = filename + '.allele.clone.airr.tsv'
             print('Output file: ' + filename)
             writer = airr.derive_rearrangement(filename, currentFile, fields=['clone_id'])
             file_writers[currentFile] = writer
