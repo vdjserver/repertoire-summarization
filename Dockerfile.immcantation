@@ -10,7 +10,7 @@ MAINTAINER VDJServer <vdjserver@utsouthwestern.edu>
 #ENV HTTPS_PROXY 'https://proxy.swmed.edu:3128/'
 
 # extra tools
-RUN yum install jq
+RUN yum install -y jq
 
 # Copy source
 RUN mkdir /repcalc-root
