@@ -96,11 +96,7 @@ def assign_clone(rep_id, fields):
         if clone['v_call'] == fields['v_call']:
             if clone['j_call'] == fields['j_call']:
                 clone['clone_count'] += 1
-                if fields['duplicate_count']:
-                    clone['duplicate_count'] += fields['duplicate_count']
-                    #print(fields['duplicate_count'])
-                else:
-                    clone['duplicate_count'] += 1
+                clone['duplicate_count'] = defaults.get_duplicate_count(fields)
                 return clone
 
     # new clone if get here
