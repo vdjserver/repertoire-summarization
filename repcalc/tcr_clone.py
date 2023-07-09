@@ -109,10 +109,7 @@ def assign_clone(rep_id, fields):
     clone['j_call'] = fields['j_call']
     clone['clone_id'] = clone_dict[rep_id]['clone_id']
     clone['clone_count'] = 1
-    if fields['duplicate_count']:
-        clone['duplicate_count'] = fields['duplicate_count']
-    else:
-        clone['duplicate_count'] = 1
+    clone['duplicate_count'] = defaults.get_duplicate_count(fields)
     clone_dict[rep_id]['clone_id'] += 1
     cdr3_dict[rep_id][fields['junction_aa']].append(clone)
     return clone
