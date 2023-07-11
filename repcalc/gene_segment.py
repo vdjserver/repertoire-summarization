@@ -289,17 +289,23 @@ def compute_group_combo(groupDict, counters, repertoire_counters):
                     compute_std(entry, repertoire_counters, 'sequence_frequency', N, groupDict, combo, level, mode, value)
                     compute_std(entry, repertoire_counters, 'duplicate_frequency', N, groupDict, combo, level, mode, value)
 
-def write_usage_output(id_name, id_value, group_flag, counters, counters_productive):
+def write_usage_output(id_name, id_value, stage, group_flag, counters, counters_productive):
     """Output segment counts to TSV files"""
     for gene in gene_fields:
         if group_flag:
-            filename = id_value + '.group.' + gene + '.tsv'
+            if stage:
+                filename = id_value + '.' + stage + '.group.' + gene + '.tsv'
+            else:
+                filename = id_value + '.group.' + gene + '.tsv'
             writer = open(filename, 'w')
             writer.write(id_name + '\tlevel\tmode\tproductive\tgene\tsequence_count\tduplicate_count\tsequence_frequency\tduplicate_frequency')
             writer.write('\tN\tsequence_count_avg\tsequence_count_std\tsequence_frequency_avg\tsequence_frequency_std')
             writer.write('\tduplicate_count_avg\tduplicate_count_std\tduplicate_frequency_avg\tduplicate_frequency_std\n')
         else:
-            filename = id_value + '.' + gene + '.tsv'
+            if stage:
+                filename = id_value + '.' + stage + '.' + gene + '.tsv'
+            else:
+                filename = id_value + '.' + gene + '.tsv'
             writer = open(filename, 'w')
             writer.write(id_name + '\tlevel\tmode\tproductive\tgene\tsequence_count\tduplicate_count\tsequence_frequency\tduplicate_frequency\n')
         for level in module_levels:
@@ -354,13 +360,19 @@ def write_usage_output(id_name, id_value, group_flag, counters, counters_product
                         writer.write(str(entry['duplicate_frequency']) + '\n')
         writer.close()
 
-def write_combo_output(id_name, id_value, group_flag, counters, counters_productive):
+def write_combo_output(id_name, id_value, stage, group_flag, counters, counters_productive):
     """Output segment combo counts to TSV files"""
     for combo in combo_fields:
         if group_flag:
-            filename = id_value + '.group.' + combo + '_combo.tsv'
+            if stage:
+                filename = id_value + '.' + stage + '.group.' + combo + '_combo.tsv'
+            else:
+                filename = id_value + '.group.' + combo + '_combo.tsv'
         else:
-            filename = id_value + '.' + combo + '_combo.tsv'
+            if stage:
+                filename = id_value + '.' + stage + '.' + combo + '_combo.tsv'
+            else:
+                filename = id_value + '.' + combo + '_combo.tsv'
         writer = open(filename, 'w')
         writer.write(id_name + '\tlevel\tmode\tproductive\tcombo\t')
         if 'v' in combo:
@@ -546,23 +558,23 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
         for rep_id in metadataDict:
             compute_usage_frequency(segment_counters[rep_id])
             compute_usage_frequency(segment_counters_productive[rep_id])
-            write_usage_output('repertoire_id', rep_id, False, segment_counters, segment_counters_productive)
+            write_usage_output('repertoire_id', rep_id, inputDict.get(defaults.processing_stage_key), False, segment_counters, segment_counters_productive)
         # repertoire groups
         if inputDict.get(defaults.groups_key) is not None:
             for group in inputDict[defaults.groups_key]:
                 compute_group_usage(inputDict[defaults.groups_key][group], group_segment_counters[group], segment_counters)
                 compute_group_usage(inputDict[defaults.groups_key][group], group_segment_counters_productive[group], segment_counters_productive)
-                write_usage_output('repertoire_group_id', group, True, group_segment_counters, group_segment_counters_productive)
+                write_usage_output('repertoire_group_id', group, inputDict.get(defaults.processing_stage_key), True, group_segment_counters, group_segment_counters_productive)
 
     # generate combo output
     if comboKey in calc['operations']:
         for rep_id in metadataDict:
             compute_combo_frequency(combo_counters[rep_id])
             compute_combo_frequency(combo_counters_productive[rep_id])
-            write_combo_output('repertoire_id', rep_id, False, combo_counters, combo_counters_productive)
+            write_combo_output('repertoire_id', rep_id, inputDict.get(defaults.processing_stage_key), False, combo_counters, combo_counters_productive)
         # repertoire groups
         if inputDict.get(defaults.groups_key) is not None:
             for group in inputDict[defaults.groups_key]:
                 compute_group_combo(inputDict[defaults.groups_key][group], group_combo_counters[group], combo_counters)
                 compute_group_combo(inputDict[defaults.groups_key][group], group_combo_counters_productive[group], combo_counters_productive)
-                write_combo_output('repertoire_group_id', group, True, group_combo_counters, group_combo_counters_productive)
+                write_combo_output('repertoire_group_id', group, inputDict.get(defaults.processing_stage_key), True, group_combo_counters, group_combo_counters_productive)
