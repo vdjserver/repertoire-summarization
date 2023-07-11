@@ -45,7 +45,10 @@ def loadGermline(filename):
     # organize the data by IDs
     germline = {}
     germline['germline_sets'] = { obj['germline_set_id'] : obj for obj in data['GermlineSet'] }
-    germline['allele_descriptions'] = { obj['allele_description_id'] : obj for obj in data['AlleleDescription'] }
+    germline['allele_descriptions'] = { }
+    for gset in germline['germline_sets']:
+        for adesc in germline['germline_sets'][gset]['allele_descriptions']:
+            germline['allele_descriptions'][adesc['label']] = adesc
     return germline
 
 def getGermlineSet(germline_set_id):
