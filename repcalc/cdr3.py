@@ -1073,6 +1073,10 @@ def process_record(inputDict, metadataDict, currentFile, calc, fields):
 
 def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
     """Finalize and save the calculations"""
+    stage = ''
+    if inputDict.get(defaults.processing_stage_key):
+        stage = '.' + inputDict.get(defaults.processing_stage_key)
+
     # length operations
     if lengthKey in calc['operations']:
         # group counts, total and relative total
@@ -1083,8 +1087,8 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
             for level in length_levels:
                 compute_relative(cdr3_histograms, rep_id, level)
                 compute_relative(cdr3_histograms_productive, rep_id, level)
-                output_counts(rep_id + ".junction_" + level + "_length.tsv", cdr3_histograms[rep_id][level], cdr3_histograms[rep_id]['rel_' + level])
-                output_counts(rep_id + ".productive.junction_" + level + "_length.tsv", cdr3_histograms_productive[rep_id][level], cdr3_histograms_productive[rep_id]['rel_' + level])
+                output_counts(rep_id + stage + ".junction_" + level + "_length.tsv", cdr3_histograms[rep_id][level], cdr3_histograms[rep_id]['rel_' + level])
+                output_counts(rep_id + stage + ".productive.junction_" + level + "_length.tsv", cdr3_histograms_productive[rep_id][level], cdr3_histograms_productive[rep_id]['rel_' + level])
 
         if inputDict.get(defaults.groups_key) is not None:
             for group in inputDict[defaults.groups_key]:
@@ -1097,13 +1101,13 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
                     # group totals
                     compute_relative(group_cdr3_histograms, group, level)
                     compute_relative(group_cdr3_histograms_productive, group, level)
-                    output_counts(group + ".group.junction_" + level + "_length.tsv", group_cdr3_histograms[group][level], group_cdr3_histograms[group]['rel_' + level])
-                    output_counts(group + ".group.productive.junction_" + level + "_length.tsv", group_cdr3_histograms_productive[group][level], group_cdr3_histograms_productive[group]['rel_' + level])
+                    output_counts(group + stage + ".group.junction_" + level + "_length.tsv", group_cdr3_histograms[group][level], group_cdr3_histograms[group]['rel_' + level])
+                    output_counts(group + stage + ".group.productive.junction_" + level + "_length.tsv", group_cdr3_histograms_productive[group][level], group_cdr3_histograms_productive[group]['rel_' + level])
                     # repertoire totals by group
-                    output_counts_table(group + ".repertoire.count.junction_" + level + "_length.csv", group_cdr3_histograms[group][level], inputDict[defaults.groups_key][group]['repertoires'], cdr3_histograms, level)
-                    output_counts_table(group + ".repertoire.frequency.junction_" + level + "_length.csv", group_cdr3_histograms[group][level], inputDict[defaults.groups_key][group]['repertoires'], cdr3_histograms, 'rel_' + level)
-                    output_counts_table(group + ".repertoire.count.productive.junction_" + level + "_length.csv", group_cdr3_histograms_productive[group][level], inputDict[defaults.groups_key][group]['repertoires'], cdr3_histograms_productive, level)
-                    output_counts_table(group + ".repertoire.frequency.productive.junction_" + level + "_length.csv", group_cdr3_histograms_productive[group][level], inputDict[defaults.groups_key][group]['repertoires'], cdr3_histograms_productive, 'rel_' + level)
+                    output_counts_table(group + stage + ".repertoire.count.junction_" + level + "_length.csv", group_cdr3_histograms[group][level], inputDict[defaults.groups_key][group]['repertoires'], cdr3_histograms, level)
+                    output_counts_table(group + stage + ".repertoire.frequency.junction_" + level + "_length.csv", group_cdr3_histograms[group][level], inputDict[defaults.groups_key][group]['repertoires'], cdr3_histograms, 'rel_' + level)
+                    output_counts_table(group + stage + ".repertoire.count.productive.junction_" + level + "_length.csv", group_cdr3_histograms_productive[group][level], inputDict[defaults.groups_key][group]['repertoires'], cdr3_histograms_productive, level)
+                    output_counts_table(group + stage + ".repertoire.frequency.productive.junction_" + level + "_length.csv", group_cdr3_histograms_productive[group][level], inputDict[defaults.groups_key][group]['repertoires'], cdr3_histograms_productive, 'rel_' + level)
 #                output_counts_table(group + ".repertoire.count.junction_length.csv", group_cdr3_histograms[group]['nucleotide'], inputDict[defaults.groups_key][group]['repertoires'], cdr3_histograms, 'nucleotide')
 #                output_counts_table(group + ".repertoire.frequency.junction_length.csv", group_cdr3_histograms[group]['nucleotide'], inputDict[defaults.groups_key][group]['repertoires'], cdr3_histograms, 'rel_nucleotide')
 #                output_counts_table(group + ".repertoire.count.productive.junction_length.csv", group_cdr3_histograms_productive[group]['nucleotide'], inputDict[defaults.groups_key][group]['repertoires'], cdr3_histograms_productive, 'nucleotide')
@@ -1126,17 +1130,17 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
                 group_total_distribution(group, group_dist_counters_productive, inputDict[defaults.groups_key][group]['repertoires'], dist_counters_productive, 'aa', aa_list)
                 group_total_distribution(group, group_dist_counters, inputDict[defaults.groups_key][group]['repertoires'], dist_counters, 'nucleotide', nt_list)
                 group_total_distribution(group, group_dist_counters_productive, inputDict[defaults.groups_key][group]['repertoires'], dist_counters_productive, 'nucleotide', nt_list)
-                output_distribution(group + ".junction_aa_distribution.tsv", group_dist_counters[group]['aa'], aa_list)
-                output_distribution(group + ".productive.junction_aa_distribution.tsv", group_dist_counters_productive[group]['aa'], aa_list)
-                output_distribution(group + ".junction_nt_distribution.tsv", group_dist_counters[group]['nucleotide'], nt_list)
-                output_distribution(group + ".productive.junction_nt_distribution.tsv", group_dist_counters_productive[group]['nucleotide'], nt_list)
+                output_distribution(group + stage + ".junction_aa_distribution.tsv", group_dist_counters[group]['aa'], aa_list)
+                output_distribution(group + stage + ".productive.junction_aa_distribution.tsv", group_dist_counters_productive[group]['aa'], aa_list)
+                output_distribution(group + stage + ".junction_nt_distribution.tsv", group_dist_counters[group]['nucleotide'], nt_list)
+                output_distribution(group + stage + ".productive.junction_nt_distribution.tsv", group_dist_counters_productive[group]['nucleotide'], nt_list)
 
         # repertoire counts
         for rep_id in metadataDict:
-            output_distribution(rep_id + ".junction_aa_distribution.tsv", dist_counters[rep_id]['aa'], aa_list)
-            output_distribution(rep_id + ".productive.junction_aa_distribution.tsv", dist_counters_productive[rep_id]['aa'], aa_list)
-            output_distribution(rep_id + ".junction_nt_distribution.tsv", dist_counters[rep_id]['nucleotide'], nt_list)
-            output_distribution(rep_id + ".productive.junction_nt_distribution.tsv", dist_counters_productive[rep_id]['nucleotide'], nt_list)
+            output_distribution(rep_id + stage + ".junction_aa_distribution.tsv", dist_counters[rep_id]['aa'], aa_list)
+            output_distribution(rep_id + stage + ".productive.junction_aa_distribution.tsv", dist_counters_productive[rep_id]['aa'], aa_list)
+            output_distribution(rep_id + stage + ".junction_nt_distribution.tsv", dist_counters[rep_id]['nucleotide'], nt_list)
+            output_distribution(rep_id + stage + ".productive.junction_nt_distribution.tsv", dist_counters_productive[rep_id]['nucleotide'], nt_list)
 
         # relative calculations
 #        for group in groups:
