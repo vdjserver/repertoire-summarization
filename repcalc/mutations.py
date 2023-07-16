@@ -606,7 +606,10 @@ def process_record(inputDict, metadataDict, currentFile, calc, row):
     # Rearrangement level
     if 'rearrangement' in calc['levels']:
         if rearrangement_writers.get(rep_id) is None:
-            rearrangement_writers[rep_id] = airr.derive_rearrangement(rep_id + '.mutations.airr.tsv', currentFile, row_transfer_names)
+            if inputDict.get(defaults.processing_stage_key) is not None:
+                rearrangement_writers[rep_id] = airr.derive_rearrangement(rep_id + inputDict.get(defaults.processing_stage_key) + '.mutations.airr.tsv', currentFile, row_transfer_names)
+            else:
+                rearrangement_writers[rep_id] = airr.derive_rearrangement(rep_id + '.mutations.airr.tsv', currentFile, row_transfer_names)
 
     # compute additional fields
     add_alignment_fields_to_row(row)
