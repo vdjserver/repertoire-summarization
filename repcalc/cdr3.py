@@ -875,8 +875,8 @@ def initialize_calculation_module(inputDict, metadataDict, headerMapping):
     for rep_id in inputDict[defaults.full_metadata_key]:
         cdr3_histograms[rep_id] = { obj: [] for obj in length_levels }
         cdr3_histograms_productive[rep_id] = { obj: [] for obj in length_levels }
-        dist_counters[rep_id] = { obj: [] for obj in length_levels }
-        dist_counters_productive[rep_id] = { obj: [] for obj in length_levels }
+        dist_counters[rep_id] = { obj: {} for obj in length_levels }
+        dist_counters_productive[rep_id] = { obj: {} for obj in length_levels }
 #            cdr3_histograms_productive[rep_id] = { 'aa': [], 'nucleotide': [] }
 #            dist_counters[rep_id] = { 'aa': {}, 'nucleotide': {} }
 #            dist_counters_productive[rep_id] = { 'aa': {}, 'nucleotide': {} }
@@ -884,8 +884,8 @@ def initialize_calculation_module(inputDict, metadataDict, headerMapping):
         for group in inputDict[defaults.groups_key]:
             group_cdr3_histograms[group] = { obj: [] for obj in length_levels }
             group_cdr3_histograms_productive[group] = { obj: [] for obj in length_levels }
-            group_dist_counters[group] = { obj: [] for obj in length_levels }
-            group_dist_counters_productive[group] = { obj: [] for obj in length_levels }
+            group_dist_counters[group] = { obj: {} for obj in length_levels }
+            group_dist_counters_productive[group] = { obj: {} for obj in length_levels }
 
 def process_record(inputDict, metadataDict, currentFile, calc, fields):
     """Perform calculation from given fields"""
