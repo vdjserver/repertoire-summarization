@@ -291,8 +291,8 @@ def level_share_summary(inputDict, cdr3_shared_level, share_summary_level, share
     # repertoires are just a count
     # groups produce an array with sharing counts among repertoires
     groups = inputDict.get(defaults.groups_key)
-    if groups is None:
-        return
+#    if groups is None:
+#        return
     # iterate over each CDR3
     #print(len(cdr3_shared_level.keys()))
     for key in cdr3_shared_level.keys():
@@ -301,9 +301,10 @@ def level_share_summary(inputDict, cdr3_shared_level, share_summary_level, share
         # iterate across each repertoire/group
         for group in group_set:
             entry = share_summary_level.get(group)
-            if not groups.get(group):
+            #print(entry, group)
+#            if not groups.get(group):
+            if (groups is None) or (not groups.get(group)):
                 # individual repertoire
-                #print(group)
                 if entry is None:
                     share_summary_level[group] = 0
                     share_summary_cdr3_level[group] = {}
@@ -1184,7 +1185,9 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
 
     # shared/unique pairwise comparison
     if compareKey in calc['operations']:
-        groups = inputDict[defaults.groups_key]
+        groups = inputDict.get(defaults.groups_key)
+        if groups is None:
+            return
         filePrefix = 'group'
         if len(groups) == 2: filePrefix = '_'.join(groups.keys())
         for level in calc['levels']:
