@@ -1,5 +1,5 @@
 # Base Image
-FROM immcantation/suite:4.2.0
+FROM immcantation/suite:4.4.0
 
 MAINTAINER VDJServer <vdjserver@utsouthwestern.edu>
 
