@@ -1,6 +1,5 @@
 {
     "metadata": "repertoires.airr.json",
-    "groups": "groups.airr.yaml",
     "germline": "vdjserver_human_germline.airr.json",
     "rearrangement_files": [
         "2648490830777881066-242ac113-0001-012.airr.tsv",
@@ -24,7 +23,7 @@
     "calculations": [
         {
             "type": "CDR3",
-            "operations": [ "compare" ], 
+            "operations": [ "shared" ], 
             "levels": [ "aa", "nucleotide", "v,aa", "v,nucleotide", "vj,aa", "vj,nucleotide" ], 
             "filters": [ "productive" ]
         }
