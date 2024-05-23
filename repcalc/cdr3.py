@@ -125,19 +125,26 @@ def output_counts(filename, cntArray, relArray):
     writer.close()
 
 def output_counts_table(filename, groupCounts, reps, repCounts, level):
-    names = [ 'repertoire_id', 'total' ]
+    names = [ 'repertoire_id', 'total', 'avg' ]
     for i in range(0, len(groupCounts), 1):
         names.append(str(i))
     writer = csv.DictWriter(open(filename, 'w'), fieldnames=names)
     writer.writeheader()
     for rep in reps:
         total = 0
+        avg = 0
         entry = { 'repertoire_id': rep['repertoire_id'] }
         cntArray = repCounts[entry['repertoire_id']][level]
         for i in range(0, len(cntArray), 1):
             entry[str(i)] = cntArray[i]
+            avg += i * cntArray[i]
             total += cntArray[i]
         entry['total'] = total
+        if total == 0:
+            avg = 0
+        else:
+            avg = avg / total
+        entry['avg'] = avg
         writer.writerow(entry);
 
 #
