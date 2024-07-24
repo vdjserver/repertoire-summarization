@@ -1,0 +1,2 @@
+include versioneer.py
+include repcalc/_version.py

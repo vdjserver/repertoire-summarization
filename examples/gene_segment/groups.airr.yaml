@@ -1,0 +1,16 @@
+RepertoireGroup:
+  - repertoire_group_id: single
+    repertoire_group_name: single
+    repertoires:
+      - repertoire_id: 8064755271837946346-242ac113-0001-012
+
+  - repertoire_group_id: all
+    repertoire_group_name: all
+    repertoires:
+      - repertoire_id: 8064755271837946346-242ac113-0001-012
+      - repertoire_id: 8118141715327226346-242ac113-0001-012
+
+  - repertoire_group_id: missing
+    repertoire_group_name: missing
+    repertoires:
+      - repertoire_id: 7717850763340026346-242ac113-0001-012

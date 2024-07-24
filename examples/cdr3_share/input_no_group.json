@@ -1,0 +1,31 @@
+{
+    "metadata": "repertoires.airr.json",
+    "germline": "vdjserver_human_germline.airr.json",
+    "rearrangement_files": [
+        "2648490830777881066-242ac113-0001-012.airr.tsv",
+        "2669106673798681066-242ac113-0001-012.airr.tsv",
+        "2686329492655641066-242ac113-0001-012.airr.tsv",
+        "2700631733751321066-242ac113-0001-012.airr.tsv",
+        "2714891025174041066-242ac113-0001-012.airr.tsv",
+
+        "3010900171214361066-242ac113-0001-012.airr.tsv",
+        "3032976303115801066-242ac113-0001-012.airr.tsv",
+        "3053506246790681066-242ac113-0001-012.airr.tsv",
+        "3077686912667161066-242ac113-0001-012.airr.tsv",
+        "3099419447184921066-242ac113-0001-012.airr.tsv",
+
+        "3434813443329561066-242ac113-0001-012.airr.tsv",
+        "3458221015092761066-242ac113-0001-012.airr.tsv",
+        "3481499737837081066-242ac113-0001-012.airr.tsv",
+        "3503404071046681066-242ac113-0001-012.airr.tsv",
+        "3525050706218521066-242ac113-0001-012.airr.tsv"
+    ],
+    "calculations": [
+        {
+            "type": "CDR3",
+            "operations": [ "shared", "compare" ], 
+            "levels": [ "aa", "nucleotide", "v,aa", "v,nucleotide", "vj,aa", "vj,nucleotide" ], 
+            "filters": [ "productive" ]
+        }
+    ]
+}

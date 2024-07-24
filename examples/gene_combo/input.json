@@ -13,7 +13,7 @@
     "calculations": [
         {
             "type": "gene_segment",
-            "operations": [ "usage" ], 
+            "operations": [ "combo" ], 
             "levels": [ "allele", "gene", "subgroup" ], 
             "filters": [ "productive" ]
         }

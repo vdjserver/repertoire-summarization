@@ -1,10 +1,9 @@
 {
     "metadata": "repertoire.airr.json",
-    "groups": "groups.airr.yaml",
     "germline": "vdjserver_human_germline.airr.json",
+    "processing_stage": "igblast.makedb",
     "repertoires": [
-        "8064755271837946346-242ac113-0001-012",
-        "8118141715327226346-242ac113-0001-012"
+        "8064755271837946346-242ac113-0001-012"
     ],
     "rearrangement_files": [
         "8064755271837946346-242ac113-0001-012.airr.tsv",
@@ -12,9 +11,9 @@
     ],
     "calculations": [
         {
-            "type": "gene_segment",
-            "operations": [ "usage" ], 
-            "levels": [ "allele", "gene", "subgroup" ], 
+            "type": "clonal_assignment",
+            "operations": [ "TCR" ], 
+            "levels": [ ], 
             "filters": [ "productive" ]
         }
     ]

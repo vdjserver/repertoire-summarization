@@ -1,5 +1,5 @@
 # Base Image
-FROM vdjserver/igblast
+FROM ubuntu:20.04
 
 MAINTAINER VDJServer <vdjserver@utsouthwestern.edu>
 
@@ -10,7 +10,7 @@ MAINTAINER VDJServer <vdjserver@utsouthwestern.edu>
 #ENV HTTPS_PROXY 'https://proxy.swmed.edu:3128/'
 
 # Install OS Dependencies
-RUN apt-get update && apt-get install -y \
+RUN export DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get install -y \
     libssl-dev \
     python3 \
     python3-pip \
@@ -28,34 +28,31 @@ RUN pip install \
     argparse \
     BeautifulSoup4 \
     reportlab \
-    biopython
+    biopython \
+    airr
 
 RUN pip3 install \
     pandas \
     biopython \
+    airr \
     presto \
-    changeo
-
-# extract database
-RUN wget http://wiki.vdjserver.org/db/db_10_05_2016.tgz
-RUN tar zxvf db_10_05_2016.tgz
+    changeo \
+    sphinx \
+    sphinxcontrib-autoprogram \
+    prov \
+    recommonmark \
+    rdflib \
+    networkx \
+    lxml \
+    commonmark \
+    isodate \
+    decorator \
+    future \
+    agavepy
 
 # Copy source
-RUN mkdir /repsum-root
-COPY . /repsum-root
+RUN mkdir /repcalc-root
+COPY . /repcalc-root
 
-# install repsum
-RUN cd /repsum-root && python setup.py install
-
-# setup run environment
-ENV DB_DIR "/db"
-ENV VDJ_DB_ROOT "/db/10_05_2016/"
-ENV IGDATA "/db"
-ENV VDJSERVER_ROOT "/repsum-root"
-ENV PATH "$PATH:/igblast-root/local/bin"
-ENV PYTHONPATH "/VDJMLpy-$VDJML_VERSION:$PYTHONPATH"
-ENV PYTHONPATH "/VDJMLpy-$VDJML_VERSION/vdjml:$PYTHONPATH"
-ENV LD_LIBRARY_PATH "/VDJMLpy-$VDJML_VERSION/vdjml:$LD_LIBRARY_PATH"
-
-# changeo setup for germline database
-RUN cd /repsum-root/docker && bash changeo_setup.sh
+# install repcalc
+RUN cd /repcalc-root && python3 setup.py install
