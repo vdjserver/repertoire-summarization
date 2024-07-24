@@ -3,14 +3,12 @@ FROM immcantation/suite:4.4.0
 
 MAINTAINER VDJServer <vdjserver@utsouthwestern.edu>
 
-# uncomment these if building behind UTSW proxy
-#ENV http_proxy 'http://proxy.swmed.edu:3128/'
-#ENV https_proxy 'https://proxy.swmed.edu:3128/'
-#ENV HTTP_PROXY 'http://proxy.swmed.edu:3128/'
-#ENV HTTPS_PROXY 'https://proxy.swmed.edu:3128/'
-
 # extra tools
 RUN yum install -y jq
+
+# latest AIRR
+RUN pip3 uninstall -y airr
+RUN pip3 install airr
 
 # Copy source
 RUN mkdir /repcalc-root
