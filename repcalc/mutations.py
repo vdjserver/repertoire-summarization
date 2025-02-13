@@ -35,7 +35,7 @@ import repcalc.metadata as metadata
 #import repcalc.gldb as gldb
 import json
 import math
-import numpy
+import numpy as np
 import csv
 import airr
 from Bio.Seq import Seq
@@ -62,14 +62,14 @@ alignment_total_names = region_total_names_nt + region_total_names_aa
 # global counts
 total_names = ['mu_seq_count','mu_duplicate_count','mu_total_count','mu_total_count_aa','mu_unique_r','mu_unique_s']
 count_names = total_names + ['mu_count_r_aa','mu_count_r','mu_count_s_aa','mu_count_s'] + alignment_total_names
-freq_names_nt = ['mu_freq_r', 'mu_freq_s']
-freq_names_aa = ['mu_freq_r_aa', 'mu_freq_s_aa']
+freq_names_nt = ['mu_freq', 'mu_freq_r', 'mu_freq_s']
+freq_names_aa = ['mu_freq_aa', 'mu_freq_r_aa', 'mu_freq_s_aa']
 freq_names = freq_names_nt + freq_names_aa
 
 # mu_count_X_r/s - region/position counts for R/S mutations
 # mu_total_count_X - normalization factor per position X
 # mu_freq_* - mu_count_* / mu_total_count_*
-region_names_nt = ['mu_count_fwr1_r','mu_count_fwr1_s','mu_count_cdr1_r','mu_count_cdr1_s','mu_count_fwr2_r','mu_count_fwr2_s','mu_count_cdr2_r','mu_count_cdr2_s','mu_count_fwr3_r','mu_count_fwr3_s']
+region_names_nt = ['mu_freq_cdr', 'mu_freq_cdr_r', 'mu_freq_cdr_s', 'mu_freq_cdr_rsratio',  'mu_freq_fwr_rsratio', 'mu_count_fwr1_r','mu_count_fwr1_s','mu_count_cdr1_r','mu_count_cdr1_s','mu_count_fwr2_r','mu_count_fwr2_s','mu_count_cdr2_r','mu_count_cdr2_s','mu_count_fwr3_r','mu_count_fwr3_s']
 region_names_aa = ['mu_count_fwr1_r_aa','mu_count_fwr1_s_aa','mu_count_cdr1_r_aa','mu_count_cdr1_s_aa','mu_count_fwr2_r_aa','mu_count_fwr2_s_aa','mu_count_cdr2_r_aa','mu_count_cdr2_s_aa','mu_count_fwr3_r_aa','mu_count_fwr3_s_aa']
 region_names = region_names_nt + region_names_aa
 aa_pos_names = []
@@ -414,13 +414,47 @@ def generate_frequency(row, count_row):
     else:
         row['mu_freq_r'] = float(count_row['mu_count_r']) / tot_nt
         row['mu_freq_s'] = float(count_row['mu_count_s']) / tot_nt
+    row['mu_freq'] = row['mu_freq_r']+row['mu_freq_s']
     if tot_aa == 0:
         row['mu_freq_r_aa'] = 0
         row['mu_freq_s_aa'] = 0
     else:
         row['mu_freq_r_aa'] = float(count_row['mu_count_r_aa']) / tot_aa
         row['mu_freq_s_aa'] = float(count_row['mu_count_s_aa']) / tot_aa
+    row['mu_freq_aa'] = row['mu_freq_aa']+row['mu_freq_aa']
 
+    # region frequencies (totals)
+    if count_row['mu_count_r'] + count_row['mu_count_s'] == 0:
+        row['mu_freq_cdr'] = 0
+    else:
+        row['mu_freq_cdr'] = float(count_row['mu_count_cdr1_r'] + count_row['mu_count_cdr1_s'] + count_row['mu_count_cdr2_r'] + count_row['mu_count_cdr2_s'])/(count_row['mu_count_r'] + count_row['mu_count_s'])
+    
+    if count_row['mu_count_r'] == 0:
+        row['mu_freq_cdr_r'] = 0
+    else:
+        row['mu_freq_cdr_r'] = float(count_row['mu_count_cdr1_r'] + count_row['mu_count_cdr2_r'])/count_row['mu_count_r']
+    if count_row['mu_count_s'] == 0:
+        row['mu_freq_cdr_s'] = 0
+    else:
+        row['mu_freq_cdr_s'] = float(count_row['mu_count_cdr1_s'] + count_row['mu_count_cdr2_s'])/count_row['mu_count_s']
+    
+    if (count_row['mu_count_cdr1_s'] + count_row['mu_count_cdr2_s'] == 0) and (count_row['mu_count_cdr1_r'] + count_row['mu_count_cdr2_r'] == 0):
+        row['mu_freq_cdr_rsratio'] = np.nan
+    elif (count_row['mu_count_cdr1_s'] + count_row['mu_count_cdr2_s'] == 0):
+        row['mu_freq_cdr_rsratio'] = np.inf
+    else:
+        row['mu_freq_cdr_rsratio'] = float(count_row['mu_count_cdr1_r'] + count_row['mu_count_cdr2_r']) /\
+                                     float(count_row['mu_count_cdr1_s'] + count_row['mu_count_cdr2_s'])
+
+    if (count_row['mu_count_fwr1_r'] + count_row['mu_count_fwr2_r'] + count_row['mu_count_fwr3_r'] == 0) and \
+        (count_row['mu_count_fwr1_s'] + count_row['mu_count_fwr2_s'] + count_row['mu_count_fwr3_s'] == 0):
+        row['mu_freq_fwr_rsratio'] = np.nan
+    elif (count_row['mu_count_fwr1_s'] + count_row['mu_count_fwr2_s'] + count_row['mu_count_fwr3_s'] == 0):
+        row['mu_freq_fwr_rsratio'] = np.inf
+    else:
+        row['mu_freq_fwr_rsratio'] = float(count_row['mu_count_fwr1_r'] + count_row['mu_count_fwr2_r'] + count_row['mu_count_fwr3_r'])/\
+                                     float(count_row['mu_count_fwr1_s'] + count_row['mu_count_fwr2_s'] + count_row['mu_count_fwr3_s'])
+    
     # region frequencies
     for n in alignment_names:
         nt_n = n.replace('_aa','')
