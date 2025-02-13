@@ -444,13 +444,16 @@ def generate_frequency(row, count_row):
         tot_cnt = float(count_row['mu_total_count_' + str(i)])
         if tot_cnt == 0:
             row['mu_freq_' + str(i) + '_r'] = 0
-            row['mu_freq_' + str(i) + '_r_aa'] = 0
             row['mu_freq_' + str(i) + '_s'] = 0
-            row['mu_freq_' + str(i) + '_s_aa'] = 0
         else:
             row['mu_freq_' + str(i) + '_r'] = float(count_row['mu_count_' + str(i) + '_r']) / tot_cnt
-            row['mu_freq_' + str(i) + '_r_aa'] = float(count_row['mu_count_' + str(i) + '_r_aa']) / tot_cnt
             row['mu_freq_' + str(i) + '_s'] = float(count_row['mu_count_' + str(i) + '_s']) / tot_cnt
+        tot_cnt = float(count_row['mu_total_count_' + str(i) + '_aa'])
+        if tot_cnt == 0:
+            row['mu_freq_' + str(i) + '_r_aa'] = 0
+            row['mu_freq_' + str(i) + '_s_aa'] = 0
+        else:
+            row['mu_freq_' + str(i) + '_r_aa'] = float(count_row['mu_count_' + str(i) + '_r_aa']) / tot_cnt
             row['mu_freq_' + str(i) + '_s_aa'] = float(count_row['mu_count_' + str(i) + '_s_aa']) / tot_cnt
 
 def unique_counts(counts):
