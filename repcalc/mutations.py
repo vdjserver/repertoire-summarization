@@ -54,13 +54,14 @@ group_mutation_frequency = {}
 
 # aa alignments with gaps
 alignment_names = ['cdr1_aa', 'cdr2_aa', 'fwr1_aa', 'fwr2_aa', 'fwr3_aa']
+
 # counts of mutable positions in regions
 region_total_names_nt = ['mu_total_count_fwr1', 'mu_total_count_cdr1', 'mu_total_count_fwr2', 'mu_total_count_cdr2', 'mu_total_count_fwr3']
 region_total_names_aa = ['mu_total_count_fwr1_aa', 'mu_total_count_cdr1_aa', 'mu_total_count_fwr2_aa', 'mu_total_count_cdr2_aa', 'mu_total_count_fwr3_aa']
 alignment_total_names = region_total_names_nt + region_total_names_aa
 
 # global counts
-total_names = ['mu_total_count_cdr', 'mu_seq_count','mu_duplicate_count','mu_total_count','mu_total_count_aa','mu_unique_r','mu_unique_s']
+total_names = ['mu_total_count_cdr', 'mu_total_count_cdrRSratio', 'mu_total_count_fwrRSratio', 'mu_seq_count','mu_duplicate_count','mu_total_count','mu_total_count_aa','mu_unique_r','mu_unique_s']
 count_names = total_names + ['mu_count_r_aa','mu_count_r','mu_count_s_aa','mu_count_s'] + alignment_total_names
 freq_names_nt = ['mu_freq', 'mu_freq_r', 'mu_freq_s']
 freq_names_aa = ['mu_freq_aa', 'mu_freq_r_aa', 'mu_freq_s_aa']
@@ -87,12 +88,10 @@ for i in range(1,105):
 pos_names = pos_total_names + nt_pos_names + aa_pos_names
 
 # region frequencies
-region_freq_names_nt = ['mu_freq_cdr', 'mu_freq_cdr_r', 'mu_freq_cdr_s', 'mu_freq_fwr1_r','mu_freq_fwr1_s','mu_freq_cdr1_r','mu_freq_cdr1_s','mu_freq_fwr2_r','mu_freq_fwr2_s','mu_freq_cdr2_r','mu_freq_cdr2_s','mu_freq_fwr3_r','mu_freq_fwr3_s']
+region_freq_names_nt = ['mu_freq_cdrRSratio',  'mu_freq_fwrRSratio', 'mu_freq_cdr', 'mu_freq_cdr_r', 'mu_freq_cdr_s', 'mu_freq_fwr1_r','mu_freq_fwr1_s','mu_freq_cdr1_r','mu_freq_cdr1_s','mu_freq_fwr2_r','mu_freq_fwr2_s','mu_freq_cdr2_r','mu_freq_cdr2_s','mu_freq_fwr3_r','mu_freq_fwr3_s']
 region_freq_names_aa = ['mu_freq_fwr1_r_aa','mu_freq_fwr1_s_aa','mu_freq_cdr1_r_aa','mu_freq_cdr1_s_aa','mu_freq_fwr2_r_aa','mu_freq_fwr2_s_aa','mu_freq_cdr2_r_aa','mu_freq_cdr2_s_aa','mu_freq_fwr3_r_aa','mu_freq_fwr3_s_aa']
 region_freq_names = region_freq_names_nt + region_freq_names_aa
 
-# ratios
-region_RSratio = ['mu_freq_cdrRSratio',  'mu_freq_fwrRSratio']
 
 # position frequencies
 pos_freq_names_nt = []
@@ -110,7 +109,7 @@ pos_freq_names = pos_freq_names_nt + pos_freq_names_aa
 row_transfer_names = alignment_names + count_names + region_names + aa_pos_names
 # fields used in summary counters
 transfer_names = count_names + region_names + pos_names
-freq_transfer_names = freq_names + region_RSratio + region_freq_names + pos_freq_names 
+freq_transfer_names = freq_names + region_freq_names + pos_freq_names
 
 # average and std for groups
 group_names = []
