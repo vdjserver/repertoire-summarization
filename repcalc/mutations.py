@@ -126,13 +126,6 @@ for field in freq_transfer_names:
     group_freq_names.append(field + '_avg')
     group_freq_names.append(field + '_std')
     group_freq_names.append(field + '_N')
-ratio_freq_names = []
-for field in region_ratios:
-    ratio_freq_names.append(field + '_avg')
-    ratio_freq_names.append(field + '_std')
-    ratio_freq_names.append(field + '_N')
-
-# freq_transfer_names = freq_names + region_ratios + region_freq_names + pos_freq_names
 
 # count mutable nt and aa positions
 # add aa translation with gaps
