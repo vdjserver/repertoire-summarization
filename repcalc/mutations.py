@@ -113,7 +113,7 @@ pos_freq_names = pos_freq_names_nt + pos_freq_names_aa
 row_transfer_names = alignment_names + count_names + region_names + aa_pos_names
 # fields used in summary counters
 transfer_names = count_names + region_names + pos_names
-freq_transfer_names = freq_names + region_freq_names + pos_freq_names
+freq_transfer_names = freq_names + region_ratios + region_freq_names + pos_freq_names
 
 # average and std for groups
 group_names = []
@@ -126,8 +126,13 @@ for field in freq_transfer_names:
     group_freq_names.append(field + '_avg')
     group_freq_names.append(field + '_std')
     group_freq_names.append(field + '_N')
+ratio_freq_names = []
+for field in region_ratios:
+    ratio_freq_names.append(field + '_avg')
+    ratio_freq_names.append(field + '_std')
+    ratio_freq_names.append(field + '_N')
 
-freq_transfer_names = freq_names + region_ratios + region_freq_names + pos_freq_names
+# freq_transfer_names = freq_names + region_ratios + region_freq_names + pos_freq_names
 
 # count mutable nt and aa positions
 # add aa translation with gaps
@@ -617,7 +622,9 @@ def compute_std(entry, repertoire_values, field, repertoire_counters, total_fiel
     for rep in groupDict['repertoires']:
         rep_id = rep['repertoire_id']
         if repertoire_values.get(rep_id) is not None:
-            if float(repertoire_counters[rep_id][total_field]) == 0:
+            if not total_field:
+                rep_value = float(repertoire_values[rep_id][field])
+            elif float(repertoire_counters[rep_id][total_field]) == 0 and total_field:
                 # repertoire does not have data
                 N -= 1.0
                 rep_value = 0.0
@@ -632,7 +639,10 @@ def compute_std(entry, repertoire_values, field, repertoire_counters, total_fiel
     for rep in groupDict['repertoires']:
         rep_id = rep['repertoire_id']
         if repertoire_values.get(rep_id) is not None:
-            if float(repertoire_counters[rep_id][total_field]) == 0:
+            if not total_field:
+                rep_value = float(repertoire_values[rep_id][field])
+                group_std += (group_avg - rep_value) * (group_avg - rep_value)
+            elif float(repertoire_counters[rep_id][total_field]) == 0:
                 # repertoire does not have data
                 rep_value = 0.0
             else:
@@ -691,6 +701,15 @@ def compute_group_frequency(groupDict, freqs, repertoire_freqs, repertoire_count
         compute_std(freqs, repertoire_freqs, field, repertoire_counters, total_name, tot_N, groupDict, False)
     for field in pos_freq_names_aa:
         total_name = field.replace('_r','').replace('_s','').replace('_aa','').replace('mu_freq','mu_total_count')
+        compute_std(freqs, repertoire_freqs, field, repertoire_counters, total_name, tot_N, groupDict, False)
+
+    # ratios
+    for field in region_ratios_nt:
+        total_name = None # field.replace('_r','').replace('_s','').replace('mu_freq','mu_total_count')
+        compute_std(freqs, repertoire_freqs, field, repertoire_counters, total_name, tot_N, groupDict, False)
+
+    for field in region_ratios_aa:
+        total_name = None # field.replace('_r','').replace('_s','').replace('mu_freq','mu_total_count')
         compute_std(freqs, repertoire_freqs, field, repertoire_counters, total_name, tot_N, groupDict, False)
 
 def initialize_calculation_module(inputDict, metadataDict, headerMapping):
