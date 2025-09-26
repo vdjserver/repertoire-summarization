@@ -31,6 +31,8 @@ Default settings
 # Info
 #from repsum import __author__, __version__, __date__
 
+import repcalc.gldb as gldb
+
 # Keys in specification file
 metadata_file_key = "metadata"
 groups_file_key = "groups"
@@ -113,7 +115,30 @@ def apply_filter(inputDict, group, fields):
 
     # helper function
     def eval_exp(fields, exp):
-        value = fields.get(exp['content']['field'])
+        fname = exp['content']['field']
+
+        # subgroup and gene are derived fields
+        if fname in ['v_subgroup', 'd_subgroup', 'j_subgroup', 'c_subgroup']:
+            fcall = fname.replace('_subgroup', '_call')
+            value = fields.get(fcall)
+            germline = inputDict[germline_key]
+            ad = germline['allele_descriptions'].get(value)
+            if ad:
+                value = gldb.getSubgroup(ad)
+            else:
+                value = None
+        elif fname in ['v_gene', 'd_gene', 'j_gene', 'c_gene']:
+            fcall = fname.replace('_gene', '_call')
+            value = fields.get(fcall)
+            germline = inputDict[germline_key]
+            ad = germline['allele_descriptions'].get(value)
+            if ad:
+                value = gldb.getGene(ad)
+            else:
+                value = None
+        else:
+            value = fields.get(exp['content']['field'])
+
         if not value:
             return False
         return logical_op(exp['op'], value, exp['content']['value'])
@@ -123,9 +148,9 @@ def apply_filter(inputDict, group, fields):
     if g.get('filter') and g.get('filter').get('Rearrangement'):
         f = g['filter']['Rearrangement']
 
-        if f['op'] == 'and':
+        if f['op'].upper() == 'AND':
             valid = eval_exp(fields, f['content'][0]) and eval_exp(fields, f['content'][1]);
-        elif f['op'] == 'or':
+        elif f['op'].upper() == 'OR':
             valid = eval_exp(fields, f['content'][0]) or eval_exp(fields, f['content'][1]);
         else:
             valid = eval_exp(fields, f);
