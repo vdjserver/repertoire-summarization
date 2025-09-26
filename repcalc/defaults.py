@@ -89,5 +89,46 @@ def get_duplicate_count(fields):
     if fields.get('duplicate_count') is None: return 1
     else: return int(fields['duplicate_count'])
 
-def apply_filter():
-    return True
+def apply_filter(inputDict, group, fields):
+    valid = True
+
+    # helper function
+    def logical_op(op, field_value, check_value):
+        if op == '=':
+            return field_value == check_value
+        elif op == '!=':
+            return field_value != check_value
+        elif op == '<':
+            return field_value < check_value
+        elif op == '<=':
+            return field_value <= check_value
+        elif op == '>':
+            return field_value > check_value
+        elif op == '>=':
+            return field_value >= check_value
+        elif op == 'contains':
+            return check_value in field_value
+        else:
+            return False
+
+    # helper function
+    def eval_exp(m, exp):
+        value = fields.get(exp['content']['field'])
+        if not value:
+            return False
+        return logical_op(exp['op'], value, exp['content']['value'])
+
+    # does group have a rearrangement filter
+    g = inputDict[groups_key][group]
+    if g.get('filter') and g.get('filter').get('Rearrangement'):
+        filter = g['filter']['Rearrangement']
+
+        if filter['op'] == 'and':
+            valid = eval_exp(fields, filter['content'][0]) and eval_exp(fields, filter['content'][1]);
+        elif filter['op'] == 'or':
+            valid = eval_exp(fields, filter['content'][0]) or eval_exp(fields, filter['content'][1]);
+        else:
+            valid = eval_exp(fields, filter);
+
+    return valid
+
