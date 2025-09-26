@@ -112,7 +112,7 @@ def apply_filter(inputDict, group, fields):
             return False
 
     # helper function
-    def eval_exp(m, exp):
+    def eval_exp(fields, exp):
         value = fields.get(exp['content']['field'])
         if not value:
             return False
@@ -121,14 +121,14 @@ def apply_filter(inputDict, group, fields):
     # does group have a rearrangement filter
     g = inputDict[groups_key][group]
     if g.get('filter') and g.get('filter').get('Rearrangement'):
-        filter = g['filter']['Rearrangement']
+        f = g['filter']['Rearrangement']
 
-        if filter['op'] == 'and':
-            valid = eval_exp(fields, filter['content'][0]) and eval_exp(fields, filter['content'][1]);
-        elif filter['op'] == 'or':
-            valid = eval_exp(fields, filter['content'][0]) or eval_exp(fields, filter['content'][1]);
+        if f['op'] == 'and':
+            valid = eval_exp(fields, f['content'][0]) and eval_exp(fields, f['content'][1]);
+        elif f['op'] == 'or':
+            valid = eval_exp(fields, f['content'][0]) or eval_exp(fields, f['content'][1]);
         else:
-            valid = eval_exp(fields, filter);
+            valid = eval_exp(fields, f);
 
     return valid
 
