@@ -88,3 +88,6 @@ def get_dupcount(headerMapping, fields):
 def get_duplicate_count(fields):
     if fields.get('duplicate_count') is None: return 1
     else: return int(fields['duplicate_count'])
+
+def apply_filter():
+    return True
