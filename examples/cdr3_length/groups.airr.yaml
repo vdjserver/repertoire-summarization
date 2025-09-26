@@ -2,5 +2,5 @@ RepertoireGroup:
   - repertoire_group_id: example
     repertoire_group_name: Example repertoire group
     repertoires:
-      - repertoire_id: 8064755271837946346-242ac113-0001-012
-      - repertoire_id: 8118141715327226346-242ac113-0001-012
+      - repertoire_id: 2648490830777881066-242ac113-0001-012
+      - repertoire_id: 2669106673798681066-242ac113-0001-012
