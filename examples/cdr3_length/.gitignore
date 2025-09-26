@@ -1,3 +1,5 @@
+*.gz
+*.tar
 *.tsv
 *.csv
 repertoire.airr.json

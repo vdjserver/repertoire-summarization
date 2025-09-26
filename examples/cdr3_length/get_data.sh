@@ -13,6 +13,8 @@
 
 curl -o study.tar https://vdjserver.tapis.io/v3/files/postits/redeem/b7e828ca-f22f-4391-ba24-c183f7432ea9-010
 tar xvf study.tar
+gunzip 2648490830777881066-242ac113-0001-012.airr.tsv.gz
+gunzip 2669106673798681066-242ac113-0001-012.airr.tsv.gz
 
 #curl -o 8064755271837946346-242ac113-0001-012.airr.tsv.gz https://vdjserver.org/postits/v2/732e64e5-1328-46c5-9fb6-1747a15b9f46-010
 #gunzip 8064755271837946346-242ac113-0001-012.airr.tsv.gz
