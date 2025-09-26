@@ -1,4 +1,9 @@
 RepertoireGroup:
+  - repertoire_group_id: single_no_filter
+    repertoire_group_name: single_no_filter
+    repertoires:
+      - repertoire_id: 2648490830777881066-242ac113-0001-012
+
   - repertoire_group_id: single
     repertoire_group_name: single
     repertoires:
@@ -9,6 +14,12 @@ RepertoireGroup:
         content:
           field: "junction_aa_length"
           value: 10
+
+  - repertoire_group_id: all_no_filter
+    repertoire_group_name: all_no_filter
+    repertoires:
+      - repertoire_id: 2648490830777881066-242ac113-0001-012
+      - repertoire_id: 2669106673798681066-242ac113-0001-012
 
   - repertoire_group_id: all
     repertoire_group_name: all
