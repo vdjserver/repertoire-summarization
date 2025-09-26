@@ -1,5 +1,6 @@
 {
-    "metadata": "repertoire.airr.json",
+    "metadata": "repertoires.airr.json",
+    "groups": "groups.airr.yaml",
     "germline": "vdjserver_mouse_germline.airr.json",
     "repertoires": [
         "8418294783347593706-242ac116-0001-012",

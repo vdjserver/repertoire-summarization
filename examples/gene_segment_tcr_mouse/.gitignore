@@ -1,3 +1,5 @@
+*.gz
+*.tar
 *.tsv
-repertoire.airr.json
+repertoires.airr.json
 vdjserver_mouse_germline.airr.json

@@ -1,0 +1,68 @@
+RepertoireGroup:
+  - repertoire_group_id: single_no_filter
+    repertoire_group_name: single_no_filter
+    repertoires:
+      - repertoire_id: 8418294783347593706-242ac116-0001-012
+
+  - repertoire_group_id: single
+    repertoire_group_name: single
+    repertoires:
+      - repertoire_id: 8418294783347593706-242ac116-0001-012
+    filter:
+      Rearrangement:
+        op: "="
+        content:
+          field: "junction_aa_length"
+          value: 10
+
+  - repertoire_group_id: all_no_filter
+    repertoire_group_name: all_no_filter
+    repertoires:
+      - repertoire_id: 8418294783347593706-242ac116-0001-012
+      - repertoire_id: 8434100262996873706-242ac116-0001-012
+      - repertoire_id: 8617753064573833706-242ac116-0001-012
+
+  - repertoire_group_id: all
+    repertoire_group_name: all
+    repertoires:
+      - repertoire_id: 8418294783347593706-242ac116-0001-012
+      - repertoire_id: 8434100262996873706-242ac116-0001-012
+      - repertoire_id: 8617753064573833706-242ac116-0001-012
+    filter:
+      Rearrangement:
+        op: "="
+        content:
+          field: "junction_aa_length"
+          value: 12
+
+  - repertoire_group_id: all_trbv8
+    repertoire_group_name: all_trbv8
+    repertoires:
+      - repertoire_id: 8418294783347593706-242ac116-0001-012
+      - repertoire_id: 8434100262996873706-242ac116-0001-012
+      - repertoire_id: 8617753064573833706-242ac116-0001-012
+    filter:
+      Rearrangement:
+        op: "="
+        content:
+          field: v_subgroup
+          value: TRBV8
+
+  - repertoire_group_id: all_trbv8_trav6
+    repertoire_group_name: all_trbv8_trav6
+    repertoires:
+      - repertoire_id: 8418294783347593706-242ac116-0001-012
+      - repertoire_id: 8434100262996873706-242ac116-0001-012
+      - repertoire_id: 8617753064573833706-242ac116-0001-012
+    filter:
+      Rearrangement:
+        op: "OR"
+        content:
+          - op: "="
+            content:
+              field: v_subgroup
+              value: TRBV8
+          - op: "="
+            content:
+              field: v_subgroup
+              value: TRAV6
