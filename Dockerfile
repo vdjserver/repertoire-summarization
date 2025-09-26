@@ -1,7 +1,7 @@
 # Base Image
 FROM immcantation/suite:4.4.0
 
-MAINTAINER VDJServer <vdjserver@utsouthwestern.edu>
+LABEL maintainer="VDJServer <vdjserver@utsouthwestern.edu>"
 
 # extra tools
 RUN yum install -y jq
