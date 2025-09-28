@@ -91,6 +91,12 @@ def get_duplicate_count(fields):
     if fields.get('duplicate_count') is None: return 1
     else: return int(fields['duplicate_count'])
 
+def has_rearrangement_filter(inputDict, group):
+    g = inputDict[groups_key][group]
+    if g.get('filter') and g.get('filter').get('Rearrangement'):
+        return True
+    return False
+
 def apply_filter(inputDict, group, fields):
     valid = True
 
