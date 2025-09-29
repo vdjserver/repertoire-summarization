@@ -1,0 +1,107 @@
+RepertoireGroup:
+  - repertoire_group_id: single
+    repertoire_group_name: single
+    repertoires:
+      - repertoire_id: 2648490830777881066-242ac113-0001-012
+
+  - repertoire_group_id: single_rf10
+    repertoire_group_name: single_rf10
+    repertoires:
+      - repertoire_id: 2648490830777881066-242ac113-0001-012
+    filter:
+      Rearrangement:
+        op: "="
+        content:
+          field: "junction_aa_length"
+          value: 10
+
+  - repertoire_group_id: all
+    repertoire_group_name: all
+    repertoires:
+      - repertoire_id: 2648490830777881066-242ac113-0001-012
+      - repertoire_id: 2669106673798681066-242ac113-0001-012
+
+  - repertoire_group_id: all_rf12
+    repertoire_group_name: all_rf12
+    repertoires:
+      - repertoire_id: 2648490830777881066-242ac113-0001-012
+      - repertoire_id: 2669106673798681066-242ac113-0001-012
+    filter:
+      Rearrangement:
+        op: "="
+        content:
+          field: "junction_aa_length"
+          value: 12
+
+  - repertoire_group_id: all_ighv4
+    repertoire_group_name: all_ighv4
+    repertoires:
+      - repertoire_id: 2648490830777881066-242ac113-0001-012
+      - repertoire_id: 2669106673798681066-242ac113-0001-012
+    filter:
+      Rearrangement:
+        op: "="
+        content:
+          field: v_subgroup
+          value: IGHV4
+
+  - repertoire_group_id: all_ighv4_ighj6
+    repertoire_group_name: all_ighv4_ighj6
+    repertoires:
+      - repertoire_id: 2648490830777881066-242ac113-0001-012
+      - repertoire_id: 2669106673798681066-242ac113-0001-012
+    filter:
+      Rearrangement:
+        op: "AND"
+        content:
+          - op: "="
+            content:
+              field: v_subgroup
+              value: IGHV4
+          - op: "="
+            content:
+              field: j_subgroup
+              value: IGHJ6
+
+
+  - repertoire_group_id: all_trbv30
+    repertoire_group_name: all_trbv30
+    repertoires:
+      - repertoire_id: 2648490830777881066-242ac113-0001-012
+      - repertoire_id: 2669106673798681066-242ac113-0001-012
+    filter:
+      Rearrangement:
+        op: "="
+        content:
+          field: v_subgroup
+          value: TRBV30
+
+  - repertoire_group_id: all_trbj2-1
+    repertoire_group_name: all_trbj2-1
+    repertoires:
+      - repertoire_id: 2648490830777881066-242ac113-0001-012
+      - repertoire_id: 2669106673798681066-242ac113-0001-012
+    filter:
+      Rearrangement:
+        op: "="
+        content:
+          field: j_subgroup
+          value: TRBJ2-1
+
+  - repertoire_group_id: all_trbv30_trbj2-1
+    repertoire_group_name: all_trbv30_trbj2-1
+    repertoires:
+      - repertoire_id: 2648490830777881066-242ac113-0001-012
+      - repertoire_id: 2669106673798681066-242ac113-0001-012
+    filter:
+      Rearrangement:
+        op: "AND"
+        content:
+          - op: "="
+            content:
+              field: v_subgroup
+              value: TRBV30
+          - op: "="
+            content:
+              field: j_subgroup
+              value: TRBJ2-1

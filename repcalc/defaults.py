@@ -56,6 +56,7 @@ calcFilters = "filters"
 
 # Calculation modules
 calculationModules = {
+    "filters": {"filename":"filters", "require_germline":True},
     "gene_segment": {"filename":"gene_segment", "require_germline":True},
     "CDR3": {"filename":"cdr3", "require_germline":True},
     "diversity": {"filename":"diversity"},

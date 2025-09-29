@@ -1,0 +1,19 @@
+{
+    "metadata": "repertoires.airr.json",
+    "groups": "groups.airr.yaml",
+    "germline": "vdjserver_human_germline.airr.json",
+    "processing_stage": "igblast.makedb",
+    "repertoires": [
+        "2648490830777881066-242ac113-0001-012",
+        "2669106673798681066-242ac113-0001-012"
+    ],
+    "rearrangement_files": [
+        "2648490830777881066-242ac113-0001-012.airr.tsv.gz",
+        "2669106673798681066-242ac113-0001-012.airr.tsv.gz"
+    ],
+    "calculations": [
+        {
+            "type": "filters"
+        }
+    ]
+}
