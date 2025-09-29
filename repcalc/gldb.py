@@ -96,3 +96,7 @@ def getDisplayName(germline, allele_call, level):
             distinct_names.append(segment_name)
 
     return distinct_names
+
+def transformToLevel(germline, allele_call, level):
+    names = getDisplayName(germline, allele_call, level)
+    return ','.join(names)
