@@ -1,0 +1,11 @@
+rm study.tar
+rm repertoires.airr.json
+rm 4869796857698062826-242ac113-0001-012*
+rm 4684511968548622826-242ac113-0001-012*
+rm 4746531296302862826-242ac113-0001-012*
+rm single*
+rm single_rf10*
+rm all*
+rm all_rf12*
+rm all_ighv4*
+rm all_ighv4_ighj6*
