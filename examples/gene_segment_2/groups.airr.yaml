@@ -56,14 +56,14 @@ RepertoireGroup:
       - repertoire_id: 1159043095574277653-242ac114-0001-012
     filter:
       Rearrangement:
-      op: "AND"
-      content:
-        op: "="
+        op: "AND"
         content:
-          field: v_subgroup
-          value: IGHV4
-        op: "="
-        content:
-          field: j_subgroup
-          value: IGHJ6
+          - op: "="
+            content:
+              field: v_subgroup
+              value: IGHV4
+          - op: "="
+            content:
+              field: j_subgroup
+              value: IGHJ6
 

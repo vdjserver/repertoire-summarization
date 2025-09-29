@@ -45,21 +45,74 @@ RepertoireGroup:
           field: v_subgroup
           value: IGHV4
 
-  - repertoire_group_id: all_ighv4
-    repertoire_group_name: all_ighv4
+  - repertoire_group_id: all_ighv4_ighj6
+    repertoire_group_name: all_ighv4_ighj6
     repertoires:
       - repertoire_id: 2648490830777881066-242ac113-0001-012
       - repertoire_id: 2669106673798681066-242ac113-0001-012
     filter:
       Rearrangement:
-      op: "AND"
-      content:
-        op: "="
+        op: "AND"
         content:
-          field: v_subgroup
-          value: IGHV4
+          - op: "="
+            content:
+              field: v_subgroup
+              value: IGHV4
+          - op: "="
+            content:
+              field: j_subgroup
+              value: IGHJ6
+
+  - repertoire_group_id: all_ighj6
+    repertoire_group_name: all_ighj6
+    repertoires:
+      - repertoire_id: 2648490830777881066-242ac113-0001-012
+      - repertoire_id: 2669106673798681066-242ac113-0001-012
+    filter:
+      Rearrangement:
         op: "="
         content:
           field: j_subgroup
           value: IGHJ6
 
+  - repertoire_group_id: all_trbv30
+    repertoire_group_name: all_trbv30
+    repertoires:
+      - repertoire_id: 2648490830777881066-242ac113-0001-012
+      - repertoire_id: 2669106673798681066-242ac113-0001-012
+    filter:
+      Rearrangement:
+        op: "="
+        content:
+          field: v_subgroup
+          value: TRBV30
+
+  - repertoire_group_id: all_trbj2-1
+    repertoire_group_name: all_trbj2-1
+    repertoires:
+      - repertoire_id: 2648490830777881066-242ac113-0001-012
+      - repertoire_id: 2669106673798681066-242ac113-0001-012
+    filter:
+      Rearrangement:
+        op: "="
+        content:
+          field: j_subgroup
+          value: TRBJ2-1
+
+  - repertoire_group_id: all_trbv30_trbj2-1
+    repertoire_group_name: all_trbv30_trbj2-1
+    repertoires:
+      - repertoire_id: 2648490830777881066-242ac113-0001-012
+      - repertoire_id: 2669106673798681066-242ac113-0001-012
+    filter:
+      Rearrangement:
+        op: "AND"
+        content:
+          - op: "="
+            content:
+              field: v_subgroup
+              value: TRBV30
+          - op: "="
+            content:
+              field: j_subgroup
+              value: TRBJ2-1
