@@ -116,3 +116,14 @@ RepertoireGroup:
             content:
               field: j_subgroup
               value: TRBJ2-1
+
+  - repertoire_group_id: single_cdr320
+    repertoire_group_name: single
+    repertoires:
+      - repertoire_id: 2648490830777881066-242ac113-0001-012
+    filter:
+      Rearrangement:
+        op: ">"
+        content: 
+          field: cdr3_aa_length
+          value: 30

@@ -143,6 +143,8 @@ def apply_filter(inputDict, group, fields):
                 value = gldb.getGene(ad)
             else:
                 value = None
+        elif fname == 'cdr3_aa_length':
+            value = len(fields.get('cdr3'))
         else:
             value = fields.get(exp['content']['field'])
 
