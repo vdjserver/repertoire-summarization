@@ -1,11 +1,11 @@
 RepertoireGroup:
-  - repertoire_group_id: single_no_filter
-    repertoire_group_name: single_no_filter
+  - repertoire_group_id: single
+    repertoire_group_name: single
     repertoires:
       - repertoire_id: 1159043099869244949-242ac114-0001-012
 
-  - repertoire_group_id: single
-    repertoire_group_name: single
+  - repertoire_group_id: single_rf10
+    repertoire_group_name: single_rf10
     repertoires:
       - repertoire_id: 1159043099869244949-242ac114-0001-012
     filter:
@@ -22,8 +22,8 @@ RepertoireGroup:
       - repertoire_id: 1159043104164212245-242ac114-0001-012
       - repertoire_id: 1159043095574277653-242ac114-0001-012
 
-  - repertoire_group_id: all
-    repertoire_group_name: all
+  - repertoire_group_id: all_rf12
+    repertoire_group_name: all_rf12
     repertoires:
       - repertoire_id: 1159043099869244949-242ac114-0001-012
       - repertoire_id: 1159043104164212245-242ac114-0001-012
@@ -35,7 +35,35 @@ RepertoireGroup:
           field: "junction_aa_length"
           value: 12
 
-  - repertoire_group_id: missing
-    repertoire_group_name: missing
+  - repertoire_group_id: all_ighv4
+    repertoire_group_name: all_ighv4
     repertoires:
+      - repertoire_id: 1159043099869244949-242ac114-0001-012
+      - repertoire_id: 1159043104164212245-242ac114-0001-012
       - repertoire_id: 1159043095574277653-242ac114-0001-012
+    filter:
+      Rearrangement:
+        op: "="
+        content:
+          field: v_subgroup
+          value: IGHV4
+
+  - repertoire_group_id: all_ighv4_ighj6
+    repertoire_group_name: all_ighv4_ighj6
+    repertoires:
+      - repertoire_id: 1159043099869244949-242ac114-0001-012
+      - repertoire_id: 1159043104164212245-242ac114-0001-012
+      - repertoire_id: 1159043095574277653-242ac114-0001-012
+    filter:
+      Rearrangement:
+      op: "AND"
+      content:
+        op: "="
+        content:
+          field: v_subgroup
+          value: IGHV4
+        op: "="
+        content:
+          field: j_subgroup
+          value: IGHJ6
+
