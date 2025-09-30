@@ -125,5 +125,5 @@ RepertoireGroup:
       Rearrangement:
         op: ">"
         content: 
-          field: cdr3_aa_length
+          field: junction_aa_length
           value: 30
