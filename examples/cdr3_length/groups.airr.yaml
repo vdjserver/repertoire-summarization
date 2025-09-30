@@ -1,14 +1,25 @@
 RepertoireGroup:
-  - repertoire_group_id: unfiltered
+  - repertoire_group_id: new_unfiltered_2
     repertoire_group_name: unfiltered rearrangements
     repertoires:
       - repertoire_id: 2648490830777881066-242ac113-0001-012
       - repertoire_id: 2669106673798681066-242ac113-0001-012
 
-  - repertoire_group_id: example
+  - repertoire_group_id: new_example_2
     repertoire_group_name: Example repertoire group
     repertoires:
       - repertoire_id: 2648490830777881066-242ac113-0001-012
+      - repertoire_id: 2669106673798681066-242ac113-0001-012
+    filter:
+      Rearrangement:
+        op: ">"
+        content:
+          field: "junction_aa_length"
+          value: 10
+
+  - repertoire_group_id: new_single_2
+    repertoire_group_name: Example single repertoire group
+    repertoires:
       - repertoire_id: 2669106673798681066-242ac113-0001-012
     filter:
       Rearrangement:
@@ -17,14 +28,14 @@ RepertoireGroup:
           field: "junction_aa_length"
           value: 10
 
-  - repertoire_group_id: spike15
-    repertoire_group_name: spike15
-    repertoires:
-      - repertoire_id: 2648490830777881066-242ac113-0001-012
-      - repertoire_id: 2669106673798681066-242ac113-0001-012
-    filter:
-      Rearrangement:
-        op: "="
-        content:
-          field: "junction_aa_length"
-          value: 15
+  # - repertoire_group_id: spike15
+  #   repertoire_group_name: spike15
+  #   repertoires:
+  #     - repertoire_id: 2648490830777881066-242ac113-0001-012
+  #     - repertoire_id: 2669106673798681066-242ac113-0001-012
+  #   filter:
+  #     Rearrangement:
+  #       op: "="
+  #       content:
+  #         field: "junction_aa_length"
+  #         value: 15
