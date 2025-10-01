@@ -93,8 +93,8 @@ region_freq_names_aa = ['mu_freq_fwr_aa', 'mu_freq_fwr_r_aa', 'mu_freq_fwr_s_aa'
 region_freq_names = region_freq_names_nt + region_freq_names_aa
 
 # ratios
-region_ratios_nt = ['mu_cdrrsratio', 'mu_fwrrsratio']
-region_ratios_aa = ['mu_cdrrsratio_aa', 'mu_fwrrsratio_aa']
+region_ratios_nt = ['mu_ratio_fwr', 'mu_ratio_fwr_r', 'mu_ratio_fwr_s', 'mu_ratio_cdr', 'mu_ratio_cdr_r', 'mu_ratio_cdr_s' 'mu_rsratio_cdr', 'mu_rsratio_fwr']
+region_ratios_aa = ['mu_ratio_fwr_aa', 'mu_ratio_fwr_r_aa', 'mu_ratio_fwr_s_aa', 'mu_ratio_cdr_aa', 'mu_ratio_cdr_r_aa', 'mu_ratio_cdr_s_aa', 'mu_rsratio_cdr_aa', 'mu_rsratio_fwr_aa']
 region_ratios = region_ratios_nt + region_ratios_aa
 
 # position frequencies
@@ -113,7 +113,7 @@ pos_freq_names = pos_freq_names_nt + pos_freq_names_aa
 row_transfer_names = alignment_names + count_names + region_names + aa_pos_names
 # fields used in summary counters
 transfer_names = count_names + region_names + pos_names
-freq_transfer_names = freq_names + region_ratios + region_freq_names + pos_freq_names
+freq_transfer_names = freq_names + region_ratios + region_freq_names + pos_freq_names + region_ratios
 
 # average and std for groups
 group_names = []
@@ -440,94 +440,86 @@ def generate_frequency(row, count_row):
         row['mu_freq_s_aa'] = float(count_row['mu_count_s_aa']) / tot_aa
     row['mu_freq_aa'] = row['mu_freq_r_aa']+row['mu_freq_s_aa']
 
-    # region frequencies (totals)
+    # region ratios (totals)
     if count_row['mu_count_r'] + count_row['mu_count_s'] == 0:
-        row['mu_freq_cdr'] = 0
-        row['mu_freq_fwr'] = 0
+        row['mu_ratio_cdr'] = 0
+        row['mu_ratio_fwr'] = 0
     else:
-        row['mu_freq_cdr'] = float(count_row['mu_count_cdr1_r'] + count_row['mu_count_cdr1_s'] + \
-                                   count_row['mu_count_cdr2_r'] + count_row['mu_count_cdr2_s'])/ \
+        row['mu_ratio_cdr'] = float(count_row['mu_count_cdr1_r'] + count_row['mu_count_cdr1_s'] + \
+                                    count_row['mu_count_cdr2_r'] + count_row['mu_count_cdr2_s'])/ \
                                    (count_row['mu_count_r'] + count_row['mu_count_s'])
-        row['mu_freq_fwr'] = float(count_row['mu_count_fwr1_r'] + count_row['mu_count_fwr1_s'] + \
+        row['mu_ratio_fwr'] = float(count_row['mu_count_fwr1_r'] + count_row['mu_count_fwr1_s'] + \
                                    count_row['mu_count_fwr2_r'] + count_row['mu_count_fwr2_s'] + \
                                    count_row['mu_count_fwr3_r'] + count_row['mu_count_fwr3_s']) / \
                                    (count_row['mu_count_r'] + count_row['mu_count_s'])
     if count_row['mu_count_r'] + count_row['mu_count_s'] == 0:
-        row['mu_freq_cdr_aa'] = 0
-        row['mu_freq_fwr_aa'] = 0
+        row['mu_ratio_cdr_aa'] = 0
+        row['mu_ratio_fwr_aa'] = 0
     else:
-        row['mu_freq_cdr_aa'] = float(count_row['mu_count_cdr1_r_aa'] + count_row['mu_count_cdr1_s_aa'] + \
+        row['mu_ratio_cdr_aa'] = float(count_row['mu_count_cdr1_r_aa'] + count_row['mu_count_cdr1_s_aa'] + \
                                       count_row['mu_count_cdr2_r_aa'] + count_row['mu_count_cdr2_s_aa'])/ \
                                       (count_row['mu_count_r_aa'] + count_row['mu_count_s_aa'])
-        row['mu_freq_fwr_aa'] = float(count_row['mu_count_fwr1_r_aa'] + count_row['mu_count_fwr1_s_aa'] + \
+        row['mu_ratio_fwr_aa'] = float(count_row['mu_count_fwr1_r_aa'] + count_row['mu_count_fwr1_s_aa'] + \
                                       count_row['mu_count_fwr2_r_aa'] + count_row['mu_count_fwr2_s_aa'] + \
                                       count_row['mu_count_fwr3_r_aa'] + count_row['mu_count_fwr3_s_aa'])/ \
                                       (count_row['mu_count_r_aa'] + count_row['mu_count_s_aa'])
     
     if count_row['mu_count_r'] == 0:
-        row['mu_freq_cdr_r'] = 0
-        row['mu_freq_fwr_r'] = 0
+        row['mu_ratio_cdr_r'] = 0
+        row['mu_ratio_fwr_r'] = 0
     else:
-        row['mu_freq_cdr_r'] = float(count_row['mu_count_cdr1_r'] + count_row['mu_count_cdr2_r'])/count_row['mu_count_r']
-        row['mu_freq_fwr_r'] = float(count_row['mu_count_fwr1_r'] + count_row['mu_count_fwr2_r'] + count_row['mu_count_fwr3_r'])/count_row['mu_count_r']
+        row['mu_ratio_cdr_r'] = float(count_row['mu_count_cdr1_r'] + count_row['mu_count_cdr2_r'])/count_row['mu_count_r']
+        row['mu_ratio_fwr_r'] = float(count_row['mu_count_fwr1_r'] + count_row['mu_count_fwr2_r'] + count_row['mu_count_fwr3_r'])/count_row['mu_count_r']
     if count_row['mu_count_s'] == 0:
-        row['mu_freq_cdr_s'] = 0
-        row['mu_freq_fwr_s'] = 0
+        row['mu_ratio_cdr_s'] = 0
+        row['mu_ratio_fwr_s'] = 0
     else:
-        row['mu_freq_cdr_s'] = float(count_row['mu_count_cdr1_s'] + count_row['mu_count_cdr2_s'])/count_row['mu_count_s']
-        row['mu_freq_fwr_s'] = float(count_row['mu_count_fwr1_s'] + count_row['mu_count_fwr2_s'] + count_row['mu_count_fwr3_s'])/count_row['mu_count_s']
+        row['mu_ratio_cdr_s'] = float(count_row['mu_count_cdr1_s'] + count_row['mu_count_cdr2_s'])/count_row['mu_count_s']
+        row['mu_ratio_fwr_s'] = float(count_row['mu_count_fwr1_s'] + count_row['mu_count_fwr2_s'] + count_row['mu_count_fwr3_s'])/count_row['mu_count_s']
     if count_row['mu_count_r_aa'] == 0:
-        row['mu_freq_cdr_r_aa'] = 0
-        row['mu_freq_fwr_r_aa'] = 0
+        row['mu_ratio_cdr_r_aa'] = 0
+        row['mu_ratio_fwr_r_aa'] = 0
     else:
-        row['mu_freq_cdr_r_aa'] = float(count_row['mu_count_cdr1_r_aa'] + count_row['mu_count_cdr2_r_aa'])/count_row['mu_count_r_aa']
-        row['mu_freq_fwr_r_aa'] = float(count_row['mu_count_fwr1_r_aa'] + count_row['mu_count_fwr2_r_aa'] + count_row['mu_count_fwr3_r_aa'])/count_row['mu_count_r_aa']
+        row['mu_ratio_cdr_r_aa'] = float(count_row['mu_count_cdr1_r_aa'] + count_row['mu_count_cdr2_r_aa'])/count_row['mu_count_r_aa']
+        row['mu_ratio_fwr_r_aa'] = float(count_row['mu_count_fwr1_r_aa'] + count_row['mu_count_fwr2_r_aa'] + count_row['mu_count_fwr3_r_aa'])/count_row['mu_count_r_aa']
     if count_row['mu_count_s_aa'] == 0:
-        row['mu_freq_cdr_s_aa'] = 0
-        row['mu_freq_fwr_s_aa'] = 0
+        row['mu_ratio_cdr_s_aa'] = 0
+        row['mu_ratio_fwr_s_aa'] = 0
     else:
-        row['mu_freq_cdr_s_aa'] = float(count_row['mu_count_cdr1_s_aa'] + count_row['mu_count_cdr2_s_aa'])/count_row['mu_count_s_aa']
-        row['mu_freq_fwr_s_aa'] = float(count_row['mu_count_fwr1_s_aa'] + count_row['mu_count_fwr2_s_aa'] + count_row['mu_count_fwr3_s_aa'])/count_row['mu_count_s_aa']
-
-    if (count_row['mu_count_cdr1_s'] + count_row['mu_count_cdr2_s'] == 0) and (count_row['mu_count_cdr1_r'] + count_row['mu_count_cdr2_r'] == 0):
-        row['mu_cdrrsratio'] = np.nan
-    elif (count_row['mu_count_cdr1_s'] + count_row['mu_count_cdr2_s'] == 0):
-        row['mu_cdrrsratio'] = np.inf
-    else:
-        row['mu_cdrrsratio'] = float(count_row['mu_count_cdr1_r'] + count_row['mu_count_cdr2_r']) /\
-                               float(count_row['mu_count_cdr1_s'] + count_row['mu_count_cdr2_s'])
+        row['mu_ratio_cdr_s_aa'] = float(count_row['mu_count_cdr1_s_aa'] + count_row['mu_count_cdr2_s_aa'])/count_row['mu_count_s_aa']
+        row['mu_ratio_fwr_s_aa'] = float(count_row['mu_count_fwr1_s_aa'] + count_row['mu_count_fwr2_s_aa'] + count_row['mu_count_fwr3_s_aa'])/count_row['mu_count_s_aa']
 
     # R/S ratios - nt
     if (count_row['mu_count_fwr1_r'] + count_row['mu_count_fwr2_r'] + count_row['mu_count_fwr3_r'] == 0) and \
         (count_row['mu_count_fwr1_s'] + count_row['mu_count_fwr2_s'] + count_row['mu_count_fwr3_s'] == 0):
-        row['mu_fwrrsratio'] = np.nan
+        row['mu_rsratio_fwr'] = np.nan
     elif (count_row['mu_count_fwr1_s'] + count_row['mu_count_fwr2_s'] + count_row['mu_count_fwr3_s'] == 0):
-        row['mu_fwrrsratio'] = np.inf
+        row['mu_rsratio_fwr'] = np.inf
     else:
-        row['mu_fwrrsratio'] = float(count_row['mu_count_fwr1_r'] + count_row['mu_count_fwr2_r'] + count_row['mu_count_fwr3_r'])/\
+        row['mu_rsratio_fwr'] = float(count_row['mu_count_fwr1_r'] + count_row['mu_count_fwr2_r'] + count_row['mu_count_fwr3_r'])/\
                                float(count_row['mu_count_fwr1_s'] + count_row['mu_count_fwr2_s'] + count_row['mu_count_fwr3_s'])
     if (count_row['mu_count_cdr1_s'] + count_row['mu_count_cdr2_s'] == 0) and (count_row['mu_count_cdr1_r'] + count_row['mu_count_cdr2_r'] == 0):
-        row['mu_cdrrsratio'] = np.nan
+        row['mu_rsratio_cdr'] = np.nan
     elif (count_row['mu_count_cdr1_s'] + count_row['mu_count_cdr2_s'] == 0):
-        row['mu_cdrrsratio'] = np.inf
+        row['mu_rsratio_cdr'] = np.inf
     else:
-        row['mu_cdrrsratio'] = float(count_row['mu_count_cdr1_r'] + count_row['mu_count_cdr2_r']) /\
+        row['mu_rsratio_cdr'] = float(count_row['mu_count_cdr1_r'] + count_row['mu_count_cdr2_r']) /\
                                float(count_row['mu_count_cdr1_s'] + count_row['mu_count_cdr2_s'])
     # R/S ratios - aa
     if (count_row['mu_count_fwr1_r_aa'] + count_row['mu_count_fwr2_r_aa'] + count_row['mu_count_fwr3_r_aa'] == 0) and \
         (count_row['mu_count_fwr1_s_aa'] + count_row['mu_count_fwr2_s_aa'] + count_row['mu_count_fwr3_s_aa'] == 0):
-        row['mu_fwrrsratio_aa'] = np.nan
+        row['mu_rsratio_fwr_aa'] = np.nan
     elif (count_row['mu_count_fwr1_s_aa'] + count_row['mu_count_fwr2_s_aa'] + count_row['mu_count_fwr3_s_aa'] == 0):
-        row['mu_fwrrsratio_aa'] = np.inf
+        row['mu_rsratio_fwr_aa'] = np.inf
     else:
-        row['mu_fwrrsratio_aa'] = float(count_row['mu_count_fwr1_r_aa'] + count_row['mu_count_fwr2_r_aa'] + count_row['mu_count_fwr3_r_aa'])/\
+        row['mu_rsratio_fwr_aa'] = float(count_row['mu_count_fwr1_r_aa'] + count_row['mu_count_fwr2_r_aa'] + count_row['mu_count_fwr3_r_aa'])/\
                                   float(count_row['mu_count_fwr1_s_aa'] + count_row['mu_count_fwr2_s_aa'] + count_row['mu_count_fwr3_s_aa'])
     if (count_row['mu_count_cdr1_s_aa'] + count_row['mu_count_cdr2_s_aa'] == 0) and (count_row['mu_count_cdr1_r_aa'] + count_row['mu_count_cdr2_r_aa'] == 0):
-        row['mu_cdrrsratio_aa'] = np.nan
+        row['mu_rsratio_cdr_aa'] = np.nan
     elif (count_row['mu_count_cdr1_s_aa'] + count_row['mu_count_cdr2_s_aa'] == 0):
-        row['mu_cdrrsratio_aa'] = np.inf
+        row['mu_rsratio_cdr_aa'] = np.inf
     else:
-        row['mu_cdrrsratio_aa'] = float(count_row['mu_count_cdr1_r_aa'] + count_row['mu_count_cdr2_r_aa']) /\
+        row['mu_rsratio_cdr_aa'] = float(count_row['mu_count_cdr1_r_aa'] + count_row['mu_count_cdr2_r_aa']) /\
                                   float(count_row['mu_count_cdr1_s_aa'] + count_row['mu_count_cdr2_s_aa'])
         
     # region frequencies
@@ -682,18 +674,30 @@ def compute_group_frequency(groupDict, freqs, repertoire_freqs, repertoire_count
 
     # regions
     for field in region_freq_names_nt:
-        total_name = field.replace('_r','').replace('_s','').replace('mu_freq','mu_total_count')
+        if field.endswith('_r') or field.endswith('_s'):
+            total_name = field[:-2].replace('mu_freq','mu_total_count')
+        else:
+            total_name = field.replace('mu_freq','mu_total_count')
         compute_std(freqs, repertoire_freqs, field, repertoire_counters, total_name, tot_N, groupDict, False)
     for field in region_freq_names_aa:
-        total_name = field.replace('_r','').replace('_s','').replace('mu_freq','mu_total_count')
+        if field.endswith('_r_aa') or field.endswith('_s_aa'):
+            total_name = field[:-5].replace('mu_freq','mu_total_count')+'_aa'
+        else:
+            total_name = field.replace('mu_freq','mu_total_count')
         compute_std(freqs, repertoire_freqs, field, repertoire_counters, total_name, tot_N, groupDict, False)
 
     # positions
     for field in pos_freq_names_nt:
-        total_name = field.replace('_r','').replace('_s','').replace('mu_freq','mu_total_count')
+        if field.endswith('_r') or field.endswith('_s'):
+            total_name = field[:-2].replace('mu_freq','mu_total_count')
+        else:
+            total_name = field.replace('mu_freq','mu_total_count')
         compute_std(freqs, repertoire_freqs, field, repertoire_counters, total_name, tot_N, groupDict, False)
     for field in pos_freq_names_aa:
-        total_name = field.replace('_r','').replace('_s','').replace('_aa','').replace('mu_freq','mu_total_count')
+        if field.endswith('_r_aa') or field.endswith('_s_aa'):
+            total_name = field[:-5].replace('mu_freq','mu_total_count')
+        else:
+            total_name = field.replace('_aa','').replace('mu_freq','mu_total_count')
         compute_std(freqs, repertoire_freqs, field, repertoire_counters, total_name, tot_N, groupDict, False)
 
     # ratios
