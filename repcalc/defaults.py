@@ -104,9 +104,15 @@ def apply_filter(inputDict, group, fields):
     # helper function
     def logical_op(op, field_value, check_value):
         if op == '=':
-            return field_value == check_value
+            if type(field_value) == list:
+                return check_value in field_value
+            else:
+                return field_value == check_value
         elif op == '!=':
-            return field_value != check_value
+            if type(field_value) == list:
+                return check_value not in field_value
+            else:
+                return field_value != check_value
         elif op == '<':
             return field_value < check_value
         elif op == '<=':
@@ -129,20 +135,19 @@ def apply_filter(inputDict, group, fields):
             fcall = fname.replace('_subgroup', '_call')
             value = fields.get(fcall)
             germline = inputDict[germline_key]
-            ad = germline['allele_descriptions'].get(value)
-            if ad:
-                value = gldb.getSubgroup(ad)
-            else:
-                value = None
+            if value:
+                value = gldb.getDisplayName(germline, value, 'subgroup')
         elif fname in ['v_gene', 'd_gene', 'j_gene', 'c_gene']:
             fcall = fname.replace('_gene', '_call')
             value = fields.get(fcall)
             germline = inputDict[germline_key]
-            ad = germline['allele_descriptions'].get(value)
-            if ad:
-                value = gldb.getGene(ad)
-            else:
-                value = None
+            if value:
+                value = gldb.getDisplayName(germline, value, 'gene')
+        elif fname in ['v_call', 'd_call', 'j_call', 'c_call']:
+            value = fields.get(fname)
+            germline = inputDict[germline_key]
+            if value:
+                value = gldb.getDisplayName(germline, value, 'allele')
         else:
             value = fields.get(exp['content']['field'])
 
