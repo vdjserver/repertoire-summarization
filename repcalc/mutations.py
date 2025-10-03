@@ -88,12 +88,18 @@ for i in range(1,105):
 pos_names = pos_total_names + nt_pos_names + aa_pos_names
 
 # region frequencies
-region_freq_names_nt = ['mu_freq_fwr', 'mu_freq_fwr_r', 'mu_freq_fwr_s', 'mu_freq_cdr', 'mu_freq_cdr_r', 'mu_freq_cdr_s', 'mu_freq_fwr1_r','mu_freq_fwr1_s','mu_freq_cdr1_r','mu_freq_cdr1_s','mu_freq_fwr2_r','mu_freq_fwr2_s','mu_freq_cdr2_r','mu_freq_cdr2_s','mu_freq_fwr3_r','mu_freq_fwr3_s']
-region_freq_names_aa = ['mu_freq_fwr_aa', 'mu_freq_fwr_r_aa', 'mu_freq_fwr_s_aa', 'mu_freq_cdr_aa', 'mu_freq_cdr_r_aa', 'mu_freq_cdr_s_aa', 'mu_freq_fwr1_r_aa','mu_freq_fwr1_s_aa','mu_freq_cdr1_r_aa','mu_freq_cdr1_s_aa','mu_freq_fwr2_r_aa','mu_freq_fwr2_s_aa','mu_freq_cdr2_r_aa','mu_freq_cdr2_s_aa','mu_freq_fwr3_r_aa','mu_freq_fwr3_s_aa']
+region_freq_names_nt = ['mu_freq_fwr','mu_freq_fwr_r','mu_freq_fwr_s', 'mu_freq_cdr','mu_freq_cdr_r','mu_freq_cdr_s', \
+                        'mu_freq_fwr1','mu_freq_fwr1_r','mu_freq_fwr1_s', 'mu_freq_cdr1','mu_freq_cdr1_r','mu_freq_cdr1_s', \
+                        'mu_freq_fwr2','mu_freq_fwr2_r','mu_freq_fwr2_s', 'mu_freq_cdr2','mu_freq_cdr2_r','mu_freq_cdr2_s',\
+                        'mu_freq_fwr3','mu_freq_fwr3_r','mu_freq_fwr3_s']
+region_freq_names_aa = ['mu_freq_fwr_aa','mu_freq_fwr_r_aa','mu_freq_fwr_s_aa', 'mu_freq_cdr_aa','mu_freq_cdr_r_aa','mu_freq_cdr_s_aa', \
+                        'mu_freq_fwr1_aa','mu_freq_fwr1_r_aa','mu_freq_fwr1_s_aa', 'mu_freq_cdr1_aa','mu_freq_cdr1_r_aa','mu_freq_cdr1_s_aa', \
+                        'mu_freq_fwr2_aa','mu_freq_fwr2_r_aa','mu_freq_fwr2_s_aa', 'mu_freq_cdr2_aa','mu_freq_cdr2_r_aa','mu_freq_cdr2_s_aa', \
+                        'mu_freq_fwr3_aa','mu_freq_fwr3_r_aa','mu_freq_fwr3_s_aa']
 region_freq_names = region_freq_names_nt + region_freq_names_aa
 
 # ratios
-region_ratios_nt = ['mu_ratio_fwr', 'mu_ratio_fwr_r', 'mu_ratio_fwr_s', 'mu_ratio_cdr', 'mu_ratio_cdr_r', 'mu_ratio_cdr_s' 'mu_rsratio_cdr', 'mu_rsratio_fwr']
+region_ratios_nt = ['mu_ratio_fwr', 'mu_ratio_fwr_r', 'mu_ratio_fwr_s', 'mu_ratio_cdr', 'mu_ratio_cdr_r', 'mu_ratio_cdr_s', 'mu_rsratio_cdr', 'mu_rsratio_fwr']
 region_ratios_aa = ['mu_ratio_fwr_aa', 'mu_ratio_fwr_r_aa', 'mu_ratio_fwr_s_aa', 'mu_ratio_cdr_aa', 'mu_ratio_cdr_r_aa', 'mu_ratio_cdr_s_aa', 'mu_rsratio_cdr_aa', 'mu_rsratio_fwr_aa']
 region_ratios = region_ratios_nt + region_ratios_aa
 
@@ -113,15 +119,19 @@ pos_freq_names = pos_freq_names_nt + pos_freq_names_aa
 row_transfer_names = alignment_names + count_names + region_names + aa_pos_names
 # fields used in summary counters
 transfer_names = count_names + region_names + pos_names
-freq_transfer_names = freq_names + region_ratios + region_freq_names + pos_freq_names + region_ratios
+freq_transfer_names = freq_names + region_ratios + region_freq_names + pos_freq_names
 
 # average and std for groups
 group_names = []
+print('transfer_names')
+print(transfer_names)
 for field in transfer_names:
     group_names.append(field + '_avg')
     group_names.append(field + '_std')
     group_names.append(field + '_N')
 group_freq_names = []
+print('freq_transfer_names')
+print(freq_transfer_names)
 for field in freq_transfer_names:
     group_freq_names.append(field + '_avg')
     group_freq_names.append(field + '_std')
@@ -420,6 +430,7 @@ def generate_frequency(row, count_row):
     # global frequencies
     tot_nt = 0
     tot_aa = 0
+        # mu_total_count_ is total mutable positions due to cdr1 and cdr2 length variance
     for n in alignment_names:
         nt_n = n.replace('_aa','')
         tot_aa += float(count_row['mu_total_count_' + n])
@@ -523,6 +534,14 @@ def generate_frequency(row, count_row):
                                   float(count_row['mu_count_cdr1_s_aa'] + count_row['mu_count_cdr2_s_aa'])
         
     # region frequencies
+    row['mu_freq_fwr_r_aa'] = 0
+    row['mu_freq_fwr_s_aa'] = 0
+    row['mu_freq_cdr_r_aa'] = 0
+    row['mu_freq_cdr_s_aa'] = 0
+    row['mu_freq_fwr_r'] = 0
+    row['mu_freq_fwr_s'] = 0
+    row['mu_freq_cdr_r'] = 0
+    row['mu_freq_cdr_s'] = 0
     for n in alignment_names:
         nt_n = n.replace('_aa','')
         tot_aa = float(count_row['mu_total_count_' + n])
@@ -532,6 +551,16 @@ def generate_frequency(row, count_row):
         else:
             row['mu_freq_' + nt_n + '_r_aa'] = float(count_row['mu_count_' + nt_n + '_r_aa']) / tot_aa
             row['mu_freq_' + nt_n + '_s_aa'] = float(count_row['mu_count_' + nt_n + '_s_aa']) / tot_aa
+            if nt_n[:-1] == 'fwr':
+                row['mu_freq_fwr_r_aa'] += float(count_row['mu_count_' + nt_n + '_r_aa']) # add here and divide at end
+                row['mu_freq_fwr_s_aa'] += float(count_row['mu_count_' + nt_n + '_s_aa']) # add here and divide at end
+            elif nt_n[:-1] == 'cdr':
+                row['mu_freq_cdr_r_aa'] += float(count_row['mu_count_' + nt_n + '_r_aa']) # add here and divide at end
+                row['mu_freq_cdr_s_aa'] += float(count_row['mu_count_' + nt_n + '_s_aa']) # add here and divide at end
+            else:
+                raise KeyError(f'Alignment name, n, is not of fwr or cdr after removing _aa and n[:-1] in aa section. Value: {nt_n[:-1]}')
+        row['mu_freq_' + nt_n + '_aa'] = row['mu_freq_' + nt_n + '_r_aa'] + row['mu_freq_' + nt_n + '_s_aa']
+        
         tot_nt = float(count_row['mu_total_count_' + nt_n])
         if tot_nt == 0:
             row['mu_freq_' + nt_n + '_r'] = 0
@@ -539,6 +568,31 @@ def generate_frequency(row, count_row):
         else:
             row['mu_freq_' + nt_n + '_r'] = float(count_row['mu_count_' + nt_n + '_r']) / tot_nt
             row['mu_freq_' + nt_n + '_s'] = float(count_row['mu_count_' + nt_n + '_s']) / tot_nt
+            if nt_n[:-1] == 'fwr':
+                row['mu_freq_fwr_r'] += float(count_row['mu_count_' + nt_n + '_r']) # add here and divide at end
+                row['mu_freq_fwr_s'] += float(count_row['mu_count_' + nt_n + '_s']) # add here and divide at end
+            elif nt_n[:-1] == 'cdr':
+                row['mu_freq_cdr_r'] += float(count_row['mu_count_' + nt_n + '_r']) # add here and divide at end
+                row['mu_freq_cdr_s'] += float(count_row['mu_count_' + nt_n + '_s']) # add here and divide at end
+            else:
+                raise KeyError(f'Alignment name, n, is not of fwr or cdr after removing _aa and n[:-1] in nt section. Value: {nt_n[:-1]}')
+        row['mu_freq_' + nt_n] = row['mu_freq_' + nt_n + '_r'] + row['mu_freq_' + nt_n + '_s']
+    
+    # Create frequencies and record
+    row['mu_freq_fwr_r_aa'] = row['mu_freq_fwr_r_aa'] / count_row['mu_total_count_fwr_aa']
+    row['mu_freq_fwr_s_aa'] = row['mu_freq_fwr_s_aa'] / count_row['mu_total_count_fwr_aa']
+    row['mu_freq_fwr_aa'] = row['mu_freq_fwr_r_aa'] + row['mu_freq_fwr_s_aa']
+    row['mu_freq_cdr_r_aa'] = row['mu_freq_cdr_r_aa'] / count_row['mu_total_count_cdr_aa']
+    row['mu_freq_cdr_s_aa'] = row['mu_freq_cdr_s_aa'] / count_row['mu_total_count_cdr_aa']
+    row['mu_freq_cdr_aa'] = row['mu_freq_cdr_r_aa'] + row['mu_freq_cdr_s_aa']
+
+    row['mu_freq_fwr_r'] = row['mu_freq_fwr_r'] / count_row['mu_total_count_fwr']
+    row['mu_freq_fwr_s'] = row['mu_freq_fwr_s'] / count_row['mu_total_count_fwr']
+    row['mu_freq_fwr'] = row['mu_freq_fwr_r'] + row['mu_freq_fwr_s']
+    row['mu_freq_cdr_r'] = row['mu_freq_cdr_r'] / count_row['mu_total_count_cdr']
+    row['mu_freq_cdr_s'] = row['mu_freq_cdr_s'] / count_row['mu_total_count_cdr']
+    row['mu_freq_cdr'] = row['mu_freq_cdr_r'] + row['mu_freq_cdr_s']
+    
 
     # position frequencies
     for i in range(1,105):
@@ -765,6 +819,8 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
         # repertoire counts
         if 'repertoire' in calc['levels']:
             names = ['repertoire_id'] + transfer_names
+            print('repertoire_counts')
+            print(names)
             filename = 'repertoire.count.mutational_report.csv'
             if inputDict.get(defaults.processing_stage_key) is not None:
                 filename = inputDict.get(defaults.processing_stage_key) + '.' + filename
@@ -809,6 +865,8 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
         # repertoire frequencies
         if 'repertoire' in calc['levels']:
             names = ['repertoire_id'] + freq_transfer_names
+            print('mutation frequency')
+            print(names)
             filename = 'repertoire.frequency.mutational_report.csv'
             if inputDict.get(defaults.processing_stage_key) is not None:
                 filename = inputDict.get(defaults.processing_stage_key) + '.' + filename
