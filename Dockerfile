@@ -1,14 +1,16 @@
 # Base Image
 FROM immcantation/suite:4.4.0
 
-MAINTAINER VDJServer <vdjserver@utsouthwestern.edu>
+LABEL maintainer="VDJServer <vdjserver@utsouthwestern.edu>"
 
 # extra tools
 RUN yum install -y jq
 
-# latest AIRR
+# AIRR v1.6.0
 RUN pip3 uninstall -y airr
-RUN pip3 install airr
+#RUN pip3 install airr
+RUN git clone https://github.com/airr-community/airr-standards.git
+RUN cd airr-standards && git checkout release-1.5 && cd lang/python && pip3 install .
 
 # Copy source
 RUN mkdir /repcalc-root

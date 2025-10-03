@@ -8,15 +8,12 @@
         "2669106673798681066-242ac113-0001-012"
     ],
     "rearrangement_files": [
-        "2648490830777881066-242ac113-0001-012.airr.tsv",
-        "2669106673798681066-242ac113-0001-012.airr.tsv"
+        "2648490830777881066-242ac113-0001-012.airr.tsv.gz",
+        "2669106673798681066-242ac113-0001-012.airr.tsv.gz"
     ],
     "calculations": [
         {
-            "type": "CDR3",
-            "operations": [ "length" ], 
-            "levels": [ ], 
-            "filters": [ "productive" ]
+            "type": "filters"
         }
     ]
 }

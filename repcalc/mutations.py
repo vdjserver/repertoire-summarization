@@ -380,12 +380,12 @@ def add_mutation_count(counts, row):
             counts['mu_count_fwr3_s'] += int(row[f]) * duplicate_count
 
 
-def add_repertoire_count(rep_id, row):
+def add_repertoire_count(global_counts, rep_id, row):
     # initialize counts per repertoire
-    rep_counts = mutation_counts['repertoire'].get(rep_id)
+    rep_counts = global_counts['repertoire'].get(rep_id)
     if rep_counts is None:
-        mutation_counts['repertoire'][rep_id] = { 'repertoire_id':rep_id }
-        rep_counts = mutation_counts['repertoire'][rep_id]
+        global_counts['repertoire'][rep_id] = { 'repertoire_id':rep_id }
+        rep_counts = global_counts['repertoire'][rep_id]
         for r in pos_names:
             rep_counts[r] = 0
         for r in region_names:
@@ -396,6 +396,21 @@ def add_repertoire_count(rep_id, row):
     # add to repertoire
     add_mutation_count(rep_counts, row)
     return
+
+def add_repertoire_group_count(inputDict, group, row):
+#     # initialize counts per repertoire in the repertoire_group
+#     rep_counts = mutation_counts['repertoire_group'].get(group)
+#     if rep_counts is None:
+#         mutation_counts['repertoire_group'][group] = { 'repertoire_group_id':group }
+#         print(group)
+#         for rep in inputDict[defaults.groups_key][group]['repertoires']:
+#             rep_id = rep['repertoire_id']
+#             mutation_counts['repertoire_group'][group]['repertoire'] = {}
+# 
+    # accumulate counts
+    for rep in inputDict[defaults.groups_key][group]['repertoires']:
+        rep_id = rep['repertoire_id']
+        add_repertoire_count(mutation_counts['repertoire_group'][group], rep_id, row)
 
 def add_clone_count(rep_id, row):
     # need clone_d
@@ -770,14 +785,16 @@ def initialize_calculation_module(inputDict, metadataDict, headerMapping):
 
     if inputDict.get(defaults.groups_key) is not None:
         for group in inputDict[defaults.groups_key]:
+            mutation_counts['repertoire_group'][group] = {}
+            mutation_counts['repertoire_group'][group]['repertoire'] = {}
             group_mutation_counts[group] = {}
             group_mutation_frequency[group] = {}
 
-def process_record(inputDict, metadataDict, currentFile, calc, row):
+def process_record(inputDict, metadataDict, currentFile, calc, fields):
     """Perform calculation from given fields"""
 
     # get repertoire
-    rep_id = row.get('repertoire_id')
+    rep_id = fields.get('repertoire_id')
     if rep_id is None:
         return
     if metadataDict.get(rep_id) is None:
@@ -792,16 +809,31 @@ def process_record(inputDict, metadataDict, currentFile, calc, row):
                 rearrangement_writers[rep_id] = airr.derive_rearrangement(rep_id + '.mutations.airr.tsv', currentFile, row_transfer_names)
 
     # compute additional fields
-    add_alignment_fields_to_row(row)
-    add_mutation_count_to_row(row)
+    add_alignment_fields_to_row(fields)
+    add_mutation_count_to_row(fields)
 
     # Mutation counts
     if 'rearrangement' in calc['levels']:
-        rearrangement_writers[rep_id].write(row)
+        rearrangement_writers[rep_id].write(fields)
     if 'repertoire' in calc['levels'] or 'repertoire_group' in calc['levels']:
-        add_repertoire_count(rep_id, row)
+        # unfiltered repertoire statistics
+        add_repertoire_count(mutation_counts, rep_id, fields)
+
+        if 'repertoire_group' in calc['levels']:
+            # the rearrangements for a repertoire may be filtered by the group
+            # if not, then cached unfiltered repertoire statistics will be used in finalize
+            # we avoid storing a filtered copy of the rearrangements, but do need
+            # to store the statistics for each repertoire
+            groupList = metadata.groupsWithRepertoire(inputDict, rep_id)
+            if groupList:
+                for group in groupList:
+                    if defaults.has_rearrangement_filter(inputDict, group):
+                        # check and apply filter
+                        if defaults.apply_filter(inputDict, group, fields):
+                            add_repertoire_group_count(inputDict, group, fields)
+
     if 'clone' in calc['levels']:
-        add_clone_count(rep_id, row)
+        add_clone_count(rep_id, fields)
 
 def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
     """Finalize and save the calculations"""
@@ -839,6 +871,7 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
         if 'repertoire_group' in calc['levels']:
             if inputDict.get(defaults.groups_key) is not None:
                 for group in inputDict[defaults.groups_key]:
+
                     names = ['repertoire_id'] + transfer_names
                     filename = 'repertoire.count.mutational_report.csv'
                     if inputDict.get(defaults.processing_stage_key) is not None:
@@ -848,8 +881,17 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
                     writer.writeheader()
                     for rep in inputDict[defaults.groups_key][group]['repertoires']:
                         rep_id = rep['repertoire_id']
-                        if mutation_counts['repertoire'].get(rep_id):
-                            writer.writerow(mutation_counts['repertoire'][rep_id])
+                        if defaults.has_rearrangement_filter(inputDict, group):
+                            # if have filter, then use group specific repertoire statistics
+                            print(mutation_counts['repertoire_group'][group].keys())
+                            print(group)
+                            print(mutation_counts['repertoire_group'][group]['repertoire'].keys())
+                            if mutation_counts['repertoire_group'][group]['repertoire'].get(rep_id):
+                                writer.writerow(mutation_counts['repertoire_group'][group]['repertoire'][rep_id])
+                        else:
+                            # use unfiltered repertoire statistics
+                            if mutation_counts['repertoire'].get(rep_id):
+                                writer.writerow(mutation_counts['repertoire'][rep_id])
 
         # TODO: clone counts by group
         # TODO: other levels

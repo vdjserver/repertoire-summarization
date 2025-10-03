@@ -1,6 +1,63 @@
 RepertoireGroup:
+  - repertoire_group_id: unfiltered
+    repertoire_group_name: unfiltered rearrangements
+    repertoires:
+      - repertoire_id: 2648490830777881066-242ac113-0001-012
+      - repertoire_id: 2669106673798681066-242ac113-0001-012
+
+    # for these repertoires, all junction_all_length > 10
+    # so group totals should equal unfiltered
   - repertoire_group_id: example
     repertoire_group_name: Example repertoire group
     repertoires:
-      - repertoire_id: 8064755271837946346-242ac113-0001-012
-      - repertoire_id: 8118141715327226346-242ac113-0001-012
+      - repertoire_id: 2648490830777881066-242ac113-0001-012
+      - repertoire_id: 2669106673798681066-242ac113-0001-012
+    filter:
+      Rearrangement:
+        op: ">"
+        content:
+          field: "junction_aa_length"
+          value: 10
+
+    # group totals should match the individual repertoire output
+  - repertoire_group_id: single
+    repertoire_group_name: Example single repertoire group
+    repertoires:
+      - repertoire_id: 2669106673798681066-242ac113-0001-012
+
+  - repertoire_group_id: jlgt15
+    repertoire_group_name: junction length filter
+    repertoires:
+      - repertoire_id: 2648490830777881066-242ac113-0001-012
+      - repertoire_id: 2669106673798681066-242ac113-0001-012
+    filter:
+      Rearrangement:
+        op: ">"
+        content:
+          field: "junction_aa_length"
+          value: 15
+
+  - repertoire_group_id: spike15
+    repertoire_group_name: junction length filter
+    repertoires:
+      - repertoire_id: 2648490830777881066-242ac113-0001-012
+      - repertoire_id: 2669106673798681066-242ac113-0001-012
+    filter:
+      Rearrangement:
+        op: "="
+        content:
+          field: "junction_aa_length"
+          value: 15
+
+  - repertoire_group_id: trbv21
+    repertoire_group_name: TRBV21 filter
+    repertoires:
+      - repertoire_id: 2648490830777881066-242ac113-0001-012
+      - repertoire_id: 2669106673798681066-242ac113-0001-012
+    filter:
+      Rearrangement:
+        op: "="
+        content:
+          field: "v_subgroup"
+          value: "TRBV21"
+

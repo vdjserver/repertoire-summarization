@@ -63,17 +63,6 @@ RepertoireGroup:
               field: j_subgroup
               value: IGHJ6
 
-  - repertoire_group_id: all_ighj6
-    repertoire_group_name: all_ighj6
-    repertoires:
-      - repertoire_id: 2648490830777881066-242ac113-0001-012
-      - repertoire_id: 2669106673798681066-242ac113-0001-012
-    filter:
-      Rearrangement:
-        op: "="
-        content:
-          field: j_subgroup
-          value: IGHJ6
 
   - repertoire_group_id: all_trbv30
     repertoire_group_name: all_trbv30
@@ -116,14 +105,3 @@ RepertoireGroup:
             content:
               field: j_subgroup
               value: TRBJ2-1
-
-  - repertoire_group_id: single_cdr320
-    repertoire_group_name: single
-    repertoires:
-      - repertoire_id: 2648490830777881066-242ac113-0001-012
-    filter:
-      Rearrangement:
-        op: ">"
-        content: 
-          field: junction_aa_length
-          value: 30

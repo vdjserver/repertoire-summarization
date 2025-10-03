@@ -532,9 +532,11 @@ def process_record(inputDict, metadataDict, currentFile, calc, fields):
                     groupList = metadata.groupsWithRepertoire(inputDict, rep_id)
                     if groupList:
                         for group in groupList:
-                            add_segment_count(germline, segment, level, group_segment_counters[group][gene][level], defaults.get_duplicate_count(fields))
-                            if fields.get('productive'):
-                                add_segment_count(germline, segment, level, group_segment_counters_productive[group][gene][level], defaults.get_duplicate_count(fields))
+                            # check and apply filter
+                            if defaults.apply_filter(inputDict, group, fields):
+                                add_segment_count(germline, segment, level, group_segment_counters[group][gene][level], defaults.get_duplicate_count(fields))
+                                if fields.get('productive'):
+                                    add_segment_count(germline, segment, level, group_segment_counters_productive[group][gene][level], defaults.get_duplicate_count(fields))
 
     # combo operations
     if comboKey in calc['operations']:
@@ -545,9 +547,11 @@ def process_record(inputDict, metadataDict, currentFile, calc, fields):
             groupList = metadata.groupsWithRepertoire(inputDict, rep_id)
             if groupList:
                 for group in groupList:
-                    add_combo_count(germline, fields, combo, group_combo_counters[group][combo], defaults.get_duplicate_count(fields))
-                    if fields.get('productive'):
-                        add_combo_count(germline, fields, combo, group_combo_counters_productive[group][combo], defaults.get_duplicate_count(fields))
+                    # check and apply filter
+                    if defaults.apply_filter(inputDict, group, fields):
+                        add_combo_count(germline, fields, combo, group_combo_counters[group][combo], defaults.get_duplicate_count(fields))
+                        if fields.get('productive'):
+                            add_combo_count(germline, fields, combo, group_combo_counters_productive[group][combo], defaults.get_duplicate_count(fields))
 
 
 def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):

@@ -12,17 +12,16 @@
 # metadata-list -v -Q '{"name":"adc_cache_repertoire","value.repertoire_id":"6079859978638004716-242ac114-0001-012"}'
 # metadata-list -v -Q '{"name":"adc_cache_repertoire","value.repertoire_id":"6085958832198324716-242ac114-0001-012"}'
 
-curl -o 6096696254733292012-242ac114-0001-012.airr.tsv.gz https://vdj-agave-api.tacc.utexas.edu/postits/v2/8169e37d-d967-4883-a3c4-c83e4bd5eff3-010
-gunzip 6096696254733292012-242ac114-0001-012.airr.tsv.gz
-curl -o 6079859978638004716-242ac114-0001-012.airr.tsv.gz https://vdj-agave-api.tacc.utexas.edu/postits/v2/fed9847b-1ea2-47b0-9840-d7afc6e40216-010
-gunzip 6079859978638004716-242ac114-0001-012.airr.tsv.gz
-curl -o 6085958832198324716-242ac114-0001-012.airr.tsv.gz https://vdj-agave-api.tacc.utexas.edu/postits/v2/930adb3b-0106-49f9-b23a-4efed22abe47-010
-gunzip 6085958832198324716-242ac114-0001-012.airr.tsv.gz
+# IG (High-Throughput Mapping of B Cell Receptor Sequences to Antigen Specificity)
+curl -o study.tar https://vdjserver.tapis.io/v3/files/postits/redeem/8b3a855e-7433-47f0-a1af-ce71c2dd07bf-010
+tar xvf study.tar 1159043099869244949-242ac114-0001-012.airr.tsv.gz
+tar xvf study.tar 1159043104164212245-242ac114-0001-012.airr.tsv.gz
+tar xvf study.tar 1159043095574277653-242ac114-0001-012.airr.tsv.gz
+tar xvf study.tar repertoires.airr.json
 
-# query VDJServer ADC to get repertoire metadata
-# this actually pulls all metadata for the study but technically only the one repertoire
-# is needed. This allows us to test that repcalc only processes the one repertoire.
-curl -k -H 'content-type: application/json' --data '{"filters":{"op":"=","content":{"field":"study.study_id","value":"PRJNA549712"}}}' https://vdjserver.org/airr/v1/repertoire | jq '.' > repertoire.airr.json
+gunzip 1159043099869244949-242ac114-0001-012.airr.tsv.gz
+gunzip 1159043104164212245-242ac114-0001-012.airr.tsv.gz
+gunzip 1159043095574277653-242ac114-0001-012.airr.tsv.gz
 
 # TODO: we should be able to download this
 # get germline database
