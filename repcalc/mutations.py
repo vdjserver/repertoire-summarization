@@ -123,15 +123,11 @@ freq_transfer_names = freq_names + region_ratios + region_freq_names + pos_freq_
 
 # average and std for groups
 group_names = []
-print('transfer_names')
-print(transfer_names)
 for field in transfer_names:
     group_names.append(field + '_avg')
     group_names.append(field + '_std')
     group_names.append(field + '_N')
 group_freq_names = []
-print('freq_transfer_names')
-print(freq_transfer_names)
 for field in freq_transfer_names:
     group_freq_names.append(field + '_avg')
     group_freq_names.append(field + '_std')
@@ -819,8 +815,6 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
         # repertoire counts
         if 'repertoire' in calc['levels']:
             names = ['repertoire_id'] + transfer_names
-            print('repertoire_counts')
-            print(names)
             filename = 'repertoire.count.mutational_report.csv'
             if inputDict.get(defaults.processing_stage_key) is not None:
                 filename = inputDict.get(defaults.processing_stage_key) + '.' + filename
@@ -865,8 +859,6 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
         # repertoire frequencies
         if 'repertoire' in calc['levels']:
             names = ['repertoire_id'] + freq_transfer_names
-            print('mutation frequency')
-            print(names)
             filename = 'repertoire.frequency.mutational_report.csv'
             if inputDict.get(defaults.processing_stage_key) is not None:
                 filename = inputDict.get(defaults.processing_stage_key) + '.' + filename
