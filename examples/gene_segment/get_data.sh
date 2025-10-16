@@ -7,7 +7,7 @@
 # If the cache is regenerated then download URLs might have changed.
 
 # TCR
-# curl -o study.tar https://vdjserver.tapis.io/v3/files/postits/redeem/b7e828ca-f22f-4391-ba24-c183f7432ea9-010
+curl -o study.tar https://vdjserver.tapis.io/v3/files/postits/redeem/b7e828ca-f22f-4391-ba24-c183f7432ea9-010
 tar xvf study.tar 2648490830777881066-242ac113-0001-012.airr.tsv.gz
 tar xvf study.tar 2669106673798681066-242ac113-0001-012.airr.tsv.gz
 tar xvf study.tar repertoires.airr.json

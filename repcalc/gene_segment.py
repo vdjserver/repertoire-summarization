@@ -291,6 +291,12 @@ def compute_group_combo(groupDict, counters, repertoire_counters):
 
 def write_usage_output(id_name, id_value, stage, group_flag, counters, counters_productive):
     """Output segment counts to TSV files"""
+    # DEBUG ***
+    with open(f'{id_value}.wuo_counters.items.json', 'w') as f:
+        json.dump(counters, f, indent=4)
+    with open(f'{id_value}.wuo_counters_productive.items.json', 'w') as f:
+        json.dump(counters_productive, f, indent=4)
+
     for gene in gene_fields:
         if group_flag:
             if stage:
@@ -466,6 +472,31 @@ def write_combo_output(id_name, id_value, stage, group_flag, counters, counters_
 def initialize_calculation_module(inputDict, metadataDict, headerMapping):
     """Perform any module initialization"""
     # gene and combo segment usage
+    if inputDict.get(defaults.groups_key) is not None:
+        for group in inputDict[defaults.groups_key]:
+            combo_counters[group] = {}
+            combo_counters_productive[group] = {}
+            segment_counters[group] = {}
+            segment_counters_productive[group] = {}
+            for rep_id in metadataDict:
+                segment_counters[group][rep_id] = {}
+                segment_counters_productive[group][rep_id] = {}
+                for gene in gene_fields:
+                    segment_counters[group][rep_id][gene] = {}
+                    segment_counters_productive[group][rep_id][gene] = {}
+                    for level in module_levels:
+                        segment_counters[group][rep_id][gene][level] = {}
+                        segment_counters_productive[group][rep_id][gene][level] = {}
+                        for mode in calc_modes:
+                            segment_counters[group][rep_id][gene][level][mode] = {}
+                            segment_counters_productive[group][rep_id][gene][level][mode] = {}
+                
+                combo_counters[group][rep_id] = {}
+                combo_counters_productive[group][rep_id] = {}
+                for combo in combo_fields:
+                    combo_counters[group][rep_id][combo] = {}
+                    combo_counters_productive[group][rep_id][combo] = {}
+    
     for rep_id in metadataDict:
         segment_counters[rep_id] = {}
         segment_counters_productive[rep_id] = {}
@@ -537,6 +568,9 @@ def process_record(inputDict, metadataDict, currentFile, calc, fields):
                                 add_segment_count(germline, segment, level, group_segment_counters[group][gene][level], defaults.get_duplicate_count(fields))
                                 if fields.get('productive'):
                                     add_segment_count(germline, segment, level, group_segment_counters_productive[group][gene][level], defaults.get_duplicate_count(fields))
+                                add_segment_count(germline, segment, level, segment_counters[group][rep_id][gene][level], defaults.get_duplicate_count(fields))
+                                if fields.get('productive'):
+                                    add_segment_count(germline, segment, level, segment_counters_productive[group][rep_id][gene][level], defaults.get_duplicate_count(fields))
 
     # combo operations
     if comboKey in calc['operations']:
@@ -552,6 +586,9 @@ def process_record(inputDict, metadataDict, currentFile, calc, fields):
                         add_combo_count(germline, fields, combo, group_combo_counters[group][combo], defaults.get_duplicate_count(fields))
                         if fields.get('productive'):
                             add_combo_count(germline, fields, combo, group_combo_counters_productive[group][combo], defaults.get_duplicate_count(fields))
+                        add_combo_count(germline, fields, combo, combo_counters[group][rep_id][combo], defaults.get_duplicate_count(fields))
+                        if fields.get('productive'):
+                            add_combo_count(germline, fields, combo, combo_counters_productive[group][rep_id][combo], defaults.get_duplicate_count(fields))
 
 
 def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
@@ -566,9 +603,14 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
         # repertoire groups
         if inputDict.get(defaults.groups_key) is not None:
             for group in inputDict[defaults.groups_key]:
-                compute_group_usage(inputDict[defaults.groups_key][group], group_segment_counters[group], segment_counters)
-                compute_group_usage(inputDict[defaults.groups_key][group], group_segment_counters_productive[group], segment_counters_productive)
+                compute_group_usage(inputDict[defaults.groups_key][group], group_segment_counters[group], segment_counters[group])
+                compute_group_usage(inputDict[defaults.groups_key][group], group_segment_counters_productive[group], segment_counters_productive[group])
                 write_usage_output('repertoire_group_id', group, inputDict.get(defaults.processing_stage_key), True, group_segment_counters, group_segment_counters_productive)
+    # DEBUG ***
+    with open('group_segment_counters.items.json', 'w') as f:
+        json.dump(group_segment_counters, f, indent=4)
+    with open('group_segment_counters_productive.items.json', 'w') as f:
+        json.dump(group_segment_counters_productive, f, indent=4)
 
     # generate combo output
     if comboKey in calc['operations']:
@@ -579,6 +621,6 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
         # repertoire groups
         if inputDict.get(defaults.groups_key) is not None:
             for group in inputDict[defaults.groups_key]:
-                compute_group_combo(inputDict[defaults.groups_key][group], group_combo_counters[group], combo_counters)
-                compute_group_combo(inputDict[defaults.groups_key][group], group_combo_counters_productive[group], combo_counters_productive)
+                compute_group_combo(inputDict[defaults.groups_key][group], group_combo_counters[group], combo_counters[group])
+                compute_group_combo(inputDict[defaults.groups_key][group], group_combo_counters_productive[group], combo_counters_productive[group])
                 write_combo_output('repertoire_group_id', group, inputDict.get(defaults.processing_stage_key), True, group_combo_counters, group_combo_counters_productive)
