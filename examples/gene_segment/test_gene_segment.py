@@ -1,10 +1,12 @@
+import os
 import json
 import yaml
 import pandas as pd
 import pytest
 from pytest import approx
 
-with open('groups.airr.yaml') as f:
+curr_dir = os.path.dirname(__file__)
+with open(os.path.join(curr_dir, 'groups.airr.yaml')) as f:
     groups = yaml.safe_load(f)
 
 groups = groups['RepertoireGroup']
@@ -24,7 +26,8 @@ def test_sequence_frequency_sum_groups():
         group_id = group['repertoire_group_id']
         for call_type in call_types:
             for level in levels:
-                orig_df = pd.read_csv(f'{group_id}.{processing_stage}.group.{call_type}.tsv', delimiter='\t')
+                filename = f'{group_id}.{processing_stage}.group.{call_type}.tsv'
+                orig_df = pd.read_csv(os.path.join(curr_dir, filename), delimiter='\t')
                 for mode in modes:
                     for productive in productivity:
                         df = orig_df[(orig_df['mode']==mode) & (orig_df['productive']==productive) & (orig_df['level']==level)]
@@ -44,7 +47,8 @@ def test_duplicate_frequency_sum_groups():
         group_id = group['repertoire_group_id']
         for call_type in call_types:
             for level in levels:
-                orig_df = pd.read_csv(f'{group_id}.{processing_stage}.group.{call_type}.tsv', delimiter='\t')
+                filename = f'{group_id}.{processing_stage}.group.{call_type}.tsv'
+                orig_df = pd.read_csv(os.path.join(curr_dir, filename), delimiter='\t')
                 for mode in modes:
                     for productive in productivity:
                         df = orig_df[(orig_df['mode']==mode) & (orig_df['productive']==productive) & (orig_df['level']==level)]
