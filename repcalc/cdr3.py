@@ -171,8 +171,12 @@ nt_list = ['A', 'C', 'G', 'T']
 # fourth key is position
 dist_counters = {}
 dist_counters_productive = {}
+
 group_dist_counters = {}
 group_dist_counters_productive = {}
+
+group_dist_counters_total = {}
+group_dist_counters_productive_total = {}
 
 def aa_distribution(counter, cdr3):
     l = len(cdr3)
@@ -252,6 +256,8 @@ def group_total_distribution(group, group_counter, repertoires, rep_counter, lev
         rep_id = rep['repertoire_id']
         repArray = rep_counter[rep_id][level]
         groupArray = group_counter[group][level]
+        # print("repArray: \n", repArray)
+        # print("GroupArray: \n", group_counter)
         for l in repArray:
             if groupArray.get(l) is None: groupArray[l] = {}
             for pos in repArray[l]:
@@ -401,7 +407,8 @@ def write_share_summary(inputDict, metadataDict, outputSpec, level, sublevel):
         if summary_level.get(group) is None:
             return
         if groups.get(group) is not None:
-            for i in range(1, len(summary_level[group]), 1): writer.write('\t' + str(summary_level[group][i]))
+            for i in range(1, len(summary_level[group]), 1): 
+                writer.write('\t' + str(summary_level[group][i]))
         else:
             writer.write('\t' + str(summary_level[group]))
         writer.write('\n')
@@ -976,14 +983,20 @@ def initialize_calculation_module(inputDict, metadataDict, headerMapping):
             group_cdr3_total_histograms[group] = { obj: [] for obj in length_levels }
             group_cdr3_total_histograms_productive[group] = { obj: [] for obj in length_levels }
             
+            group_dist_counters[group] = {}
+            group_dist_counters_productive[group] = {}
+            
+            group_dist_counters_total[group] = { obj: {} for obj in length_levels }
+            group_dist_counters_productive_total[group] = { obj: {} for obj in length_levels }
+            
             rep_list = [rep_id['repertoire_id'] for rep_id in inputDict[defaults.groups_key][group]['repertoires']]
-            #print("Repertoire List: ", group, rep_list)
+            # print("Repertoire List: ", group, rep_list)
             for rep_id in rep_list:
                 group_cdr3_histograms[group][rep_id] = { obj: [] for obj in length_levels }
                 group_cdr3_histograms_productive[group][rep_id] = { obj: [] for obj in length_levels }
-            # print("Group CDR3 hist: \n", group_cdr3_histograms)  
-            group_dist_counters[group] = { obj: {} for obj in length_levels }
-            group_dist_counters_productive[group] = { obj: {} for obj in length_levels }
+                # print("Group CDR3 hist: \n", group_cdr3_histograms)  
+                group_dist_counters[group][rep_id] = { obj: {} for obj in length_levels }
+                group_dist_counters_productive[group][rep_id] = { obj: {} for obj in length_levels }
 
 def process_record(inputDict, metadataDict, currentFile, calc, fields):
     """Perform calculation from given fields"""
@@ -1055,11 +1068,33 @@ def process_record(inputDict, metadataDict, currentFile, calc, fields):
             aa_distribution(dist_counters[rep_id]['aa'], cdr3)
             if fields.get('productive'):
                 aa_distribution(dist_counters_productive[rep_id]['aa'], cdr3)
+            # group aa distribution
+            if inputDict.get(defaults.groups_key) is not None:
+                groupList = metadata.groupsWithRepertoire(inputDict, rep_id)
+                if groupList:
+                    for group in groupList:
+                        # we do not bother optimizing if the group has no rearrangement filter
+                        # just accumulate repertoire counts for each group, data is duplicated but it is small
+                        if defaults.apply_filter(inputDict, group, fields):
+                            aa_distribution(group_dist_counters[group][rep_id]['aa'], cdr3)
+                            if fields.get('productive'):
+                                aa_distribution(group_dist_counters_productive[group][rep_id]['aa'], cdr3)
         cdr3 = fields.get('junction')
         if cdr3 is not None:
             aa_distribution(dist_counters[rep_id]['nucleotide'], cdr3)
             if fields.get('productive'):
                 aa_distribution(dist_counters_productive[rep_id]['nucleotide'], cdr3)
+            # group aa distribution
+            if inputDict.get(defaults.groups_key) is not None:
+                groupList = metadata.groupsWithRepertoire(inputDict, rep_id)
+                if groupList:
+                    for group in groupList:
+                        # we do not bother optimizing if the group has no rearrangement filter
+                        # just accumulate repertoire counts for each group, data is duplicated but it is small
+                        if defaults.apply_filter(inputDict, group, fields):
+                            aa_distribution(group_dist_counters[group][rep_id]['nucleotide'], cdr3)
+                            if fields.get('productive'):
+                                aa_distribution(group_dist_counters_productive[group][rep_id]['nucleotide'], cdr3)
 
     # share/unique sequence operations
     if sharedKey in calc['operations']:
@@ -1182,20 +1217,35 @@ def process_record(inputDict, metadataDict, currentFile, calc, fields):
             else:
                 # unknown level so just ignore
                 continue
-
             # increment counts for entry
             if cdr3_entry is not None:
+                # print("cdr3_entry: ", cdr3_entry.get(rep_id))
                 if cdr3_entry.get(rep_id) is None:
                     cdr3_entry[rep_id] = { 'count': 0, 'total_count': 0 }
                 cdr3_entry[rep_id]['count'] = cdr3_entry[rep_id]['count'] + 1
                 cdr3_entry[rep_id]['total_count'] = cdr3_entry[rep_id]['total_count'] + defaults.get_duplicate_count(fields)
-                for group in groups:
-                    group_entry = cdr3_entry.get(group)
-                    if group_entry is None:
-                        cdr3_entry[group] = { 'count': 0, 'total_count': 0 }
-                        group_entry = cdr3_entry.get(group)
-                    group_entry['count'] = group_entry['count'] + 1
-                    group_entry['total_count'] = group_entry['total_count'] + defaults.get_duplicate_count(fields)
+               
+                if inputDict.get(defaults.groups_key) is not None:
+                    groupList = metadata.groupsWithRepertoire(inputDict, rep_id)
+                    if groupList:
+                        for group in groupList:
+                            if defaults.has_rearrangement_filter(inputDict, group):
+                                if defaults.apply_filter(inputDict, group, fields):
+                                    if cdr3_entry.get(group) is None:
+                                        cdr3_entry[group] = {}
+                                    if cdr3_entry[group].get(rep_id) is None:
+                                        cdr3_entry[group][rep_id] = { 'count': 0, 'total_count': 0 }
+                                    cdr3_entry[group][rep_id]['count'] = cdr3_entry[group][rep_id]['count'] + 1
+                                    cdr3_entry[group][rep_id]['total_count'] = cdr3_entry[group][rep_id]['total_count'] + defaults.get_duplicate_count(fields)
+               
+                # for group in groups:
+                #     group_entry = cdr3_entry.get(group)
+                #     if group_entry is None:
+                #         # cdr3_entry[group] = { 'count': 0, 'total_count': 0 }
+                #         cdr3_entry[group] = {}
+                #         # group_entry = cdr3_entry.get(group)
+                #     # group_entry['count'] = group_entry['count'] + 1
+                #     # group_entry['total_count'] = group_entry['total_count'] + defaults.get_duplicate_count(fields)
 
 
 def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
@@ -1245,17 +1295,20 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
 
     # AA/NT distribution operations
     if distributionKey in calc['operations']:
+        #  group_dist_counters_total
+        #  group_dist_counters_productive_total
         # group counts
         if inputDict.get(defaults.groups_key) is not None:
             for group in inputDict[defaults.groups_key]:
-                group_total_distribution(group, group_dist_counters, inputDict[defaults.groups_key][group]['repertoires'], dist_counters, 'aa', aa_list)
-                group_total_distribution(group, group_dist_counters_productive, inputDict[defaults.groups_key][group]['repertoires'], dist_counters_productive, 'aa', aa_list)
-                group_total_distribution(group, group_dist_counters, inputDict[defaults.groups_key][group]['repertoires'], dist_counters, 'nucleotide', nt_list)
-                group_total_distribution(group, group_dist_counters_productive, inputDict[defaults.groups_key][group]['repertoires'], dist_counters_productive, 'nucleotide', nt_list)
-                output_distribution(group + stage + ".junction_aa_distribution.tsv", group_dist_counters[group]['aa'], aa_list)
-                output_distribution(group + stage + ".productive.junction_aa_distribution.tsv", group_dist_counters_productive[group]['aa'], aa_list)
-                output_distribution(group + stage + ".junction_nt_distribution.tsv", group_dist_counters[group]['nucleotide'], nt_list)
-                output_distribution(group + stage + ".productive.junction_nt_distribution.tsv", group_dist_counters_productive[group]['nucleotide'], nt_list)
+                group_total_distribution(group, group_dist_counters_total, inputDict[defaults.groups_key][group]['repertoires'], group_dist_counters[group], 'aa', aa_list)
+                group_total_distribution(group, group_dist_counters_productive_total, inputDict[defaults.groups_key][group]['repertoires'], group_dist_counters_productive[group], 'aa', aa_list)
+                group_total_distribution(group, group_dist_counters_total, inputDict[defaults.groups_key][group]['repertoires'], group_dist_counters[group], 'nucleotide', nt_list)
+                group_total_distribution(group, group_dist_counters_productive_total, inputDict[defaults.groups_key][group]['repertoires'], group_dist_counters_productive[group], 'nucleotide', nt_list)
+                
+                output_distribution(group + stage + ".junction_aa_distribution.tsv", group_dist_counters_total[group]['aa'], aa_list)
+                output_distribution(group + stage + ".productive.junction_aa_distribution.tsv", group_dist_counters_productive_total[group]['aa'], aa_list)
+                output_distribution(group + stage + ".junction_nt_distribution.tsv", group_dist_counters_total[group]['nucleotide'], nt_list)
+                output_distribution(group + stage + ".productive.junction_nt_distribution.tsv", group_dist_counters_productive_total[group]['nucleotide'], nt_list)
 
         # repertoire counts
         for rep_id in metadataDict:

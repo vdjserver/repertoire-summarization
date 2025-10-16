@@ -1,6 +1,30 @@
 RepertoireGroup:
-  - repertoire_group_id: example
-    repertoire_group_name: Example repertoire group
+  - repertoire_group_id: example_updated
+    repertoire_group_name: Example repertoire group updated
     repertoires:
-      - repertoire_id: 8064755271837946346-242ac113-0001-012
-      - repertoire_id: 8118141715327226346-242ac113-0001-012
+      - repertoire_id: 2648490830777881066-242ac113-0001-012
+      - repertoire_id: 2669106673798681066-242ac113-0001-012
+
+  - repertoire_group_id: jlgt20
+    repertoire_group_name: junction length filter
+    repertoires:
+      - repertoire_id: 2648490830777881066-242ac113-0001-012
+      - repertoire_id: 2669106673798681066-242ac113-0001-012
+    filter:
+      Rearrangement:
+        op: ">"
+        content:
+          field: "junction_aa_length"
+          value: 20
+  
+  - repertoire_group_id: spike15
+    repertoire_group_name: junction length filter
+    repertoires:
+      - repertoire_id: 2648490830777881066-242ac113-0001-012
+      - repertoire_id: 2669106673798681066-242ac113-0001-012
+    filter:
+      Rearrangement:
+        op: "="
+        content:
+          field: "junction_aa_length"
+          value: 10
