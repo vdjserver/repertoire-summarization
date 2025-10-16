@@ -602,6 +602,13 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
             write_usage_output('repertoire_id', rep_id, inputDict.get(defaults.processing_stage_key), False, segment_counters, segment_counters_productive)
         # repertoire groups
         if inputDict.get(defaults.groups_key) is not None:
+            # compute frequencies for group rearrangement filter counts
+            for group in inputDict[defaults.groups_key]:
+                for rep in inputDict[defaults.groups_key][group]['repertoires']:
+                    rep_id = rep['repertoire_id']
+                    compute_usage_frequency(segment_counters[group][rep_id])
+                    compute_usage_frequency(segment_counters_productive[group][rep_id])
+
             for group in inputDict[defaults.groups_key]:
                 compute_group_usage(inputDict[defaults.groups_key][group], group_segment_counters[group], segment_counters[group])
                 compute_group_usage(inputDict[defaults.groups_key][group], group_segment_counters_productive[group], segment_counters_productive[group])
