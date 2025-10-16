@@ -1,0 +1,21 @@
+{
+    "metadata": "repertoires.airr.json",
+    "groups": "groups.airr.yaml",
+    "germline": "vdjserver_human_germline.airr.json",
+    "processing_stage": "igblast.makedb.gene.clone.mutations",
+    "repertoires": [
+        "ad1fbdf8-35e1-4848-baea-fcabff0e9b5a",
+        "d3d1d40d-1192-49f2-98b2-cfc7c3064160",
+        "1216ddee-ac62-4069-b2f4-ee2b144ea4f2"
+    ],
+    "rearrangement_files": [
+        "ad1fbdf8-35e1-4848-baea-fcabff0e9b5a.igblast.makedb.gene.clone.mutations.airr.tsv",
+        "d3d1d40d-1192-49f2-98b2-cfc7c3064160.igblast.makedb.gene.clone.mutations.airr.tsv",
+        "1216ddee-ac62-4069-b2f4-ee2b144ea4f2.igblast.makedb.gene.clone.mutations.airr.tsv"
+    ],
+  "calculations": [
+    {
+        "type": "filters"
+    }
+  ]
+}
