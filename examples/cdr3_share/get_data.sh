@@ -9,8 +9,8 @@
 # download url for rearrangement data and repertoire metadata
 # metadata-list -v -Q '{"name":"adc_cache_study","value.study_id":"3276777473314001386-242ac116-0001-012"}'
 
-curl -o study.tar https://vdj-agave-api.tacc.utexas.edu/postits/v2/937871ca-0d6e-4903-9d2f-c63d4c4638c4-010
-tar xf study.tar
+curl -o study.tar https://vdjserver.tapis.io/v3/files/postits/redeem/b7e828ca-f22f-4391-ba24-c183f7432ea9-010
+tar xf study.tar 
 gunzip *.airr.tsv.gz
 
 # query VDJServer ADC to get repertoire metadata

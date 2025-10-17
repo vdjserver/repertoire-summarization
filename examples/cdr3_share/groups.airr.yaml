@@ -1,5 +1,5 @@
 RepertoireGroup:
-  - repertoire_group_id: benign
+  - repertoire_group_id: example
     repertoire_group_name: benign ovarian
     repertoires:
       - repertoire_id: 2648490830777881066-242ac113-0001-012
@@ -7,21 +7,47 @@ RepertoireGroup:
       - repertoire_id: 2686329492655641066-242ac113-0001-012
       - repertoire_id: 2700631733751321066-242ac113-0001-012
       - repertoire_id: 2714891025174041066-242ac113-0001-012
-
-  - repertoire_group_id: malignant
-    repertoire_group_name: malignant ovarian cancer
-    repertoires:
-      - repertoire_id: 3010900171214361066-242ac113-0001-012
-      - repertoire_id: 3032976303115801066-242ac113-0001-012
-      - repertoire_id: 3053506246790681066-242ac113-0001-012
-      - repertoire_id: 3077686912667161066-242ac113-0001-012
-      - repertoire_id: 3099419447184921066-242ac113-0001-012
-
-  - repertoire_group_id: normal
-    repertoire_group_name: normal ovarian
-    repertoires:
       - repertoire_id: 3434813443329561066-242ac113-0001-012
       - repertoire_id: 3458221015092761066-242ac113-0001-012
       - repertoire_id: 3481499737837081066-242ac113-0001-012
       - repertoire_id: 3503404071046681066-242ac113-0001-012
       - repertoire_id: 3525050706218521066-242ac113-0001-012
+
+
+  - repertoire_group_id: filtered_example
+    repertoire_group_name: benign ovarian filtered
+    repertoires:
+      - repertoire_id: 2648490830777881066-242ac113-0001-012
+      - repertoire_id: 2669106673798681066-242ac113-0001-012
+      - repertoire_id: 2686329492655641066-242ac113-0001-012
+      - repertoire_id: 2700631733751321066-242ac113-0001-012
+      - repertoire_id: 2714891025174041066-242ac113-0001-012
+      - repertoire_id: 3434813443329561066-242ac113-0001-012
+      - repertoire_id: 3458221015092761066-242ac113-0001-012
+      - repertoire_id: 3481499737837081066-242ac113-0001-012
+      - repertoire_id: 3503404071046681066-242ac113-0001-012
+      - repertoire_id: 3525050706218521066-242ac113-0001-012
+    filter:
+      Rearrangement:
+        op: ">"
+        content:
+          field: "junction_aa_length"
+          value: 15
+
+  # - repertoire_group_id: malignant
+  #   repertoire_group_name: malignant ovarian cancer
+  #   repertoires:
+  #     - repertoire_id: 3010900171214361066-242ac113-0001-012
+  #     - repertoire_id: 3032976303115801066-242ac113-0001-012
+  #     - repertoire_id: 3053506246790681066-242ac113-0001-012
+  #     - repertoire_id: 3077686912667161066-242ac113-0001-012
+  #     - repertoire_id: 3099419447184921066-242ac113-0001-012
+
+  # - repertoire_group_id: normal
+  #   repertoire_group_name: normal ovarian
+  #   repertoires:
+  #     - repertoire_id: 3434813443329561066-242ac113-0001-012
+  #     - repertoire_id: 3458221015092761066-242ac113-0001-012
+  #     - repertoire_id: 3481499737837081066-242ac113-0001-012
+  #     - repertoire_id: 3503404071046681066-242ac113-0001-012
+  #     - repertoire_id: 3525050706218521066-242ac113-0001-012

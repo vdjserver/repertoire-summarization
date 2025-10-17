@@ -32,7 +32,7 @@ Mutational analysis
 from repcalc import __version__
 import repcalc.defaults as defaults
 import repcalc.metadata as metadata
-#import repcalc.gldb as gldb
+import repcalc.gldb as gldb
 import json
 import math
 import numpy as np
@@ -43,7 +43,8 @@ from Bio.Seq import Seq
 # module operations
 countKey = "count"
 frequencyKey = "frequency"
-module_levels = [ "rearrangement", "repertoire", "clone", "allele", "gene", "subgroup", "repertoire_group" ]
+segment_levels = [ "v_call", "v_gene", "v_subgroup", "j_call", "j_gene", "j_subgroup" ]
+module_levels = [ "rearrangement", "repertoire", "clone", "repertoire_group" ] + segment_levels
 
 rearrangement_writers = {}
 
@@ -413,7 +414,7 @@ def add_repertoire_group_count(inputDict, group, row):
         add_repertoire_count(mutation_counts['repertoire_group'][group], rep_id, row)
 
 def add_clone_count(rep_id, row):
-    # need clone_d
+    # need clone_id
     clone_id = row['clone_id']
     if clone_id is None:
         return
@@ -435,6 +436,36 @@ def add_clone_count(rep_id, row):
 
     # add to clone
     add_mutation_count(clone_counts, row)
+    return
+
+# counts for allele, gene and subgroup
+def add_segment_count(germline, rep_id, segment_level, row):
+    l = segment_level.split('_')
+    level = l[1]
+    if level == 'call':
+        level = 'allele'
+    allele_call = row[l[0] + '_call']
+    if allele_call is None:
+        return
+    names = gldb.transformToLevel(germline, allele_call, level)
+
+    # initialize counts per segment
+    segment_counts = mutation_counts[segment_level].get(rep_id)
+    if segment_counts is None:
+        mutation_counts[segment_level][rep_id] = {}
+    segment_counts = mutation_counts[segment_level][rep_id].get(names)
+    if segment_counts is None:
+        mutation_counts[segment_level][rep_id][names] = { 'repertoire_id':rep_id, segment_level:names }
+        segment_counts = mutation_counts[segment_level][rep_id][names]
+        for r in pos_names:
+            segment_counts[r] = 0
+        for r in region_names:
+            segment_counts[r] = 0
+        for r in count_names:
+            segment_counts[r] = 0
+
+    # add to clone
+    add_mutation_count(segment_counts, row)
     return
 
 def generate_frequency(row, count_row):
@@ -787,6 +818,8 @@ def initialize_calculation_module(inputDict, metadataDict, headerMapping):
         for group in inputDict[defaults.groups_key]:
             mutation_counts['repertoire_group'][group] = {}
             mutation_counts['repertoire_group'][group]['repertoire'] = {}
+            mutation_frequency['repertoire_group'][group] = {}
+            mutation_frequency['repertoire_group'][group]['repertoire'] = {}
             group_mutation_counts[group] = {}
             group_mutation_frequency[group] = {}
 
@@ -830,10 +863,16 @@ def process_record(inputDict, metadataDict, currentFile, calc, fields):
                     if defaults.has_rearrangement_filter(inputDict, group):
                         # check and apply filter
                         if defaults.apply_filter(inputDict, group, fields):
-                            add_repertoire_group_count(inputDict, group, fields)
+                            add_repertoire_count(mutation_counts['repertoire_group'][group], rep_id, fields)
 
     if 'clone' in calc['levels']:
         add_clone_count(rep_id, fields)
+
+    for level in calc['levels']:
+        if level in segment_levels:
+            germline = inputDict.get(defaults.germline_key)
+            add_segment_count(germline, rep_id, level, fields)
+
 
 def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
     """Finalize and save the calculations"""
@@ -866,6 +905,19 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
             for rep_id in mutation_counts['clone']: 
                 for clone_id in mutation_counts['clone'][rep_id]: 
                     writer.writerow(mutation_counts['clone'][rep_id][clone_id])
+
+        # segment counts
+        for level in calc['levels']:
+            if level in segment_levels:
+                names = ['repertoire_id', level] + transfer_names
+                filename = level + '.count.mutational_report.csv'
+                if inputDict.get(defaults.processing_stage_key) is not None:
+                    filename = inputDict.get(defaults.processing_stage_key) + '.' + filename
+                writer = csv.DictWriter(open(filename, 'w'), fieldnames=names)
+                writer.writeheader()
+                for rep_id in mutation_counts[level]: 
+                    for allele_call in mutation_counts[level][rep_id]: 
+                        writer.writerow(mutation_counts[level][rep_id][allele_call])
 
         # repertoire counts by group
         if 'repertoire_group' in calc['levels']:
@@ -922,6 +974,21 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
                     generate_frequency(clone_freq, mutation_counts['clone'][rep_id][clone_id])
                     writer.writerow(clone_freq)
 
+        # segment frequencies
+        for level in calc['levels']:
+            if level in segment_levels:
+                names = ['repertoire_id', level] + freq_transfer_names
+                filename = level + '.frequency.mutational_report.csv'
+                if inputDict.get(defaults.processing_stage_key) is not None:
+                    filename = inputDict.get(defaults.processing_stage_key) + '.' + filename
+                writer = csv.DictWriter(open(filename, 'w'), fieldnames=names)
+                writer.writeheader()
+                for rep_id in mutation_counts[level]:
+                    for allele_call in mutation_counts[level][rep_id]:
+                        allele_freq = { 'repertoire_id':rep_id, level:allele_call }
+                        generate_frequency(allele_freq, mutation_counts[level][rep_id][allele_call])
+                        writer.writerow(allele_freq)
+
         # group frequencies
         if 'repertoire_group' in calc['levels']:
             if inputDict.get(defaults.groups_key) is not None:
@@ -932,7 +999,19 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
                 writer = csv.DictWriter(open(filename, 'w'), fieldnames=names)
                 writer.writeheader()
                 for group in inputDict[defaults.groups_key]:
-                    compute_group_frequency(inputDict[defaults.groups_key][group], group_mutation_frequency[group], mutation_frequency['repertoire'], mutation_counts['repertoire'])
+                    # compute frequencies for group rearrangement filter counts
+                    for rep in inputDict[defaults.groups_key][group]['repertoires']:
+                        rep_id = rep['repertoire_id']
+                        if defaults.has_rearrangement_filter(inputDict, group):
+                            if mutation_counts['repertoire_group'][group]['repertoire'].get(rep_id):
+                                mutation_frequency['repertoire_group'][group]['repertoire'][rep_id] = { 'repertoire_id':rep_id }
+                                generate_frequency(mutation_frequency['repertoire_group'][group]['repertoire'][rep_id], mutation_counts['repertoire_group'][group]['repertoire'][rep_id])
+
+                    # use the filtered or unfiltered repertoire frequencies
+                    if defaults.has_rearrangement_filter(inputDict, group):
+                        compute_group_frequency(inputDict[defaults.groups_key][group], group_mutation_frequency[group], mutation_frequency['repertoire_group'][group]['repertoire'], mutation_counts['repertoire_group'][group]['repertoire'])
+                    else:
+                        compute_group_frequency(inputDict[defaults.groups_key][group], group_mutation_frequency[group], mutation_frequency['repertoire'], mutation_counts['repertoire'])
                     writer.writerow(group_mutation_frequency[group])
 
         # repertoire frequencies by group
@@ -948,9 +1027,10 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
                     writer.writeheader()
                     for rep in inputDict[defaults.groups_key][group]['repertoires']:
                         rep_id = rep['repertoire_id']
-                        if mutation_counts['repertoire'].get(rep_id):
-                            mutation_frequency['repertoire'][rep_id] = { 'repertoire_id':rep_id }
-                            generate_frequency(mutation_frequency['repertoire'][rep_id], mutation_counts['repertoire'][rep_id])
+                        if defaults.has_rearrangement_filter(inputDict, group):
+                            if mutation_frequency['repertoire_group'][group]['repertoire'].get(rep_id):
+                                writer.writerow(mutation_frequency['repertoire_group'][group]['repertoire'][rep_id])
+                        else:
                             writer.writerow(mutation_frequency['repertoire'][rep_id])
 
         # TODO: other levels

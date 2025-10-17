@@ -24,7 +24,7 @@
     "calculations": [
         {
             "type": "CDR3",
-            "operations": [ "shared", "compare" ], 
+            "operations": [ "shared" ], 
             "levels": [ "aa", "nucleotide", "v,aa", "v,nucleotide", "vj,aa", "vj,nucleotide" ], 
             "filters": [ "productive" ]
         }
