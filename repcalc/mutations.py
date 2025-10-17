@@ -883,9 +883,6 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
                         rep_id = rep['repertoire_id']
                         if defaults.has_rearrangement_filter(inputDict, group):
                             # if have filter, then use group specific repertoire statistics
-                            print(mutation_counts['repertoire_group'][group].keys())
-                            print(group)
-                            print(mutation_counts['repertoire_group'][group]['repertoire'].keys())
                             if mutation_counts['repertoire_group'][group]['repertoire'].get(rep_id):
                                 writer.writerow(mutation_counts['repertoire_group'][group]['repertoire'][rep_id])
                         else:
