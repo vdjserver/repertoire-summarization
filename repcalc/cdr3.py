@@ -407,8 +407,7 @@ def write_share_summary(inputDict, metadataDict, outputSpec, level, sublevel):
         if summary_level.get(group) is None:
             return
         if groups.get(group) is not None:
-            for i in range(1, len(summary_level[group]), 1): 
-                writer.write('\t' + str(summary_level[group][i]))
+            for i in range(1, len(summary_level[group]), 1): writer.write('\t' + str(summary_level[group][i]))
         else:
             writer.write('\t' + str(summary_level[group]))
         writer.write('\n')
@@ -990,7 +989,7 @@ def initialize_calculation_module(inputDict, metadataDict, headerMapping):
             group_dist_counters_productive_total[group] = { obj: {} for obj in length_levels }
             
             rep_list = [rep_id['repertoire_id'] for rep_id in inputDict[defaults.groups_key][group]['repertoires']]
-            # print("Repertoire List: ", group, rep_list)
+            print("Repertoire List: ", group, rep_list)
             for rep_id in rep_list:
                 group_cdr3_histograms[group][rep_id] = { obj: [] for obj in length_levels }
                 group_cdr3_histograms_productive[group][rep_id] = { obj: [] for obj in length_levels }
@@ -1217,35 +1216,20 @@ def process_record(inputDict, metadataDict, currentFile, calc, fields):
             else:
                 # unknown level so just ignore
                 continue
+
             # increment counts for entry
             if cdr3_entry is not None:
-                # print("cdr3_entry: ", cdr3_entry.get(rep_id))
                 if cdr3_entry.get(rep_id) is None:
                     cdr3_entry[rep_id] = { 'count': 0, 'total_count': 0 }
                 cdr3_entry[rep_id]['count'] = cdr3_entry[rep_id]['count'] + 1
                 cdr3_entry[rep_id]['total_count'] = cdr3_entry[rep_id]['total_count'] + defaults.get_duplicate_count(fields)
-               
-                if inputDict.get(defaults.groups_key) is not None:
-                    groupList = metadata.groupsWithRepertoire(inputDict, rep_id)
-                    if groupList:
-                        for group in groupList:
-                            if defaults.has_rearrangement_filter(inputDict, group):
-                                if defaults.apply_filter(inputDict, group, fields):
-                                    if cdr3_entry.get(group) is None:
-                                        cdr3_entry[group] = {}
-                                    if cdr3_entry[group].get(rep_id) is None:
-                                        cdr3_entry[group][rep_id] = { 'count': 0, 'total_count': 0 }
-                                    cdr3_entry[group][rep_id]['count'] = cdr3_entry[group][rep_id]['count'] + 1
-                                    cdr3_entry[group][rep_id]['total_count'] = cdr3_entry[group][rep_id]['total_count'] + defaults.get_duplicate_count(fields)
-               
-                # for group in groups:
-                #     group_entry = cdr3_entry.get(group)
-                #     if group_entry is None:
-                #         # cdr3_entry[group] = { 'count': 0, 'total_count': 0 }
-                #         cdr3_entry[group] = {}
-                #         # group_entry = cdr3_entry.get(group)
-                #     # group_entry['count'] = group_entry['count'] + 1
-                #     # group_entry['total_count'] = group_entry['total_count'] + defaults.get_duplicate_count(fields)
+                for group in groups:
+                    group_entry = cdr3_entry.get(group)
+                    if group_entry is None:
+                        cdr3_entry[group] = { 'count': 0, 'total_count': 0 }
+                        group_entry = cdr3_entry.get(group)
+                    group_entry['count'] = group_entry['count'] + 1
+                    group_entry['total_count'] = group_entry['total_count'] + defaults.get_duplicate_count(fields)
 
 
 def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
