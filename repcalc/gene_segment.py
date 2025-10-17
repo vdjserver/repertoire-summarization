@@ -291,11 +291,6 @@ def compute_group_combo(groupDict, counters, repertoire_counters):
 
 def write_usage_output(id_name, id_value, stage, group_flag, counters, counters_productive):
     """Output segment counts to TSV files"""
-    # DEBUG ***
-    with open(f'{id_value}.wuo_counters.items.json', 'w') as f:
-        json.dump(counters, f, indent=4)
-    with open(f'{id_value}.wuo_counters_productive.items.json', 'w') as f:
-        json.dump(counters_productive, f, indent=4)
 
     for gene in gene_fields:
         if group_flag:
@@ -478,7 +473,8 @@ def initialize_calculation_module(inputDict, metadataDict, headerMapping):
             combo_counters_productive[group] = {}
             segment_counters[group] = {}
             segment_counters_productive[group] = {}
-            for rep_id in metadataDict:
+            for rep in inputDict[defaults.groups_key][group]['repertoires']:
+                rep_id = rep['repertoire_id']
                 segment_counters[group][rep_id] = {}
                 segment_counters_productive[group][rep_id] = {}
                 for gene in gene_fields:
@@ -613,11 +609,6 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
                 compute_group_usage(inputDict[defaults.groups_key][group], group_segment_counters[group], segment_counters[group])
                 compute_group_usage(inputDict[defaults.groups_key][group], group_segment_counters_productive[group], segment_counters_productive[group])
                 write_usage_output('repertoire_group_id', group, inputDict.get(defaults.processing_stage_key), True, group_segment_counters, group_segment_counters_productive)
-    # DEBUG ***
-    with open('group_segment_counters.items.json', 'w') as f:
-        json.dump(group_segment_counters, f, indent=4)
-    with open('group_segment_counters_productive.items.json', 'w') as f:
-        json.dump(group_segment_counters_productive, f, indent=4)
 
     # generate combo output
     if comboKey in calc['operations']:
@@ -627,6 +618,12 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
             write_combo_output('repertoire_id', rep_id, inputDict.get(defaults.processing_stage_key), False, combo_counters, combo_counters_productive)
         # repertoire groups
         if inputDict.get(defaults.groups_key) is not None:
+             # compute frequencies for group rearrangement filter counts
+            for group in inputDict[defaults.groups_key]:
+                for rep in inputDict[defaults.groups_key][group]['repertoires']:
+                    rep_id = rep['repertoire_id']
+                    compute_combo_frequency(combo_counters[group][rep_id])
+                    compute_combo_frequency(combo_counters_productive[group][rep_id])
             for group in inputDict[defaults.groups_key]:
                 compute_group_combo(inputDict[defaults.groups_key][group], group_combo_counters[group], combo_counters[group])
                 compute_group_combo(inputDict[defaults.groups_key][group], group_combo_counters_productive[group], combo_counters_productive[group])
