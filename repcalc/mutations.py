@@ -621,20 +621,37 @@ def generate_frequency(row, count_row):
         row['mu_freq_' + nt_n] = row['mu_freq_' + nt_n + '_r'] + row['mu_freq_' + nt_n + '_s']
     
     # Create frequencies and record
-    row['mu_freq_fwr_r_aa'] = row['mu_freq_fwr_r_aa'] / count_row['mu_total_count_fwr_aa']
-    row['mu_freq_fwr_s_aa'] = row['mu_freq_fwr_s_aa'] / count_row['mu_total_count_fwr_aa']
+    if count_row['mu_total_count_fwr_aa'] != 0:
+        row['mu_freq_fwr_r_aa'] = row['mu_freq_fwr_r_aa'] / count_row['mu_total_count_fwr_aa']
+        row['mu_freq_fwr_s_aa'] = row['mu_freq_fwr_s_aa'] / count_row['mu_total_count_fwr_aa']
+    else:
+        row['mu_freq_fwr_r_aa'] = 0
+        row['mu_freq_fwr_s_aa'] = 0
     row['mu_freq_fwr_aa'] = row['mu_freq_fwr_r_aa'] + row['mu_freq_fwr_s_aa']
-    row['mu_freq_cdr_r_aa'] = row['mu_freq_cdr_r_aa'] / count_row['mu_total_count_cdr_aa']
-    row['mu_freq_cdr_s_aa'] = row['mu_freq_cdr_s_aa'] / count_row['mu_total_count_cdr_aa']
+
+    if count_row['mu_total_count_cdr_aa'] != 0:
+        row['mu_freq_cdr_r_aa'] = row['mu_freq_cdr_r_aa'] / count_row['mu_total_count_cdr_aa']
+        row['mu_freq_cdr_s_aa'] = row['mu_freq_cdr_s_aa'] / count_row['mu_total_count_cdr_aa']
+    else:
+        row['mu_freq_cdr_r_aa'] = 0
+        row['mu_freq_cdr_s_aa'] = 0
     row['mu_freq_cdr_aa'] = row['mu_freq_cdr_r_aa'] + row['mu_freq_cdr_s_aa']
 
-    row['mu_freq_fwr_r'] = row['mu_freq_fwr_r'] / count_row['mu_total_count_fwr']
-    row['mu_freq_fwr_s'] = row['mu_freq_fwr_s'] / count_row['mu_total_count_fwr']
+    if count_row['mu_total_count_fwr'] != 0:
+        row['mu_freq_fwr_r'] = row['mu_freq_fwr_r'] / count_row['mu_total_count_fwr']
+        row['mu_freq_fwr_s'] = row['mu_freq_fwr_s'] / count_row['mu_total_count_fwr']
+    else:
+        row['mu_freq_fwr_r'] = 0
+        row['mu_freq_fwr_s'] = 0
     row['mu_freq_fwr'] = row['mu_freq_fwr_r'] + row['mu_freq_fwr_s']
-    row['mu_freq_cdr_r'] = row['mu_freq_cdr_r'] / count_row['mu_total_count_cdr']
-    row['mu_freq_cdr_s'] = row['mu_freq_cdr_s'] / count_row['mu_total_count_cdr']
+
+    if count_row['mu_total_count_cdr'] != 0:
+        row['mu_freq_cdr_r'] = row['mu_freq_cdr_r'] / count_row['mu_total_count_cdr']
+        row['mu_freq_cdr_s'] = row['mu_freq_cdr_s'] / count_row['mu_total_count_cdr']
+    else:
+        row['mu_freq_cdr_r'] = 0
+        row['mu_freq_cdr_s'] = 0
     row['mu_freq_cdr'] = row['mu_freq_cdr_r'] + row['mu_freq_cdr_s']
-    
 
     # position frequencies
     for i in range(1,105):

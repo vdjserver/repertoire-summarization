@@ -2,5 +2,6 @@
 *.tar
 *.tsv
 *.zip
+*.csv
 repertoires.airr.json
 vdjserver_human_germline.airr.json

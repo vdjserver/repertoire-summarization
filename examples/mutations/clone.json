@@ -21,8 +21,7 @@
         "frequency"
       ],
       "levels": [
-        "repertoire",
-        "repertoire_group"
+        "clone"
       ],
       "filters": [ ]
     }

@@ -24,18 +24,19 @@ def test_sequence_frequency_sum_groups():
     '''
     for group in groups:
         group_id = group['repertoire_group_id']
+        rep_ids = [rep_obj['repertoire_id'] for rep_obj in group['repertoires']]
         for call_type in call_types:
             for level in levels:
-                filename = f'{group_id}.{processing_stage}.group.{call_type}.tsv'
+                filename = f'{group_id}.{processing_stage}.group.repertoires.{call_type}.tsv'
                 orig_df = pd.read_csv(os.path.join(curr_dir, filename), delimiter='\t')
                 for mode in modes:
                     for productive in productivity:
-                        df = orig_df[(orig_df['mode']==mode) & (orig_df['productive']==productive) & (orig_df['level']==level)]
-                        # print(f'{group_id}\t{call_type}\t{level}\t{productive}\t{df.loc[0,'sequence_frequency']}')
-                        assert df['sequence_frequency'].sum() == approx(1) or df['sequence_frequency'].sum() == 0, f"Expected the sum of"+\
-                            f"sequence_frequency to be equal to approx 1 or exactly 0. Instead: \n"+\
-                            f"∑(sequence_frequency) = {df['sequence_frequency'].sum()} \n"+\
-                            f"Variables: \n\tgroup_id:{group_id} \n\tcall_type:{call_type} \n\tlevel:{level} \n\tmode:{mode} \n\tproductive:{productive}"
+                        for rep_id in rep_ids:
+                            df = orig_df[(orig_df['mode']==mode) & (orig_df['productive']==productive) & (orig_df['level']==level) & (orig_df['repertoire_id']==rep_id)]
+                            assert df['sequence_frequency'].sum() == approx(1) or df['sequence_frequency'].sum() == 0, "Expected the sum of"+\
+                                "sequence_frequency to be equal to approx 1 or exactly 0. Instead: \n"+\
+                                f"∑(sequence_frequency) = {df['sequence_frequency'].sum()} \n"+\
+                                f"Variables: \n\tgroup_id:{group_id} \n\t repertoire_id:{rep_id} \n\tcall_type:{call_type} \n\tlevel:{level} \n\tmode:{mode} \n\tproductive:{productive}"
 
 def test_duplicate_frequency_sum_groups():
     '''
@@ -45,15 +46,16 @@ def test_duplicate_frequency_sum_groups():
     '''
     for group in groups:
         group_id = group['repertoire_group_id']
+        rep_ids = [rep_obj['repertoire_id'] for rep_obj in group['repertoires']]
         for call_type in call_types:
             for level in levels:
-                filename = f'{group_id}.{processing_stage}.group.{call_type}.tsv'
+                filename = f'{group_id}.{processing_stage}.group.repertoires.{call_type}.tsv'
                 orig_df = pd.read_csv(os.path.join(curr_dir, filename), delimiter='\t')
                 for mode in modes:
                     for productive in productivity:
-                        df = orig_df[(orig_df['mode']==mode) & (orig_df['productive']==productive) & (orig_df['level']==level)]
-                        # print(f'{group_id}\t{call_type}\t{level}\t{productive}\t{df.loc[0,'duplicate_frequency']}')
-                        assert df['duplicate_frequency'].sum() == approx(1) or df['duplicate_frequency'].sum() == 0, f"Expected the sum of"+\
-                            f"duplicate_frequency to be equal to approx 1 or exactly 0. Instead: \n"+\
-                            f"∑(duplicate_frequency) = {df['duplicate_frequency'].sum()} \n"+\
-                            f"Variables: \n\tgroup_id:{group_id} \n\tcall_type:{call_type} \n\tlevel:{level} \n\tmode:{mode} \n\tproductive:{productive}"
+                        for rep_id in rep_ids:
+                            df = orig_df[(orig_df['mode']==mode) & (orig_df['productive']==productive) & (orig_df['level']==level) & (orig_df['repertoire_id']==rep_id)]
+                            assert df['duplicate_frequency'].sum() == approx(1) or df['duplicate_frequency'].sum() == 0, f"Expected the sum of"+\
+                                f"duplicate_frequency to be equal to approx 1 or exactly 0. Instead: \n"+\
+                                f"∑(duplicate_frequency) = {df['duplicate_frequency'].sum()} \n"+\
+                                f"Variables: \n\tgroup_id:{group_id} \n\tcall_type:{call_type} \n\tlevel:{level} \n\tmode:{mode} \n\tproductive:{productive}"

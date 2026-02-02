@@ -289,41 +289,28 @@ def compute_group_combo(groupDict, counters, repertoire_counters):
                     compute_std(entry, repertoire_counters, 'sequence_frequency', N, groupDict, combo, level, mode, value)
                     compute_std(entry, repertoire_counters, 'duplicate_frequency', N, groupDict, combo, level, mode, value)
 
-def write_usage_output(id_name, id_value, stage, group_flag, counters, counters_productive):
+def write_usage_output(id_name, id_value, stage, group_flag, counters, counters_productive, repertoire_ids=None, group_id=None):
     """Output segment counts to TSV files"""
-
-    for gene in gene_fields:
-        if group_flag:
-            if stage:
-                filename = id_value + '.' + stage + '.group.' + gene + '.tsv'
-            else:
-                filename = id_value + '.group.' + gene + '.tsv'
-            writer = open(filename, 'w')
-            writer.write(id_name + '\tlevel\tmode\tproductive\tgene\tsequence_count\tduplicate_count\tsequence_frequency\tduplicate_frequency')
-            writer.write('\tN\tsequence_count_avg\tsequence_count_std\tsequence_frequency_avg\tsequence_frequency_std')
-            writer.write('\tduplicate_count_avg\tduplicate_count_std\tduplicate_frequency_avg\tduplicate_frequency_std\n')
-        else:
-            if stage:
-                filename = id_value + '.' + stage + '.' + gene + '.tsv'
-            else:
-                filename = id_value + '.' + gene + '.tsv'
-            writer = open(filename, 'w')
-            writer.write(id_name + '\tlevel\tmode\tproductive\tgene\tsequence_count\tduplicate_count\tsequence_frequency\tduplicate_frequency\n')
+    def write_bulk(counters, id_val, gene, group_flag, productive, group_id=None):
         for level in module_levels:
             for mode in calc_modes:
                 # output data
-                for value in counters[id_value][gene][level][mode]:
-                    entry = counters[id_value][gene][level][mode][value]
-                    writer.write(id_value + '\t')
+                for value in counters[id_val][gene][level][mode]:
+        
+                    entry = counters[id_val][gene][level][mode][value]
+                    writer.write(id_val + '\t')
+                    if group_id:
+                        writer.write(group_id + '\t')
                     writer.write(level + '\t')
                     writer.write(mode + '\t')
-                    writer.write('FALSE\t')
+                    writer.write(productive + '\t')
                     writer.write(value + '\t')
-                    writer.write(str(entry['sequence_count']) + '\t')
-                    writer.write(str(entry['duplicate_count']) + '\t')
-                    writer.write(str(entry['sequence_frequency']) + '\t')
-                    if group_flag:
-                        writer.write(str(entry['duplicate_frequency']) + '\t')
+                    if not group_flag:
+                        writer.write(str(entry['sequence_count']) + '\t')
+                        writer.write(str(entry['duplicate_count']) + '\t')
+                        writer.write(str(entry['sequence_frequency']) + '\t')
+                        writer.write(str(entry['duplicate_frequency']) + '\n')
+                    else:
                         writer.write(str(entry['N']) + '\t')
                         writer.write(str(entry['sequence_count_avg']) + '\t')
                         writer.write(str(entry['sequence_count_std']) + '\t')
@@ -333,70 +320,75 @@ def write_usage_output(id_name, id_value, stage, group_flag, counters, counters_
                         writer.write(str(entry['duplicate_count_std']) + '\t')
                         writer.write(str(entry['duplicate_frequency_avg']) + '\t')
                         writer.write(str(entry['duplicate_frequency_std']) + '\n')
-                    else:
-                        writer.write(str(entry['duplicate_frequency']) + '\n')
-                # output data
-                for value in counters_productive[id_value][gene][level][mode]:
-                    entry = counters_productive[id_value][gene][level][mode][value]
-                    writer.write(id_value + '\t')
-                    writer.write(level + '\t')
-                    writer.write(mode + '\t')
-                    writer.write('TRUE\t')
-                    writer.write(value + '\t')
-                    writer.write(str(entry['sequence_count']) + '\t')
-                    writer.write(str(entry['duplicate_count']) + '\t')
-                    writer.write(str(entry['sequence_frequency']) + '\t')
-                    if group_flag:
-                        writer.write(str(entry['duplicate_frequency']) + '\t')
-                        writer.write(str(entry['N']) + '\t')
-                        writer.write(str(entry['sequence_count_avg']) + '\t')
-                        writer.write(str(entry['sequence_count_std']) + '\t')
-                        writer.write(str(entry['sequence_frequency_avg']) + '\t')
-                        writer.write(str(entry['sequence_frequency_std']) + '\t')
-                        writer.write(str(entry['duplicate_count_avg']) + '\t')
-                        writer.write(str(entry['duplicate_count_std']) + '\t')
-                        writer.write(str(entry['duplicate_frequency_avg']) + '\t')
-                        writer.write(str(entry['duplicate_frequency_std']) + '\n')
-                    else:
-                        writer.write(str(entry['duplicate_frequency']) + '\n')
-        writer.close()
 
-def write_combo_output(id_name, id_value, stage, group_flag, counters, counters_productive):
+    if repertoire_ids and group_id:
+        for gene in gene_fields:
+            # filename
+            if stage:
+                filename = group_id + '.' + stage + '.group.repertoires.' + gene + '.tsv'
+            else:
+                filename = group_id + '.group.repertoires.' + gene + '.tsv'
+
+            # header
+            writer = open(filename, 'w')
+            writer.write(id_name+'\tgroup_id\tlevel\tmode\tproductive\tgene')
+            if not group_flag:
+                writer.write('\tsequence_count\tduplicate_count\tsequence_frequency\tduplicate_frequency\n')
+            else:
+                writer.write('\tN\tsequence_count_avg\tsequence_count_std\tsequence_frequency_avg\tsequence_frequency_std')
+                writer.write('\tduplicate_count_avg\tduplicate_count_std\tduplicate_frequency_avg\tduplicate_frequency_std\n')
+            
+            # write output
+            for rep in repertoire_ids:
+                rep_id = rep['repertoire_id']
+                write_bulk(counters, rep_id, gene, group_flag, 'FALSE', group_id)
+                write_bulk(counters_productive, rep_id, gene, group_flag, 'TRUE', group_id)
+            writer.close()
+
+    else:
+        for gene in gene_fields:
+            if group_flag:
+                # filename
+                if stage:
+                    filename = id_value + '.' + stage + '.group.' + gene + '.tsv'
+                else:
+                    filename = id_value + '.group.' + gene + '.tsv'
+                
+                # header
+                writer = open(filename, 'w')
+                writer.write(id_name+'\tlevel\tmode\tproductive\tgene')
+                writer.write('\tN\tsequence_count_avg\tsequence_count_std\tsequence_frequency_avg\tsequence_frequency_std')
+                writer.write('\tduplicate_count_avg\tduplicate_count_std\tduplicate_frequency_avg\tduplicate_frequency_std\n')
+                
+            else:
+                # filename
+                if stage:
+                    filename = id_value + '.' + stage + '.' + gene + '.tsv'
+                else:
+                    filename = id_value + '.' + gene + '.tsv'
+                
+                # header
+                writer = open(filename, 'w')
+                writer.write(id_name + '\tlevel\tmode\tproductive\tgene\tsequence_count\tduplicate_count\tsequence_frequency\tduplicate_frequency\n')
+            
+            # write output
+            write_bulk(counters, id_value, gene, group_flag, 'FALSE')
+            write_bulk(counters_productive, id_value, gene, group_flag, 'TRUE')
+            writer.close()
+
+def write_combo_output(id_name, id_value, stage, group_flag, counters, counters_productive, repertoire_ids=None, group_id=None):
     """Output segment combo counts to TSV files"""
-    for combo in combo_fields:
-        if group_flag:
-            if stage:
-                filename = id_value + '.' + stage + '.group.' + combo + '_combo.tsv'
-            else:
-                filename = id_value + '.group.' + combo + '_combo.tsv'
-        else:
-            if stage:
-                filename = id_value + '.' + stage + '.' + combo + '_combo.tsv'
-            else:
-                filename = id_value + '.' + combo + '_combo.tsv'
-        writer = open(filename, 'w')
-        writer.write(id_name + '\tlevel\tmode\tproductive\tcombo\t')
-        if 'v' in combo:
-            writer.write('v_level\t')
-        if 'd' in combo:
-            writer.write('d_level\t')
-        if 'j' in combo:
-            writer.write('j_level\t')
-        writer.write('sequence_count\tduplicate_count\tsequence_frequency\tduplicate_frequency')
-        if group_flag:
-            writer.write('\tN\tsequence_count_avg\tsequence_count_std\tsequence_frequency_avg\tsequence_frequency_std')
-            writer.write('\tduplicate_count_avg\tduplicate_count_std\tduplicate_frequency_avg\tduplicate_frequency_std\n')
-        else:
-            writer.write('\n')
-        for level in counters[id_value][combo]:
+    def write_bulk(counters, id_val, combo, group_flag, productive, group_id=None):
+        for level in counters[id_val][combo]:
             for mode in calc_modes:
-                # output data
-                for value in counters[id_value][combo][level][mode]:
-                    entry = counters[id_value][combo][level][mode][value]
-                    writer.write(id_value + '\t')
+                for value in counters[id_val][combo][level][mode]:
+                    entry = counters[id_val][combo][level][mode][value]
+                    writer.write(id_val + '\t')
+                    if group_id:
+                        writer.write(group_id + '\t')
                     writer.write(level + '\t')
                     writer.write(mode + '\t')
-                    writer.write('FALSE\t')
+                    writer.write(productive+'\t')
                     writer.write(value + '\t')
                     l = value.split('|')
                     idx = 0
@@ -409,11 +401,12 @@ def write_combo_output(id_name, id_value, stage, group_flag, counters, counters_
                     if 'j' in combo:
                         writer.write(l[idx] + '\t')
                         idx += 1
-                    writer.write(str(entry['sequence_count']) + '\t')
-                    writer.write(str(entry['duplicate_count']) + '\t')
-                    writer.write(str(entry['sequence_frequency']) + '\t')
-                    if group_flag:
-                        writer.write(str(entry['duplicate_frequency']) + '\t')
+                    if not group_flag:
+                        writer.write(str(entry['sequence_count']) + '\t')
+                        writer.write(str(entry['duplicate_count']) + '\t')
+                        writer.write(str(entry['sequence_frequency']) + '\t')
+                        writer.write(str(entry['duplicate_frequency']) + '\n')
+                    else:
                         writer.write(str(entry['N']) + '\t')
                         writer.write(str(entry['sequence_count_avg']) + '\t')
                         writer.write(str(entry['sequence_count_std']) + '\t')
@@ -423,46 +416,71 @@ def write_combo_output(id_name, id_value, stage, group_flag, counters, counters_
                         writer.write(str(entry['duplicate_count_std']) + '\t')
                         writer.write(str(entry['duplicate_frequency_avg']) + '\t')
                         writer.write(str(entry['duplicate_frequency_std']) + '\n')
-                    else:
-                        writer.write(str(entry['duplicate_frequency']) + '\n')
-        # productive
-        for level in counters_productive[id_value][combo]:
-            for mode in calc_modes:
-                for value in counters_productive[id_value][combo][level][mode]:
-                    entry = counters_productive[id_value][combo][level][mode][value]
-                    writer.write(id_value + '\t')
-                    writer.write(level + '\t')
-                    writer.write(mode + '\t')
-                    writer.write('TRUE\t')
-                    writer.write(value + '\t')
-                    l = value.split('|')
-                    idx = 0
-                    if 'v' in combo:
-                        writer.write(l[idx] + '\t')
-                        idx += 1
-                    if 'd' in combo:
-                        writer.write(l[idx] + '\t')
-                        idx += 1
-                    if 'j' in combo:
-                        writer.write(l[idx] + '\t')
-                        idx += 1
-                    writer.write(str(entry['sequence_count']) + '\t')
-                    writer.write(str(entry['duplicate_count']) + '\t')
-                    writer.write(str(entry['sequence_frequency']) + '\t')
-                    if group_flag:
-                        writer.write(str(entry['duplicate_frequency']) + '\t')
-                        writer.write(str(entry['N']) + '\t')
-                        writer.write(str(entry['sequence_count_avg']) + '\t')
-                        writer.write(str(entry['sequence_count_std']) + '\t')
-                        writer.write(str(entry['sequence_frequency_avg']) + '\t')
-                        writer.write(str(entry['sequence_frequency_std']) + '\t')
-                        writer.write(str(entry['duplicate_count_avg']) + '\t')
-                        writer.write(str(entry['duplicate_count_std']) + '\t')
-                        writer.write(str(entry['duplicate_frequency_avg']) + '\t')
-                        writer.write(str(entry['duplicate_frequency_std']) + '\n')
-                    else:
-                        writer.write(str(entry['duplicate_frequency']) + '\n')
-        writer.close()
+
+    if repertoire_ids and group_id:
+        for combo in combo_fields:
+            # filename
+            if stage:
+                filename = group_id + '.' + stage + '.group.repertoires.' + combo + '_combo.tsv'
+            else:
+                filename = group_id + '.group.repertoires.' + combo + '_combo.tsv'
+
+            # header
+            writer = open(filename, 'w')
+            writer.write(id_name + '\tgroup_id\tlevel\tmode\tproductive\tcombo\t')
+            if 'v' in combo:
+                writer.write('v_level\t')
+            if 'd' in combo:
+                writer.write('d_level\t')
+            if 'j' in combo:
+                writer.write('j_level\t')
+            if not group_flag:
+                writer.write('sequence_count\tduplicate_count\tsequence_frequency\tduplicate_frequency\n')
+            else:
+                writer.write('\tN\tsequence_count_avg\tsequence_count_std\tsequence_frequency_avg\tsequence_frequency_std')
+                writer.write('\tduplicate_count_avg\tduplicate_count_std\tduplicate_frequency_avg\tduplicate_frequency_std\n')
+
+            # write output
+            for rep in repertoire_ids:
+                rep_id = rep['repertoire_id']
+                write_bulk(counters, rep_id, combo, group_flag, 'FALSE', group_id)
+                write_bulk(counters_productive, rep_id, combo, group_flag, 'TRUE', group_id)
+            writer.close()
+
+    else:
+        for combo in combo_fields:
+            # filename
+            if group_flag:
+                if stage:
+                    filename = id_value + '.' + stage + '.group.' + combo + '_combo.tsv'
+                else:
+                    filename = id_value + '.group.' + combo + '_combo.tsv'
+            else:
+                if stage:
+                    filename = id_value + '.' + stage + '.' + combo + '_combo.tsv'
+                else:
+                    filename = id_value + '.' + combo + '_combo.tsv'
+            
+            # header
+            writer = open(filename, 'w')
+            writer.write(id_name + '\tlevel\tmode\tproductive\tcombo\t')
+            if 'v' in combo:
+                writer.write('v_level\t')
+            if 'd' in combo:
+                writer.write('d_level\t')
+            if 'j' in combo:
+                writer.write('j_level\t')
+            if not group_flag:
+                writer.write('sequence_count\tduplicate_count\tsequence_frequency\tduplicate_frequency\n')
+            else:
+                writer.write('\tN\tsequence_count_avg\tsequence_count_std\tsequence_frequency_avg\tsequence_frequency_std')
+                writer.write('\tduplicate_count_avg\tduplicate_count_std\tduplicate_frequency_avg\tduplicate_frequency_std\n')
+
+            # write output
+            write_bulk(counters, id_value, combo, group_flag, 'FALSE')
+            write_bulk(counters_productive, id_value, combo, group_flag, 'TRUE')
+            writer.close()
+        
 
 def initialize_calculation_module(inputDict, metadataDict, headerMapping):
     """Perform any module initialization"""
@@ -604,7 +622,7 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
                     rep_id = rep['repertoire_id']
                     compute_usage_frequency(segment_counters[group][rep_id])
                     compute_usage_frequency(segment_counters_productive[group][rep_id])
-
+                    write_usage_output('repertoire_id', rep_id, inputDict.get(defaults.processing_stage_key), False, segment_counters[group], segment_counters_productive[group], inputDict[defaults.groups_key][group]['repertoires'], group)
             for group in inputDict[defaults.groups_key]:
                 compute_group_usage(inputDict[defaults.groups_key][group], group_segment_counters[group], segment_counters[group])
                 compute_group_usage(inputDict[defaults.groups_key][group], group_segment_counters_productive[group], segment_counters_productive[group])
@@ -624,6 +642,7 @@ def finalize_calculation_module(inputDict, metadataDict, outputSpec, calc):
                     rep_id = rep['repertoire_id']
                     compute_combo_frequency(combo_counters[group][rep_id])
                     compute_combo_frequency(combo_counters_productive[group][rep_id])
+                    write_combo_output('repertoire_id', rep_id, inputDict.get(defaults.processing_stage_key), False, combo_counters[group], combo_counters_productive[group], inputDict[defaults.groups_key][group]['repertoires'], group)
             for group in inputDict[defaults.groups_key]:
                 compute_group_combo(inputDict[defaults.groups_key][group], group_combo_counters[group], combo_counters[group])
                 compute_group_combo(inputDict[defaults.groups_key][group], group_combo_counters_productive[group], combo_counters_productive[group])
