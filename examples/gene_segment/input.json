@@ -1,7 +1,7 @@
 {
     "metadata": "repertoires.airr.json",
     "groups": "groups.airr.yaml",
-    "germline": "/work/data/germlines/vdjserver_germline.airr.json",
+    "germline": "vdjserver_human_germline.airr.json",
     "processing_stage": "igblast.makedb",
     "repertoires": [
         "2648490830777881066-242ac113-0001-012",

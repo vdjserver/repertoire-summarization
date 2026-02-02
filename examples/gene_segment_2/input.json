@@ -1,5 +1,5 @@
 {
-    "metadata": "repertoire.airr.json",
+    "metadata": "repertoires.airr.json",
     "groups": "groups.airr.yaml",
     "germline": "vdjserver_human_germline.airr.json",
     "repertoires": [
