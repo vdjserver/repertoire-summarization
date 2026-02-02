@@ -27,8 +27,7 @@
         "j_call",
         "j_gene",
         "j_subgroup"
-      ],
-      "filters": [ ]
+      ]
     }
   ]
 }

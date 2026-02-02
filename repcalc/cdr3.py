@@ -989,7 +989,7 @@ def initialize_calculation_module(inputDict, metadataDict, headerMapping):
             group_dist_counters_productive_total[group] = { obj: {} for obj in length_levels }
             
             rep_list = [rep_id['repertoire_id'] for rep_id in inputDict[defaults.groups_key][group]['repertoires']]
-            print("Repertoire List: ", group, rep_list)
+            #print("Repertoire List: ", group, rep_list)
             for rep_id in rep_list:
                 group_cdr3_histograms[group][rep_id] = { obj: [] for obj in length_levels }
                 group_cdr3_histograms_productive[group][rep_id] = { obj: [] for obj in length_levels }
@@ -1100,9 +1100,8 @@ def process_record(inputDict, metadataDict, currentFile, calc, fields):
         germline = inputDict.get(defaults.germline_key)
         groups = metadata.groupsWithRepertoire(inputDict, rep_id)
 
-        if "productive" in calc['filters']:
-            if not fields.get('productive'):
-                return
+        if not fields.get('productive'):
+            return
 
         for l in calc['levels']:
             cdr3_entry = None

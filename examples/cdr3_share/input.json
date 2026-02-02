@@ -25,8 +25,7 @@
         {
             "type": "CDR3",
             "operations": [ "shared" ], 
-            "levels": [ "aa", "nucleotide", "v,aa", "v,nucleotide", "vj,aa", "vj,nucleotide" ], 
-            "filters": [ "productive" ]
+            "levels": [ "aa", "nucleotide", "v,aa", "v,nucleotide", "vj,aa", "vj,nucleotide" ]
         }
     ]
 }

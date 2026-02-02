@@ -15,8 +15,7 @@
         {
             "type": "gene_segment",
             "operations": [ "usage" ], 
-            "levels": [ "allele", "gene", "subgroup" ], 
-            "filters": [ "productive" ]
+            "levels": [ "allele", "gene", "subgroup" ]
         }
     ]
 }
