@@ -12,6 +12,8 @@ RUN pip3 uninstall -y airr
 RUN git clone https://github.com/airr-community/airr-standards.git
 RUN cd airr-standards && git checkout release-1.5 && cd lang/python && pip3 install .
 
+RUN pip3 install pytest
+
 # Copy source
 RUN mkdir /repcalc-root
 COPY . /repcalc-root
