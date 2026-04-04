@@ -56,11 +56,22 @@ def getGermlineSet(germline_set_id):
     return None
 
 def getGene(allele_description):
+    if allele_description['locus'] is None:
+        print('locus is None')
+        print(allele_description)
+    if allele_description['sequence_type'] is None:
+        print('sequence_type is None')
+        print(allele_description)
+    if allele_description['gene_designation'] is None:
+        return allele_description['locus'] + allele_description['sequence_type']
     return allele_description['locus'] + allele_description['sequence_type'] + allele_description['gene_designation']
 
 def getSubgroup(allele_description):
     if allele_description['subgroup_designation'] is None:
-        return allele_description['locus'] + allele_description['sequence_type'] + allele_description['gene_designation']
+        if allele_description['gene_designation'] is None:
+            return allele_description['locus'] + allele_description['sequence_type']
+        else:
+            return allele_description['locus'] + allele_description['sequence_type'] + allele_description['gene_designation']
     else:
         return allele_description['locus'] + allele_description['sequence_type'] + allele_description['subgroup_designation']
 
