@@ -55,25 +55,30 @@ def getGermlineSet(germline_set_id):
     """Return germline set from its identifier"""
     return None
 
-def getGene(allele_description):
+def getSubgroup(allele_description):
     if allele_description['locus'] is None:
-        print('locus is None')
+        print('ERROR: locus is None')
         print(allele_description)
     if allele_description['sequence_type'] is None:
-        print('sequence_type is None')
+        print('ERROR: sequence_type is None')
         print(allele_description)
-    if allele_description['gene_designation'] is None:
-        return allele_description['locus'] + allele_description['sequence_type']
-    return allele_description['locus'] + allele_description['sequence_type'] + allele_description['gene_designation']
-
-def getSubgroup(allele_description):
     if allele_description['subgroup_designation'] is None:
-        if allele_description['gene_designation'] is None:
-            return allele_description['locus'] + allele_description['sequence_type']
-        else:
-            return allele_description['locus'] + allele_description['sequence_type'] + allele_description['gene_designation']
+        return allele_description['locus'] + allele_description['sequence_type']
     else:
         return allele_description['locus'] + allele_description['sequence_type'] + allele_description['subgroup_designation']
+
+def getGene(allele_description):
+    n = getSubgroup(allele_description)
+    # TRG is special with no subgroup in the name because one gene per subgroup
+    if allele_description['locus'] == 'TRG' and allele_description['sequence_type'] == 'V':
+        n = allele_description['locus'] + allele_description['sequence_type']
+    if allele_description['gene_designation'] is None:
+        return n
+    else:
+        if allele_description['functional'] == True:
+            return n + '-' + allele_description['gene_designation']
+        else:
+            return n + '/' + allele_description['gene_designation']
 
 def getDisplayName(germline, allele_call, level):
     """Return display name for allele call"""
