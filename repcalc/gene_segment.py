@@ -437,7 +437,7 @@ def write_combo_output(id_name, id_value, stage, group_flag, counters, counters_
             if not group_flag:
                 writer.write('sequence_count\tduplicate_count\tsequence_frequency\tduplicate_frequency\n')
             else:
-                writer.write('\tN\tsequence_count_avg\tsequence_count_std\tsequence_frequency_avg\tsequence_frequency_std')
+                writer.write('N\tsequence_count_avg\tsequence_count_std\tsequence_frequency_avg\tsequence_frequency_std')
                 writer.write('\tduplicate_count_avg\tduplicate_count_std\tduplicate_frequency_avg\tduplicate_frequency_std\n')
 
             # write output
@@ -473,7 +473,7 @@ def write_combo_output(id_name, id_value, stage, group_flag, counters, counters_
             if not group_flag:
                 writer.write('sequence_count\tduplicate_count\tsequence_frequency\tduplicate_frequency\n')
             else:
-                writer.write('\tN\tsequence_count_avg\tsequence_count_std\tsequence_frequency_avg\tsequence_frequency_std')
+                writer.write('N\tsequence_count_avg\tsequence_count_std\tsequence_frequency_avg\tsequence_frequency_std')
                 writer.write('\tduplicate_count_avg\tduplicate_count_std\tduplicate_frequency_avg\tduplicate_frequency_std\n')
 
             # write output
