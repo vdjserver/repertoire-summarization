@@ -122,7 +122,13 @@ def apply_filter(inputDict, group, fields):
         elif op == '>=':
             return field_value >= check_value
         elif op == 'contains':
-            return check_value in field_value
+            if isinstance(field_value, list):
+                for v in field_value:
+                    if check_value in v:
+                        return True
+                return False
+            else:
+                return check_value in field_value
         else:
             return False
 
